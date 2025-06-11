@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
-export const passwordHash = async (password: string): Promise<string> => {
+export const hashPassword = async (password: string): Promise<string> => {
   try {
     if (!password) {
       throw new Error("Password is required");
@@ -20,7 +20,7 @@ export const passwordHash = async (password: string): Promise<string> => {
   }
 };
 
-export const passwordCompare = async (
+export const comparePassword = async (
   password: string,
   hashedPassword: string
 ): Promise<boolean> => {
