@@ -6,7 +6,7 @@ UNPLAN is a modern travel platform that helps users discover, plan, and book uni
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 with App Router
+- **Frontend**: Next.js 15 with App Router
 - **Backend**: Next.js API Routes
 - **Authentication**: AuthJS (NextAuth.js)
 - **Database**: PostgreSQL

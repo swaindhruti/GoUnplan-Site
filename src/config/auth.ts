@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { comparePassword } from "@/utils/passwordUtils";
+import { Role } from "@/types/auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -60,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.role = user.role;
       }
       return token;
     },
@@ -67,6 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
+        session.user.role = token.role as Role;
       }
       return session;
     },
