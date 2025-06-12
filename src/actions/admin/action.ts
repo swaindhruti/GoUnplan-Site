@@ -1,8 +1,10 @@
+"use server";
+
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/roleGaurd";
 import { Role } from "@/types/auth";
 
-export const showAllUsers = async () => {
+export const getAllUsers = async () => {
   const session = await requireAdmin();
   if (!session) return { error: "Unauthorized" };
 
@@ -17,6 +19,10 @@ export const showAllUsers = async () => {
         createdAt: true,
       },
     });
+    console.log("Fetched users:", users); // Debugging line to check fetched users
+    if (!users || users.length === 0) {
+      return { message: "No users found" };
+    }
     return { users };
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -85,5 +91,67 @@ export const getHostApplications = async () => {
   } catch (error) {
     console.error("Error fetching host applications:", error);
     return { error: "Failed to fetch host applications" };
+  }
+};
+
+export const approveHostApplication = async (email: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email: email } });
+    if (!user) return { error: "User not found" };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { role: "HOST", appliedForHost: false },
+    });
+
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error("Error approving host application:", error);
+    return { error: "Failed to approve host application" };
+  }
+};
+
+export const rejectHostApplication = async (email: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email: email } });
+    if (!user) return { error: "User not found" };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { appliedForHost: false },
+    });
+
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error("Error rejecting host application:", error);
+    return { error: "Failed to reject host application" };
+  }
+};
+
+export const getAllHosts = async () => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hosts = await prisma.user.findMany({
+      where: { role: "HOST" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        createdAt: true,
+      },
+    });
+    return { hosts };
+  } catch (error) {
+    console.error("Error fetching hosts:", error);
+    return { error: "Failed to fetch hosts" };
   }
 };

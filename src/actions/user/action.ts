@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/roleGaurd";
 
@@ -14,6 +16,7 @@ export const getUserProfile = async (email: string) => {
         email: true,
         role: true,
         phone: true,
+        bio: true,
         createdAt: true,
       },
     });
