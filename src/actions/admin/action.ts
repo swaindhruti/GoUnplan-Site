@@ -59,3 +59,31 @@ export const updateUserRole = async (email: string, role: Role) => {
     return { error: "Failed to update user role" };
   }
 };
+
+export const getHostApplications = async () => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hostApplicants = await prisma.user.findMany({
+      where: { appliedForHost: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        createdAt: true,
+        role: true,
+      },
+    });
+
+    if (!hostApplicants || hostApplicants.length === 0) {
+      return { message: "No host applications found" };
+    }
+
+    return { hostApplicants };
+  } catch (error) {
+    console.error("Error fetching host applications:", error);
+    return { error: "Failed to fetch host applications" };
+  }
+};

@@ -14,17 +14,85 @@ enum Role {
   ADMIN
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum TravelPlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  bio       String?  @default("Travelling with vibe")
-  phone     String   @unique
-  password  String
-  role      Role     @default(USER)
-  image     String?  @default("https://avatar.iran.liara.run/public")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  bio            String?  @default("Travelling with vibe")
+  phone          String   @unique
+  password       String
+  role           Role     @default(USER)
+  image          String?  @default("https://avatar.iran.liara.run/public")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  appliedForHost Boolean  @default(false)
+
+  hostProfile HostProfile?
+  bookings    Booking[]
 
   @@map("users")
+}
+
+model HostProfile {
+  hostId      String   @id @default(cuid())
+  description String
+  image       String?  @default("https://avatar.iran.liara.run/public")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  travelPlans TravelPlans[]
+
+  @@map("host_profiles")
+}
+
+model TravelPlans {
+  travelPlanId       String           @id @default(cuid())
+  title              String
+  description        String
+  includedActivities String[]
+  restrictions       String[]
+  noOfDays           Int
+  hostId             String
+  price              Int
+  country            String
+  state              String
+  city               String
+  status             TravelPlanStatus @default(INACTIVE)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  host     HostProfile @relation(fields: [hostId], references: [hostId])
+  bookings Booking[]
+
+  @@map("travel_plans")
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  userId       String
+  travelPlanId String
+  startDate    DateTime
+  endDate      DateTime
+  totalPrice   Int
+  participants Int           @default(1)
+  status       BookingStatus @default(PENDING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id])
+  travelPlan TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId])
+
+  @@map("bookings")
 }

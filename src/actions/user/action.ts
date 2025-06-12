@@ -63,3 +63,27 @@ export const updateUserProfile = async (
     return { error: "Failed to update user profile" };
   }
 };
+
+export const applyForHost = async (email: string) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email: email } });
+    if (!user) return { error: "User not found" };
+
+    if (user.role === "HOST") return { error: "Already a host" };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { appliedForHost: true },
+    });
+
+    if (!updatedUser) return { error: "Failed to apply for host" };
+
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error("Error applying for host:", error);
+    return { error: "Failed to apply for host" };
+  }
+};
