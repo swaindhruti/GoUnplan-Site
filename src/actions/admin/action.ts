@@ -19,7 +19,6 @@ export const getAllUsers = async () => {
         createdAt: true,
       },
     });
-    console.log("Fetched users:", users); // Debugging line to check fetched users
     if (!users || users.length === 0) {
       return { message: "No users found" };
     }
