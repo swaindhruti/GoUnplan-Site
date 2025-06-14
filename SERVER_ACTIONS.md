@@ -30,3 +30,20 @@
 - `getHostApplications` - Gets all pending host applications
 - `approveHostApplication` - Approves a host application
 - `rejectHostApplication` - Rejects a host application
+
+### Buisness Management
+
+- `getTotalRevenue` - Calculates total confirmed and refund revenue by the platform
+- `refundBooking` - Update the DB for bookings after a refund is completed by Uplan Admin
+
+## Host Actions
+
+### Host Management
+
+- `getHostDetails` - Fetches details about a specific host
+- `updateHostProfile` - Updates a host's profile information (name, bio, etc.)
+
+### Travel Plan Management
+
+- `createTravelPlan` - Creates a new travel plan for a host
+- `getHostTravelPlansByStatus` - Retrieves travel plans created by a host filtered by status (ACTIVE/INACTIVE)
