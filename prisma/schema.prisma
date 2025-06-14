@@ -18,7 +18,7 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
-  COMPLETED
+  REFUNDED
 }
 
 enum TravelPlanStatus {
@@ -48,6 +48,8 @@ model HostProfile {
   hostId      String   @id @default(cuid())
   description String
   image       String?  @default("https://avatar.iran.liara.run/public")
+  hostMobile  String
+  hostEmail   String   @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

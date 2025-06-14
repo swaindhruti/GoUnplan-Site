@@ -154,3 +154,53 @@ export const getAllHosts = async () => {
     return { error: "Failed to fetch hosts" };
   }
 };
+
+export const getTotalRevenue = async () => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const totalSales = await prisma.booking.aggregate({
+      where: { status: "CONFIRMED" },
+      _sum: { totalPrice: true },
+      _count: { id: true },
+    });
+
+    const refundAmmount = await prisma.booking.aggregate({
+      where: { status: "CANCELLED" },
+      _sum: { refundAmount: true },
+      _count: { id: true },
+    });
+
+    return { totalSales, refundAmmount };
+  } catch (error) {
+    console.error("Error fetching total sales:", error);
+    return { error: "Failed to fetch sales data" };
+  }
+};
+
+export const refundBooking = async (bookingId: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+    if (!booking) return { error: "Booking not found" };
+
+    if (booking.status !== "CONFIRMED") {
+      return { error: "Only completed bookings can be refunded" };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: { status: "REFUNDED", refundAmount: booking.totalPrice },
+    });
+
+    return { success: true, booking: updatedBooking };
+  } catch (error) {
+    console.error("Error processing refund:", error);
+    return { error: "Failed to process refund" };
+  }
+};
