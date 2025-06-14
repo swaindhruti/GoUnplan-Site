@@ -214,63 +214,33 @@ export const bookTravelPlan = async (
   }
 };
 
-export const getUserBookings = async (userId: string) => {
-  const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-  if (session.user.id !== userId) return { error: "Unauthorized" };
-
-  try {
-    const bookings = await prisma.booking.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        travelPlan: {
-          select: {
-            title: true,
-            description: true,
-            country: true,
-            state: true,
-            city: true,
-            noOfDays: true,
-            host: {
-              select: {
-                user: {
-                  select: {
-                    name: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return { success: true, bookings };
-  } catch (error) {
-    console.error("Error fetching bookings:", error);
-    return { error: "Failed to fetch bookings" };
-  }
-};
-
-export const getBookingsByStatus = async (
+export const getUserBookings = async (
   userId: string,
-  status: BookingStatus
+  status?: BookingStatus
 ) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
   if (session.user.id !== userId) return { error: "Unauthorized" };
 
   try {
+    const whereClause: { userId: string; status?: BookingStatus } = { userId };
+    if (status) {
+      whereClause.status = status;
+    }
+
     const bookings = await prisma.booking.findMany({
-      where: {
-        userId,
-        status,
-      },
-      include: {
+      where: whereClause,
+      select: {
+        id: true,
+        startDate: true,
+        endDate: true,
+        participants: true,
+        pricePerPerson: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
+        cancelledAt: true,
+        refundAmount: true,
         travelPlan: {
           select: {
             title: true,
@@ -285,6 +255,7 @@ export const getBookingsByStatus = async (
                 user: {
                   select: {
                     name: true,
+                    email: true,
                     image: true,
                   },
                 },
@@ -293,14 +264,33 @@ export const getBookingsByStatus = async (
           },
         },
       },
-      orderBy: { startDate: "desc" },
+      orderBy: status ? { startDate: "desc" } : { createdAt: "desc" },
     });
 
-    return { success: true, bookings };
+    const statusMessage = status
+      ? `Found ${bookings.length} ${status.toLowerCase()} bookings`
+      : undefined;
+
+    return {
+      success: true,
+      bookings,
+      message: statusMessage,
+    };
   } catch (error) {
-    console.error(`Error fetching ${status} bookings:`, error);
-    return { error: `Failed to fetch ${status} bookings` };
+    console.error("Error fetching bookings:", error);
+    return {
+      error: status
+        ? `Failed to fetch ${status} bookings`
+        : "Failed to fetch bookings",
+    };
   }
+};
+
+export const getBookingsByStatus = async (
+  userId: string,
+  status: BookingStatus
+) => {
+  return getUserBookings(userId, status);
 };
 
 export const getBookingDetails = async (userId: string, bookingId: string) => {
