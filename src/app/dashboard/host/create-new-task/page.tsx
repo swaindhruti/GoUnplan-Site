@@ -1,5 +1,11 @@
+import { CreateDestinationForm } from "@/components/global/contactForm";
+
 const CreateNewTask = () => {
-  return <>hi</>;
+  return (
+    <>
+      <CreateDestinationForm />
+    </>
+  );
 };
 
 export default CreateNewTask;
