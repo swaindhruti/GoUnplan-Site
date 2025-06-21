@@ -156,9 +156,6 @@ export const getAllHosts = async () => {
 };
 
 export const getTotalRevenue = async () => {
-  const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
-
   try {
     const totalSales = await prisma.booking.aggregate({
       where: { status: "CONFIRMED" },
@@ -166,13 +163,16 @@ export const getTotalRevenue = async () => {
       _count: { id: true },
     });
 
-    const refundAmmount = await prisma.booking.aggregate({
+    const refundAmount = await prisma.booking.aggregate({
       where: { status: "CANCELLED" },
       _sum: { refundAmount: true },
       _count: { id: true },
     });
 
-    return { totalSales, refundAmmount };
+    return {
+      totalSales,
+      refundAmount,
+    };
   } catch (error) {
     console.error("Error fetching total sales:", error);
     return { error: "Failed to fetch sales data" };
