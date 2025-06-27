@@ -112,27 +112,65 @@ export const updateUserProfile = async (
   }
 };
 
-export const applyForHost = async (email: string) => {
+// In actions/user/action.ts
+export const applyForHost = async (
+  email: string,
+  hostData?: {
+    description?: string;
+    image?: string;
+    hostMobile?: string;
+  }
+) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) {
+    return { success: false, error: "Authentication required" };
+  }
 
   try {
-    const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
-
-    if (user.role === "HOST") return { error: "Already a host" };
-
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: { appliedForHost: true },
+    const user = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        appliedForHost: true,
+        hostProfile: {
+          create: {
+            description: hostData?.description || "",
+            hostEmail: email,
+            hostMobile: hostData?.hostMobile || "",
+          },
+        },
+      },
     });
 
-    if (!updatedUser) return { error: "Failed to apply for host" };
-
-    return { success: true, user: updatedUser };
+    return {
+      success: true,
+      user,
+    };
   } catch (error) {
     console.error("Error applying for host:", error);
-    return { error: "Failed to apply for host" };
+    return {
+      success: false,
+      error: "Failed to apply for host status",
+    };
+  }
+};
+
+export const hasAppliedForHost = async (email: string) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+      select: { appliedForHost: true },
+    });
+
+    if (!user) return { error: "User not found" };
+
+    return { success: true, hasApplied: user.appliedForHost };
+  } catch (error) {
+    console.error("Error checking host application status:", error);
+    return { error: "Failed to check host application status" };
   }
 };
 

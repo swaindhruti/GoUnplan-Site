@@ -488,7 +488,7 @@ export default function UserDashboard() {
 
           {activeTab === "explore" && (
             <div className="mt-6">
-              <Link href="/explore">
+              <Link href="/trips">
                 <Button className="bg-purple-600 text-white hover:bg-purple-700">
                   Browse Available Trips
                 </Button>

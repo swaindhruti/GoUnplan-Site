@@ -2,10 +2,8 @@ import { HostLanding } from "@/components/host/hostDashboard";
 import { HostRegistration } from "@/components/host/hostRegistration";
 import { requireUser } from "@/lib/roleGaurd";
 import { isHost } from "@/lib/roleGaurd";
-// import Link from "next/link";
 
 export default async function HostDashboard() {
-  // const authSession = await requireHost();
   const userSession = await requireUser();
 
   console.log("kk", userSession.user);
