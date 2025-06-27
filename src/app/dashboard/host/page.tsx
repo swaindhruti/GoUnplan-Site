@@ -1,6 +1,7 @@
 import { HostLanding } from "@/components/host/hostDashboard";
 import { HostRegistration } from "@/components/host/hostRegistration";
 import { requireUser } from "@/lib/roleGaurd";
+import { isHost } from "@/lib/roleGaurd";
 // import Link from "next/link";
 
 export default async function HostDashboard() {
@@ -11,7 +12,7 @@ export default async function HostDashboard() {
 
   return (
     <>
-      {userSession.user.role === "HOST" ? (
+      {isHost(userSession.user.role) ? (
         <>
           <HostLanding
             hostData={{
@@ -19,7 +20,7 @@ export default async function HostDashboard() {
               name: userSession.user.name!,
               email: userSession.user.email!,
               image: userSession.user.image!,
-              role: userSession.user.role as "HOST" | "ADMIN" | "USER"
+              role: userSession.user.role as "HOST" | "ADMIN" | "USER",
             }}
           />
         </>

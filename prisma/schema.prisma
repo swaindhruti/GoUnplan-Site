@@ -8,6 +8,85 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  bio            String?      @default("Travelling with vibe")
+  phone          String       @unique
+  password       String
+  role           Role         @default(USER)
+  image          String?      @default("https://avatar.iran.liara.run/public")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  appliedForHost Boolean      @default(false)
+  bookings       Booking[]
+  hostProfile    HostProfile?
+
+  @@map("users")
+}
+
+model HostProfile {
+  hostId      String        @id @default(cuid())
+  description String?
+  image       String?       @default("https://avatar.iran.liara.run/public")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  hostEmail   String        @unique
+  hostMobile  String
+  user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  travelPlans TravelPlans[]
+
+  @@map("host_profiles")
+}
+
+model TravelPlans {
+  travelPlanId       String           @id @default(cuid())
+  title              String
+  description        String
+  includedActivities String[]
+  restrictions       String[]
+  noOfDays           Int
+  hostId             String
+  price              Int
+  country            String
+  state              String
+  city               String
+  status             TravelPlanStatus @default(INACTIVE)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  maxParticipants    Int              @default(10)
+  destination        String?
+  filters            String[]         @default([])
+  languages          String[]         @default([])
+  endDate            DateTime?
+  startDate          DateTime?
+  bookings           Booking[]
+  host               HostProfile      @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+
+  @@map("travel_plans")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  userId         String
+  travelPlanId   String
+  startDate      DateTime
+  endDate        DateTime
+  totalPrice     Int
+  participants   Int           @default(1)
+  status         BookingStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  cancelledAt    DateTime?
+  pricePerPerson Int
+  refundAmount   Int           @default(0)
+  travelPlan     TravelPlans   @relation(fields: [travelPlanId], references: [travelPlanId])
+  user           User          @relation(fields: [userId], references: [id])
+
+  @@map("bookings")
+}
+
 enum Role {
   USER
   HOST
@@ -24,87 +103,4 @@ enum BookingStatus {
 enum TravelPlanStatus {
   ACTIVE
   INACTIVE
-}
-
-model User {
-  id             String       @id @default(cuid())
-  email          String       @unique
-  name           String
-  bio            String?      @default("Travelling with vibe")
-  phone          String       @unique
-  password       String
-  role           Role         @default(USER)
-  image          String?      @default("https://avatar.iran.liara.run/public")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  appliedForHost Boolean      @default(false)
-  hostProfile    HostProfile?
-  bookings       Booking[]
-
-  @@map("users")
-}
-
-model HostProfile {
-  hostId      String   @id @default(cuid())
-  description String?
-  image       String?  @default("https://avatar.iran.liara.run/public")
-  hostMobile  String
-  hostEmail   String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  travelPlans TravelPlans[]
-
-  @@map("host_profiles")
-}
-
-model TravelPlans {
-  travelPlanId       String           @id @default(cuid())
-  title              String
-  destination        String?          
-  description        String
-  filters            String[]         @default([])
-  includedActivities String[]
-  restrictions       String[]
-  noOfDays           Int
-  hostId             String
-  price              Int
-  languages          String[]         @default([])
-  maxParticipants    Int              @default(10)
-  country            String
-  state              String
-  city               String
-  startDate          DateTime?       
-  endDate            DateTime?   
-  status             TravelPlanStatus @default(INACTIVE)
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-
-  host     HostProfile @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
-  bookings Booking[]
-
-  @@map("travel_plans")
-}
-
-model Booking {
-  id             String        @id @default(cuid())
-  userId         String
-  travelPlanId   String
-  startDate      DateTime
-  endDate        DateTime
-  participants   Int           @default(1)
-  pricePerPerson Int
-  totalPrice     Int
-  status         BookingStatus @default(PENDING)
-  cancelledAt    DateTime?
-  refundAmount   Int           @default(0)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-
-  user       User        @relation(fields: [userId], references: [id])
-  travelPlan TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId])
-
-  @@map("bookings")
 }
