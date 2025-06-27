@@ -16,8 +16,8 @@ export const getAllUsers = async () => {
         email: true,
         role: true,
         phone: true,
-        createdAt: true,
-      },
+        createdAt: true
+      }
     });
     if (!users || users.length === 0) {
       return { message: "No users found" };
@@ -52,10 +52,25 @@ export const updateUserRole = async (email: string, role: Role) => {
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
     if (!user) return { error: "User not found" };
+    console.log("mm", role);
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { role: role },
+      data: { role: role }
+    });
+    console.log("mm", updatedUser);
+    const host = await prisma.hostProfile.findUnique({
+      where: { hostEmail: email }
+    });
+    if (host) return;
+    await prisma.hostProfile.create({
+      data: {
+        hostEmail: user.email,
+        hostMobile: user.phone,
+        hostId: user.id,
+        image: user.image,
+        description: ""
+      }
     });
 
     return { success: true, user: updatedUser };
@@ -78,8 +93,8 @@ export const getHostApplications = async () => {
         email: true,
         phone: true,
         createdAt: true,
-        role: true,
-      },
+        role: true
+      }
     });
 
     if (!hostApplicants || hostApplicants.length === 0) {
@@ -103,7 +118,7 @@ export const approveHostApplication = async (email: string) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { role: "HOST", appliedForHost: false },
+      data: { role: "HOST", appliedForHost: false }
     });
 
     return { success: true, user: updatedUser };
@@ -123,7 +138,7 @@ export const rejectHostApplication = async (email: string) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { appliedForHost: false },
+      data: { appliedForHost: false }
     });
 
     return { success: true, user: updatedUser };
@@ -145,8 +160,8 @@ export const getAllHosts = async () => {
         name: true,
         email: true,
         phone: true,
-        createdAt: true,
-      },
+        createdAt: true
+      }
     });
     return { hosts };
   } catch (error) {
@@ -160,18 +175,18 @@ export const getTotalRevenue = async () => {
     const totalSales = await prisma.booking.aggregate({
       where: { status: "CONFIRMED" },
       _sum: { totalPrice: true },
-      _count: { id: true },
+      _count: { id: true }
     });
 
     const refundAmount = await prisma.booking.aggregate({
       where: { status: "CANCELLED" },
       _sum: { refundAmount: true },
-      _count: { id: true },
+      _count: { id: true }
     });
 
     return {
       totalSales,
-      refundAmount,
+      refundAmount
     };
   } catch (error) {
     console.error("Error fetching total sales:", error);
@@ -185,7 +200,7 @@ export const refundBooking = async (bookingId: string) => {
 
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
+      where: { id: bookingId }
     });
     if (!booking) return { error: "Booking not found" };
 
@@ -195,7 +210,7 @@ export const refundBooking = async (bookingId: string) => {
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
-      data: { status: "REFUNDED", refundAmount: booking.totalPrice },
+      data: { status: "REFUNDED", refundAmount: booking.totalPrice }
     });
 
     return { success: true, booking: updatedBooking };

@@ -8,11 +8,18 @@ export default function Home() {
       <header className="border-b py-2">
         <div className="container mx-auto flex justify-between items-center h-12 px-4">
           <div className="text-3xl font-bold">Unplan</div>
-          <Link href="/auth/signup">
-            <Button size="lg" className="text-lg">
-              Start Planning
-            </Button>
-          </Link>
+          <div className="flex gap-10">
+            <Link href="/auth/signup">
+              <Button size="lg" className="text-lg">
+                Start Planning
+              </Button>
+            </Link>
+            <Link href="/dashboard/host">
+              <Button size="lg" className="text-lg">
+                Host
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 

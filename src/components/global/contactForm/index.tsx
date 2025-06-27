@@ -21,16 +21,22 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CreateDestinationFormData } from "@/config/form/formData/CreateDestinationData";
-import { CreateDestinationSchema } from "@/config/form/formSchemaData/CreateDestinationSchema";
+import { FormComponentProps } from "@/types/form";
+import { createTravelPlan } from "@/actions/host/action";
+import { useRouter } from "next/navigation";
+// import { generateDynamicSchema } from "@/utils/generateDynamicSchema";
 
-export const CreateDestinationForm = () => {
-  const schema = CreateDestinationSchema;
+export const CreateDestinationForm = ({
+  FormData,
+  FormSchema
+}: FormComponentProps) => {
+  const schema = FormSchema;
+  const router = useRouter();
 
-  const defaultValues = CreateDestinationFormData.reduce(
+  const defaultValues = FormData.reduce(
     (acc, field) => ({
       ...acc,
-      [field.id]: field.type === "number" ? "" : ""
+      [field.id]: field.type === "number" ? 0 : field.type === "date" ? "" : ""
     }),
     {}
   );
@@ -41,14 +47,53 @@ export const CreateDestinationForm = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
-    console.log("Trip Destination Data:", data);
-    // await submit(data);
+    try {
+      console.log(data);
+      const start = new Date(data.startDate);
+      const end = new Date(data.endDate);
+
+      const timeDiff = Math.abs(end.getTime() - start.getTime());
+      const noOfDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+      console.log(noOfDays);
+      console.log("mm", data.country, data.state, data.city);
+      const result = await createTravelPlan({
+        title: data.tripName,
+        description: data.description,
+        includedActivities: [],
+        restrictions: [],
+        noOfDays,
+        price: data.price,
+        startDate: start,
+        endDate: end,
+        maxParticipants: data.maxLimit,
+        country: data.country,
+        state: data.state,
+        city: data.city,
+        languages: data.languages,
+        filters: data.filters
+      });
+
+      if (result?.error) {
+        console.error("Failed to create travel plan:", result.error);
+      } else {
+        console.log("Success:", result.message);
+        router.push("/dashboard/host");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    }
+  };
+
+  const formatDateForInput = (date: Date | string | number | undefined) => {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
   };
 
   return (
     <div
       id="trip-destination-form"
-      // style={{ backgroundColor: "#000000" }}
       className="min-h-screen px-[16px] sm:px-6 bg-black lg:px-20 py-10 flex flex-col items-center gap-10 mt-0 relative"
     >
       <div className="relative z-10 text-center">
@@ -73,7 +118,7 @@ export const CreateDestinationForm = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col md:grid md:grid-cols-2 gap-6"
           >
-            {CreateDestinationFormData.map((data) => {
+            {FormData.map((data) => {
               if (["text", "email", "tel", "number"].includes(data.type)) {
                 return (
                   <FormField
@@ -91,7 +136,39 @@ export const CreateDestinationForm = () => {
                             placeholder={data.placeholder}
                             className="py-[14px] bg-[#1a1a1a] border border-white/20 text-white placeholder:text-white/60 focus:bg-[#2a2a2a]"
                             {...field}
-                            value={field.value ?? ""}
+                            value={field.value?.toString() ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              }
+
+              if (data.type === "date") {
+                return (
+                  <FormField
+                    key={data.id}
+                    control={form.control}
+                    name={data.id}
+                    render={({ field }) => (
+                      <FormItem className={data.className}>
+                        <FormLabel className="text-sm font-bold text-white">
+                          {data.label}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            className="py-[14px] bg-[#1a1a1a] border border-white/20 text-white placeholder:text-white/60 focus:bg-[#2a2a2a] [&::-webkit-calendar-picker-indicator]:invert"
+                            {...field}
+                            value={formatDateForInput(field.value)}
+                            onChange={(e) => {
+                              const dateValue = e.target.value;
+                              field.onChange(
+                                dateValue ? new Date(dateValue) : ""
+                              );
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -117,7 +194,7 @@ export const CreateDestinationForm = () => {
                             placeholder={data.placeholder}
                             className="py-[14px] bg-[#1a1a1a] border border-white/20 text-white placeholder:text-white/60 min-h-[120px] focus:bg-[#2a2a2a]"
                             {...field}
-                            value={field.value ?? ""}
+                            value={field.value?.toString() ?? ""}
                           />
                         </FormControl>
                         <FormMessage />
@@ -127,7 +204,11 @@ export const CreateDestinationForm = () => {
                 );
               }
 
-              if (data.type === "select" && Array.isArray(data.options)) {
+              if (
+                data.type === "select" &&
+                "options" in data &&
+                Array.isArray(data.options)
+              ) {
                 return (
                   <FormField
                     key={data.id}
@@ -144,11 +225,14 @@ export const CreateDestinationForm = () => {
                         >
                           <FormControl>
                             <SelectTrigger className="bg-[#1a1a1a] border border-white/20 text-white hover:bg-[#2a2a2a]">
-                              <SelectValue placeholder={data.placeholder} />
+                              <SelectValue
+                                placeholder={data.placeholder}
+                                className=""
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {data.options.map((option) => (
+                            {data?.options?.map((option) => (
                               <SelectItem key={option} value={option}>
                                 {option}
                               </SelectItem>
@@ -167,7 +251,7 @@ export const CreateDestinationForm = () => {
 
             <Button
               type="submit"
-              className="col-span-2 h-14 flex justify-center items-center text-xl font-semibold bg-white text-black hover:bg-gray-200 hover:scale-105 transition-all duration-200 rounded-md"
+              className="col-span-2 h-14 flex justify-center items-center text-xl font-semibold bg-white text-black hover:bg-gray-200 cursor-pointer transition-all duration-200 rounded-md"
             >
               Create Trip Destination
             </Button>

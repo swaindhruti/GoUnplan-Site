@@ -19,7 +19,7 @@ interface FormErrors {
 export default function SignInPage() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
-    password: "",
+    password: ""
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -39,13 +39,13 @@ export default function SignInPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
 
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: undefined,
+        [name]: undefined
       }));
     }
   };
@@ -80,7 +80,7 @@ export default function SignInPage() {
       const result = await signIn("credentials", {
         email: formData.email.trim(),
         password: formData.password,
-        redirect: false,
+        redirect: false
       });
 
       if (result?.error) {
@@ -88,7 +88,7 @@ export default function SignInPage() {
       } else if (result?.ok) {
         const session = await getSession();
         if (session) {
-          router.push("/dashboard");
+          router.push("/");
           router.refresh();
         }
       }
