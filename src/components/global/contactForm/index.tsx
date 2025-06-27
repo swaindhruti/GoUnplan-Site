@@ -8,7 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +16,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 
 export const CreateDestinationForm = ({
   FormData,
-  FormSchema
+  FormSchema,
 }: FormComponentProps) => {
   const schema = FormSchema;
   const router = useRouter();
@@ -36,14 +36,14 @@ export const CreateDestinationForm = ({
   const defaultValues = FormData.reduce(
     (acc, field) => ({
       ...acc,
-      [field.id]: field.type === "number" ? 0 : field.type === "date" ? "" : ""
+      [field.id]: field.type === "number" ? 0 : field.type === "date" ? "" : "",
     }),
     {}
   );
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues
+    defaultValues,
   });
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
@@ -59,6 +59,7 @@ export const CreateDestinationForm = ({
       const result = await createTravelPlan({
         title: data.tripName,
         description: data.description,
+        destination: data.destination,
         includedActivities: [],
         restrictions: [],
         noOfDays,
@@ -70,7 +71,7 @@ export const CreateDestinationForm = ({
         state: data.state,
         city: data.city,
         languages: data.languages,
-        filters: data.filters
+        filters: data.filters,
       });
 
       if (result?.error) {
@@ -109,7 +110,7 @@ export const CreateDestinationForm = ({
         style={{
           borderRadius: "11px",
           background: "#111111",
-          boxShadow: "0 0 20px rgba(255, 255, 255, 0.05)"
+          boxShadow: "0 0 20px rgba(255, 255, 255, 0.05)",
         }}
         className="w-full max-w-3xl p-6 backdrop-blur-md relative z-10"
       >
