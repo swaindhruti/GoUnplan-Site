@@ -5,11 +5,10 @@ import Link from "next/link";
 
 type Props = {
   params: {
-    "edit-trip": string; // the [edit-trip] param is the trip id
+    "edit-trip": string;
   };
 };
 
-// Server action for handling form submission
 async function handleUpdateTrip(formData: FormData) {
   "use server";
 
@@ -36,15 +35,12 @@ async function handleUpdateTrip(formData: FormData) {
     const result = await updateTravelPlan(tripId, updateData);
 
     if (result && !("error" in result)) {
-      // Revalidate the cache and redirect on success
       revalidatePath("/dashboard/host");
       redirect("/dashboard/host");
     } else {
-      // Handle error case - you might want to show an error message
       throw new Error("Failed to update trip");
     }
   } catch (error) {
-    // Handle error - in a real app, you'd want to show this to the user
     console.error("Error updating trip:", error);
     throw error;
   }
@@ -63,10 +59,7 @@ export default async function EditTripPage({ params }: Props) {
       <h1 className="text-3xl font-bold mb-6">Edit Trip: {trip.title}</h1>
 
       <form action={handleUpdateTrip} className="space-y-6">
-        {/* Hidden field for trip ID */}
         <input type="hidden" name="tripId" value={tripId} />
-
-        {/* Title Field */}
         <div>
           <label
             htmlFor="title"
@@ -83,8 +76,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Description Field */}
         <div>
           <label
             htmlFor="description"
@@ -101,8 +92,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Destination Field */}
         <div>
           <label
             htmlFor="destination"
@@ -119,8 +108,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Price Field */}
         <div>
           <label
             htmlFor="price"
@@ -138,8 +125,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Duration Field */}
         <div>
           <label
             htmlFor="noOfDays"
@@ -156,8 +141,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Max Participants Field */}
         <div>
           <label
             htmlFor="maxParticipants"
@@ -174,8 +157,6 @@ export default async function EditTripPage({ params }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-
-        {/* Filters Field (Multiple Selection) */}
         <div>
           <label
             htmlFor="filters"
