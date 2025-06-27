@@ -120,3 +120,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+  /* overflow: hidden; */
+  overscroll-behavior: none;
+}
