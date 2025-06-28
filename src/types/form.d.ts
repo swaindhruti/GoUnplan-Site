@@ -11,20 +11,42 @@ type FieldId =
   | "minLimit"
   | "maxLimit"
   | "description"
-  | "languages";
+  | "languages"
+  | "sectionhead"
+  | "dayWiseData";
 
-type ZodType = "string" | "number" | "enum" | "date";
+type ZodType = "string" | "number" | "enum" | "date" | "enum[]";
 
-type InputType = "text" | "number" | "select" | "textarea" | "date";
+type DayWiseFieldId = "title" | "description" | "meals" | "accommodation";
+
+type InputType =
+  | "text"
+  | "number"
+  | "select"
+  | "textarea"
+  | "date"
+  | "multi-select"
+  | "sectionHead"
+  | "dynamic-group";
+
+type GroupFieldTypes = {
+  label: string;
+  type: InputType;
+  id: DayWiseFieldId;
+  placeholder?: string;
+  className: string;
+  zod: string;
+};
 
 type BaseFormField = {
   label: string;
   type: InputType;
   id: FieldId;
-  placeholder: string;
+  placeholder?: string;
   className: string;
   zod: ZodType;
   options?: string[];
+  groupFields?: GroupFieldTypes[];
 };
 
 export type FormFields = BaseFormField;
