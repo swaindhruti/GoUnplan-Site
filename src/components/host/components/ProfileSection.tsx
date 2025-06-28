@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { HostData } from "../types";
+import Image from "next/image";
 
 // Define proper interfaces based on the actual API response structure
 interface HostDetails {
@@ -148,7 +149,9 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
             <div className="p-6 flex flex-col items-center text-center">
               <div className="h-24 w-24 rounded-full bg-purple-100 mb-4 overflow-hidden">
                 {hostDetails.image ? (
-                  <img
+                  <Image
+                    height={96}
+                    width={96}
                     src={hostDetails.image}
                     alt={hostData.name || "Host"}
                     className="h-full w-full object-cover"
