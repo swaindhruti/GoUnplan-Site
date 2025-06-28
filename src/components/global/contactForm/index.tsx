@@ -107,8 +107,8 @@ export const CreateDestinationForm = ({
       const result = await createTravelPlan({
         title: data.tripName,
         description: data.description,
-        includedActivities: [],
         destination: data.destination,
+        includedActivities: [],
         restrictions: [],
         noOfDays,
         price: data.price,

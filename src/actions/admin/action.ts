@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/roleGaurd";
 import { Role } from "@/types/auth";
+import { TravelPlanStatus } from "../../../db/generated/prisma";
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();
@@ -16,8 +17,8 @@ export const getAllUsers = async () => {
         email: true,
         role: true,
         phone: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
     if (!users || users.length === 0) {
       return { message: "No users found" };
@@ -56,11 +57,11 @@ export const updateUserRole = async (email: string, role: Role) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { role: role }
+      data: { role: role },
     });
     console.log("mm", updatedUser);
     const host = await prisma.hostProfile.findUnique({
-      where: { hostEmail: email }
+      where: { hostEmail: email },
     });
     if (host) return;
     await prisma.hostProfile.create({
@@ -69,8 +70,8 @@ export const updateUserRole = async (email: string, role: Role) => {
         hostMobile: user.phone,
         hostId: user.id,
         image: user.image,
-        description: ""
-      }
+        description: "",
+      },
     });
 
     return { success: true, user: updatedUser };
@@ -93,8 +94,8 @@ export const getHostApplications = async () => {
         email: true,
         phone: true,
         createdAt: true,
-        role: true
-      }
+        role: true,
+      },
     });
 
     if (!hostApplicants || hostApplicants.length === 0) {
@@ -118,7 +119,7 @@ export const approveHostApplication = async (email: string) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { role: "HOST", appliedForHost: false }
+      data: { role: "HOST", appliedForHost: false },
     });
 
     return { success: true, user: updatedUser };
@@ -138,7 +139,7 @@ export const rejectHostApplication = async (email: string) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { appliedForHost: false }
+      data: { appliedForHost: false },
     });
 
     return { success: true, user: updatedUser };
@@ -160,8 +161,8 @@ export const getAllHosts = async () => {
         name: true,
         email: true,
         phone: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
     return { hosts };
   } catch (error) {
@@ -175,18 +176,18 @@ export const getTotalRevenue = async () => {
     const totalSales = await prisma.booking.aggregate({
       where: { status: "CONFIRMED" },
       _sum: { totalPrice: true },
-      _count: { id: true }
+      _count: { id: true },
     });
 
     const refundAmount = await prisma.booking.aggregate({
       where: { status: "CANCELLED" },
       _sum: { refundAmount: true },
-      _count: { id: true }
+      _count: { id: true },
     });
 
     return {
       totalSales,
-      refundAmount
+      refundAmount,
     };
   } catch (error) {
     console.error("Error fetching total sales:", error);
@@ -200,7 +201,7 @@ export const refundBooking = async (bookingId: string) => {
 
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId }
+      where: { id: bookingId },
     });
     if (!booking) return { error: "Booking not found" };
 
@@ -210,12 +211,44 @@ export const refundBooking = async (bookingId: string) => {
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
-      data: { status: "REFUNDED", refundAmount: booking.totalPrice }
+      data: { status: "REFUNDED", refundAmount: booking.totalPrice },
     });
 
     return { success: true, booking: updatedBooking };
   } catch (error) {
     console.error("Error processing refund:", error);
     return { error: "Failed to process refund" };
+  }
+};
+
+export const getAlltravelPlanApplications = async () => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const travelPlans = await prisma.travelPlans.findMany({
+      where: { status: TravelPlanStatus.INACTIVE },
+      select: {
+        travelPlanId: true,
+        title: true,
+        description: true,
+        country: true,
+        state: true,
+        city: true,
+        noOfDays: true,
+        price: true,
+        hostId: true,
+        createdAt: true,
+      },
+    });
+
+    if (!travelPlans || travelPlans.length === 0) {
+      return { message: "No travel plan applications found" };
+    }
+
+    return { travelPlans };
+  } catch (error) {
+    console.error("Error fetching travel plan applications:", error);
+    return { error: "Failed to fetch travel plan applications" };
   }
 };
