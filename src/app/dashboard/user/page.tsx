@@ -448,7 +448,7 @@ export default function UserDashboard() {
                     : `No ${bookingFilter} bookings found.`}
                 </p>
                 <div className="mt-6">
-                  <Link href="/explore">
+                  <Link href="/trips">
                     <Button className="bg-purple-600 text-white hover:bg-purple-700">
                       Explore Trips
                     </Button>

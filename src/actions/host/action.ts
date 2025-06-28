@@ -110,34 +110,59 @@ export const createTravelPlan = async (data: {
   state: string;
   city: string;
   languages: string[];
+  dayWiseData?: Array<{
+    dayNumber: number;
+    title: string;
+    description: string;
+    activities: string[];
+    meals: string;
+    accommodation: string;
+  }>;
 }) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
-  console.log("m", data.country);
 
   try {
-    console.log(session);
     const hostProfile = await prisma.hostProfile.findUnique({
       where: { hostId: session.user.id },
     });
-    const hostProfiles = await prisma.hostProfile.findMany();
-
-    console.log(hostProfiles);
 
     if (!hostProfile) {
       return { error: "Host profile not found" };
     }
-    console.log("mm", data.startDate, data.endDate);
 
+    // Debug - Log all incoming data
+    console.log("Received travel plan data:", {
+      title: data.title,
+      description: data.description.slice(0, 30) + "...",
+      noOfDays: data.noOfDays,
+      filters: data.filters,
+      languages: data.languages,
+      dayWiseData: data.dayWiseData
+        ? `${data.dayWiseData.length} days`
+        : "none",
+    });
+
+    // Debug - Full day-wise data
+    if (data.dayWiseData && data.dayWiseData.length > 0) {
+      console.log(
+        "Received day-wise data details:",
+        JSON.stringify(data.dayWiseData, null, 2)
+      );
+    } else {
+      console.log("WARNING: No day-wise data received or the array is empty");
+    }
+
+    // Create the travel plan first (without transaction)
     const travelPlan = await prisma.travelPlans.create({
       data: {
         title: data.title,
         description: data.description,
-        includedActivities: data.includedActivities,
+        includedActivities: data.includedActivities || [],
         destination: data.destination,
         startDate: data.startDate,
         endDate: data.endDate,
-        restrictions: data.restrictions,
+        restrictions: data.restrictions || [],
         noOfDays: data.noOfDays,
         hostId: hostProfile.hostId,
         price: data.price,
@@ -145,19 +170,72 @@ export const createTravelPlan = async (data: {
         country: data.country,
         state: data.state,
         city: data.city,
+        languages: data.languages || [],
+        filters: data.filters || [],
         status: TravelPlanStatus.INACTIVE,
       },
     });
 
+    console.log("Travel plan created successfully:", travelPlan);
+
+    // Create day-wise itineraries if provided
+    if (data.dayWiseData && data.dayWiseData.length > 0) {
+      console.log(`Processing ${data.dayWiseData.length} day entries...`);
+
+      try {
+        // Create day-wise itineraries one by one
+        for (const dayData of data.dayWiseData) {
+          console.log(
+            `Creating day ${dayData.dayNumber}:`,
+            JSON.stringify(dayData, null, 2)
+          );
+
+          // Create day-wise itinerary using standard Prisma client
+          const createdDay = await prisma.dayWiseItinerary.create({
+            data: {
+              travelPlanId: travelPlan.travelPlanId,
+              dayNumber: dayData.dayNumber,
+              title: dayData.title || `Day ${dayData.dayNumber}`,
+              description: dayData.description || "",
+              activities: Array.isArray(dayData.activities)
+                ? dayData.activities
+                : [],
+              meals: dayData.meals || "",
+              accommodation: dayData.accommodation || "",
+            },
+          });
+
+          console.log(
+            `Day ${dayData.dayNumber} created successfully:`,
+            createdDay.id
+          );
+        }
+
+        console.log("All day-wise itineraries created successfully!");
+      } catch (dayError) {
+        console.error("Error creating day-wise data:", dayError);
+
+        // Since we're not using transactions, we should handle cleanup here
+        // Delete the travel plan if day-wise itinerary creation fails
+        await prisma.travelPlans.delete({
+          where: { travelPlanId: travelPlan.travelPlanId },
+        });
+
+        throw dayError;
+      }
+    } else {
+      console.log("No day-wise data provided");
+    }
+
     return {
       success: true,
-      travelPlan,
+      travelPlan: travelPlan,
       message:
         "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
     };
   } catch (error) {
     console.error("Error creating travel plan:", error);
-    return { error: "Failed to create travel plan" };
+    return { error: `Failed to create travel plan` };
   }
 };
 
@@ -274,5 +352,138 @@ export const getTripById = async (tripId: string) => {
   } catch (error) {
     console.error("Error fetching trip by ID:", error);
     return { error: "Failed to fetch trip" };
+  }
+};
+
+export const getRevenueAnalytics = async () => {
+  const session = await requireHost();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hostProfile = await prisma.hostProfile.findUnique({
+      where: { hostId: session.user.id },
+    });
+
+    if (!hostProfile) {
+      return { error: "Host profile not found" };
+    }
+
+    // Get all travel plans by this host
+    const travelPlans = await prisma.travelPlans.findMany({
+      where: { hostId: hostProfile.hostId },
+      select: { travelPlanId: true },
+    });
+
+    const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
+
+    // Get confirmed bookings revenue
+    const confirmedBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        status: "CONFIRMED",
+      },
+    });
+
+    // Get cancelled bookings data
+    const cancelledBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+        refundAmount: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        status: { in: ["CANCELLED", "REFUNDED"] },
+      },
+    });
+
+    // Get pending bookings value
+    const pendingBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        status: "PENDING",
+      },
+    });
+
+    // Get monthly revenue trend (last 6 months)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const monthlyRevenue = await prisma.booking.groupBy({
+      by: ["status"],
+      _sum: {
+        totalPrice: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        createdAt: { gte: sixMonthsAgo },
+        status: "CONFIRMED",
+      },
+    });
+
+    // Calculate metrics
+    const totalConfirmedRevenue = confirmedBookings._sum.totalPrice || 0;
+    const totalCancelledValue = cancelledBookings._sum.totalPrice || 0;
+    const totalRefundAmount = cancelledBookings._sum.refundAmount || 0;
+    const totalPendingValue = pendingBookings._sum.totalPrice || 0;
+
+    // Net revenue = Confirmed revenue - refunds
+    const netRevenue = totalConfirmedRevenue - totalRefundAmount;
+
+    // Revenue at risk = Pending bookings that might cancel
+    const revenueAtRisk = totalPendingValue;
+
+    // Cancellation rate
+    const totalBookings =
+      (confirmedBookings._count.id || 0) +
+      (cancelledBookings._count.id || 0) +
+      (pendingBookings._count.id || 0);
+
+    const cancellationRate =
+      totalBookings > 0
+        ? ((cancelledBookings._count.id || 0) / totalBookings) * 100
+        : 0;
+
+    return {
+      success: true,
+      revenueData: {
+        confirmed: {
+          revenue: totalConfirmedRevenue,
+          bookingCount: confirmedBookings._count.id || 0,
+        },
+        cancelled: {
+          bookingValue: totalCancelledValue,
+          refundAmount: totalRefundAmount,
+          bookingCount: cancelledBookings._count.id || 0,
+        },
+        pending: {
+          bookingValue: totalPendingValue,
+          bookingCount: pendingBookings._count.id || 0,
+        },
+        summary: {
+          netRevenue,
+          revenueAtRisk,
+          cancellationRate: Math.round(cancellationRate * 10) / 10, // Round to 1 decimal place
+        },
+        monthlyTrend: monthlyRevenue,
+      },
+    };
+  } catch (error) {
+    console.error("Error calculating revenue analytics:", error);
+    return { error: "Failed to calculate revenue analytics" };
   }
 };
