@@ -34,6 +34,7 @@ type ProfileSectionProps = {
 };
 
 export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
+  // Use null as initial state to prevent hydration mismatches
   const [hostDetails, setHostDetails] = useState<HostDetails | null>(null);
   const [hostLoading, setHostLoading] = useState(true);
   const [hostError, setHostError] = useState<string | null>(null);
@@ -44,9 +45,19 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     hostMobile: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Add this to prevent hydration mismatch during initial render
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set isMounted to true after component mounts
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Fetch host details on component mount
   useEffect(() => {
+    // Only run if component is mounted
+    if (!isMounted) return;
+
     const fetchHostDetails = async () => {
       setHostLoading(true);
       setHostError(null);
@@ -73,7 +84,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     };
 
     fetchHostDetails();
-  }, []);
+  }, [isMounted]);
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -114,6 +125,16 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     }
   };
 
+  // Return a loading state if not yet mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <span className="ml-3 text-gray-600">Loading...</span>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-8">
@@ -149,7 +170,9 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
             <div className="p-6 flex flex-col items-center text-center">
               <div className="h-24 w-24 rounded-full bg-purple-100 mb-4 overflow-hidden">
                 {hostDetails.image ? (
+                  // Use key to force re-render when image changes
                   <Image
+                    key={hostDetails.image}
                     height={96}
                     width={96}
                     src={hostDetails.image}
@@ -161,23 +184,24 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                 )}
               </div>
               <h3 className="text-xl font-semibold text-gray-900">
-                {hostData.name || hostDetails.user?.name}
+                {hostData.name || hostDetails.user?.name || ""}
               </h3>
               <p className="text-gray-600 mb-4">
-                {hostData.email || hostDetails.user?.email}
+                {hostData.email || hostDetails.user?.email || ""}
               </p>
               <div className="w-full border-t border-gray-100 pt-4 mt-2">
                 <p className="text-sm text-gray-500 mb-1">Host Since</p>
                 <p className="font-medium text-gray-900">
-                  {hostDetails.createdAt &&
-                    new Date(hostDetails.createdAt).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
+                  {hostDetails.createdAt
+                    ? new Date(hostDetails.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )
+                    : "N/A"}
                 </p>
               </div>
             </div>
