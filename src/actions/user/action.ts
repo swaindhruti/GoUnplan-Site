@@ -180,7 +180,7 @@ export const bookTravelPlan = async (
   bookingData: {
     startDate: Date;
     endDate: Date;
-    participants: number;
+    participants?: number;
   }
 ) => {
   const session = await requireUser();
@@ -188,7 +188,6 @@ export const bookTravelPlan = async (
   if (session.user.id !== userId) return { error: "Unauthorized" };
 
   try {
-    // Get travel plan details
     const travelPlan = await prisma.travelPlans.findUnique({
       where: { travelPlanId }
     });
@@ -204,11 +203,14 @@ export const bookTravelPlan = async (
     }
 
     // Validate participants
-    if (bookingData.participants <= 0) {
+    if (bookingData.participants && bookingData.participants <= 0) {
       return { error: "Number of participants must be at least 1" };
     }
 
-    if (bookingData.participants > travelPlan.maxParticipants) {
+    if (
+      bookingData.participants &&
+      bookingData.participants > travelPlan.maxParticipants
+    ) {
       return {
         error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`
       };
@@ -227,9 +229,11 @@ export const bookTravelPlan = async (
       return { error: "End date cannot be before start date" };
     }
 
-    // Calculate pricing
+    let totalPrice = 0;
     const pricePerPerson = travelPlan.price;
-    const totalPrice = pricePerPerson * bookingData.participants;
+    if (bookingData.participants) {
+      totalPrice = pricePerPerson * bookingData.participants;
+    }
 
     // Create the booking
     const booking = await prisma.booking.create({

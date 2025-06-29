@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getTripById } from "@/actions/host/action";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
   params: {
@@ -35,7 +36,6 @@ export default async function MountainBikingAdventure({ params }: Props) {
         </div>
       </section>
 
-      {/* Trip Highlights */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Trip Highlights</h2>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
@@ -136,7 +136,9 @@ export default async function MountainBikingAdventure({ params }: Props) {
               <strong>Languages:</strong> English, German, French
             </li>
           </ul>
-          <Button className="w-full mb-2">Book Now</Button>
+          <Link href={`trips/booking/${trip.travelPlanId}`}>
+            <Button className="w-full mb-2">Book Now</Button>
+          </Link>
           <Button variant="outline" className="w-full">
             Message Host
           </Button>
