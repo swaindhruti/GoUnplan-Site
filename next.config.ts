@@ -6,9 +6,8 @@ const nextConfig: NextConfig = {
       "res.cloudinary.com",
       "images.unsplash.com",
       "avatar.iran.liara.run",
-    ],
-  },
-    domains: ["res.cloudinary.com", "images.unsplash.com", "images.pexels.com"]
+      "images.pexels.com"
+    ]
   }
 };
 

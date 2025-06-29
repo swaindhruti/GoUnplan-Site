@@ -2,7 +2,10 @@
 
 import prisma from "@/lib/prisma";
 import { requireHost } from "@/lib/roleGaurd";
-import { TravelPlanStatus } from "@prisma/client";
+import { TravelPlanStatuses } from "@/types/travel";
+import { TravelPlanStatus } from "../../../db/generated/prisma";
+// import { TravelPlan } from "@/types/booking";
+// import { TravelPlanStatus } from "@prisma/client";
 
 export const getHostDetails = async () => {
   const session = await requireHost();
@@ -20,10 +23,10 @@ export const getHostDetails = async () => {
             id: true,
             name: true,
             email: true,
-            phone: true,
-          },
-        },
-      },
+            phone: true
+          }
+        }
+      }
     });
 
     if (!host) {
@@ -37,7 +40,9 @@ export const getHostDetails = async () => {
   }
 };
 
-export const getHostTravelPlansByStatus = async (status: TravelPlanStatus) => {
+export const getHostTravelPlansByStatus = async (
+  status: TravelPlanStatuses
+) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
 
@@ -45,14 +50,14 @@ export const getHostTravelPlansByStatus = async (status: TravelPlanStatus) => {
     const travelPlans = await prisma.travelPlans.findMany({
       where: {
         hostId: session.user.id,
-        status: status,
+        status: status
       },
       select: {
         title: true,
         description: true,
         price: true,
-        maxParticipants: true,
-      },
+        maxParticipants: true
+      }
     });
 
     if (!travelPlans || travelPlans.length === 0) {
@@ -83,8 +88,8 @@ export const updateHostProfile = async (data: {
         description: data.description,
         image: data.image,
         hostEmail: data.hostEmail,
-        hostMobile: data.hostMobile,
-      },
+        hostMobile: data.hostMobile
+      }
     });
 
     return { success: true, host: updatedHost };
@@ -124,7 +129,7 @@ export const createTravelPlan = async (data: {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id },
+      where: { hostId: session.user.id }
     });
 
     if (!hostProfile) {
@@ -138,9 +143,7 @@ export const createTravelPlan = async (data: {
       noOfDays: data.noOfDays,
       filters: data.filters,
       languages: data.languages,
-      dayWiseData: data.dayWiseData
-        ? `${data.dayWiseData.length} days`
-        : "none",
+      dayWiseData: data.dayWiseData ? `${data.dayWiseData.length} days` : "none"
     });
 
     // Debug - Full day-wise data
@@ -172,8 +175,8 @@ export const createTravelPlan = async (data: {
         city: data.city,
         languages: data.languages || [],
         filters: data.filters || [],
-        status: TravelPlanStatus.INACTIVE,
-      },
+        status: TravelPlanStatus.INACTIVE
+      }
     });
 
     console.log("Travel plan created successfully:", travelPlan);
@@ -201,8 +204,8 @@ export const createTravelPlan = async (data: {
                 ? dayData.activities
                 : [],
               meals: dayData.meals || "",
-              accommodation: dayData.accommodation || "",
-            },
+              accommodation: dayData.accommodation || ""
+            }
           });
 
           console.log(
@@ -218,7 +221,7 @@ export const createTravelPlan = async (data: {
         // Since we're not using transactions, we should handle cleanup here
         // Delete the travel plan if day-wise itinerary creation fails
         await prisma.travelPlans.delete({
-          where: { travelPlanId: travelPlan.travelPlanId },
+          where: { travelPlanId: travelPlan.travelPlanId }
         });
 
         throw dayError;
@@ -231,7 +234,7 @@ export const createTravelPlan = async (data: {
       success: true,
       travelPlan: travelPlan,
       message:
-        "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
+        "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings."
     };
   } catch (error) {
     console.error("Error creating travel plan:", error);
@@ -245,7 +248,7 @@ export const getAllTrips = async () => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id },
+      where: { hostId: session.user.id }
     });
 
     if (!hostProfile) {
@@ -254,11 +257,11 @@ export const getAllTrips = async () => {
 
     const trips = await prisma.travelPlans.findMany({
       where: {
-        hostId: hostProfile.hostId,
+        hostId: hostProfile.hostId
       },
       orderBy: {
-        createdAt: "desc",
-      },
+        createdAt: "desc"
+      }
     });
 
     return { success: true, trips };
@@ -293,7 +296,7 @@ export const updateTravelPlan = async (
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id },
+      where: { hostId: session.user.id }
     });
 
     if (!hostProfile) {
@@ -301,7 +304,7 @@ export const updateTravelPlan = async (
     }
 
     const existingPlan = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: id },
+      where: { travelPlanId: id }
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
@@ -312,14 +315,14 @@ export const updateTravelPlan = async (
     const updatedPlan = await prisma.travelPlans.update({
       where: { travelPlanId: id },
       data: {
-        ...data,
-      },
+        ...data
+      }
     });
 
     return {
       success: true,
       updatedPlan,
-      message: "Travel plan updated successfully!",
+      message: "Travel plan updated successfully!"
     };
   } catch (error) {
     console.error("Error updating travel plan:", error);
@@ -333,7 +336,7 @@ export const getTripById = async (tripId: string) => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id },
+      where: { hostId: session.user.id }
     });
 
     if (!hostProfile) {
@@ -341,7 +344,7 @@ export const getTripById = async (tripId: string) => {
     }
 
     const trip = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: tripId },
+      where: { travelPlanId: tripId }
     });
 
     if (!trip || trip.hostId !== hostProfile.hostId) {
@@ -361,7 +364,7 @@ export const getRevenueAnalytics = async () => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id },
+      where: { hostId: session.user.id }
     });
 
     if (!hostProfile) {
@@ -371,7 +374,7 @@ export const getRevenueAnalytics = async () => {
     // Get all travel plans by this host
     const travelPlans = await prisma.travelPlans.findMany({
       where: { hostId: hostProfile.hostId },
-      select: { travelPlanId: true },
+      select: { travelPlanId: true }
     });
 
     const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
@@ -379,44 +382,44 @@ export const getRevenueAnalytics = async () => {
     // Get confirmed bookings revenue
     const confirmedBookings = await prisma.booking.aggregate({
       _sum: {
-        totalPrice: true,
+        totalPrice: true
       },
       _count: {
-        id: true,
+        id: true
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: "CONFIRMED",
-      },
+        status: "CONFIRMED"
+      }
     });
 
     // Get cancelled bookings data
     const cancelledBookings = await prisma.booking.aggregate({
       _sum: {
         totalPrice: true,
-        refundAmount: true,
+        refundAmount: true
       },
       _count: {
-        id: true,
+        id: true
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: { in: ["CANCELLED", "REFUNDED"] },
-      },
+        status: { in: ["CANCELLED", "REFUNDED"] }
+      }
     });
 
     // Get pending bookings value
     const pendingBookings = await prisma.booking.aggregate({
       _sum: {
-        totalPrice: true,
+        totalPrice: true
       },
       _count: {
-        id: true,
+        id: true
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: "PENDING",
-      },
+        status: "PENDING"
+      }
     });
 
     // Get monthly revenue trend (last 6 months)
@@ -426,13 +429,13 @@ export const getRevenueAnalytics = async () => {
     const monthlyRevenue = await prisma.booking.groupBy({
       by: ["status"],
       _sum: {
-        totalPrice: true,
+        totalPrice: true
       },
       where: {
         travelPlanId: { in: travelPlanIds },
         createdAt: { gte: sixMonthsAgo },
-        status: "CONFIRMED",
-      },
+        status: "CONFIRMED"
+      }
     });
 
     // Calculate metrics
@@ -463,24 +466,24 @@ export const getRevenueAnalytics = async () => {
       revenueData: {
         confirmed: {
           revenue: totalConfirmedRevenue,
-          bookingCount: confirmedBookings._count.id || 0,
+          bookingCount: confirmedBookings._count.id || 0
         },
         cancelled: {
           bookingValue: totalCancelledValue,
           refundAmount: totalRefundAmount,
-          bookingCount: cancelledBookings._count.id || 0,
+          bookingCount: cancelledBookings._count.id || 0
         },
         pending: {
           bookingValue: totalPendingValue,
-          bookingCount: pendingBookings._count.id || 0,
+          bookingCount: pendingBookings._count.id || 0
         },
         summary: {
           netRevenue,
           revenueAtRisk,
-          cancellationRate: Math.round(cancellationRate * 10) / 10, // Round to 1 decimal place
+          cancellationRate: Math.round(cancellationRate * 10) / 10 // Round to 1 decimal place
         },
-        monthlyTrend: monthlyRevenue,
-      },
+        monthlyTrend: monthlyRevenue
+      }
     };
   } catch (error) {
     console.error("Error calculating revenue analytics:", error);

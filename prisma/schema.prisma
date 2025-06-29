@@ -33,6 +33,7 @@ model HostProfile {
   updatedAt   DateTime      @updatedAt
   hostEmail   String        @unique
   hostMobile  String
+   
   user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   travelPlans TravelPlans[]
 
@@ -54,6 +55,22 @@ model DayWiseItinerary {
 
   @@map("day_wise_itineraries")
 }
+
+model TeamMembers {
+  id            String      @id @default(cuid())
+  email         Int
+  teamLead      Boolean
+  phone         String
+  activities    String[]    @default([])
+  meals         String?
+  accommodation String?
+  travelPlanId  String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("team_members")
+}
+
 
 model TravelPlans {
   travelPlanId       String             @id @default(cuid())
