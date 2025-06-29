@@ -2,8 +2,10 @@
 
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/roleGaurd";
+import { TeamMemberInput } from "@/types/booking";
+import { BookingStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { BookingStatus } from "@/types/booking";
+// import type { BookingStatus } from "@/types/booking";
 
 export const createBooking = async (bookingData: {
   userId: string;
@@ -12,13 +14,8 @@ export const createBooking = async (bookingData: {
   endDate: Date;
   participants?: number;
   specialRequirements?: string;
-  guests?: Array<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-  }>;
-  submissionType?: "individual" | "team";
+  guests?: Array<TeamMemberInput>;
+  // submissionType?: "individual" | "team";
 }) => {
   const session = await requireUser();
   if (!session || session.user.id !== bookingData.userId)
@@ -34,6 +31,8 @@ export const createBooking = async (bookingData: {
         error: "This travel plan is not currently available for booking"
       };
     }
+
+    console.log("tt", bookingData);
 
     const participants = bookingData.participants || 1;
     if (participants <= 0)
@@ -61,6 +60,7 @@ export const createBooking = async (bookingData: {
         travelPlanId: bookingData.travelPlanId,
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,
+        guests: { create: bookingData.guests },
         participants,
         pricePerPerson,
         totalPrice,
@@ -115,7 +115,8 @@ export const updateBookingGuestInfo = async (
   guestData: {
     participants: number;
     specialRequirements?: string;
-    submissionType: "individual" | "team";
+    guests: TeamMemberInput[];
+    // submissionType: "individual" | "team";
   }
 ) => {
   const session = await requireUser();
@@ -126,7 +127,7 @@ export const updateBookingGuestInfo = async (
       where: { id: bookingId },
       include: { travelPlan: true }
     });
-
+    console.log(guestData.guests);
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
 
@@ -147,6 +148,17 @@ export const updateBookingGuestInfo = async (
         totalPrice
       }
     });
+
+    console.log("teamMember model:", prisma.teamMember);
+
+    const createdTeam = await prisma.teamMember.createMany({
+      data: guestData.guests.map((guest) => ({
+        ...guest,
+        bookingId
+      }))
+    });
+    console.log(createdTeam);
+    // const updatedBookings=[...updatedBooking,...createdTeam]
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
     return { success: true, booking: updatedBooking };
@@ -173,7 +185,7 @@ export const updateBookingStatus = async (
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        status: { set: status },
+        status: { set: status as BookingStatus },
         ...(status === "CANCELLED" && { cancelledAt: new Date() })
       }
     });

@@ -33,7 +33,7 @@ model HostProfile {
   updatedAt   DateTime      @updatedAt
   hostEmail   String        @unique
   hostMobile  String
-   
+
   user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   travelPlans TravelPlans[]
 
@@ -56,20 +56,6 @@ model DayWiseItinerary {
   @@map("day_wise_itineraries")
 }
 
-model TeamMembers {
-  id            String      @id @default(cuid())
-  email         Int
-  teamLead      Boolean
-  phone         String
-  activities    String[]    @default([])
-  meals         String?
-  accommodation String?
-  travelPlanId  String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@map("team_members")
-}
 
 
 model TravelPlans {
@@ -100,6 +86,23 @@ model TravelPlans {
   @@map("travel_plans")
 }
 
+
+model TeamMember {
+  id            String      @id @default(cuid())
+  isteamLead    Boolean
+  phone         String
+  firstName     String
+  lastName      String
+  memberEmail   String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  bookingId     String     
+  booking       Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("team_members")
+}
+
 model Booking {
   id             String        @id @default(cuid())
   userId         String
@@ -111,6 +114,8 @@ model Booking {
   status         BookingStatus @default(PENDING)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  guests         TeamMember[] 
+  specialRequirements String?
   cancelledAt    DateTime?
   pricePerPerson Int
   refundAmount   Int           @default(0)
@@ -119,6 +124,7 @@ model Booking {
 
   @@map("bookings")
 }
+
 
 model WaitingList {
   id        String   @id @default(cuid())

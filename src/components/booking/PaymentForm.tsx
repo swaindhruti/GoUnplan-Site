@@ -1,47 +1,53 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { CreditCard, Lock } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { CreditCard, Lock } from "lucide-react";
 
 interface PaymentFormProps {
-  onBack: () => void
-  onComplete: () => void
+  onBack: () => void;
+  onComplete: () => void;
   tripData: {
-    title: string
-    startDate: string
-    endDate: string
-    numberOfGuests: number
-    pricePerPerson: number
-  }
+    title: string;
+    startDate: string;
+    endDate: string;
+    numberOfGuests: number;
+    pricePerPerson: number;
+  };
 }
 
-export function PaymentForm({ onBack, onComplete, tripData }: PaymentFormProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
+export function PaymentForm({
+  onBack,
+  onComplete,
+  tripData
+}: PaymentFormProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  // const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
 
-  const subtotal = tripData.numberOfGuests * tripData.pricePerPerson
-  const serviceFee = Math.round(subtotal * 0.1)
-  const total = subtotal + serviceFee
+  const subtotal = tripData.numberOfGuests * tripData.pricePerPerson;
+  const serviceFee = Math.round(subtotal * 0.1);
+  const total = subtotal + serviceFee;
 
   const handlePayment = async () => {
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setIsProcessing(false)
-    onComplete()
-  }
+    setIsProcessing(false);
+    onComplete();
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Payment Details</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Payment Details
+        </h2>
 
         {/* Trip Summary */}
         <Card className="mb-6">
@@ -59,7 +65,8 @@ export function PaymentForm({ onBack, onComplete, tripData }: PaymentFormProps) 
             </div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>
-                {tripData.numberOfGuests} guest{tripData.numberOfGuests > 1 ? "s" : ""}
+                {tripData.numberOfGuests} guest
+                {tripData.numberOfGuests > 1 ? "s" : ""}
               </span>
             </div>
 
@@ -99,13 +106,21 @@ export function PaymentForm({ onBack, onComplete, tripData }: PaymentFormProps) 
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="cardNumber">Card Number</Label>
-                <Input id="cardNumber" placeholder="1234 5678 9012 3456" className="font-mono" />
+                <Input
+                  id="cardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  className="font-mono"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="expiry">Expiry Date</Label>
-                  <Input id="expiry" placeholder="MM/YY" className="font-mono" />
+                  <Input
+                    id="expiry"
+                    placeholder="MM/YY"
+                    className="font-mono"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cvc">CVC</Label>
@@ -141,5 +156,5 @@ export function PaymentForm({ onBack, onComplete, tripData }: PaymentFormProps) 
         </Button>
       </div>
     </div>
-  )
+  );
 }

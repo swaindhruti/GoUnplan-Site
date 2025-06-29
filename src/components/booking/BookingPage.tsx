@@ -10,23 +10,23 @@ import { GuestInformationForm } from "./GuestInformation";
 import { PaymentForm } from "./PaymentForm";
 import { format, addDays } from "date-fns";
 import { useBookingState } from "@/hooks/use-booking";
-import type { TravelPlan, BookingFormData } from "@/types/booking";
+import type { TravelPlan, BookingFormData, BookingData } from "@/types/booking";
 
 interface BookingPageProps {
   userId: string;
-  travelPlanId: string;
+  // travelPlanId: string;
+  existingBookingData: BookingData;
   tripData: TravelPlan;
   existingBookingId?: string;
 }
 
 export function BookingPage({
   userId,
-  travelPlanId,
   tripData,
-  existingBookingId
+  existingBookingData
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(1);
-
+  // console.log(existingBookingData, existingBookingId);
   const {
     bookingData,
     isLoading,
@@ -37,8 +37,8 @@ export function BookingPage({
     createNewBooking
   } = useBookingState({
     userId,
-    travelPlanId,
-    initialData: {
+    travelPlanId: tripData.travelPlanId,
+    initialData: existingBookingData || {
       pricePerPerson: tripData.price,
       participants: 1
     }
@@ -65,14 +65,12 @@ export function BookingPage({
     cancellationPolicy:
       "Free cancellation up to 14 days before the trip. 50% refund for cancellations 7-14 days before. No refund for cancellations within 7 days of the trip start date.",
     hostInfo: {
-      name: "Travel Host",
+      name: tripData.host.user.name || "",
       experience: "Professional travel guide with 5+ years experience",
-      description:
-        "Experienced guide passionate about creating memorable travel experiences."
+      description: tripData.host.description || ""
     }
   };
 
-  // Update local state when booking data changes
   useEffect(() => {
     if (bookingData.startDate) setStartDate(bookingData.startDate);
     if (bookingData.endDate) setEndDate(bookingData.endDate);
@@ -94,7 +92,7 @@ export function BookingPage({
       if (!bookingData.id) {
         const initialBookingData = {
           userId,
-          travelPlanId,
+          travelPlanId: tripData.travelPlanId,
           startDate,
           endDate,
           pricePerPerson: tripData.price,
@@ -131,8 +129,8 @@ export function BookingPage({
     const success = await updateGuestInfo({
       participants: guestCount,
       guests: guestData.guests,
-      specialRequirements: guestData.specialRequirements,
-      submissionType: guestData.submissionType
+      specialRequirements: guestData.specialRequirements
+      // submissionType: guestData.submissionType
     });
 
     if (success) {
@@ -238,7 +236,6 @@ export function BookingPage({
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="lg:col-span-1">
             <TripCard
               title={displayTripData.title}
@@ -249,8 +246,7 @@ export function BookingPage({
               hostInfo={displayTripData.hostInfo}
             />
 
-            {/* Booking Progress Indicator */}
-            <div className="mt-4 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="mt-4 sticky top-52 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <h3 className="font-semibold text-gray-900 mb-2">
                 Booking Progress
               </h3>

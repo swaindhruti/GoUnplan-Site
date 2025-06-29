@@ -501,13 +501,27 @@ export const getTripById = async (tripId: string) => {
       where: { travelPlanId: tripId },
       include: {
         dayWiseItinerary: true,
+        bookings: {
+          where: {
+            userId: session.user.id,
+            travelPlanId: tripId
+          },
+          select: {
+            id: true,
+            userId: true,
+            travelPlanId: true,
+            startDate: true,
+            endDate: true,
+            totalPrice: true,
+            participants: true,
+            status: true,
+            pricePerPerson: true,
+            refundAmount: true
+          }
+        },
         host: {
           include: {
-            user: {
-              select: {
-                name: true
-              }
-            }
+            user: true
           }
         }
       }

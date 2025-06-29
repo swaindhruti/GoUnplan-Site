@@ -9,12 +9,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 type Props = {
-  params: {
-    "trip-by-id": string;
-  };
+  params: Promise<{
+    tripId: string;
+  }>;
 };
 export default async function MountainBikingAdventure({ params }: Props) {
-  const tripId = params["trip-by-id"];
+  const tripId = (await params).tripId;
   const trip = await getTripById(tripId);
 
   if (!trip || "error" in trip) {
@@ -24,7 +24,6 @@ export default async function MountainBikingAdventure({ params }: Props) {
   const createdAt = new Date(trip.createdAt);
   const year = createdAt.getFullYear();
 
-  console.log(trip);
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <section className="bg-gradient-to-b from-gray-800 to-transparent text-white py-16 px-4 text-center rounded-lg shadow-lg mb-10">
@@ -114,7 +113,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
               ))}
             </li>
           </ul>
-          <Link href={`trips/booking/${trip.travelPlanId}`}>
+          <Link href={`/trips/booking/${trip.travelPlanId}`}>
             <Button className="w-full mb-2">Book Now</Button>
           </Link>
           <Button variant="outline" className="w-full">
@@ -126,7 +125,9 @@ export default async function MountainBikingAdventure({ params }: Props) {
           <h3 className="font-semibold mb-4">About Your Host</h3>
           <div className="flex gap-4 items-center">
             <Avatar>
-              <AvatarImage src="https://via.placeholder.com/60" />
+              <AvatarImage
+                src={trip.host.image || "https://via.placeholder.com/60"}
+              />
               <AvatarFallback>AM</AvatarFallback>
             </Avatar>
             <div>
