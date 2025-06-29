@@ -121,7 +121,7 @@ export default function UserDashboard() {
     };
 
     fetchUserData();
-  }, [session]);
+  }, []);
 
   const TabButton = ({
     label,

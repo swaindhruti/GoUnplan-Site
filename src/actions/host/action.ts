@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { requireHost } from "@/lib/roleGaurd";
-import { TravelPlanStatus } from "../../../db/generated/prisma";
+import { TravelPlanStatus } from "@prisma/client";
 
 export const getHostDetails = async () => {
   const session = await requireHost();

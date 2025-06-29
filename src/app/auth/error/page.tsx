@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, ArrowLeft, Home } from "lucide-react";
@@ -15,7 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function AuthError() {
+// Create a separate component that uses useSearchParams
+function ErrorContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +43,43 @@ export default function AuthError() {
     }
   }, [searchParams]);
 
+  return (
+    <CardContent className="pt-6">
+      {error && (
+        <Alert
+          variant="destructive"
+          className="mb-6 bg-red-50 border-red-200 text-red-800"
+        >
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      <div className="text-center text-sm text-gray-600 mt-2 bg-gray-50 p-4 rounded-lg">
+        <p>Please try again or contact support if the issue persists.</p>
+        <p className="mt-2">
+          You can also try using a different authentication method.
+        </p>
+      </div>
+    </CardContent>
+  );
+}
+
+// Fallback component to show while loading
+function ErrorFallback() {
+  return (
+    <CardContent className="pt-6">
+      <div className="flex justify-center items-center h-20">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+      </div>
+      <div className="text-center text-sm text-gray-600 mt-2 bg-gray-50 p-4 rounded-lg">
+        <p>Loading error details...</p>
+      </div>
+    </CardContent>
+  );
+}
+
+export default function AuthError() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -83,24 +121,10 @@ export default function AuthError() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pt-6">
-            {error && (
-              <Alert
-                variant="destructive"
-                className="mb-6 bg-red-50 border-red-200 text-red-800"
-              >
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <div className="text-center text-sm text-gray-600 mt-2 bg-gray-50 p-4 rounded-lg">
-              <p>Please try again or contact support if the issue persists.</p>
-              <p className="mt-2">
-                You can also try using a different authentication method.
-              </p>
-            </div>
-          </CardContent>
+          {/* Wrap the component using useSearchParams in Suspense */}
+          <Suspense fallback={<ErrorFallback />}>
+            <ErrorContent />
+          </Suspense>
 
           <CardFooter className="flex flex-col space-y-3 pt-2">
             <Button

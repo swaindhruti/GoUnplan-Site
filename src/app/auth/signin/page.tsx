@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +33,8 @@ interface FormErrors {
   general?: string;
 }
 
-export default function SignInPage() {
+// Component that uses useSearchParams
+function SignInForm() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -117,6 +119,131 @@ export default function SignInPage() {
   };
 
   return (
+    <CardContent className="pt-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {successMessage && (
+          <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {errors.general && (
+          <Alert className="mb-4 bg-red-50 border-red-200 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errors.general}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <Mail className="mr-2 h-4 w-4 text-gray-500" />
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
+              Email Address
+            </label>
+          </div>
+          <div className="relative">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border ${
+                errors.email ? "border-red-300" : "border-gray-300"
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+              placeholder="your.email@example.com"
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <Lock className="mr-2 h-4 w-4 text-gray-500" />
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+          </div>
+          <div className="relative">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border ${
+                errors.password ? "border-red-300" : "border-gray-300"
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+              placeholder="••••••••"
+            />
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="remember-me"
+              className="ml-2 block text-sm text-gray-700"
+            >
+              Remember me
+            </label>
+          </div>
+          <div className="text-sm">
+            <Link
+              href="/auth/forgot-password"
+              className="font-medium text-purple-600 hover:text-purple-500"
+            >
+              Forgot password?
+            </Link>
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5 mt-4"
+        >
+          {isLoading ? "Signing In..." : "Sign In"}
+          {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
+        </Button>
+      </form>
+    </CardContent>
+  );
+}
+
+// Loading fallback component
+function SignInFallback() {
+  return (
+    <CardContent className="pt-6">
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    </CardContent>
+  );
+}
+
+export default function SignInPage() {
+  return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
@@ -149,117 +276,20 @@ export default function SignInPage() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {successMessage && (
-                <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertDescription>{successMessage}</AlertDescription>
-                </Alert>
-              )}
+          {/* Wrap the component using useSearchParams in Suspense */}
+          <Suspense fallback={<SignInFallback />}>
+            <SignInForm />
+          </Suspense>
 
-              {errors.general && (
-                <Alert className="mb-4 bg-red-50 border-red-200 text-red-800">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{errors.general}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Mail className="mr-2 h-4 w-4 text-gray-500" />
-                  <label
-                    htmlFor="email"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Email Address
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border ${
-                      errors.email ? "border-red-300" : "border-gray-300"
-                    } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
-                    placeholder="your.email@example.com"
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Lock className="mr-2 h-4 w-4 text-gray-500" />
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border ${
-                      errors.password ? "border-red-300" : "border-gray-300"
-                    } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
-                    placeholder="••••••••"
-                  />
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-2 block text-sm text-gray-700"
-                  >
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <Link
-                    href="/auth/forgot-password"
-                    className="font-medium text-purple-600 hover:text-purple-500"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5 mt-4"
-              >
-                {isLoading ? "Signing In..." : "Sign In"}
-                {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
-              </Button>
-            </form>
-          </CardContent>
+          {/* Optional footer inside card */}
+          <CardFooter className="flex justify-center border-t border-gray-100 pt-4">
+            <p className="text-sm text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link href="/auth/signup" className="text-purple-600 font-medium">
+                Sign up
+              </Link>
+            </p>
+          </CardFooter>
         </Card>
       </div>
 
