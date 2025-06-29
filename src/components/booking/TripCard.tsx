@@ -1,25 +1,37 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Shield, User } from "lucide-react"
-import Image from "next/image"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Shield, User } from "lucide-react";
+import Image from "next/image";
 
 interface TripCardProps {
-  title: string
-  maxPeople: number
-  imageUrl: string
-  whatsIncluded: string[]
-  cancellationPolicy: string
+  title: string;
+  maxPeople: number;
+  imageUrl: string;
+  whatsIncluded: string[];
+  cancellationPolicy: string;
   hostInfo: {
-    name: string
-    experience: string
-    description: string
-  }
+    name: string;
+    experience: string;
+    description: string;
+  };
 }
 
-export function TripCard({ title, maxPeople, imageUrl, whatsIncluded, cancellationPolicy, hostInfo }: TripCardProps) {
+export function TripCard({
+  title,
+  maxPeople,
+  imageUrl,
+  whatsIncluded,
+  cancellationPolicy,
+  hostInfo
+}: TripCardProps) {
   return (
     <Card className="sticky top-4">
       <div className="relative h-48 w-full">
-        <Image src={imageUrl || "/placeholder.svg"} alt={title} fill className="object-cover rounded-t-lg" />
+        <Image
+          src={imageUrl || "/placeholder.svg"}
+          alt={title}
+          fill
+          className="object-cover rounded-t-lg"
+        />
       </div>
 
       <CardHeader>
@@ -32,7 +44,7 @@ export function TripCard({ title, maxPeople, imageUrl, whatsIncluded, cancellati
 
       <CardContent className="space-y-4">
         <div>
-          <h4 className="font-semibold mb-2">What's included</h4>
+          <h4 className="font-semibold mb-2">What&apos;s included</h4>
           <ul className="text-sm space-y-1">
             {whatsIncluded.slice(0, 4).map((item, index) => (
               <li key={index} className="flex items-start gap-2">
@@ -41,7 +53,9 @@ export function TripCard({ title, maxPeople, imageUrl, whatsIncluded, cancellati
               </li>
             ))}
             {whatsIncluded.length > 4 && (
-              <li className="text-purple-600 text-sm">+{whatsIncluded.length - 4} more items</li>
+              <li className="text-purple-600 text-sm">
+                +{whatsIncluded.length - 4} more items
+              </li>
             )}
           </ul>
         </div>
@@ -67,5 +81,5 @@ export function TripCard({ title, maxPeople, imageUrl, whatsIncluded, cancellati
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

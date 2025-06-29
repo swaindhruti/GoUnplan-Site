@@ -1,20 +1,24 @@
-export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+export type BookingStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "CANCELLED"
+  // | "COMPLETED"
+  | "REFUNDED";
 export type TravelPlanStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
 
-export interface GuestInfo {
+export interface TeamMemberInput {
+  isteamLead: boolean;
+  phone: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phoneNumber: string;
+  memberEmail: string;
 }
 
-export type BookingFormData = {
-  guests: GuestInfo[];
-  submissionType: "individual" | "team";
-  numberOfGuests: number;
-  participants: number; // Required!
+export interface BookingFormData {
+  participants: number;
+  guests: TeamMemberInput[];
   specialRequirements?: string;
-};
+}
 
 export interface BookingData {
   id?: string;
@@ -27,9 +31,34 @@ export interface BookingData {
   status: BookingStatus;
   pricePerPerson: number;
   refundAmount?: number;
-  specialRequirements?: string;
-  guests?: GuestInfo[];
+  specialRequirements?: string | null;
+  guests?: TeamMemberInput[];
   submissionType?: "individual" | "team";
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  bio?: string | null;
+  phone: string;
+  password: string;
+  role: string;
+  image?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  appliedForHost: boolean;
+}
+
+export interface HostProfile {
+  hostId: string;
+  description?: string | null;
+  image?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  hostEmail: string;
+  hostMobile: string;
+  user: User;
 }
 
 export interface TravelPlan {
@@ -44,13 +73,25 @@ export interface TravelPlan {
   country: string;
   state: string;
   city: string;
-  status: TravelPlanStatus;
+  status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
   maxParticipants: number;
   destination?: string | null;
   filters: string[];
   languages: string[];
-  endDate?: Date;
-  startDate?: Date;
+  endDate?: Date | null;
+  startDate?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  host: HostProfile;
+  dayWiseItinerary: {
+    id: string;
+    dayNumber: number;
+    title: string;
+    description: string;
+    meals: string | null;
+    accommodation: string | null;
+    travelPlanId: string;
+  }[];
 }
 
 export interface DateSelectorUpdate {
@@ -60,9 +101,9 @@ export interface DateSelectorUpdate {
 
 export interface GuestInfoUpdate {
   participants: number;
-  guests: GuestInfo[];
+  guests: TeamMemberInput[];
   specialRequirements?: string;
-  submissionType: "individual" | "team";
+  // submissionType: "individual" | "team";
 }
 
 export interface PaymentUpdate {

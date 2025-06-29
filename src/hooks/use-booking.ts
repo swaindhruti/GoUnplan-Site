@@ -13,6 +13,7 @@ import type {
   GuestInfoUpdate,
   PaymentUpdate
 } from "@/types/booking";
+import { Booking } from "@prisma/client";
 
 interface UseBookingStateProps {
   userId?: string;
@@ -51,7 +52,7 @@ export function useBookingState({
     setBookingData((prev) => ({ ...prev, ...updates }));
   }, []);
   const convertPrismaBookingToBookingData = useCallback(
-    (prismaBooking: any): Partial<BookingData> => {
+    (prismaBooking: Booking): Partial<BookingData> => {
       const { status, ...rest } = prismaBooking;
 
       let mappedStatus: BookingData["status"] | undefined;
@@ -78,8 +79,6 @@ export function useBookingState({
 
       try {
         updateBookingData(update);
-
-        // If booking exists, update it on server
         if (bookingData.id) {
           const result = await updateBookingDates(
             bookingData.id,
@@ -117,12 +116,12 @@ export function useBookingState({
       try {
         updateBookingData(update);
 
-        // If booking exists, update it on server
         if (bookingData.id) {
           const result = await updateBookingGuestInfo(bookingData.id, {
             participants: update.participants,
-            specialRequirements: update.specialRequirements,
-            submissionType: update.submissionType
+            guests: update.guests,
+            specialRequirements: update.specialRequirements
+            // submissionType: update.submissionType
           });
 
           if (result.error) {
@@ -159,8 +158,6 @@ export function useBookingState({
 
       try {
         updateBookingData(update);
-
-        // Update booking status on server
         if (bookingData.id) {
           const result = await updateBookingStatus(
             bookingData.id,
@@ -203,7 +200,7 @@ export function useBookingState({
           startDate: data.startDate || bookingData.startDate!,
           endDate: data.endDate || bookingData.endDate!,
           participants: data.participants || bookingData.participants || 1,
-          specialRequirements: data.specialRequirements,
+          specialRequirements: data.specialRequirements ?? undefined,
           guests: data.guests,
           submissionType: data.submissionType
         };
