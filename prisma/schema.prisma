@@ -103,6 +103,14 @@ model Booking {
   @@map("bookings")
 }
 
+model WaitingList {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("waiting_list")
+}
+
 enum Role {
   USER
   HOST

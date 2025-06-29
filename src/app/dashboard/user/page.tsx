@@ -121,7 +121,7 @@ export default function UserDashboard() {
     };
 
     fetchUserData();
-  }, []);
+  }, [session?.user?.email]);
 
   const TabButton = ({
     label,

@@ -3,17 +3,51 @@
 import React, { useState, useEffect, useRef } from "react";
 import DotGridBackgroundProvider from "@/components/providers/dotGridBackgroundProvider";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Users, Plane } from "lucide-react";
+import {
+  ArrowRight,
+  Mail,
+  Users,
+  Plane,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  addEmailToWaitingList,
+  getWaitingListCount,
+} from "@/actions/common/waiting-list/action";
+
+// Base count to add to the actual database count
+const BASE_COUNT = 326;
 
 export default function ComingSoonPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  // Starting waitlist count - could be fetched from an API in a real application
-  const [waitlistCount, setWaitlistCount] = useState(427);
+  const [waitlistCount, setWaitlistCount] = useState(0);
   const [cursorPosition, setCursorPosition] = useState({ x: -100, y: -100 });
   const [isOverCard, setIsOverCard] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Fetch waiting list count on component mount
+  useEffect(() => {
+    const fetchWaitlistCount = async () => {
+      try {
+        const response = await getWaitingListCount();
+        if (response.success && response.count !== undefined) {
+          const dbCount = response.count;
+          setWaitlistCount(BASE_COUNT + dbCount);
+        } else {
+          console.error("Failed to fetch waitlist count:", response.message);
+        }
+      } catch (error) {
+        console.error("Error fetching waitlist count:", error);
+      }
+    };
+
+    fetchWaitlistCount();
+  }, []);
 
   // Track mouse position
   useEffect(() => {
@@ -40,14 +74,58 @@ export default function ComingSoonPage() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      console.log("Email submitted:", email);
-      setSubmitted(true);
-      setWaitlistCount((prev) => prev + 1);
-      setTimeout(() => setSubmitted(false), 3000);
-      setEmail("");
+
+    if (!email) return;
+
+    setIsLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      const result = await addEmailToWaitingList(email);
+
+      if (result.success) {
+        setSubmitted(true);
+        setMessage({
+          text: "Thanks for joining our waitlist! We'll notify you when we launch.",
+          type: "success",
+        });
+
+        // Update the count
+        const countResponse = await getWaitingListCount();
+        if (countResponse.success && countResponse.count !== undefined) {
+          const countResponse = await getWaitingListCount();
+          if (countResponse.success && countResponse.count !== undefined) {
+            const newDbCount = countResponse.count;
+            setWaitlistCount(BASE_COUNT + newDbCount);
+          } else {
+          }
+
+          // Clear the form
+          setEmail("");
+
+          // Reset success state after a few seconds
+          setTimeout(() => {
+            setSubmitted(false);
+            setMessage({ text: "", type: "" });
+          }, 5000);
+        } else {
+          setMessage({
+            text:
+              result.message || "Failed to join waitlist. Please try again.",
+            type: "error",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting email:", error);
+      setMessage({
+        text: "Something went wrong. Please try again later.",
+        type: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -142,6 +220,7 @@ export default function ComingSoonPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
                         className="pl-12 pr-4 py-7 w-full bg-gray-100 border-3 border-black rounded-md text-lg font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         placeholder="johndoe@gmail.com"
                         required
@@ -149,15 +228,41 @@ export default function ComingSoonPage() {
                     </div>
                     <Button
                       type="submit"
-                      className="bg-green-500 hover:bg-green-400 border-3 border-black text-black font-bold text-lg py-7 px-6 rounded-md flex items-center justify-center transition-all duration-150 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1"
+                      disabled={isLoading}
+                      className="bg-green-500 hover:bg-green-400 border-3 border-black text-black font-bold text-lg py-7 px-6 rounded-md flex items-center justify-center transition-all duration-150 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      Notify Me <ArrowRight className="ml-2 h-5 w-5" />
+                      {isLoading ? (
+                        "Submitting..."
+                      ) : (
+                        <>
+                          Notify Me <ArrowRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
                     </Button>
                   </form>
 
-                  {submitted && (
-                    <div className="mt-4 bg-yellow-300 border-3 border-black p-3 rounded-md text-center font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                      Thanks! You&apos;re number {waitlistCount}! 🚀
+                  {message.text && (
+                    <div
+                      className={`mt-4 ${
+                        message.type === "success"
+                          ? "bg-yellow-300"
+                          : "bg-red-100 text-red-800"
+                      } border-3 border-black p-3 rounded-md flex items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
+                    >
+                      {message.type === "success" ? (
+                        <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                      ) : (
+                        <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                      )}
+                      <span className="font-bold">{message.text}</span>
+                    </div>
+                  )}
+
+                  {submitted && waitlistCount > 0 && (
+                    <div className="mt-4 pt-2 text-center font-bold">
+                      You&apos;re number{" "}
+                      <span className="text-purple-600">{waitlistCount}</span>{" "}
+                      on our waitlist! 🚀
                     </div>
                   )}
                 </div>
