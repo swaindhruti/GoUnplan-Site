@@ -1,9 +1,21 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Globe, MapPin, Calendar, Star } from "lucide-react";
 import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  // Redirect to coming-soon page when this page is loaded
+  useEffect(() => {
+    router.replace("/coming-soon");
+  }, [router]);
+
+  // The rest of your component will only be rendered if the redirect doesn't happen immediately
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}

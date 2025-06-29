@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/roleGaurd";
 import { Role } from "@/types/auth";
-import { TravelPlanStatus } from "../../../db/generated/prisma";
+import { TravelPlanStatus } from "@prisma/client";
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();

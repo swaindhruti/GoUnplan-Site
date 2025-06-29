@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:studio": "prisma studio",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:generate": "prisma generate --no-engine"
+    "prisma:generate": "prisma generate --no-engine",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
@@ -34,6 +35,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "fs": "^0.0.1-security",
+    "gsap": "^3.13.0",
     "lucide-react": "^0.514.0",
     "next": "15.3.3",
     "next-auth": "^5.0.0-beta.28",

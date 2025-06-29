@@ -158,7 +158,7 @@ export default function SignUpPage() {
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md shadow-lg border border-gray-200">
-          <CardHeader className="space-y-1 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+          <CardHeader className="space-y-1 border-b bg-gray-50 rounded-t-lg">
             <CardTitle className="text-2xl font-bold text-center text-gray-900">
               Create your account
             </CardTitle>
@@ -317,30 +317,6 @@ export default function SignUpPage() {
               >
                 Sign in instead
               </Link>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-gray-50 px-2 text-gray-500">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                Google
-              </Button>
-              <Button
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                GitHub
-              </Button>
             </div>
           </CardFooter>
         </Card>

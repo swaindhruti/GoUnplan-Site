@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../db/generated/prisma"
 }
 
 datasource db {
@@ -40,8 +39,24 @@ model HostProfile {
   @@map("host_profiles")
 }
 
+model DayWiseItinerary {
+  id            String      @id @default(cuid())
+  dayNumber     Int
+  title         String
+  description   String
+  activities    String[]    @default([])
+  meals         String?
+  accommodation String?
+  travelPlanId  String
+  travelPlan    TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("day_wise_itineraries")
+}
+
 model TravelPlans {
-  travelPlanId       String           @id @default(cuid())
+  travelPlanId       String             @id @default(cuid())
   title              String
   description        String
   includedActivities String[]
@@ -52,17 +67,18 @@ model TravelPlans {
   country            String
   state              String
   city               String
-  status             TravelPlanStatus @default(INACTIVE)
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-  maxParticipants    Int              @default(10)
+  status             TravelPlanStatus   @default(INACTIVE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  maxParticipants    Int                @default(10)
   destination        String?
-  filters            String[]         @default([])
-  languages          String[]         @default([])
+  filters            String[]           @default([])
+  languages          String[]           @default([])
   endDate            DateTime?
   startDate          DateTime?
   bookings           Booking[]
-  host               HostProfile      @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+  host               HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+  dayWiseItinerary   DayWiseItinerary[]
 
   @@map("travel_plans")
 }
@@ -85,6 +101,14 @@ model Booking {
   user           User          @relation(fields: [userId], references: [id])
 
   @@map("bookings")
+}
+
+model WaitingList {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("waiting_list")
 }
 
 enum Role {

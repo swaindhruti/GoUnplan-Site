@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/roleGaurd";
-import { BookingStatus } from "../../../db/generated/prisma";
+import { BookingStatus } from "@prisma/client";
 
 export const getUserProfile = async (email: string) => {
   const session = await requireUser();
@@ -22,10 +22,10 @@ export const getUserProfile = async (email: string) => {
         createdAt: true,
         _count: {
           select: {
-            bookings: true
-          }
-        }
-      }
+            bookings: true,
+          },
+        },
+      },
     });
 
     if (!user) return { error: "User not found" };
@@ -33,11 +33,11 @@ export const getUserProfile = async (email: string) => {
     const bookingStats = await prisma.booking.groupBy({
       by: ["status"],
       where: {
-        userId: user.id
+        userId: user.id,
       },
       _count: {
-        id: true
-      }
+        id: true,
+      },
     });
 
     const bookingCounts = {
@@ -45,7 +45,7 @@ export const getUserProfile = async (email: string) => {
       pending: 0,
       confirmed: 0,
       cancelled: 0,
-      completed: 0
+      completed: 0,
     };
 
     bookingStats.forEach((stat) => {
@@ -58,8 +58,8 @@ export const getUserProfile = async (email: string) => {
     return {
       user: {
         ...user,
-        bookingCounts
-      }
+        bookingCounts,
+      },
     };
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -87,7 +87,7 @@ export const updateUserProfile = async (
     const newEmail = data.newEmail ? data.newEmail.trim() : null;
     if (newEmail && newEmail !== email) {
       const existingUserWithNewMail = await prisma.user.findUnique({
-        where: { email: newEmail }
+        where: { email: newEmail },
       });
       if (existingUserWithNewMail) return { error: "Email already in use" };
     }
@@ -99,8 +99,8 @@ export const updateUserProfile = async (
         phone: data.phone ? data.phone.trim() : user.phone,
         email: newEmail || user.email,
         bio: data.bio ? data.bio.trim() : user.bio,
-        image: data.image || user.image
-      }
+        image: data.image || user.image,
+      },
     });
 
     if (!updatedUser) return { error: "Failed to update user profile" };
@@ -129,7 +129,7 @@ export const applyForHost = async (
   try {
     const user = await prisma.user.update({
       where: {
-        email: email
+        email: email,
       },
       data: {
         appliedForHost: true,
@@ -137,21 +137,21 @@ export const applyForHost = async (
           create: {
             description: hostData?.description || "",
             hostEmail: email,
-            hostMobile: hostData?.hostMobile || ""
-          }
-        }
-      }
+            hostMobile: hostData?.hostMobile || "",
+          },
+        },
+      },
     });
 
     return {
       success: true,
-      user
+      user,
     };
   } catch (error) {
     console.error("Error applying for host:", error);
     return {
       success: false,
-      error: "Failed to apply for host status"
+      error: "Failed to apply for host status",
     };
   }
 };
@@ -162,7 +162,7 @@ export const hasAppliedForHost = async (email: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: { email: email },
-      select: { appliedForHost: true }
+      select: { appliedForHost: true },
     });
 
     if (!user) return { error: "User not found" };
@@ -189,7 +189,7 @@ export const bookTravelPlan = async (
 
   try {
     const travelPlan = await prisma.travelPlans.findUnique({
-      where: { travelPlanId }
+      where: { travelPlanId },
     });
 
     if (!travelPlan) {
@@ -198,7 +198,7 @@ export const bookTravelPlan = async (
 
     if (travelPlan.status !== "ACTIVE") {
       return {
-        error: "This travel plan is not currently available for booking"
+        error: "This travel plan is not currently available for booking",
       };
     }
 
@@ -212,7 +212,7 @@ export const bookTravelPlan = async (
       bookingData.participants > travelPlan.maxParticipants
     ) {
       return {
-        error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`
+        error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`,
       };
     }
 
@@ -245,8 +245,8 @@ export const bookTravelPlan = async (
         participants: bookingData.participants,
         pricePerPerson,
         totalPrice,
-        status: "PENDING"
-      }
+        status: "PENDING",
+      },
     });
 
     return { success: true, booking };
@@ -298,15 +298,15 @@ export const getUserBookings = async (
                   select: {
                     name: true,
                     email: true,
-                    image: true
-                  }
-                }
-              }
-            }
-          }
-        }
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      orderBy: status ? { startDate: "desc" } : { createdAt: "desc" }
+      orderBy: status ? { startDate: "desc" } : { createdAt: "desc" },
     });
 
     const statusMessage = status
@@ -316,14 +316,14 @@ export const getUserBookings = async (
     return {
       success: true,
       bookings,
-      message: statusMessage
+      message: statusMessage,
     };
   } catch (error) {
     console.error("Error fetching bookings:", error);
     return {
       error: status
         ? `Failed to fetch ${status} bookings`
-        : "Failed to fetch bookings"
+        : "Failed to fetch bookings",
     };
   }
 };
@@ -343,7 +343,7 @@ export const getBookingDetails = async (userId: string, bookingId: string) => {
   try {
     const booking = await prisma.booking.findUnique({
       where: {
-        id: bookingId
+        id: bookingId,
       },
       include: {
         travelPlan: {
@@ -364,14 +364,14 @@ export const getBookingDetails = async (userId: string, bookingId: string) => {
                 user: {
                   select: {
                     name: true,
-                    email: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!booking) {
@@ -398,8 +398,8 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
-        travelPlan: true
-      }
+        travelPlan: true,
+      },
     });
 
     if (!booking) {
@@ -412,7 +412,7 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
 
     if (booking.status !== "PENDING" && booking.status !== "CONFIRMED") {
       return {
-        error: `Cannot cancel a booking that is already ${booking.status}`
+        error: `Cannot cancel a booking that is already ${booking.status}`,
       };
     }
 
@@ -442,14 +442,14 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
       data: {
         status: "CANCELLED",
         cancelledAt: now,
-        refundAmount
-      }
+        refundAmount,
+      },
     });
 
     return {
       success: true,
       booking: updatedBooking,
-      message: refundMessage
+      message: refundMessage,
     };
   } catch (error) {
     console.error("Error cancelling booking:", error);
@@ -464,7 +464,7 @@ export const getAllActiveTrips = async () => {
   try {
     const activeTrips = await prisma.travelPlans.findMany({
       where: {
-        status: "ACTIVE"
+        status: "ACTIVE",
       },
       select: {
         travelPlanId: true,
@@ -478,11 +478,11 @@ export const getAllActiveTrips = async () => {
         noOfDays: true,
         price: true,
         hostId: true,
-        createdAt: true
+        createdAt: true,
       },
       orderBy: {
-        createdAt: "desc"
-      }
+        createdAt: "desc",
+      },
     });
 
     return { success: true, trips: activeTrips };
