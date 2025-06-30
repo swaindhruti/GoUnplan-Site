@@ -27,7 +27,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       redirect("/auth/signin");
     }
     if (!booking || !trip) {
-      return <></>;
+      return <>booking not!...404</>;
     }
 
     const startDate = booking.startDate;

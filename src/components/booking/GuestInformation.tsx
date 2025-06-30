@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Trash2, Plus, AlertCircle } from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
+// import { useBookingStore } from "@/store/booking-store";
 
 const baseGuestInfoSchema = z.object({
   firstName: z
@@ -98,6 +99,15 @@ export function GuestInformationForm({
   onContinue,
   maxGuests = 8
 }: GuestInformationFormProps) {
+  // const bookingData = useBookingStore((state) => state.bookingData);
+
+  // const existingGuestsLength = Array.isArray(bookingData.guests)
+  //   ? bookingData.guests.length
+  //   : 0;
+
+  // maxGuests =
+  //   (bookingData?.participants || 9) - (existingGuestsLength + 1) || 8;
+
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
     {
