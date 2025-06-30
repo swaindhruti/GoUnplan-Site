@@ -107,7 +107,6 @@ export const updateBookingGuestInfo = async (
     }
 
     const totalPrice = booking.pricePerPerson * guestData.participants;
-
     await prisma.booking.update({
       where: { id: bookingId },
       data: {
@@ -116,26 +115,16 @@ export const updateBookingGuestInfo = async (
         specialRequirements: guestData.specialRequirements || undefined
       }
     });
+    await prisma.teamMember.deleteMany({
+      where: { bookingId }
+    });
 
-    await Promise.all(
-      guestData.guests.map((guest) =>
-        prisma.teamMember.upsert({
-          where: {
-            bookingId_memberEmail: {
-              bookingId,
-              memberEmail: guest.memberEmail
-            }
-          },
-          update: {
-            ...guest
-          },
-          create: {
-            ...guest,
-            bookingId
-          }
-        })
-      )
-    );
+    await prisma.teamMember.createMany({
+      data: guestData.guests.map((guest) => ({
+        ...guest,
+        bookingId
+      }))
+    });
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
@@ -309,6 +298,36 @@ export const updateBookingDates = async (
       data: {
         startDate,
         endDate
+      }
+    });
+
+    revalidatePath(`/booking/${booking.travelPlanId}`);
+    return { success: true, booking: updatedBooking };
+  } catch (error) {
+    console.error("Error updating booking dates:", error);
+    return { error: "Failed to update booking dates" };
+  }
+};
+
+export const updateFormSubmittedStatus = async (bookingId: string) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    console.log("hii");
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { travelPlan: true }
+    });
+
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Unauthorized" };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        formSubmitted: false
       }
     });
 

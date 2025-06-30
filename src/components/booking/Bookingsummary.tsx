@@ -9,6 +9,8 @@ import {
   FileText
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
+import { updateFormSubmittedStatus } from "@/actions/booking/actions";
+import { useRouter } from "next/navigation";
 
 export interface BookingSummaryProps {
   booking: BookingData | null;
@@ -23,6 +25,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
   travelPlan,
   loading = false
 }) => {
+  const router = useRouter();
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -73,6 +76,15 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
       style: "currency",
       currency: "INR"
     }).format(amount);
+  };
+
+  const handleEditDetails = async () => {
+    try {
+      const response = await updateFormSubmittedStatus(booking?.id || "");
+      if (response.success) {
+        router.push(`/trips/booking/${booking.travelPlanId}`);
+      }
+    } catch {}
   };
 
   const getDuration = (): string => {
@@ -277,7 +289,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
             {booking.formSubmitted && booking.status !== "CANCELLED" && (
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 <button
-                  onClick={() => {}}
+                  onClick={() => {
+                    handleEditDetails();
+                  }}
                   className="flex-1 bg-white border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                   type="button"
@@ -285,7 +299,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                   Edit Details
                 </button>
                 <button
-                  onClick={() => {}}
+                  onClick={() => {
+                    router.push(
+                      `/trips/booking/${booking.travelPlanId}/payment-form`
+                    );
+                  }}
                   className="flex-1 bg-gray-900 text-white font-medium py-3 px-6 rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading || booking.status === "CONFIRMED"}
                   type="button"

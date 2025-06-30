@@ -7,7 +7,6 @@ import { DateSelector } from "./DateSelector";
 import { TripSummary } from "./TripSummary";
 import { TripCard } from "./TripCard";
 import { GuestInformationForm } from "./GuestInformation";
-import { PaymentForm } from "./PaymentForm";
 import { format, addDays } from "date-fns";
 import { useBookingState } from "@/hooks/use-booking";
 import type { TravelPlan, BookingFormData, BookingData } from "@/types/booking";
@@ -35,7 +34,6 @@ export function BookingPage({
     error,
     updateDateSelection,
     updateGuestInfo,
-    updatePaymentInfo,
     createNewBooking
   } = useBookingState({
     userId,
@@ -139,18 +137,18 @@ export function BookingPage({
     }
   };
 
-  const handlePaymentComplete = async () => {
-    const totalPrice = numberOfGuests * (tripData?.price || 0);
+  // const handlePaymentComplete = async () => {
+  //   const totalPrice = numberOfGuests * (tripData?.price || 0);
 
-    const success = await updatePaymentInfo({
-      totalPrice,
-      status: "CONFIRMED"
-    });
+  //   const success = await updatePaymentInfo({
+  //     totalPrice,
+  //     status: "CONFIRMED"
+  //   });
 
-    if (success) {
-      console.log("Payment completed successfully!");
-    }
-  };
+  //   if (success) {
+  //     console.log("Payment completed successfully!");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -217,20 +215,6 @@ export function BookingPage({
                 <GuestInformationForm
                   onBack={handleBack}
                   onContinue={handleGuestInfoSubmit}
-                />
-              )}
-
-              {currentStep === 3 && (
-                <PaymentForm
-                  onBack={handleBack}
-                  onComplete={handlePaymentComplete}
-                  tripData={{
-                    title: tripData.title,
-                    startDate: format(startDate, "MMM dd, yyyy"),
-                    endDate: format(endDate, "MMM dd, yyyy"),
-                    numberOfGuests,
-                    pricePerPerson: tripData?.price || 0
-                  }}
                 />
               )}
             </div>
