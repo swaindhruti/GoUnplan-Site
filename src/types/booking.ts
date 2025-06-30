@@ -33,7 +33,10 @@ export interface BookingData {
   refundAmount?: number;
   specialRequirements?: string | null;
   guests?: TeamMemberInput[];
+  formSubmitted: boolean;
   submissionType?: "individual" | "team";
+  updatedAt?: Date;
+  createdAt?: Date;
 }
 
 export interface User {
@@ -65,25 +68,25 @@ export interface TravelPlan {
   travelPlanId: string;
   title: string;
   description: string;
-  includedActivities: string[];
-  restrictions: string[];
-  noOfDays: number;
-  hostId: string;
-  price: number;
-  country: string;
-  state: string;
-  city: string;
+  includedActivities?: string[];
+  restrictions?: string[];
+  noOfDays?: number;
+  hostId?: string;
+  price?: number;
+  country?: string;
+  state?: string;
+  city?: string;
   status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
-  maxParticipants: number;
+  maxParticipants?: number;
   destination?: string | null;
-  filters: string[];
+  filters?: string[];
   languages: string[];
   endDate?: Date | null;
   startDate?: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  host: HostProfile;
-  dayWiseItinerary: {
+  createdAt?: Date;
+  updatedAt?: Date;
+  host?: HostProfile;
+  dayWiseItinerary?: {
     id: string;
     dayNumber: number;
     title: string;

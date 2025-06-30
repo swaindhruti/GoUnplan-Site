@@ -18,7 +18,7 @@ export default async function HostDashboard() {
               name: userSession.user.name!,
               email: userSession.user.email!,
               image: userSession.user.image!,
-              role: userSession.user.role as "HOST" | "ADMIN" | "USER",
+              role: userSession.user.role as "HOST" | "ADMIN" | "USER"
             }}
           />
         </>

@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 // import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getTripById } from "@/actions/user/action";
+// import { getTripById } from "@/actions/user/action";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTripById } from "@/actions/trips/getTripByIdForTripDetail";
 
 type Props = {
   params: Promise<{

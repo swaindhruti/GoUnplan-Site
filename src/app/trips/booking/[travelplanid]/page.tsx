@@ -1,8 +1,10 @@
-// import { BookingPage } from './components/booking/BookingPage';
-import { getTripById } from "@/actions/user/action";
+// import { getTripById } from "@/actions/user/action";
+import { getTripById } from "@/actions/trips/getTripByIdForBooking";
 import { BookingPage } from "@/components/booking/BookingPage";
+// import { GetTrip } from "@/hooks/use-get-trip";
 import { requireUser } from "@/lib/roleGaurd";
-import { notFound } from "next/navigation";
+// import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 type Props = {
   params: Promise<{
     travelPlanId: string;
@@ -10,21 +12,31 @@ type Props = {
 };
 export default async function Booking({ params }: Props) {
   const tripId = (await params).travelPlanId;
-  const trip = await getTripById(tripId);
+  const { trip, booking } = await getTripById(tripId);
   const userSession = await requireUser();
-  if (!trip || "error" in trip) {
-    return notFound();
+
+  if (!booking) {
+    return <div>Booking not found</div>;
   }
+
+  if (!trip) {
+    return <div>Booking not found</div>;
+  }
+  if (booking?.formSubmitted) {
+    redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
+  }
+
   return (
-    <BookingPage
-      existingBookingData={trip.bookings[0]}
-      userId={userSession.user.id || ""}
-      tripData={{
-        ...trip,
-        destination: trip.destination ?? undefined,
-        endDate: trip.endDate ?? undefined,
-        startDate: trip.endDate ?? undefined
-      }}
-    />
+    <>
+      {
+        <BookingPage
+          existingBookingData={booking}
+          userId={userSession.user.id || ""}
+          tripData={{
+            ...trip
+          }}
+        />
+      }
+    </>
   );
 }

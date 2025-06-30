@@ -77,46 +77,12 @@ export const createBooking = async (bookingData: {
   }
 };
 
-export const updateBookingDates = async (
-  bookingId: string,
-  startDate: Date,
-  endDate: Date
-) => {
-  const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-
-  try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId }
-    });
-    if (!booking || booking.userId !== session.user.id)
-      return { error: "Unauthorized" };
-
-    const today = new Date();
-    if (startDate < today) return { error: "Start date cannot be in the past" };
-    if (endDate < startDate)
-      return { error: "End date cannot be before start date" };
-
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: { startDate, endDate }
-    });
-
-    revalidatePath(`/booking/${booking.travelPlanId}`);
-    return { success: true, booking: updatedBooking };
-  } catch (error) {
-    console.error("Error updating booking dates:", error);
-    return { error: "Failed to update booking dates" };
-  }
-};
-
 export const updateBookingGuestInfo = async (
   bookingId: string,
   guestData: {
     participants: number;
     specialRequirements?: string;
     guests: TeamMemberInput[];
-    // submissionType: "individual" | "team";
   }
 ) => {
   const session = await requireUser();
@@ -127,12 +93,13 @@ export const updateBookingGuestInfo = async (
       where: { id: bookingId },
       include: { travelPlan: true }
     });
-    console.log(guestData.guests);
+
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
 
     if (guestData.participants <= 0)
       return { error: "Number of participants must be at least 1" };
+
     if (guestData.participants > booking.travelPlan.maxParticipants) {
       return {
         error: `Maximum ${booking.travelPlan.maxParticipants} participants allowed for this plan`
@@ -140,25 +107,31 @@ export const updateBookingGuestInfo = async (
     }
 
     const totalPrice = booking.pricePerPerson * guestData.participants;
-
-    const updatedBooking = await prisma.booking.update({
+    await prisma.booking.update({
       where: { id: bookingId },
       data: {
         participants: guestData.participants,
-        totalPrice
+        totalPrice,
+        specialRequirements: guestData.specialRequirements || undefined
       }
     });
+    await prisma.teamMember.deleteMany({
+      where: { bookingId }
+    });
 
-    console.log("teamMember model:", prisma.teamMember);
-
-    const createdTeam = await prisma.teamMember.createMany({
+    await prisma.teamMember.createMany({
       data: guestData.guests.map((guest) => ({
         ...guest,
         bookingId
       }))
     });
-    console.log(createdTeam);
-    // const updatedBookings=[...updatedBooking,...createdTeam]
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        formSubmitted: true
+      }
+    });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
     return { success: true, booking: updatedBooking };
@@ -294,5 +267,74 @@ export const cancelBooking = async (bookingId: string) => {
   } catch (error) {
     console.error("Error cancelling booking:", error);
     return { error: "Failed to cancel booking" };
+  }
+};
+
+export const updateBookingDates = async (
+  bookingId: string,
+  startDate: Date,
+  endDate: Date
+) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { travelPlan: true }
+    });
+
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Unauthorized" };
+    }
+
+    // Optional: Add a check to ensure dates are valid (e.g., endDate after startDate)
+    if (startDate >= endDate) {
+      return { error: "End date must be after start date" };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        startDate,
+        endDate
+      }
+    });
+
+    revalidatePath(`/booking/${booking.travelPlanId}`);
+    return { success: true, booking: updatedBooking };
+  } catch (error) {
+    console.error("Error updating booking dates:", error);
+    return { error: "Failed to update booking dates" };
+  }
+};
+
+export const updateFormSubmittedStatus = async (bookingId: string) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    console.log("hii");
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { travelPlan: true }
+    });
+
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Unauthorized" };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        formSubmitted: false
+      }
+    });
+
+    revalidatePath(`/booking/${booking.travelPlanId}`);
+    return { success: true, booking: updatedBooking };
+  } catch (error) {
+    console.error("Error updating booking dates:", error);
+    return { error: "Failed to update booking dates" };
   }
 };

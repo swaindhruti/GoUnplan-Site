@@ -74,7 +74,7 @@ export default function BookingPageLoading() {
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center">
         <Loader2 className="h-12 w-12 animate-spin text-black mx-auto mb-4" />
-        <p className="text-black text-lg">Redirecting to booking page...</p>
+        <p className="text-black text-lg">Redirecting to Payment...</p>
       </div>
     </div>
   );
