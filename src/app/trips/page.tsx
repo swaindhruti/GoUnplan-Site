@@ -9,7 +9,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import {
   Map,
@@ -27,15 +27,15 @@ import {
   Search,
   Compass,
   AlertCircle,
-  Loader2,
   Languages,
   Filter,
   X,
   ChevronDown,
-  ChevronUp,
+  ChevronUp
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ReactSelect, { StylesConfig, MultiValue } from "react-select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ✅ Backend raw trip type
 type RawTrip = {
@@ -89,7 +89,6 @@ export default function TripsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  // ✅ Load and transform trips
   useEffect(() => {
     async function loadTrips() {
       try {
@@ -107,7 +106,7 @@ export default function TripsPage() {
                 createdAt: new Date(trip.createdAt).toISOString(),
                 languages: Array.isArray(trip.languages) ? trip.languages : [],
                 filters: safeFilters,
-                vibes: safeFilters, // alias for UI
+                vibes: safeFilters
               };
             }
           );
@@ -188,7 +187,7 @@ export default function TripsPage() {
     countryFilter,
     languageFilter,
     vibeFilter,
-    trips,
+    trips
   ]);
 
   const uniqueCountries = Array.from(
@@ -212,7 +211,7 @@ export default function TripsPage() {
     control: (base) => ({
       ...base,
       backgroundColor: "#faf5ff",
-      borderColor: "#d8b4fe",
+      borderColor: "#d8b4fe"
     }),
     option: (base, state) => ({
       ...base,
@@ -221,15 +220,15 @@ export default function TripsPage() {
         : state.isFocused
         ? "#f3e8ff"
         : undefined,
-      color: state.isSelected ? "white" : "#4c1d95",
+      color: state.isSelected ? "white" : "#4c1d95"
     }),
     multiValue: (base) => ({ ...base, backgroundColor: "#e9d5ff" }),
     multiValueLabel: (base) => ({ ...base, color: "#4c1d95" }),
     multiValueRemove: (base) => ({
       ...base,
       color: "#4c1d95",
-      ":hover": { backgroundColor: "#d8b4fe", color: "#6b21a8" },
-    }),
+      ":hover": { backgroundColor: "#d8b4fe", color: "#6b21a8" }
+    })
   };
 
   return (
@@ -258,7 +257,6 @@ export default function TripsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Filter section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -300,8 +298,6 @@ export default function TripsPage() {
               {filteredTrips.length === 1 ? "trip" : "trips"} found
             </p>
           </div>
-
-          {/* Collapsible filter panel */}
           {showFilters && (
             <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100 mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Left column */}
@@ -333,7 +329,7 @@ export default function TripsPage() {
                       onChange={(e) =>
                         setPriceRange([
                           priceRange[0],
-                          +e.target.value || Infinity,
+                          +e.target.value || Infinity
                         ])
                       }
                     />
@@ -405,7 +401,7 @@ export default function TripsPage() {
                     placeholder="Select languages"
                     options={uniqueLanguages.map((l) => ({
                       value: l,
-                      label: l,
+                      label: l
                     }))}
                     value={languageFilter.map((l) => ({ value: l, label: l }))}
                     onChange={(selected: MultiValue<SelectOption>) =>
@@ -434,17 +430,30 @@ export default function TripsPage() {
           )}
         </div>
 
-        {/* Loading */}
         {isLoading && (
-          <div className="text-center py-16">
-            <Loader2 className="animate-spin h-12 w-12 text-purple-600 mx-auto mb-4" />
-            <p className="text-purple-600 text-lg">
-              Loading amazing experiences...
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16">
+            {[...Array(6)].map((_, i) => (
+              <Card
+                key={i}
+                className="overflow-hidden border border-purple-100 animate-pulse"
+              >
+                <div className="h-48 bg-purple-100" />
+                <CardHeader>
+                  <Skeleton className="h-4 w-3/4 bg-purple-200 rounded" />
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Skeleton className="h-3 w-full bg-purple-100 rounded" />
+                  <Skeleton className="h-3 w-5/6 bg-purple-100 rounded" />
+                  <Skeleton className="h-3 w-2/3 bg-purple-100 rounded" />
+                </CardContent>
+                <CardFooter>
+                  <Skeleton className="h-10 w-full bg-purple-200 rounded-md" />
+                </CardFooter>
+              </Card>
+            ))}
           </div>
         )}
 
-        {/* Error */}
         {error && (
           <Alert className="mb-6 bg-red-50 border-red-200 text-red-800">
             <AlertCircle className="h-4 w-4" />
@@ -452,7 +461,6 @@ export default function TripsPage() {
           </Alert>
         )}
 
-        {/* Results */}
         {!isLoading && !error && filteredTrips.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredTrips.map((trip) => (
@@ -521,7 +529,6 @@ export default function TripsPage() {
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && !error && filteredTrips.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-purple-100 px-4">
             <Compass className="h-16 w-16 text-purple-300 mx-auto mb-4" />

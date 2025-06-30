@@ -15,17 +15,19 @@ import type { TravelPlan, BookingFormData, BookingData } from "@/types/booking";
 interface BookingPageProps {
   userId: string;
   // travelPlanId: string;
-  existingBookingData: BookingData;
+  existingBookingData: Partial<BookingData>;
   tripData: TravelPlan;
   existingBookingId?: string;
+  Step?: number;
 }
 
 export function BookingPage({
   userId,
   tripData,
-  existingBookingData
+  existingBookingData,
+  Step
 }: BookingPageProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(Step || 1);
   // console.log(existingBookingData, existingBookingId);
   const {
     bookingData,
@@ -48,7 +50,7 @@ export function BookingPage({
     bookingData.startDate || new Date()
   );
   const [endDate, setEndDate] = useState<Date>(
-    bookingData.endDate || addDays(new Date(), tripData.noOfDays - 1)
+    bookingData.endDate || addDays(new Date(), tripData.noOfDays || 0 - 1)
   );
   const [numberOfGuests, setNumberOfGuests] = useState<number>(
     bookingData.participants || 1
@@ -65,9 +67,9 @@ export function BookingPage({
     cancellationPolicy:
       "Free cancellation up to 14 days before the trip. 50% refund for cancellations 7-14 days before. No refund for cancellations within 7 days of the trip start date.",
     hostInfo: {
-      name: tripData.host.user.name || "",
+      name: tripData.host?.user.name || "",
       experience: "Professional travel guide with 5+ years experience",
-      description: tripData.host.description || ""
+      description: tripData.host?.description || ""
     }
   };
 
@@ -98,7 +100,7 @@ export function BookingPage({
           pricePerPerson: tripData.price,
           participants: numberOfGuests,
           status: "PENDING" as const,
-          totalPrice: tripData.price * numberOfGuests
+          totalPrice: tripData?.price || 0 * numberOfGuests
         };
 
         const newBooking = await createNewBooking(initialBookingData);
@@ -130,7 +132,6 @@ export function BookingPage({
       participants: guestCount,
       guests: guestData.guests,
       specialRequirements: guestData.specialRequirements
-      // submissionType: guestData.submissionType
     });
 
     if (success) {
@@ -139,7 +140,7 @@ export function BookingPage({
   };
 
   const handlePaymentComplete = async () => {
-    const totalPrice = numberOfGuests * tripData.price;
+    const totalPrice = numberOfGuests * (tripData?.price || 0);
 
     const success = await updatePaymentInfo({
       totalPrice,
@@ -148,7 +149,6 @@ export function BookingPage({
 
     if (success) {
       console.log("Payment completed successfully!");
-      // Redirect to success page or show success modal
     }
   };
 
@@ -188,7 +188,7 @@ export function BookingPage({
                     Select Your Travel Date
                   </h2>
                   <DateSelector
-                    tripDuration={tripData.noOfDays}
+                    tripDuration={tripData.noOfDays || 0}
                     onDateChange={handleDateChange}
                     selectedDate={startDate}
                   />
@@ -229,7 +229,7 @@ export function BookingPage({
                     startDate: format(startDate, "MMM dd, yyyy"),
                     endDate: format(endDate, "MMM dd, yyyy"),
                     numberOfGuests,
-                    pricePerPerson: tripData.price
+                    pricePerPerson: tripData?.price || 0
                   }}
                 />
               )}
@@ -239,9 +239,9 @@ export function BookingPage({
           <div className="lg:col-span-1">
             <TripCard
               title={displayTripData.title}
-              maxPeople={displayTripData.maxPeople}
+              maxPeople={displayTripData.maxPeople || 1}
               imageUrl={displayTripData.imageUrl}
-              whatsIncluded={displayTripData.whatsIncluded}
+              whatsIncluded={displayTripData.whatsIncluded || []}
               cancellationPolicy={displayTripData.cancellationPolicy}
               hostInfo={displayTripData.hostInfo}
             />

@@ -96,11 +96,11 @@ model TeamMember {
   memberEmail   String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-
   bookingId     String     
   booking       Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("team_members")
+  @@unique([bookingId, memberEmail])
 }
 
 model Booking {
@@ -116,6 +116,7 @@ model Booking {
   updatedAt      DateTime      @updatedAt
   guests         TeamMember[] 
   specialRequirements String?
+  formSubmitted  Boolean       @default(false)
   cancelledAt    DateTime?
   pricePerPerson Int
   refundAmount   Int           @default(0)
