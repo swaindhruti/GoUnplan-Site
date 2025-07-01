@@ -21,18 +21,22 @@ model User {
   appliedForHost Boolean      @default(false)
   bookings       Booking[]
   hostProfile    HostProfile?
+  reviews        Review[]
 
   @@map("users")
 }
 
 model HostProfile {
-  hostId      String        @id @default(cuid())
-  description String?
-  image       String?       @default("https://avatar.iran.liara.run/public")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  hostEmail   String        @unique
-  hostMobile  String
+  hostId        String   @id @default(cuid())
+  description   String?
+  image         String?  @default("https://avatar.iran.liara.run/public")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  hostEmail     String   @unique
+  hostMobile    String
+  reviewCount   Int      @default(0)
+  averageRating Float    @default(0)
+  reviews       Review[]
 
   user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   travelPlans TravelPlans[]
@@ -55,8 +59,6 @@ model DayWiseItinerary {
 
   @@map("day_wise_itineraries")
 }
-
-
 
 model TravelPlans {
   travelPlanId       String             @id @default(cuid())
@@ -82,50 +84,53 @@ model TravelPlans {
   bookings           Booking[]
   host               HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
   dayWiseItinerary   DayWiseItinerary[]
+  reviewCount        Int                @default(0)
+  averageRating      Float              @default(0)
+  reviews            Review[]
 
   @@map("travel_plans")
 }
 
-
 model TeamMember {
-  id            String      @id @default(cuid())
-  isteamLead    Boolean
-  phone         String
-  firstName     String
-  lastName      String
-  memberEmail   String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  bookingId     String     
-  booking       Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  isteamLead  Boolean
+  phone       String
+  firstName   String
+  lastName    String
+  memberEmail String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
-  @@map("team_members")
   @@unique([bookingId, memberEmail])
+  @@map("team_members")
 }
 
 model Booking {
-  id             String        @id @default(cuid())
-  userId         String
-  travelPlanId   String
-  startDate      DateTime
-  endDate        DateTime
-  totalPrice     Int
-  participants   Int           @default(1)
-  status         BookingStatus @default(PENDING)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  guests         TeamMember[] 
+  id                  String        @id @default(cuid())
+  userId              String
+  travelPlanId        String
+  startDate           DateTime
+  endDate             DateTime
+  totalPrice          Int
+  participants        Int           @default(1)
+  status              BookingStatus @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  guests              TeamMember[]
   specialRequirements String?
-  formSubmitted  Boolean       @default(false)
-  cancelledAt    DateTime?
-  pricePerPerson Int
-  refundAmount   Int           @default(0)
-  travelPlan     TravelPlans   @relation(fields: [travelPlanId], references: [travelPlanId])
-  user           User          @relation(fields: [userId], references: [id])
+  formSubmitted       Boolean       @default(false)
+  cancelledAt         DateTime?
+  pricePerPerson      Int
+  refundAmount        Int           @default(0)
+  travelPlan          TravelPlans   @relation(fields: [travelPlanId], references: [travelPlanId])
+  user                User          @relation(fields: [userId], references: [id])
+  isReviewed          Boolean       @default(false)
+  review              Review?
 
   @@map("bookings")
 }
-
 
 model WaitingList {
   id        String   @id @default(cuid())
@@ -133,6 +138,26 @@ model WaitingList {
   createdAt DateTime @default(now())
 
   @@map("waiting_list")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  userId       String
+  bookingId    String   @unique
+  travelPlanId String
+  hostId       String
+  rating       Int      @default(0)
+  comment      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking    Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  travelPlan TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
+  host       HostProfile @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+
+  @@map("reviews")
 }
 
 enum Role {
