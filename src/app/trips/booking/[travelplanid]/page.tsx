@@ -11,13 +11,13 @@ type Props = {
 };
 export default async function Booking({ params }: Props) {
   const tripId = (await params).travelplanid;
-  console.log("tripId", tripId);
   const { trip, booking } = await getTripById(tripId);
   const userSession = await requireUser();
 
   if (!trip) {
     return <div>Booking not found</div>;
   }
+
   if (booking?.formSubmitted) {
     redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
   }

@@ -10,7 +10,7 @@ export const getTripById = async (tripId: string) => {
   if (!session) return { error: "Unauthorized" };
 
   try {
-    const trip = await prisma.travelPlans.findUnique({
+    const trip = await prisma?.travelPlans.findUnique({
       where: { travelPlanId: tripId },
       include: {
         host: {
