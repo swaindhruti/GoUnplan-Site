@@ -1,4 +1,3 @@
-// import { getTripById } from "@/actions/user/action";
 import { getTripById } from "@/actions/trips/getTripByIdForBooking";
 import { BookingPage } from "@/components/booking/BookingPage";
 // import { GetTrip } from "@/hooks/use-get-trip";
@@ -12,13 +11,8 @@ type Props = {
 };
 export default async function Booking({ params }: Props) {
   const tripId = (await params).travelplanid;
-  console.log(tripId);
   const { trip, booking } = await getTripById(tripId);
   const userSession = await requireUser();
-
-  if (!booking) {
-    return <div>Booking not found</div>;
-  }
 
   if (!trip) {
     return <div>Booking not found</div>;
@@ -32,10 +26,10 @@ export default async function Booking({ params }: Props) {
     <>
       {
         <BookingPage
-          existingBookingData={booking}
+          existingBookingData={booking || {}}
           userId={userSession.user.id || ""}
           tripData={{
-            ...trip
+            ...trip,
           }}
         />
       }

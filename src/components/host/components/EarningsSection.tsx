@@ -1,6 +1,5 @@
 "use client";
 import { RevenueAnalytics } from "../types";
-import { StatCard } from "./common/StatCard";
 import { DollarSign, TrendingDown, AlertCircle, BarChart3 } from "lucide-react";
 
 type EarningsSectionProps = {
@@ -18,91 +17,139 @@ export const EarningsSection = ({
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-3xl font-black text-black uppercase tracking-tight">
             Revenue Analytics
           </h2>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-gray-700 font-bold">
             Track your earnings, bookings, and financial performance
           </p>
         </div>
       </div>
 
       {revenueLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <span className="ml-3 text-gray-600">Loading revenue data...</span>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-bounce bg-yellow-300 border-3 border-black rounded-lg h-16 w-16 flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
+            <DollarSign className="h-8 w-8 text-black" />
+          </div>
+          <span className="text-xl font-bold text-black">
+            Loading revenue data...
+          </span>
         </div>
       ) : revenueError ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
-            <p className="mt-2 text-red-600 font-medium">{revenueError}</p>
+            <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
+              <AlertCircle className="h-10 w-10 text-black" />
+            </div>
+            <p className="mt-2 text-xl font-bold text-black">{revenueError}</p>
           </div>
         </div>
       ) : revenueData ? (
         <>
           {/* Revenue Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatCard
-              title="Net Revenue"
-              value={`₹${revenueData.summary.netRevenue.toLocaleString()}`}
-              icon={<DollarSign size={20} />}
-              color="green"
-            />
+            <div className="bg-green-500 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-black uppercase">
+                  Net Revenue
+                </h3>
+                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-black" />
+                </div>
+              </div>
+              <p className="mt-2 text-3xl font-black text-black">
+                ₹{revenueData.summary.netRevenue.toLocaleString()}
+              </p>
+            </div>
 
-            <StatCard
-              title="Confirmed Bookings"
-              value={revenueData.confirmed.bookingCount}
-              icon={<BarChart3 size={20} />}
-              subtitle={`₹${revenueData.confirmed.revenue.toLocaleString()} total revenue`}
-              color="blue"
-            />
+            <div className="bg-blue-400 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-black uppercase">
+                  Confirmed Bookings
+                </h3>
+                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-black" />
+                </div>
+              </div>
+              <p className="mt-2 text-3xl font-black text-black">
+                {revenueData.confirmed.bookingCount}
+              </p>
+              <p className="mt-1 text-sm font-extrabold text-black">
+                ₹{revenueData.confirmed.revenue.toLocaleString()} total revenue
+              </p>
+            </div>
 
-            <StatCard
-              title="Cancellation Rate"
-              value={`${revenueData.summary.cancellationRate}%`}
-              icon={<AlertCircle size={20} />}
-              subtitle={`${revenueData.cancelled.bookingCount} cancelled bookings`}
-              color={
-                revenueData.summary.cancellationRate > 10 ? "red" : "yellow"
-              }
-            />
+            <div
+              className={`${
+                revenueData.summary.cancellationRate > 10
+                  ? "bg-red-400"
+                  : "bg-yellow-300"
+              } rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6`}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-black uppercase">
+                  Cancellation Rate
+                </h3>
+                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-black" />
+                </div>
+              </div>
+              <p className="mt-2 text-3xl font-black text-black">
+                {revenueData.summary.cancellationRate}%
+              </p>
+              <p className="mt-1 text-sm font-extrabold text-black">
+                {revenueData.cancelled.bookingCount} cancelled bookings
+              </p>
+            </div>
 
-            <StatCard
-              title="Revenue at Risk"
-              value={`₹${revenueData.summary.revenueAtRisk.toLocaleString()}`}
-              icon={<TrendingDown size={20} />}
-              subtitle={`${revenueData.pending.bookingCount} pending bookings`}
-              color="yellow"
-            />
+            <div className="bg-yellow-300 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-black uppercase">
+                  Revenue at Risk
+                </h3>
+                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
+                  <TrendingDown className="h-6 w-6 text-black" />
+                </div>
+              </div>
+              <p className="mt-2 text-3xl font-black text-black">
+                ₹{revenueData.summary.revenueAtRisk.toLocaleString()}
+              </p>
+              <p className="mt-1 text-sm font-extrabold text-black">
+                {revenueData.pending.bookingCount} pending bookings
+              </p>
+            </div>
           </div>
 
           {/* Detailed Revenue Analysis */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Confirmed Bookings */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
+              <div className="border-b-4 border-black bg-purple-600 px-6 py-4">
+                <h3 className="text-xl font-black text-white uppercase">
                   Confirmed Bookings
                 </h3>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Revenue</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-black font-bold">Total Revenue</span>
+                    <span className="font-extrabold text-black bg-green-500 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       ₹{revenueData.confirmed.revenue.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Number of Bookings</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-black font-bold">
+                      Number of Bookings
+                    </span>
+                    <span className="font-extrabold text-black bg-blue-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       {revenueData.confirmed.bookingCount}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Average Booking Value</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-black font-bold">
+                      Average Booking Value
+                    </span>
+                    <span className="font-extrabold text-black bg-yellow-300 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       ₹
                       {revenueData.confirmed.bookingCount > 0
                         ? Math.round(
@@ -117,31 +164,33 @@ export const EarningsSection = ({
             </div>
 
             {/* Cancelled Bookings */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
+              <div className="border-b-4 border-black bg-pink-500 px-6 py-4">
+                <h3 className="text-xl font-black text-black uppercase">
                   Cancelled Bookings
                 </h3>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Booking Value</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-black font-bold">
+                      Total Booking Value
+                    </span>
+                    <span className="font-extrabold text-black bg-blue-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       ₹{revenueData.cancelled.bookingValue.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Refunds</span>
-                    <span className="font-semibold text-red-600">
+                    <span className="text-black font-bold">Total Refunds</span>
+                    <span className="font-extrabold text-black bg-red-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       ₹{revenueData.cancelled.refundAmount.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">
+                    <span className="text-black font-bold">
                       Number of Cancellations
                     </span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-extrabold text-black bg-yellow-300 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
                       {revenueData.cancelled.bookingCount}
                     </span>
                   </div>
@@ -150,15 +199,19 @@ export const EarningsSection = ({
             </div>
 
             {/* Monthly Revenue Analysis */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-2">
-              <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden lg:col-span-2">
+              <div className="border-b-4 border-black bg-blue-400 px-6 py-4">
+                <h3 className="text-xl font-black text-black uppercase">
                   Monthly Revenue Analysis
                 </h3>
               </div>
-              <div className="p-6">
+              <div className="p-6 relative">
+                {/* Decorative elements */}
+                <div className="absolute bottom-4 right-8 h-8 w-8 bg-yellow-300 border-3 border-black rounded-lg"></div>
+                <div className="absolute top-4 left-8 h-6 w-6 bg-pink-500 border-2 border-black rounded-full"></div>
+
                 <div className="flex items-center justify-center h-64">
-                  <p className="text-gray-500">
+                  <p className="text-black font-bold px-4 py-3 bg-gray-100 border-3 border-black rounded-md">
                     {revenueData.monthlyTrend.length === 0
                       ? "No monthly trend data available yet"
                       : "Monthly trend data available. Implement chart visualization here."}
@@ -169,22 +222,14 @@ export const EarningsSection = ({
           </div>
         </>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] p-12">
           <div className="text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-              />
-            </svg>
-            <p className="mt-2 text-gray-600">No revenue data available</p>
+            <div className="mx-auto h-20 w-20 bg-blue-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
+              <DollarSign className="h-10 w-10 text-black" />
+            </div>
+            <p className="mt-2 text-xl font-bold text-black">
+              No revenue data available
+            </p>
           </div>
         </div>
       )}

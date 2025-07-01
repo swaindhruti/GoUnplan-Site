@@ -1,13 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Clock, AlertCircle, CalendarIcon } from "lucide-react"
-import { addDays, format, isBefore, isAfter, startOfDay } from "date-fns"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { z } from "zod"
+import { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Clock, AlertCircle, CalendarIcon } from "lucide-react";
+import { addDays, format, isBefore, isAfter, startOfDay } from "date-fns";
+import { z } from "zod";
 
 // Define base schema without refinements for field validation
 const baseDateSelectionSchema = z.object({
@@ -20,119 +18,135 @@ const baseDateSelectionSchema = z.object({
     invalid_type_error: "Please select a valid date",
   }),
   duration: z.number().min(1, "Duration must be at least 1 day"),
-})
+});
 
 // Enhanced schema with refinements for full validation
 const dateSelectionSchema = baseDateSelectionSchema
-  .refine((data) => !isBefore(startOfDay(data.startDate), startOfDay(new Date())), {
-    message: "Start date cannot be in the past",
-    path: ["startDate"],
-  })
+  .refine(
+    (data) => !isBefore(startOfDay(data.startDate), startOfDay(new Date())),
+    {
+      message: "Start date cannot be in the past",
+      path: ["startDate"],
+    }
+  )
   .refine((data) => isAfter(data.endDate, data.startDate), {
     message: "End date must be after start date",
     path: ["endDate"],
-  })
+  });
 
 interface DateSelectorProps {
-  tripDuration: number
-  onDateChange: (startDate: Date, endDate: Date) => void
-  selectedDate?: Date
+  tripDuration: number;
+  onDateChange: (startDate: Date, endDate: Date) => void;
+  selectedDate?: Date;
 }
 
-export function DateSelector({ tripDuration, onDateChange, selectedDate }: DateSelectorProps) {
-  const [date, setDate] = useState<Date | undefined>(selectedDate)
-  const [availabilityFilter, setAvailabilityFilter] = useState<"weekend" | "summer" | "all">("all")
-  const [validationErrors, setValidationErrors] = useState<string[]>([])
+export function DateSelector({
+  tripDuration,
+  onDateChange,
+  selectedDate,
+}: DateSelectorProps) {
+  const [date, setDate] = useState<Date | undefined>(selectedDate);
+  const [availabilityFilter, setAvailabilityFilter] = useState<
+    "weekend" | "summer" | "all"
+  >("all");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const handleDateSelect = (newDate: Date | undefined) => {
     if (newDate) {
-      const endDate = addDays(newDate, tripDuration - 1)
+      const endDate = addDays(newDate, tripDuration - 1);
 
       // Validate the date selection
       const validation = dateSelectionSchema.safeParse({
         startDate: newDate,
         endDate: endDate,
         duration: tripDuration,
-      })
+      });
 
       if (validation.success) {
-        setDate(newDate)
-        setValidationErrors([])
-        onDateChange(newDate, endDate)
+        setDate(newDate);
+        setValidationErrors([]);
+        onDateChange(newDate, endDate);
       } else {
-        const errors = validation.error.errors.map((err) => err.message)
-        setValidationErrors(errors)
+        const errors = validation.error.errors.map((err) => err.message);
+        setValidationErrors(errors);
       }
     }
-  }
+  };
 
   const availabilityOptions = [
     { value: "weekend" as const, label: "Every weekend" },
     { value: "summer" as const, label: "Summer months" },
     { value: "all" as const, label: "All year round" },
-  ]
+  ];
 
   // Helper function to check if date should be disabled based on filter
   const isDateDisabled = (checkDate: Date) => {
     // Always disable past dates
     if (isBefore(startOfDay(checkDate), startOfDay(new Date()))) {
-      return true
+      return true;
     }
 
     // Apply availability filter
     if (availabilityFilter === "weekend") {
-      const dayOfWeek = checkDate.getDay()
-      return dayOfWeek !== 0 && dayOfWeek !== 6 // Only weekends (0 = Sunday, 6 = Saturday)
+      const dayOfWeek = checkDate.getDay();
+      return dayOfWeek !== 0 && dayOfWeek !== 6; // Only weekends (0 = Sunday, 6 = Saturday)
     }
 
     if (availabilityFilter === "summer") {
-      const month = checkDate.getMonth()
-      return month < 5 || month > 8 // Only June (5) to September (8)
+      const month = checkDate.getMonth();
+      return month < 5 || month > 8; // Only June (5) to September (8)
     }
 
-    return false
-  }
+    return false;
+  };
 
   return (
     <div className="space-y-6">
-      <Card className="border-purple-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Clock className="w-5 h-5 text-purple-600" />
-            Trip Duration: {tripDuration} days
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm text-gray-600">
-            {date && (
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4" />
-                <span>
-                  Selected: {format(date, "MMM dd, yyyy")} - {format(addDays(date, tripDuration - 1), "MMM dd, yyyy")}
-                </span>
-              </div>
-            )}
+      {/* Trip Duration Card */}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-green-500 p-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <Clock className="w-5 h-5 text-black" strokeWidth={2.5} />
           </div>
-        </CardContent>
-      </Card>
+          <h3 className="text-lg font-black uppercase">
+            Trip Duration: {tripDuration} days
+          </h3>
+        </div>
+
+        {date && (
+          <div className="mt-2 bg-white border-2 border-black rounded-lg p-2 font-bold">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" strokeWidth={2.5} />
+              <span>
+                Selected: {format(date, "MMM dd, yyyy")} -{" "}
+                {format(addDays(date, tripDuration - 1), "MMM dd, yyyy")}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            <ul className="list-disc list-inside space-y-1">
-              {validationErrors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
+        <div className="border-3 border-black rounded-xl p-4 bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <h3 className="font-black uppercase">Error</h3>
+          </div>
+          <ul className="list-disc list-inside space-y-1 font-bold">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      <div>
-        <label className="block text-lg font-semibold text-gray-900 mb-4">Select Start Date</label>
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+      {/* Calendar Section */}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-4">
+        <label className="block text-lg font-black uppercase mb-4">
+          Select Start Date
+        </label>
+        <div className="bg-blue-100 border-3 border-black rounded-lg p-4">
           <Calendar
             mode="single"
             selected={date}
@@ -140,78 +154,86 @@ export function DateSelector({ tripDuration, onDateChange, selectedDate }: DateS
             disabled={isDateDisabled}
             className="w-full"
             classNames={{
-              day_selected: "bg-purple-600 text-white hover:bg-purple-700",
-              day_today: "bg-purple-100 text-purple-900 font-semibold",
+              day_selected:
+                "bg-purple-600 text-white hover:bg-purple-700 font-black rounded-md border-2 border-black",
+              day_today:
+                "bg-yellow-300 text-black font-black border-2 border-black",
               day_disabled: "text-gray-300 opacity-50",
+              day: "hover:bg-blue-200 rounded-md hover:font-bold",
+              head_cell: "font-black uppercase text-xs",
+              cell: "text-center font-bold p-0",
+              button: "w-9 h-9 p-0 font-bold hover:bg-blue-200",
+              nav_button: "border-2 border-black bg-white hover:bg-yellow-300",
+              nav_button_previous: "absolute left-1",
+              nav_button_next: "absolute right-1",
+              caption: "font-black text-black",
             }}
           />
         </div>
       </div>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Available Dates</h3>
+      {/* Availability Filters */}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-orange-400 p-4">
+        <h3 className="text-lg font-black uppercase mb-3">Available Dates</h3>
         <div className="flex flex-wrap gap-2">
           {availabilityOptions.map((option) => (
             <Button
               key={option.value}
-              variant={availabilityFilter === option.value ? "default" : "outline"}
-              size="sm"
               onClick={() => setAvailabilityFilter(option.value)}
-              className={
-                availabilityFilter === option.value
-                  ? "bg-purple-600 hover:bg-purple-700"
-                  : "hover:bg-purple-50 hover:border-purple-300"
-              }
+              className={`border-2 border-black hover:bg-white font-black uppercase text-xs py-2 px-3
+                ${
+                  availabilityFilter === option.value
+                    ? "bg-black text-white shadow-none hover:bg-black"
+                    : "bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                }`}
             >
               {option.label}
             </Button>
           ))}
         </div>
-        <p className="text-sm text-gray-500 mt-2">Filter available dates based on your preference</p>
+        <p className="text-sm font-bold mt-2 bg-white border-2 border-black rounded-md p-2">
+          Filter available dates based on your preference
+        </p>
       </div>
 
       {/* Quick Date Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Quick Selection</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDateSelect(addDays(new Date(), 7))}
-              className="text-left justify-start"
-            >
-              Next Week
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDateSelect(addDays(new Date(), 14))}
-              className="text-left justify-start"
-            >
-              In 2 Weeks
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDateSelect(addDays(new Date(), 30))}
-              className="text-left justify-start"
-            >
-              Next Month
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDateSelect(addDays(new Date(), 60))}
-              className="text-left justify-start"
-            >
-              In 2 Months
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-pink-400 p-4">
+        <h3 className="text-lg font-black uppercase mb-3">Quick Selection</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            onClick={() => handleDateSelect(addDays(new Date(), 7))}
+            className="border-2 border-black bg-white text-black font-bold justify-start 
+                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+          >
+            Next Week
+          </Button>
+          <Button
+            onClick={() => handleDateSelect(addDays(new Date(), 14))}
+            className="border-2 border-black bg-white text-black font-bold justify-start
+                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+          >
+            In 2 Weeks
+          </Button>
+          <Button
+            onClick={() => handleDateSelect(addDays(new Date(), 30))}
+            className="border-2 border-black bg-white text-black font-bold justify-start
+                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+          >
+            Next Month
+          </Button>
+          <Button
+            onClick={() => handleDateSelect(addDays(new Date(), 60))}
+            className="border-2 border-black bg-white text-black font-bold justify-start
+                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+          >
+            In 2 Months
+          </Button>
+        </div>
+      </div>
     </div>
-  )
+  );
 }

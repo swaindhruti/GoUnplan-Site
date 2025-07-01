@@ -1,7 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { getHostDetails, updateHostProfile } from "@/actions/host/action";
-import { User, AlertCircle } from "lucide-react";
+import {
+  User,
+  AlertCircle,
+  Star,
+  Calendar,
+  CheckCircle,
+  Eye,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -129,8 +136,12 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
   if (!isMounted) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-        <span className="ml-3 text-gray-600">Loading...</span>
+        <div className="animate-bounce bg-yellow-300 border-3 border-black rounded-lg h-16 w-16 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-4">
+          <User className="h-8 w-8 text-black" />
+        </div>
+        <span className="ml-3 text-xl font-black tracking-wide">
+          Loading...
+        </span>
       </div>
     );
   }
@@ -139,59 +150,71 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Host Profile</h2>
-          <p className="mt-1 text-gray-600">
+          <h2 className="text-4xl font-black text-black uppercase tracking-wide -rotate-1">
+            Host Profile
+          </h2>
+          <p className="mt-1 text-gray-700 font-bold text-lg tracking-wide">
             Manage your personal information and host settings
           </p>
         </div>
       </div>
 
       {hostLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <span className="ml-3 text-gray-600">Loading profile data...</span>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-bounce bg-yellow-300 border-3 border-black rounded-lg h-16 w-16 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-4">
+            <User className="h-8 w-8 text-black" />
+          </div>
+          <span className="text-2xl font-bold text-black tracking-wide">
+            Loading profile data...
+          </span>
         </div>
       ) : hostError ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
-            <p className="mt-2 text-red-600 font-medium">{hostError}</p>
+            <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-3 mb-4">
+              <AlertCircle className="h-10 w-10 text-black" />
+            </div>
+            <p className="mt-2 text-2xl font-bold text-black tracking-wide">
+              {hostError}
+            </p>
           </div>
         </div>
       ) : hostDetails ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] overflow-hidden">
+            <div className="border-b-4 border-black bg-purple-600 px-6 py-4">
+              <h3 className="text-2xl font-black text-white uppercase tracking-wide">
                 Your Profile
               </h3>
             </div>
             <div className="p-6 flex flex-col items-center text-center">
-              <div className="h-24 w-24 rounded-full bg-purple-100 mb-4 overflow-hidden">
+              <div className="h-28 w-28 rounded-full bg-yellow-300 mb-4 overflow-hidden border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                 {hostDetails.image ? (
                   // Use key to force re-render when image changes
                   <Image
                     key={hostDetails.image}
-                    height={96}
-                    width={96}
+                    height={112}
+                    width={112}
                     src={hostDetails.image}
                     alt={hostData.name || "Host"}
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <User className="h-full w-full p-4 text-purple-500" />
+                  <User className="h-full w-full p-4 text-black" />
                 )}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-3xl font-black text-black tracking-wide">
                 {hostData.name || hostDetails.user?.name || ""}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-700 mb-4 font-bold text-lg tracking-wide">
                 {hostData.email || hostDetails.user?.email || ""}
               </p>
-              <div className="w-full border-t border-gray-100 pt-4 mt-2">
-                <p className="text-sm text-gray-500 mb-1">Host Since</p>
-                <p className="font-medium text-gray-900">
+              <div className="w-full border-t-3 border-black pt-4 mt-2">
+                <p className="text-sm font-bold text-gray-500 mb-1 uppercase tracking-wide">
+                  Host Since
+                </p>
+                <p className="font-bold text-black text-xl tracking-wide">
                   {hostDetails.createdAt
                     ? new Date(hostDetails.createdAt).toLocaleDateString(
                         "en-US",
@@ -208,23 +231,26 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           </div>
 
           {/* Edit Profile Form */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-2">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] overflow-hidden lg:col-span-2">
+            <div className="border-b-4 border-black bg-blue-400 px-6 py-4">
+              <h3 className="text-2xl font-black text-black uppercase tracking-wide">
                 Edit Host Information
               </h3>
             </div>
             <div className="p-6">
               {updateSuccess && (
-                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                  Profile updated successfully!
+                <div className="mb-4 p-4 bg-green-500 text-black rounded-md border-3 border-black font-extrabold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-2" />
+                  <span className="text-lg tracking-wide">
+                    Profile updated successfully!
+                  </span>
                 </div>
               )}
 
               <form onSubmit={handleProfileUpdate}>
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-base font-extrabold text-black mb-2 uppercase tracking-wide">
                       Profile Image URL
                     </label>
                     <Input
@@ -233,11 +259,12 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                       value={formData.image}
                       onChange={handleFormChange}
                       placeholder="https://example.com/your-image.jpg"
+                      className="bg-gray-100 border-3 border-black rounded-md text-lg font-medium shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] px-4 py-3 h-auto"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-base font-extrabold text-black mb-2 uppercase tracking-wide">
                       Phone Number
                     </label>
                     <Input
@@ -246,11 +273,12 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                       value={formData.hostMobile}
                       onChange={handleFormChange}
                       placeholder="+91 9876543210"
+                      className="bg-gray-100 border-3 border-black rounded-md text-lg font-medium shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] px-4 py-3 h-auto"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-base font-extrabold text-black mb-2 uppercase tracking-wide">
                       Bio / Description
                     </label>
                     <Textarea
@@ -259,18 +287,19 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                       onChange={handleFormChange}
                       rows={4}
                       placeholder="Tell travelers about yourself and your expertise as a host..."
+                      className="bg-gray-100 border-3 border-black rounded-md text-lg font-medium shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] px-4 py-3"
                     />
                   </div>
 
-                  <div className="pt-3">
+                  <div className="pt-4">
                     <Button
                       type="submit"
-                      className="bg-purple-600 hover:bg-purple-700 text-white w-full"
+                      className="bg-green-500 text-black hover:bg-green-400 border-3 border-black text-xl font-extrabold py-6 w-full rounded-md shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all tracking-wide"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>{" "}
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black mr-2"></div>{" "}
                           Updating...
                         </>
                       ) : (
@@ -284,42 +313,74 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           </div>
 
           {/* Host Statistics */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-3">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] overflow-hidden lg:col-span-3">
+            <div className="border-b-4 border-black bg-pink-500 px-6 py-4">
+              <h3 className="text-2xl font-black text-black uppercase tracking-wide">
                 Host Statistics
               </h3>
             </div>
-            <div className="p-6">
+            <div className="p-8 relative">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="border border-gray-100 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Profile Views</p>
-                  <p className="text-2xl font-bold text-purple-700">127</p>
+                <div className="border-3 border-black bg-blue-400 rounded-lg p-5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex justify-center mb-3">
+                    <Eye className="h-7 w-7 text-black" />
+                  </div>
+                  <p className="text-base font-extrabold text-black mb-1 uppercase tracking-wide">
+                    Profile Views
+                  </p>
+                  <p className="text-3xl font-black text-black tracking-wide">
+                    127
+                  </p>
                 </div>
 
-                <div className="border border-gray-100 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Response Rate</p>
-                  <p className="text-2xl font-bold text-green-600">98%</p>
+                <div className="border-3 border-black bg-green-500 rounded-lg p-5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex justify-center mb-3">
+                    <CheckCircle className="h-7 w-7 text-black" />
+                  </div>
+                  <p className="text-base font-extrabold text-black mb-1 uppercase tracking-wide">
+                    Response Rate
+                  </p>
+                  <p className="text-3xl font-black text-black tracking-wide">
+                    98%
+                  </p>
                 </div>
 
-                <div className="border border-gray-100 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Completion Rate</p>
-                  <p className="text-2xl font-bold text-blue-600">100%</p>
+                <div className="border-3 border-black bg-purple-400 rounded-lg p-5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex justify-center mb-3">
+                    <Calendar className="h-7 w-7 text-black" />
+                  </div>
+                  <p className="text-base font-extrabold text-black mb-1 uppercase tracking-wide">
+                    Completion Rate
+                  </p>
+                  <p className="text-3xl font-black text-black tracking-wide">
+                    100%
+                  </p>
                 </div>
 
-                <div className="border border-gray-100 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Host Rating</p>
-                  <p className="text-2xl font-bold text-yellow-600">4.8 ★</p>
+                <div className="border-3 border-black bg-yellow-300 rounded-lg p-5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex justify-center mb-3">
+                    <Star className="h-7 w-7 text-black" fill="black" />
+                  </div>
+                  <p className="text-base font-extrabold text-black mb-1 uppercase tracking-wide">
+                    Host Rating
+                  </p>
+                  <p className="text-3xl font-black text-black tracking-wide">
+                    4.8 ★
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div className="bg-white rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] p-12">
           <div className="text-center">
-            <User className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-gray-600">No profile data available</p>
+            <div className="mx-auto h-24 w-24 bg-blue-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-4">
+              <User className="h-12 w-12 text-black" />
+            </div>
+            <p className="mt-2 text-2xl font-bold text-black tracking-wide">
+              No profile data available
+            </p>
           </div>
         </div>
       )}

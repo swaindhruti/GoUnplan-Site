@@ -3,14 +3,13 @@ import type {
   BookingData,
   DateSelectorUpdate,
   GuestInfoUpdate,
-  PaymentUpdate
+  PaymentUpdate,
 } from "@/types/booking";
-// import { Booking } from "@prisma/client";
 import {
   createBooking,
   updateBookingDates,
   updateBookingGuestInfo,
-  updateBookingStatus
+  updateBookingStatus,
 } from "@/actions/booking/actions";
 
 interface BookingStoreState {
@@ -28,7 +27,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   bookingData: {
     status: "PENDING",
     participants: 1,
-    refundAmount: 0
+    refundAmount: 0,
   },
   isLoading: false,
   error: null,
@@ -60,7 +59,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return true;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to update dates"
+        error: err instanceof Error ? err.message : "Failed to update dates",
       });
       return false;
     } finally {
@@ -78,7 +77,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         const result = await updateBookingGuestInfo(bookingData.id, {
           participants: update.participants,
           guests: update.guests,
-          specialRequirements: update.specialRequirements
+          specialRequirements: update.specialRequirements,
         });
         if (result.error) {
           set({ error: result.error });
@@ -92,7 +91,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     } catch (err) {
       set({
         error:
-          err instanceof Error ? err.message : "Failed to update guest info"
+          err instanceof Error ? err.message : "Failed to update guest info",
       });
       return false;
     } finally {
@@ -119,7 +118,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return true;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to process payment"
+        error: err instanceof Error ? err.message : "Failed to process payment",
       });
       return false;
     } finally {
@@ -140,7 +139,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         participants: data.participants || bookingData.participants || 1,
         specialRequirements: data.specialRequirements ?? undefined,
         guests: data.guests,
-        submissionType: data.submissionType
+        submissionType: data.submissionType,
       };
 
       const result = await createBooking(payload);
@@ -158,13 +157,13 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return null;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to create booking"
+        error: err instanceof Error ? err.message : "Failed to create booking",
       });
       return null;
     } finally {
       set({ isLoading: false });
     }
-  }
+  },
 }));
 
 // 👇 Export type for use elsewhere

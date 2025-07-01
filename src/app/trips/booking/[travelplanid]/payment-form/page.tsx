@@ -20,7 +20,7 @@ export default async function BookingSummaryPage({ params }: Props) {
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
       getTripById(tripId),
-      requireUser()
+      requireUser(),
     ]);
 
     if (!userSession) {
@@ -41,7 +41,7 @@ export default async function BookingSummaryPage({ params }: Props) {
             pricePerPerson: trip?.price || 0,
             numberOfGuests: booking?.guests?.length + 1,
             startDate: format(startDate, "MMM dd, yyyy"),
-            endDate: format(endDate, "MMM dd, yyyy")
+            endDate: format(endDate, "MMM dd, yyyy"),
           }}
         />
       </>

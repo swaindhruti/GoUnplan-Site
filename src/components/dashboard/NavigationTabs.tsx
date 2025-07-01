@@ -1,43 +1,58 @@
-import { TabType } from "../types";
-import { Plane, User, Calendar, DollarSign, MessageSquare } from "lucide-react";
+import {
+  User,
+  Calendar,
+  BookOpen,
+  MessageSquare,
+  Settings,
+  Star,
+} from "lucide-react";
 
-type NavigationProps = {
-  activeTab: TabType;
-  setActiveTab: (tab: TabType) => void;
-};
+interface NavigationTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
 
-export const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
+export function NavigationTabs({
+  activeTab,
+  setActiveTab,
+}: NavigationTabsProps) {
   // Define tabs with neobrutalist colors
   const tabs = [
     {
-      id: "trips" as TabType,
-      label: "TRIPS",
-      icon: <Plane className="w-5 h-5" />,
-      color: "bg-yellow-300",
-    },
-    {
-      id: "profile" as TabType,
+      id: "profile",
       label: "PROFILE",
       icon: <User className="w-5 h-5" />,
       color: "bg-blue-400",
     },
     {
-      id: "bookings" as TabType,
+      id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
       color: "bg-green-500",
     },
     {
-      id: "earnings" as TabType,
-      label: "EARNINGS",
-      icon: <DollarSign className="w-5 h-5" />,
-      color: "bg-pink-500",
+      id: "explore",
+      label: "EXPLORE",
+      icon: <BookOpen className="w-5 h-5" />,
+      color: "bg-yellow-300",
     },
     {
-      id: "messages" as TabType,
+      id: "messages",
       label: "MESSAGES",
       icon: <MessageSquare className="w-5 h-5" />,
       color: "bg-purple-400",
+    },
+    {
+      id: "reviews",
+      label: "REVIEWS",
+      icon: <Star className="w-5 h-5" />,
+      color: "bg-pink-500",
+    },
+    {
+      id: "settings",
+      label: "SETTINGS",
+      icon: <Settings className="w-5 h-5" />,
+      color: "bg-orange-400",
     },
   ];
 
@@ -75,7 +90,8 @@ export const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
         </div>
       </div>
 
-      {/* Bottom decorative zigzag pattern */}
+      {/* Bottom decorative zigzag */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-black"></div>
     </div>
   );
-};
+}

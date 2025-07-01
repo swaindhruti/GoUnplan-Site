@@ -1,6 +1,11 @@
 import { prisma, requireUser } from "@/lib/shared";
 
 export const getTripById = async (tripId: string) => {
+  // Add validation to ensure tripId is provided
+  if (!tripId) {
+    return { error: "Trip ID is required" };
+  }
+
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
@@ -10,19 +15,24 @@ export const getTripById = async (tripId: string) => {
       include: {
         host: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     });
+
+    // Check if trip exists
+    if (!trip) {
+      return { error: "Trip not found" };
+    }
 
     const booking = await prisma.booking.findFirst({
       where: {
         userId: session.user.id,
-        travelPlanId: tripId
+        travelPlanId: tripId,
       },
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
       select: {
         id: true,
@@ -39,8 +49,8 @@ export const getTripById = async (tripId: string) => {
         travelPlan: true,
         guests: true,
         updatedAt: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     return { trip, booking };

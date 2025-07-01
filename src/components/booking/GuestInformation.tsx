@@ -6,18 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Trash2, Plus, AlertCircle } from "lucide-react";
+  Trash2,
+  Plus,
+  AlertCircle,
+  User,
+  Users,
+  FileText,
+  BriefcaseMedical,
+} from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
-// import { useBookingStore } from "@/store/booking-store";
 
 const baseGuestInfoSchema = z.object({
   firstName: z
@@ -49,7 +47,7 @@ const baseGuestInfoSchema = z.object({
     .regex(/^[+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .min(10, "Phone number must be at least 10 digits")
     .max(20, "Phone number must be less than 20 characters"),
-  isteamLead: z.boolean().default(false)
+  isteamLead: z.boolean().default(false),
 });
 
 const baseGuestInformationFormSchema = z.object({
@@ -64,13 +62,13 @@ const baseGuestInformationFormSchema = z.object({
   specialRequirements: z
     .string()
     .max(500, "Special requirements must be less than 500 characters")
-    .optional()
+    .optional(),
 });
 
 const guestInformationFormSchema = baseGuestInformationFormSchema
   .refine((data) => data.guests.length === data.participants, {
     message: "Number of guest forms must match selected number of guests",
-    path: ["guests"]
+    path: ["guests"],
   })
   .refine(
     (data) => {
@@ -80,12 +78,11 @@ const guestInformationFormSchema = baseGuestInformationFormSchema
     },
     {
       message: "Exactly one guest must be designated as the team lead",
-      path: ["guests"]
+      path: ["guests"],
     }
   );
 
 type GuestInfo = z.infer<typeof baseGuestInfoSchema>;
-type GuestInformationForm = z.infer<typeof guestInformationFormSchema>;
 type ValidationErrors = Record<string, string[]>;
 
 interface GuestInformationFormProps {
@@ -97,17 +94,8 @@ interface GuestInformationFormProps {
 export function GuestInformationForm({
   onBack,
   onContinue,
-  maxGuests = 8
+  maxGuests = 8,
 }: GuestInformationFormProps) {
-  // const bookingData = useBookingStore((state) => state.bookingData);
-
-  // const existingGuestsLength = Array.isArray(bookingData.guests)
-  //   ? bookingData.guests.length
-  //   : 0;
-
-  // maxGuests =
-  //   (bookingData?.participants || 9) - (existingGuestsLength + 1) || 8;
-
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
     {
@@ -115,14 +103,26 @@ export function GuestInformationForm({
       lastName: "",
       memberEmail: "",
       phone: "",
-      isteamLead: true
-    }
+      isteamLead: true,
+    },
   ]);
   const [specialRequirements, setSpecialRequirements] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Function to get random color from a set of neobrutalist colors
+  const getRandomBgColor = () => {
+    const colors = [
+      "bg-yellow-300",
+      "bg-pink-400",
+      "bg-blue-400",
+      "bg-green-500",
+      "bg-orange-400",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
 
   const validateField = (
     field: string,
@@ -177,7 +177,7 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false
+          isteamLead: false,
         });
       }
     } else if (num < currentForms.length) {
@@ -198,8 +198,8 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false
-        }
+          isteamLead: false,
+        },
       ]);
     }
   };
@@ -264,9 +264,8 @@ export function GuestInformationForm({
     const formData: BookingFormData = {
       guests: guestForms,
       specialRequirements: specialRequirements || undefined,
-      participants: numberOfGuests
+      participants: numberOfGuests,
     };
-    console.log(formData);
 
     const validation = guestInformationFormSchema.safeParse(formData);
 
@@ -301,93 +300,116 @@ export function GuestInformationForm({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="flex items-center gap-3 border-b-3 border-black pb-4 mb-6">
+        <div className="bg-blue-400 p-2 rounded-lg border-2 border-black">
+          <Users className="h-6 w-6 text-black" strokeWidth={2.5} />
+        </div>
+        <h2 className="text-2xl font-black text-black uppercase tracking-tight">
           Guest Information
         </h2>
-        {hasErrors && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Please correct the errors below before continuing.
-            </AlertDescription>
-          </Alert>
-        )}
+      </div>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Number of Guests</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="guests">Select number of guests</Label>
-              <Select
-                value={numberOfGuests.toString()}
-                onValueChange={handleNumberOfGuestsChange}
+      {hasErrors && (
+        <div className="border-3 border-black rounded-xl p-4 bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <h3 className="font-black uppercase">Error</h3>
+          </div>
+          <p className="font-bold">
+            Please correct the errors below before continuing.
+          </p>
+        </div>
+      )}
+
+      {/* Number of Guests */}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-yellow-300 p-4">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <Users className="w-5 h-5 text-black" strokeWidth={2.5} />
+          </div>
+          <h3 className="text-lg font-black uppercase">Number of Guests</h3>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="guests" className="font-bold text-black">
+            Select number of guests
+          </Label>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mt-2">
+            {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+              <Button
+                key={num}
+                onClick={() => handleNumberOfGuestsChange(num.toString())}
+                className={`border-3 border-black font-black text-lg py-2 px-3
+                  ${
+                    numberOfGuests === num
+                      ? "bg-black text-white shadow-none"
+                      : "bg-white text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  }`}
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select number of guests" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: maxGuests }, (_, i) => i + 1).map(
-                    (num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} {num === 1 ? "person" : "people"}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-gray-500">
-                Maximum {maxGuests} people per booking
-              </p>
-              {getFieldError("participants") && (
-                <p className="text-sm text-red-600">
-                  {getFieldError("participants")}
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                {num}
+              </Button>
+            ))}
+          </div>
+          <p className="bg-white border-2 border-black p-2 rounded-md mt-2 font-bold">
+            Maximum {maxGuests} people per booking
+          </p>
+          {getFieldError("participants") && (
+            <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold">
+              {getFieldError("participants")}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Guest Forms */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Guest Details</h3>
-          <div className="text-sm text-gray-500">
+        <div className="flex items-center justify-between mb-2 border-b-2 border-black pb-2">
+          <h3 className="text-lg font-black uppercase">Guest Details</h3>
+          <div className="bg-white border-2 border-black rounded-md px-2 py-1 font-bold">
             {guestForms.length} of {numberOfGuests} guest
             {numberOfGuests > 1 ? "s" : ""}
           </div>
         </div>
 
         {guestForms.map((guest, index) => (
-          <Card key={index} className="relative">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-lg">
-                Guest {index + 1}
-                {guest.isteamLead && (
-                  <span className="ml-2 text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                    Team Lead
-                  </span>
-                )}
-              </CardTitle>
+          <div
+            key={index}
+            className={`border-3 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${getRandomBgColor()}`}
+          >
+            <div className="bg-white border-b-3 border-black flex items-center justify-between p-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+                  <User className="w-5 h-5 text-black" strokeWidth={2.5} />
+                </div>
+                <h3 className="font-black uppercase">
+                  Guest {index + 1}
+                  {guest.isteamLead && (
+                    <span className="ml-2 bg-black text-white px-2 py-0.5 text-xs rounded-md uppercase">
+                      Team Lead
+                    </span>
+                  )}
+                </h3>
+              </div>
               {guestForms.length > 1 && (
                 <Button
-                  variant="outline"
-                  size="sm"
                   onClick={() => removeGuestForm(index)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="bg-white border-2 border-black text-black hover:bg-red-400 
+                            font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none 
+                            hover:translate-x-[2px] hover:translate-y-[2px]"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" strokeWidth={2.5} />
                 </Button>
               )}
-            </CardHeader>
-            <CardContent className="space-y-4">
+            </div>
+
+            <div className="p-4 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor={`firstName-${index}`}>
-                    First Name <span className="text-red-500">*</span>
+                  <Label
+                    htmlFor={`firstName-${index}`}
+                    className="font-bold text-black"
+                  >
+                    First Name <span className="text-red-600">*</span>
                   </Label>
                   <Input
                     id={`firstName-${index}`}
@@ -396,20 +418,25 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "firstName", e.target.value)
                     }
-                    className={
-                      getFieldError("firstName", index) ? "border-red-500" : ""
-                    }
+                    className={`border-2 border-black bg-white ${
+                      getFieldError("firstName", index)
+                        ? "border-red-600 border-3"
+                        : ""
+                    }`}
                   />
                   {getFieldError("firstName", index) && (
-                    <p className="text-sm text-red-600">
+                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
                       {getFieldError("firstName", index)}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`lastName-${index}`}>
-                    Last Name <span className="text-red-500">*</span>
+                  <Label
+                    htmlFor={`lastName-${index}`}
+                    className="font-bold text-black"
+                  >
+                    Last Name <span className="text-red-600">*</span>
                   </Label>
                   <Input
                     id={`lastName-${index}`}
@@ -418,12 +445,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "lastName", e.target.value)
                     }
-                    className={
-                      getFieldError("lastName", index) ? "border-red-500" : ""
-                    }
+                    className={`border-2 border-black bg-white ${
+                      getFieldError("lastName", index)
+                        ? "border-red-600 border-3"
+                        : ""
+                    }`}
                   />
                   {getFieldError("lastName", index) && (
-                    <p className="text-sm text-red-600">
+                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
                       {getFieldError("lastName", index)}
                     </p>
                   )}
@@ -432,8 +461,11 @@ export function GuestInformationForm({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor={`memberEmail-${index}`}>
-                    Email Address <span className="text-red-500">*</span>
+                  <Label
+                    htmlFor={`memberEmail-${index}`}
+                    className="font-bold text-black"
+                  >
+                    Email Address <span className="text-red-600">*</span>
                   </Label>
                   <Input
                     id={`memberEmail-${index}`}
@@ -443,22 +475,25 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "memberEmail", e.target.value)
                     }
-                    className={
+                    className={`border-2 border-black bg-white ${
                       getFieldError("memberEmail", index)
-                        ? "border-red-500"
+                        ? "border-red-600 border-3"
                         : ""
-                    }
+                    }`}
                   />
                   {getFieldError("memberEmail", index) && (
-                    <p className="text-sm text-red-600">
+                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
                       {getFieldError("memberEmail", index)}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`phone-${index}`}>
-                    Phone Number <span className="text-red-500">*</span>
+                  <Label
+                    htmlFor={`phone-${index}`}
+                    className="font-bold text-black"
+                  >
+                    Phone Number <span className="text-red-600">*</span>
                   </Label>
                   <Input
                     id={`phone-${index}`}
@@ -468,12 +503,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "phone", e.target.value)
                     }
-                    className={
-                      getFieldError("phone", index) ? "border-red-500" : ""
-                    }
+                    className={`border-2 border-black bg-white ${
+                      getFieldError("phone", index)
+                        ? "border-red-600 border-3"
+                        : ""
+                    }`}
                   />
                   {getFieldError("phone", index) && (
-                    <p className="text-sm text-red-600">
+                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
                       {getFieldError("phone", index)}
                     </p>
                   )}
@@ -482,7 +519,7 @@ export function GuestInformationForm({
 
               {/* Team Lead Selection */}
               {numberOfGuests > 1 && (
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t-2 border-black">
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -491,9 +528,12 @@ export function GuestInformationForm({
                       onChange={(e) =>
                         updateGuestForm(index, "isteamLead", e.target.checked)
                       }
-                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      className="w-5 h-5 border-2 border-black"
                     />
-                    <Label htmlFor={`teamLead-${index}`} className="text-sm">
+                    <Label
+                      htmlFor={`teamLead-${index}`}
+                      className="font-bold text-black"
+                    >
                       Make this person the primary contact (Team Lead)
                     </Label>
                   </div>
@@ -502,129 +542,156 @@ export function GuestInformationForm({
 
               {/* Primary contact note for single guest or team lead */}
               {(numberOfGuests === 1 || guest.isteamLead) && (
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 mb-2">
+                <div className="pt-4 border-t-2 border-black">
+                  <p className="bg-white border-2 border-black p-2 rounded-md font-bold text-xs">
                     <strong>Note:</strong> This person will be the primary
                     contact for the booking.
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
 
         {/* Add Guest Button */}
         {canAddMoreForms && (
           <Button
-            variant="outline"
             onClick={addGuestForm}
-            className="w-full border-dashed border-2 border-purple-300 text-purple-600 hover:bg-purple-50 hover:border-purple-400 bg-transparent"
+            className="w-full border-3 border-black text-black font-black uppercase 
+                     bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 
+                     hover:translate-x-[2px] hover:translate-y-[2px] 
+                     hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" strokeWidth={2.5} />
             Add Guest ({guestForms.length}/{numberOfGuests})
           </Button>
         )}
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="text-center py-4">
-            <p className="text-sm text-gray-500">
+          <div className="bg-green-400 border-3 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <p className="font-bold">
               All guest forms added. You can increase the number of guests above
               to add more.
             </p>
           </div>
         )}
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
-            Special Requirements (Optional)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="requirements">
-              Any dietary restrictions, accessibility needs, medical conditions,
-              or other special requests
-            </Label>
-            <Textarea
-              id="requirements"
-              placeholder="Please describe any special requirements, dietary restrictions, accessibility needs, or other requests we should know about..."
-              value={specialRequirements}
-              onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
-              rows={4}
-              className={
-                getFieldError("specialRequirements") ? "border-red-500" : ""
-              }
+
+      {/* Special Requirements */}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-blue-400 p-4">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <BriefcaseMedical
+              className="w-5 h-5 text-black"
+              strokeWidth={2.5}
             />
-            <p className="text-xs text-gray-500">
-              Maximum 500 characters ({specialRequirements.length}/500)
-            </p>
-            {getFieldError("specialRequirements") && (
-              <p className="text-sm text-red-600">
-                {getFieldError("specialRequirements")}
-              </p>
-            )}
           </div>
-        </CardContent>
-      </Card>
+          <h3 className="text-lg font-black uppercase">
+            Special Requirements (Optional)
+          </h3>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="requirements" className="font-bold text-black">
+            Any dietary restrictions, accessibility needs, medical conditions,
+            or other special requests
+          </Label>
+          <Textarea
+            id="requirements"
+            placeholder="Please describe any special requirements, dietary restrictions, accessibility needs, or other requests we should know about..."
+            value={specialRequirements}
+            onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
+            rows={4}
+            className={`border-2 border-black bg-white ${
+              getFieldError("specialRequirements")
+                ? "border-red-600 border-3"
+                : ""
+            }`}
+          />
+          <p className="bg-white border-2 border-black p-2 rounded-md font-bold">
+            Maximum 500 characters ({specialRequirements.length}/500)
+          </p>
+          {getFieldError("specialRequirements") && (
+            <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold">
+              {getFieldError("specialRequirements")}
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* Summary Card */}
-      <Card className="bg-gray-50">
-        <CardHeader>
-          <CardTitle className="text-lg">Booking Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Number of Guests:</span>
-              <span className="font-medium">{numberOfGuests}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Forms Completed:</span>
-              <span className="font-medium">
-                {
-                  guestForms.filter(
-                    (guest) =>
-                      guest.firstName &&
-                      guest.lastName &&
-                      guest.memberEmail &&
-                      guest.phone
-                  ).length
-                }{" "}
-                of {numberOfGuests}
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-orange-400 p-4">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <FileText className="w-5 h-5 text-black" strokeWidth={2.5} />
+          </div>
+          <h3 className="text-lg font-black uppercase">Booking Summary</h3>
+        </div>
+
+        <div className="space-y-2 bg-white border-2 border-black p-4 rounded-lg">
+          <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
+            <span className="font-bold">Number of Guests:</span>
+            <span className="font-black">{numberOfGuests}</span>
+          </div>
+          <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
+            <span className="font-bold">Forms Completed:</span>
+            <span className="font-black">
+              {
+                guestForms.filter(
+                  (guest) =>
+                    guest.firstName &&
+                    guest.lastName &&
+                    guest.memberEmail &&
+                    guest.phone
+                ).length
+              }{" "}
+              of {numberOfGuests}
+            </span>
+          </div>
+          {numberOfGuests > 1 && (
+            <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
+              <span className="font-bold">Team Lead:</span>
+              <span className="font-black">
+                {guestForms.find((g) => g.isteamLead)?.firstName ||
+                  "Not selected"}
               </span>
             </div>
-            {numberOfGuests > 1 && (
-              <div className="flex justify-between">
-                <span>Team Lead:</span>
-                <span className="font-medium">
-                  {guestForms.find((g) => g.isteamLead)?.firstName ||
-                    "Not selected"}
-                </span>
-              </div>
-            )}
-            {specialRequirements && (
-              <div className="pt-2 border-t">
-                <span className="text-gray-600">Special Requirements:</span>
-                <p className="text-xs mt-1 text-gray-700">
-                  {specialRequirements}
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          )}
+          {specialRequirements && (
+            <div className="pt-2 border-t-2 border-black">
+              <span className="font-bold block mb-1">
+                Special Requirements:
+              </span>
+              <p className="bg-gray-100 p-2 border-2 border-black rounded-md">
+                {specialRequirements}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6 border-t border-gray-200">
-        <Button variant="outline" onClick={onBack} disabled={isSubmitting}>
+      <div className="flex justify-between pt-6 border-t-3 border-black">
+        <Button
+          onClick={onBack}
+          disabled={isSubmitting}
+          className="bg-white text-black font-black uppercase 
+                   border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                   hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                   hover:translate-x-[2px] hover:translate-y-[2px]
+                   transition-all duration-200"
+        >
           Back to Dates
         </Button>
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50"
+          className="bg-purple-600 text-white font-black uppercase 
+                   border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                   hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                   hover:translate-x-[2px] hover:translate-y-[2px]
+                   transition-all duration-200"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
         </Button>
