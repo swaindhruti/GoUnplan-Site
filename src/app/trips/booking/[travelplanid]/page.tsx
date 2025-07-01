@@ -7,11 +7,12 @@ import { requireUser } from "@/lib/roleGaurd";
 import { redirect } from "next/navigation";
 type Props = {
   params: Promise<{
-    travelPlanId: string;
+    travelplanid: string;
   }>;
 };
 export default async function Booking({ params }: Props) {
-  const tripId = (await params).travelPlanId;
+  const tripId = (await params).travelplanid;
+  console.log(tripId);
   const { trip, booking } = await getTripById(tripId);
   const userSession = await requireUser();
 
@@ -22,6 +23,7 @@ export default async function Booking({ params }: Props) {
   if (!trip) {
     return <div>Booking not found</div>;
   }
+
   if (booking?.formSubmitted) {
     redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
   }
