@@ -1,356 +1,18 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { getAllActiveTrips } from "@/actions/user/action";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { useState, useCallback, useMemo } from "react";
+import { useTripsData, useFilters } from "@/hooks/useTrips";
+import { MultiValue } from "react-select";
+import { SelectOption } from "@/types/trips";
+import { HeroSection } from "@/components/trips/HeroSection";
+import { FilterControls } from "@/components/trips/FilterControls";
+import { FilterPanel } from "@/components/trips/FilterPanel";
+import { TripCard } from "@/components/trips/TripCard";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import {
-  Map,
-  Calendar,
-  DollarSign,
-  Search,
-  Compass,
-  AlertCircle,
-  Languages,
-  Filter,
-  X,
-  ChevronDown,
-  ChevronUp
-} from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import ReactSelect, { StylesConfig, MultiValue } from "react-select";
-import { Skeleton } from "@/components/ui/skeleton";
-
-// Types
-type RawTrip = {
-  travelPlanId: string;
-  title: string;
-  description: string;
-  country: string;
-  state: string;
-  city: string;
-  noOfDays: number;
-  price: number;
-  hostId: string;
-  createdAt: string | Date;
-  languages?: string[];
-  filters?: string[];
-};
-
-type Trip = {
-  travelPlanId: string;
-  title: string;
-  description: string;
-  country: string;
-  state: string;
-  city: string;
-  noOfDays: number;
-  price: number;
-  hostId: string;
-  createdAt: string;
-  languages: string[];
-  filters: string[];
-  vibes: string[];
-};
-
-type SelectOption = {
-  value: string;
-  label: string;
-};
-
-type FilterState = {
-  searchTerm: string;
-  priceRange: [number, number];
-  daysFilter: string;
-  countryFilter: string;
-  languageFilter: string[];
-  vibeFilter: string[];
-};
-
-const INITIAL_FILTERS: FilterState = {
-  searchTerm: "",
-  priceRange: [0, Infinity],
-  daysFilter: "all",
-  countryFilter: "all",
-  languageFilter: [],
-  vibeFilter: []
-};
-
-const DURATION_OPTIONS = [
-  { value: "all", label: "All Durations" },
-  { value: "1-3", label: "Short Trip (1–3 Days)" },
-  { value: "4-7", label: "Medium Trip (4–7 Days)" },
-  { value: "8", label: "Extended Trip (8+ Days)" }
-];
-
-const normalizeTrip = (trip: RawTrip): Trip => {
-  const safeFilters = Array.isArray(trip.filters) ? trip.filters : [];
-  return {
-    ...trip,
-    createdAt: new Date(trip.createdAt).toISOString(),
-    languages: Array.isArray(trip.languages) ? trip.languages : [],
-    filters: safeFilters,
-    vibes: safeFilters
-  };
-};
-
-const parseTrips = (rawTrips: RawTrip[]): Trip[] => rawTrips.map(normalizeTrip);
-
-const useTripsData = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadTrips = async () => {
-      try {
-        const result = await getAllActiveTrips();
-
-        if (!isMounted) return;
-
-        if (result.error) {
-          setError(result.error);
-        } else if (result.trips) {
-          const formattedTrips = parseTrips(result.trips as RawTrip[]);
-          setTrips(formattedTrips);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        setError("Failed to load travel plans");
-        console.error(err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadTrips();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  return { trips, isLoading, error };
-};
-
-const useFilters = (trips: Trip[]) => {
-  const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
-
-  const updateFilter = useCallback(
-    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
-
-  const clearAllFilters = useCallback(() => {
-    setFilters(INITIAL_FILTERS);
-  }, []);
-
-  const filterOptions = useMemo(
-    () => ({
-      countries: Array.from(new Set(trips.map((t) => t.country))).sort(),
-      languages: Array.from(new Set(trips.flatMap((t) => t.languages))).sort(),
-      vibes: Array.from(new Set(trips.flatMap((t) => t.vibes))).sort()
-    }),
-    [trips]
-  );
-
-  const filteredTrips = useMemo(() => {
-    if (trips.length === 0) return [];
-
-    return trips.filter((trip) => {
-      if (filters.searchTerm.trim()) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        const searchableText = [
-          trip.title,
-          trip.description,
-          trip.city,
-          trip.state,
-          trip.country
-        ]
-          .join(" ")
-          .toLowerCase();
-
-        if (!searchableText.includes(searchLower)) return false;
-      }
-
-      if (
-        trip.price < filters.priceRange[0] ||
-        trip.price > filters.priceRange[1]
-      ) {
-        return false;
-      }
-      if (filters.daysFilter !== "all") {
-        const [min, max] = filters.daysFilter.split("-").map(Number);
-        if (trip.noOfDays < min || (max && trip.noOfDays > max)) {
-          return false;
-        }
-      }
-      if (
-        filters.countryFilter !== "all" &&
-        trip.country.toLowerCase() !== filters.countryFilter.toLowerCase()
-      ) {
-        return false;
-      }
-      if (
-        filters.languageFilter.length > 0 &&
-        !filters.languageFilter.some((lang) => trip.languages.includes(lang))
-      ) {
-        return false;
-      }
-      if (
-        filters.vibeFilter.length > 0 &&
-        !filters.vibeFilter.some((vibe) => trip.vibes.includes(vibe))
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [trips, filters]);
-
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (filters.searchTerm.trim()) count++;
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < Infinity) count++;
-    if (filters.daysFilter !== "all") count++;
-    if (filters.countryFilter !== "all") count++;
-    if (filters.languageFilter.length > 0) count++;
-    if (filters.vibeFilter.length > 0) count++;
-    return count;
-  }, [filters]);
-
-  return {
-    filters,
-    updateFilter,
-    clearAllFilters,
-    filteredTrips,
-    activeFiltersCount,
-    filterOptions
-  };
-};
-const LoadingSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16">
-    {Array.from({ length: 6 }, (_, i) => (
-      <Card
-        key={i}
-        className="overflow-hidden border border-purple-100 animate-pulse"
-      >
-        <div className="h-48 bg-purple-100" />
-        <CardHeader>
-          <Skeleton className="h-4 w-3/4 bg-purple-200 rounded" />
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Skeleton className="h-3 w-full bg-purple-100 rounded" />
-          <Skeleton className="h-3 w-5/6 bg-purple-100 rounded" />
-          <Skeleton className="h-3 w-2/3 bg-purple-100 rounded" />
-        </CardContent>
-        <CardFooter>
-          <Skeleton className="h-10 w-full bg-purple-200 rounded-md" />
-        </CardFooter>
-      </Card>
-    ))}
-  </div>
-);
-
-const EmptyState = ({ onClearFilters }: { onClearFilters: () => void }) => (
-  <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-purple-100 px-4">
-    <Compass className="h-16 w-16 text-purple-300 mx-auto mb-4" />
-    <h3 className="text-xl font-medium text-purple-900 mb-2">
-      No travel plans match your filters
-    </h3>
-    <p className="text-purple-600 mb-6 max-w-md mx-auto">
-      We couldn&apos;t find any trips with your current filter settings. Try
-      adjusting your criteria or check back soon for new adventures!
-    </p>
-    <Button
-      onClick={onClearFilters}
-      className="bg-purple-600 hover:bg-purple-700 text-white"
-    >
-      Clear All Filters
-    </Button>
-  </div>
-);
-
-const TripCard = ({ trip }: { trip: Trip }) => (
-  <Card className="overflow-hidden hover:shadow-lg transition-shadow border-purple-100 hover:border-purple-200">
-    <div className="h-48 bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center relative overflow-hidden group">
-      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-      <Map className="h-20 w-20 text-white opacity-75 group-hover:scale-110 transition-transform" />
-    </div>
-    <CardHeader>
-      <CardTitle className="text-purple-900">{trip.title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p className="text-purple-700 text-sm line-clamp-2 mb-4">
-        {trip.description}
-      </p>
-
-      <div className="space-y-2">
-        <p className="text-sm flex items-center text-gray-700">
-          <Compass className="h-4 w-4 mr-2 text-purple-500" />
-          {trip.city}, {trip.state}, {trip.country}
-        </p>
-        <p className="text-sm flex items-center text-gray-700">
-          <Calendar className="h-4 w-4 mr-2 text-purple-500" />
-          {trip.noOfDays} {trip.noOfDays === 1 ? "Day" : "Days"}
-        </p>
-        <p className="text-sm flex items-center text-gray-700">
-          <DollarSign className="h-4 w-4 mr-2 text-purple-500" />
-          <span className="font-medium text-purple-900">
-            ${trip.price.toLocaleString()}
-          </span>
-        </p>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-1">
-        {trip.languages.length > 0 && (
-          <div className="flex items-center bg-purple-50 px-2 py-1 rounded text-xs text-purple-700">
-            <Languages className="h-3 w-3 mr-1" />
-            {trip.languages.join(", ")}
-          </div>
-        )}
-
-        {trip.vibes.map((vibe) => (
-          <span
-            key={vibe}
-            className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-xs"
-          >
-            {vibe}
-          </span>
-        ))}
-      </div>
-    </CardContent>
-    <CardFooter>
-      <Link href={`/trips/${trip.travelPlanId}`} className="w-full">
-        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-          View Details
-        </Button>
-      </Link>
-    </CardFooter>
-  </Card>
-);
+  LoadingSkeleton,
+  EmptyState,
+  ErrorDisplay,
+} from "@/components/trips/LoadingStates";
 
 export default function TripsPage() {
   const { trips, isLoading, error } = useTripsData();
@@ -360,46 +22,115 @@ export default function TripsPage() {
     clearAllFilters,
     filteredTrips,
     activeFiltersCount,
-    filterOptions
+    filterOptions,
   } = useFilters(trips);
 
   const [showFilters, setShowFilters] = useState(false);
-  const selectStyles: StylesConfig<SelectOption, true> = useMemo(
+
+  const selectStyles = useMemo(
     () => ({
-      control: (base) => ({
-        ...base,
-        backgroundColor: "#faf5ff",
-        borderColor: "#d8b4fe"
+      control: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        backgroundColor: "white",
+        borderWidth: "3px",
+        borderColor: "black",
+        borderRadius: "0.5rem",
+        boxShadow: "3px 3px 0px 0px rgba(0,0,0,1)",
+        padding: "4px",
+        fontSize: "1rem",
+        fontWeight: "bold",
+        "&:hover": {
+          borderColor: "black",
+        },
       }),
-      option: (base, state) => ({
-        ...base,
+      option: (
+        baseStyles: Record<string, unknown>,
+        state: { isSelected: boolean; isFocused: boolean }
+      ) => ({
+        ...baseStyles,
         backgroundColor: state.isSelected
-          ? "#8b5cf6"
+          ? "#22c55e"
           : state.isFocused
-          ? "#f3e8ff"
-          : undefined,
-        color: state.isSelected ? "white" : "#4c1d95"
+          ? "#f0f9ff"
+          : "white",
+        color: "black",
+        fontWeight: state.isSelected ? "bold" : "normal",
+        padding: "8px 12px",
+        borderBottom: "1px solid #e5e7eb",
+        textTransform: "uppercase" as const,
+        fontSize: "0.875rem",
+        "&:hover": {
+          backgroundColor: "#22c55e",
+        },
       }),
-      multiValue: (base) => ({ ...base, backgroundColor: "#e9d5ff" }),
-      multiValueLabel: (base) => ({ ...base, color: "#4c1d95" }),
-      multiValueRemove: (base) => ({
-        ...base,
-        color: "#4c1d95",
-        ":hover": { backgroundColor: "#d8b4fe", color: "#6b21a8" }
-      })
+      multiValue: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        backgroundColor: "#fde047",
+        borderWidth: "2px",
+        borderColor: "black",
+        borderRadius: "4px",
+        padding: "0px 2px",
+        margin: "2px 4px 2px 0",
+      }),
+      multiValueLabel: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        color: "black",
+        fontWeight: "bold",
+        padding: "2px 4px",
+        fontSize: "0.875rem",
+      }),
+      multiValueRemove: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        color: "black",
+        borderLeft: "1px solid black",
+        paddingLeft: "4px",
+        paddingRight: "4px",
+        "&:hover": {
+          backgroundColor: "#f59e0b",
+          color: "black",
+        },
+      }),
+      placeholder: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        color: "#6b7280",
+        fontWeight: "bold",
+      }),
+      input: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        color: "black",
+        fontWeight: "bold",
+      }),
+      indicatorSeparator: () => ({
+        display: "none",
+      }),
+      dropdownIndicator: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        color: "black",
+        "&:hover": {
+          color: "black",
+        },
+      }),
+      menu: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        backgroundColor: "white",
+        border: "3px solid black",
+        borderRadius: "0.5rem",
+        boxShadow: "3px 3px 0px 0px rgba(0,0,0,1)",
+        overflow: "hidden",
+      }),
+      menuList: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        padding: "0",
+      }),
+      valueContainer: (baseStyles: Record<string, unknown>) => ({
+        ...baseStyles,
+        padding: "4px 6px",
+      }),
     }),
     []
   );
-  const languageOptions = useMemo(
-    () => filterOptions.languages.map((l) => ({ value: l, label: l })),
-    [filterOptions.languages]
-  );
 
-  const vibeOptions = useMemo(
-    () => filterOptions.vibes.map((v) => ({ value: v, label: v })),
-    [filterOptions.vibes]
-  );
-
+  // Handler functions for filter changes
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateFilter("searchTerm", e.target.value);
@@ -418,7 +149,7 @@ export default function TripsPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateFilter("priceRange", [
         filters.priceRange[0],
-        +e.target.value || Infinity
+        +e.target.value || Infinity,
       ]);
     },
     [updateFilter, filters.priceRange]
@@ -446,211 +177,44 @@ export default function TripsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-16 px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover Amazing Adventures
-          </h1>
-          <p className="text-lg md:text-xl mb-8 text-purple-100">
-            Find and book unique travel experiences tailored to your interests
-          </p>
-
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-3.5 text-purple-300" />
-            <Input
-              placeholder="Search destinations, activities, or experiences..."
-              className="pl-12 py-6 text-lg bg-white/10 backdrop-blur-sm border-purple-400/30 text-white placeholder:text-purple-200 rounded-full"
-              value={filters.searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Hero section with search */}
+      <HeroSection
+        searchTerm={filters.searchTerm}
+        onSearchChange={handleSearchChange}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Filter controls section */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className={`flex items-center gap-2 ${
-                  showFilters ? "bg-purple-100 border-purple-300" : ""
-                }`}
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4" />
-                Filters
-                {activeFiltersCount > 0 && (
-                  <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    {activeFiltersCount}
-                  </span>
-                )}
-                {showFilters ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </Button>
-
-              {activeFiltersCount > 0 && (
-                <Button
-                  variant="ghost"
-                  className="text-purple-600 hover:text-purple-800"
-                  onClick={clearAllFilters}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Clear all
-                </Button>
-              )}
-            </div>
-
-            <p className="text-sm text-gray-500">
-              {filteredTrips.length}{" "}
-              {filteredTrips.length === 1 ? "trip" : "trips"} found
-            </p>
-          </div>
+          <FilterControls
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            activeFiltersCount={activeFiltersCount}
+            filteredTripsCount={filteredTrips.length}
+            clearAllFilters={clearAllFilters}
+          />
 
           {showFilters && (
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100 mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Trip Details */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-purple-900 border-b border-purple-100 pb-2">
-                  Trip Details
-                </h3>
-
-                <div>
-                  <Label className="text-sm text-purple-700 mb-1 block">
-                    Price Range
-                  </Label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      type="number"
-                      placeholder="Min"
-                      className="bg-purple-50 border-purple-200"
-                      value={
-                        filters.priceRange[0] === 0 ? "" : filters.priceRange[0]
-                      }
-                      onChange={handlePriceMinChange}
-                    />
-                    <span className="text-purple-500">to</span>
-                    <Input
-                      type="number"
-                      placeholder="Max"
-                      className="bg-purple-50 border-purple-200"
-                      value={
-                        filters.priceRange[1] === Infinity
-                          ? ""
-                          : filters.priceRange[1]
-                      }
-                      onChange={handlePriceMaxChange}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm text-purple-700 mb-1 block">
-                    Duration
-                  </Label>
-                  <Select
-                    value={filters.daysFilter}
-                    onValueChange={(value) => updateFilter("daysFilter", value)}
-                  >
-                    <SelectTrigger className="bg-purple-50 border-purple-200">
-                      <SelectValue placeholder="Duration" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DURATION_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="font-medium text-purple-900 border-b border-purple-100 pb-2">
-                  Location
-                </h3>
-
-                <div>
-                  <Label className="text-sm text-purple-700 mb-1 block">
-                    Country
-                  </Label>
-                  <Select
-                    value={filters.countryFilter}
-                    onValueChange={(value) =>
-                      updateFilter("countryFilter", value)
-                    }
-                  >
-                    <SelectTrigger className="bg-purple-50 border-purple-200">
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      {filterOptions.countries.map((country) => (
-                        <SelectItem key={country} value={country.toLowerCase()}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="font-medium text-purple-900 border-b border-purple-100 pb-2">
-                  Preferences
-                </h3>
-
-                <div>
-                  <Label className="text-sm text-purple-700 mb-1 block">
-                    Languages
-                  </Label>
-                  <ReactSelect
-                    isMulti
-                    styles={selectStyles}
-                    placeholder="Select languages"
-                    options={languageOptions}
-                    value={filters.languageFilter.map((l) => ({
-                      value: l,
-                      label: l
-                    }))}
-                    onChange={handleLanguageChange}
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-sm text-purple-700 mb-1 block">
-                    Vibes
-                  </Label>
-                  <ReactSelect
-                    isMulti
-                    styles={selectStyles}
-                    placeholder="Select vibes"
-                    options={vibeOptions}
-                    value={filters.vibeFilter.map((v) => ({
-                      value: v,
-                      label: v
-                    }))}
-                    onChange={handleVibeChange}
-                  />
-                </div>
-              </div>
-            </div>
+            <FilterPanel
+              filters={filters}
+              updateFilter={updateFilter}
+              filterOptions={filterOptions}
+              selectStyles={selectStyles}
+              handlePriceMinChange={handlePriceMinChange}
+              handlePriceMaxChange={handlePriceMaxChange}
+              handleLanguageChange={handleLanguageChange}
+              handleVibeChange={handleVibeChange}
+            />
           )}
         </div>
 
+        {/* Loading state */}
         {isLoading && <LoadingSkeleton />}
 
-        {error && (
-          <Alert className="mb-6 bg-red-50 border-red-200 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        {/* Error state */}
+        {error && <ErrorDisplay error={error} />}
 
+        {/* Results grid */}
         {!isLoading && !error && filteredTrips.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredTrips.map((trip) => (
@@ -659,6 +223,7 @@ export default function TripsPage() {
           </div>
         )}
 
+        {/* Empty state */}
         {!isLoading && !error && filteredTrips.length === 0 && (
           <EmptyState onClearFilters={clearAllFilters} />
         )}

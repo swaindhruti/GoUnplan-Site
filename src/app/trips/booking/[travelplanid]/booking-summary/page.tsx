@@ -7,17 +7,17 @@ import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
-    travelPlanId: string;
+    travelplanid: string;
   }>;
 };
 
 export default async function BookingSummaryPage({ params }: Props) {
-  const tripId = (await params).travelPlanId;
+  const tripId = (await params).travelplanid;
 
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
       getTripById(tripId),
-      requireUser()
+      requireUser(),
     ]);
 
     if (!userSession) {
@@ -31,7 +31,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       <>
         <BookingSummary
           booking={{
-            ...booking
+            ...booking,
           }}
           travelPlan={trip}
         />

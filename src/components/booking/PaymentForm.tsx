@@ -3,11 +3,17 @@
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { CreditCard, Lock } from "lucide-react";
+import {
+  CreditCard,
+  Lock,
+  Calendar,
+  DollarSign,
+  Users,
+  ArrowLeft,
+  ChevronDown,
+} from "lucide-react";
 
 interface PaymentFormProps {
   onComplete?: () => void;
@@ -24,6 +30,19 @@ interface PaymentFormProps {
 export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  // Function to get random background color for cards
+  const getRandomBgColor = () => {
+    const colors = [
+      "bg-yellow-300",
+      "bg-pink-400",
+      "bg-blue-400",
+      "bg-green-500",
+      "bg-orange-400",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
 
   const subtotal = useMemo(
     () => tripData.numberOfGuests * tripData.pricePerPerson,
@@ -44,112 +63,242 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   };
 
   return (
-    <div className="flex justify-center items-center p-10 md:p-20">
-      <div className="w-full max-w-3xl space-y-6">
-        <h2 className="text-2xl font-bold text-gray-900">Payment Details</h2>
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8 flex flex-col">
+          <div className="inline-block bg-purple-500 border-3 border-black rounded-xl px-8 py-4 mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] max-w-2xl justify-center mx-auto">
+            <h1 className="text-3xl font-black text-white uppercase tracking-tight">
+              Payment Details
+            </h1>
+          </div>
+        </div>
 
-        {/* Trip Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Booking Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-gray-800">
-            <div className="flex justify-between font-medium">
-              <span>{tripData.title}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>
-                {tripData.startDate} - {tripData.endDate}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>
-                {tripData.numberOfGuests} guest
-                {tripData.numberOfGuests > 1 ? "s" : ""}
-              </span>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>
-                  ${tripData.pricePerPerson} × {tripData.numberOfGuests}
-                </span>
-                <span>${subtotal}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Service fee</span>
-                <span>${serviceFee}</span>
+        <div className="space-y-6">
+          {/* Trip Summary */}
+          <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
+            <div
+              className={`${getRandomBgColor()} text-black border-b-3 border-black p-4`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="bg-white p-1.5 rounded-md border-2 border-black">
+                  <Calendar className="w-5 h-5 text-black" strokeWidth={2.5} />
+                </div>
+                <h2 className="text-xl font-black uppercase">
+                  Booking Summary
+                </h2>
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="ml-auto bg-white p-1.5 rounded-md border-2 border-black"
+                >
+                  <ChevronDown
+                    className={`w-5 h-5 text-black transition-transform ${
+                      isExpanded ? "transform rotate-180" : ""
+                    }`}
+                    strokeWidth={2.5}
+                  />
+                </button>
               </div>
             </div>
 
-            <Separator />
+            {isExpanded && (
+              <div className="p-4 space-y-4">
+                <div className="bg-gray-100 border-2 border-black p-3 rounded-md font-bold">
+                  <span className="block text-lg font-black">
+                    {tripData.title || "Adventure Trip"}
+                  </span>
+                </div>
 
-            <div className="flex justify-between font-semibold text-lg">
-              <span>Total</span>
-              <span>${total}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="bg-blue-400 border-2 border-black p-3 rounded-md">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Calendar
+                        className="w-4 h-4 text-black"
+                        strokeWidth={2.5}
+                      />
+                      <span className="font-bold">Trip Dates</span>
+                    </div>
+                    <p className="bg-white border-2 border-black p-2 rounded-md text-center font-bold">
+                      {tripData.startDate} - {tripData.endDate}
+                    </p>
+                  </div>
+
+                  <div className="bg-yellow-300 border-2 border-black p-3 rounded-md">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-black" strokeWidth={2.5} />
+                      <span className="font-bold">Guests</span>
+                    </div>
+                    <p className="bg-white border-2 border-black p-2 rounded-md text-center font-bold">
+                      {tripData.numberOfGuests}{" "}
+                      {tripData.numberOfGuests > 1 ? "guests" : "guest"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-green-500 border-2 border-black p-3 rounded-md">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign
+                      className="w-4 h-4 text-black"
+                      strokeWidth={2.5}
+                    />
+                    <span className="font-bold">Cost Breakdown</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between bg-white border-2 border-black p-2 rounded-md">
+                      <span className="font-bold">Price per person:</span>
+                      <span className="font-black">
+                        ${tripData.pricePerPerson}
+                      </span>
+                    </div>
+                    <div className="flex justify-between bg-white border-2 border-black p-2 rounded-md">
+                      <span className="font-bold">
+                        Subtotal (${tripData.pricePerPerson} ×{" "}
+                        {tripData.numberOfGuests}):
+                      </span>
+                      <span className="font-black">${subtotal}</span>
+                    </div>
+                    <div className="flex justify-between bg-white border-2 border-black p-2 rounded-md">
+                      <span className="font-bold">Service fee (10%):</span>
+                      <span className="font-black">${serviceFee}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between bg-black text-white border-2 border-black p-3 rounded-md">
+                  <span className="font-black text-lg">TOTAL AMOUNT</span>
+                  <span className="font-black text-lg">${total}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Payment Card Info */}
+          <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
+            <div className="bg-purple-500 text-white border-b-3 border-black p-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-white p-1.5 rounded-md border-2 border-black">
+                  <CreditCard
+                    className="w-5 h-5 text-black"
+                    strokeWidth={2.5}
+                  />
+                </div>
+                <h2 className="text-xl font-black uppercase">Payment Method</h2>
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Payment Card Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Payment Method
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <Input
-                id="cardNumber"
-                placeholder="1234 5678 9012 3456"
-                className="font-mono"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="expiry">Expiry Date</Label>
-                <Input id="expiry" placeholder="MM/YY" className="font-mono" />
+                <Label htmlFor="cardNumber" className="font-bold text-black">
+                  Card Number <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="cardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  className="border-2 border-black p-2 font-mono bg-white"
+                />
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry" className="font-bold text-black">
+                    Expiry Date <span className="text-red-600">*</span>
+                  </Label>
+                  <Input
+                    id="expiry"
+                    placeholder="MM/YY"
+                    className="border-2 border-black p-2 font-mono bg-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cvc" className="font-bold text-black">
+                    CVC <span className="text-red-600">*</span>
+                  </Label>
+                  <Input
+                    id="cvc"
+                    placeholder="123"
+                    className="border-2 border-black p-2 font-mono bg-white"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="cvc">CVC</Label>
-                <Input id="cvc" placeholder="123" className="font-mono" />
+                <Label htmlFor="cardName" className="font-bold text-black">
+                  Name on Card <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="cardName"
+                  placeholder="John Doe"
+                  className="border-2 border-black p-2 bg-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 bg-yellow-300 border-2 border-black p-3 rounded-md font-bold">
+                <Lock className="w-5 h-5 text-black" strokeWidth={2.5} />
+                <span>Your payment information is secure and encrypted</span>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="cardName">Name on Card</Label>
-              <Input id="cardName" placeholder="John Doe" />
-            </div>
+          {/* Terms and Policies */}
+          <div className="border-3 border-black rounded-xl p-4 bg-pink-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <p className="bg-white border-2 border-black p-3 rounded-md font-bold text-center">
+              By completing this payment, you agree to our{" "}
+              <a
+                href="#"
+                className="underline decoration-2 decoration-black hover:bg-yellow-300 transition-colors"
+              >
+                Terms & Conditions
+              </a>{" "}
+              and{" "}
+              <a
+                href="#"
+                className="underline decoration-2 decoration-black hover:bg-yellow-300 transition-colors"
+              >
+                Cancellation Policy
+              </a>
+            </p>
+          </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-              <Lock className="w-4 h-4" />
-              <span>Your payment information is secure and encrypted</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6 border-t border-gray-200">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            disabled={isProcessing}
-          >
-            Back
-          </Button>
-          <Button
-            onClick={handlePayment}
-            disabled={isProcessing}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-          >
-            {isProcessing ? "Processing..." : `Pay $${total}`}
-          </Button>
+          {/* Navigation Buttons */}
+          <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6 border-t-3 border-black">
+            <Button
+              onClick={handleBack}
+              disabled={isProcessing}
+              className="bg-white text-black font-black uppercase 
+                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                       hover:translate-x-[2px] hover:translate-y-[2px]
+                       transition-all duration-200 py-3 px-6 rounded-md
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
+              Back to Summary
+            </Button>
+            <Button
+              onClick={handlePayment}
+              disabled={isProcessing}
+              className="bg-black text-white font-black uppercase 
+                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                       hover:translate-x-[2px] hover:translate-y-[2px]
+                       transition-all duration-200 py-3 px-6 rounded-md
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       flex-1 flex items-center justify-center"
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                  Processing...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5" strokeWidth={2.5} />
+                  Pay ${total} Now
+                </div>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

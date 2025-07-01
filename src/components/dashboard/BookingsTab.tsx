@@ -67,7 +67,7 @@ export function BookingsTab({
               Manage your travel bookings
             </p>
           </div>
-          <div className="flex space-x-1">
+          <div className="flex space-x-3">
             <button
               onClick={() => setBookingFilter("all")}
               className={`px-4 py-2 text-sm font-extrabold rounded-lg transition-colors border-3 border-black ${

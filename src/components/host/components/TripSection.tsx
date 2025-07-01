@@ -36,7 +36,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-black text-black uppercase tracking-tight -rotate-1">
+          <h2 className="text-3xl font-black text-black uppercase tracking-tight ">
             Your Trips
           </h2>
           <p className="mt-1 text-gray-700 font-bold">
@@ -54,8 +54,6 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
 
       <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden relative">
         {/* Decorative elements */}
-
-        <div className="absolute bottom-4 left-8 h-8 w-8 bg-yellow-300 border-3 border-black rounded-lg -rotate-6"></div>
 
         <div className="border-b-4 border-black bg-purple-600 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -114,7 +112,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         ) : error ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-3 mb-4">
+              <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  mb-4">
                 <AlertTriangle className="h-10 w-10 text-black" />
               </div>
               <p className="mt-2 text-xl font-bold text-black">{error}</p>
@@ -123,7 +121,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         ) : filteredTrips.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="mx-auto h-20 w-20 bg-blue-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-3 mb-4">
+              <div className="mx-auto h-20 w-20 bg-blue-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  mb-4">
                 <FileText className="h-10 w-10 text-black" />
               </div>
               <p className="mt-2 text-xl font-bold text-black">
@@ -180,8 +178,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                               "yellow-300",
                               "purple-400",
                             ][index % 5]
-                          } border-2 border-black flex items-center justify-center text-black font-black text-lg mr-4 ${
-                            index % 2 === 0 ? "rotate-2" : "-rotate-2"
+                          } border-2 border-black flex items-center justify-center text-black font-black text-lg mr-4 "
                           }`}
                         >
                           {trip.title.charAt(0).toUpperCase()}

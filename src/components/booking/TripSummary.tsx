@@ -1,35 +1,59 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, MapPin, Clock } from "lucide-react"
+import { Calendar, MapPin, Clock } from "lucide-react";
 
 interface TripSummaryProps {
-  startDate: string
-  endDate: string
-  duration: string
-  location: string
+  startDate: string;
+  endDate: string;
+  duration: string;
+  location: string;
 }
 
-export function TripSummary({ startDate, endDate, duration, location }: TripSummaryProps) {
+export function TripSummary({
+  startDate,
+  endDate,
+  duration,
+  location,
+}: TripSummaryProps) {
   return (
-    <Card className="bg-purple-50 border-purple-200">
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Trip Summary</h3>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="w-4 h-4 text-purple-600" />
-            <span>
+    <div className="font-bold">
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 border-2 border-black rounded-lg p-3 bg-pink-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <Calendar className="w-4 h-4 text-black" strokeWidth={2.5} />
+          </div>
+          <div>
+            <div className="text-xs uppercase font-black tracking-wide">
+              Dates
+            </div>
+            <div className="text-sm">
               {startDate} - {endDate}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Clock className="w-4 h-4 text-purple-600" />
-            <span>{duration}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="w-4 h-4 text-purple-600" />
-            <span>{location}</span>
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  )
+
+        <div className="flex items-center gap-3 border-2 border-black rounded-lg p-3 bg-yellow-300 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <Clock className="w-4 h-4 text-black" strokeWidth={2.5} />
+          </div>
+          <div>
+            <div className="text-xs uppercase font-black tracking-wide">
+              Duration
+            </div>
+            <div className="text-sm">{duration}</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 border-2 border-black rounded-lg p-3 bg-green-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+            <MapPin className="w-4 h-4 text-black" strokeWidth={2.5} />
+          </div>
+          <div>
+            <div className="text-xs uppercase font-black tracking-wide">
+              Location
+            </div>
+            <div className="text-sm">{location}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
