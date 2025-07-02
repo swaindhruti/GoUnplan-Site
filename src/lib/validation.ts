@@ -1,25 +1,68 @@
 import { z } from "zod";
 
+// Signup form validation
+export const signupFormSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, { message: "First name must be at least 2 characters." })
+      .max(25, { message: "First name must not exceed 25 characters." })
+      .regex(/^[a-zA-Z\s]+$/, {
+        message: "First name can only contain letters and spaces.",
+      }),
+    lastName: z
+      .string()
+      .min(2, { message: "Last name must be at least 2 characters." })
+      .max(25, { message: "Last name must not exceed 25 characters." })
+      .regex(/^[a-zA-Z\s]+$/, {
+        message: "Last name can only contain letters and spaces.",
+      }),
+    email: z
+      .string()
+      .email({ message: "Please enter a valid email address." })
+      .max(100, { message: "Email must not exceed 100 characters." }),
+    phone: z
+      .string()
+      .min(10, { message: "Phone number must be at least 10 digits." })
+      .max(15, { message: "Phone number must not exceed 15 digits." })
+      .regex(/^\+?[1-9]\d{1,14}$/, {
+        message: "Please enter a valid phone number.",
+      }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(100, { message: "Password must not exceed 100 characters." })
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, and one number.",
+      }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
+
 // Date selector validation
 export const dateSelectionSchema = z
   .object({
     startDate: z
       .date({
         required_error: "Start date is required",
-        invalid_type_error: "Please select a valid date"
+        invalid_type_error: "Please select a valid date",
       })
       .refine((date) => date >= new Date(), {
-        message: "Start date cannot be in the past"
+        message: "Start date cannot be in the past",
       }),
     endDate: z.date({
       required_error: "End date is required",
-      invalid_type_error: "Please select a valid date"
+      invalid_type_error: "Please select a valid date",
     }),
-    duration: z.number().min(1, "Duration must be at least 1 day")
+    duration: z.number().min(1, "Duration must be at least 1 day"),
   })
   .refine((data) => data.endDate > data.startDate, {
     message: "End date must be after start date",
-    path: ["endDate"]
+    path: ["endDate"],
   });
 
 // Guest information validation
@@ -55,14 +98,14 @@ export const guestInfoSchema = z.object({
     .min(1, "Phone number is required")
     .regex(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .min(10, "Phone number must be at least 10 digits")
-    .max(20, "Phone number must be less than 20 characters")
+    .max(20, "Phone number must be less than 20 characters"),
 });
 
 // Guest information form validation
 export const guestInformationFormSchema = z
   .object({
     submissionType: z.enum(["individual", "team"], {
-      required_error: "Please select a submission type"
+      required_error: "Please select a submission type",
     }),
 
     numberOfGuests: z
@@ -78,11 +121,11 @@ export const guestInformationFormSchema = z
     specialRequirements: z
       .string()
       .max(500, "Special requirements must be less than 500 characters")
-      .optional()
+      .optional(),
   })
   .refine((data) => data.guests.length === data.numberOfGuests, {
     message: "Number of guest forms must match selected number of guests",
-    path: ["guests"]
+    path: ["guests"],
   })
   .refine(
     (data) => {
@@ -93,7 +136,7 @@ export const guestInformationFormSchema = z
     },
     {
       message: "Individual submission must have exactly 1 guest",
-      path: ["numberOfGuests"]
+      path: ["numberOfGuests"],
     }
   );
 
@@ -105,7 +148,7 @@ export const creditCardSchema = z.object({
     .regex(/^[\d\s]+$/, "Card number can only contain digits and spaces")
     .transform((val) => val.replace(/\s/g, ""))
     .refine((val) => val.length >= 13 && val.length <= 19, {
-      message: "Card number must be between 13 and 19 digits"
+      message: "Card number must be between 13 and 19 digits",
     })
     .refine(
       (val) => {
@@ -126,7 +169,7 @@ export const creditCardSchema = z.object({
         return sum % 10 === 0;
       },
       {
-        message: "Please enter a valid card number"
+        message: "Please enter a valid card number",
       }
     ),
 
@@ -142,7 +185,7 @@ export const creditCardSchema = z.object({
         return expiry > now;
       },
       {
-        message: "Card has expired"
+        message: "Card has expired",
       }
     ),
 
@@ -159,21 +202,21 @@ export const creditCardSchema = z.object({
     .regex(
       /^[a-zA-Z\s'-]+$/,
       "Cardholder name can only contain letters, spaces, hyphens, and apostrophes"
-    )
+    ),
 });
 
 // Payment form validation
 export const paymentFormSchema = z
   .object({
     paymentMethod: z.enum(["credit-card", "paypal"], {
-      required_error: "Please select a payment method"
+      required_error: "Please select a payment method",
     }),
 
     creditCard: creditCardSchema.optional(),
 
     agreeToTerms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to the terms and conditions"
-    })
+      message: "You must agree to the terms and conditions",
+    }),
   })
   .refine(
     (data) => {
@@ -184,7 +227,7 @@ export const paymentFormSchema = z
     },
     {
       message: "Credit card information is required",
-      path: ["creditCard"]
+      path: ["creditCard"],
     }
   );
 
@@ -197,7 +240,7 @@ export const tripBookingSummarySchema = z.object({
     .number()
     .min(1, "At least 1 guest is required")
     .max(8, "Maximum 8 guests allowed"),
-  pricePerPerson: z.number().min(0, "Price must be a positive number")
+  pricePerPerson: z.number().min(0, "Price must be a positive number"),
 });
 
 // Complete booking validation (combines all steps)
@@ -205,7 +248,7 @@ export const completeBookingSchema = z.object({
   dateSelection: dateSelectionSchema,
   guestInformation: guestInformationFormSchema,
   payment: paymentFormSchema,
-  tripSummary: tripBookingSummarySchema
+  tripSummary: tripBookingSummarySchema,
 });
 
 // Type exports for TypeScript
@@ -216,3 +259,4 @@ export type CreditCard = z.infer<typeof creditCardSchema>;
 export type PaymentForm = z.infer<typeof paymentFormSchema>;
 export type TripBookingSummary = z.infer<typeof tripBookingSummarySchema>;
 export type CompleteBooking = z.infer<typeof completeBookingSchema>;
+export type SignupForm = z.infer<typeof signupFormSchema>;

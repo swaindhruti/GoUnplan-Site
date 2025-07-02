@@ -1,98 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { AlertCircle, ArrowRight, User, Mail, Phone, Lock } from "lucide-react";
+import { motion } from "framer-motion";
+import { Plane } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, { message: "Name must be at least 2 characters." })
-      .max(50, { message: "Name must not exceed 50 characters." })
-      .regex(/^[a-zA-Z\s]+$/, {
-        message: "Name can only contain letters and spaces.",
-      }),
-    email: z
-      .string()
-      .email({ message: "Please enter a valid email address." })
-      .max(100, { message: "Email must not exceed 100 characters." }),
-    phone: z
-      .string()
-      .min(10, { message: "Phone number must be at least 10 digits." })
-      .max(15, { message: "Phone number must not exceed 15 digits." })
-      .regex(/^\+?[1-9]\d{1,14}$/, {
-        message: "Please enter a valid phone number.",
-      }),
-    password: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters." })
-      .max(100, { message: "Password must not exceed 100 characters." })
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-        message:
-          "Password must contain at least one uppercase letter, one lowercase letter, and one number.",
-      }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ["confirmPassword"],
-  });
-
-type FormData = z.infer<typeof formSchema>;
+import { SignupForm } from "@/components/auth/signup-form";
+import { PageHeader } from "@/components/layout/page-header";
+import { PageFooter } from "@/components/layout/page-footer";
+import { BenefitsCard } from "@/components/auth/benefits-card";
+import { DecoElements } from "@/components/ui/deco-elements";
+import DotGridBackgroundProvider from "@/components/providers/dotGridBackgroundProvider";
+import { type SignupForm as SignupFormData } from "@/lib/validation";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
+  // Cursor tracking states
+  const [cursorPosition, setCursorPosition] = useState({ x: -100, y: -100 });
+  const [isOverInteractive, setIsOverInteractive] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const onSubmit = async (values: FormData) => {
+  // Track mouse position for custom cursor
+  useEffect(() => {
+    const updateCursorPosition = (e: MouseEvent) => {
+      setCursorPosition({ x: e.clientX, y: e.clientY });
+
+      // Check if cursor is over any interactive element
+      const target = e.target as HTMLElement;
+      const isInteractive =
+        target.tagName === "BUTTON" ||
+        target.tagName === "A" ||
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.closest("button") ||
+        target.closest("a") ||
+        target.closest("input") ||
+        target.closest("textarea") ||
+        target.closest(".interactive");
+
+      setIsOverInteractive(!!isInteractive);
+    };
+
+    window.addEventListener("mousemove", updateCursorPosition);
+
+    return () => {
+      window.removeEventListener("mousemove", updateCursorPosition);
+    };
+  }, []);
+
+  const handleSubmit = async (values: SignupFormData) => {
     setIsLoading(true);
     setServerError(null);
 
     try {
+      // Combine first name and last name
+      const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
+
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: values.name.trim(),
+          name: fullName, // Send the combined name
           email: values.email.trim(),
           phone: values.phone.trim(),
           password: values.password,
@@ -102,22 +75,7 @@ export default function SignUpPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.details && Array.isArray(data.details)) {
-          data.details.forEach(
-            (error: { path?: string[]; message: string }) => {
-              if (error.path && error.path[0]) {
-                form.setError(error.path[0] as keyof FormData, {
-                  type: "server",
-                  message: error.message,
-                });
-              }
-            }
-          );
-        } else {
-          setServerError(
-            data.error || "Something went wrong. Please try again."
-          );
-        }
+        setServerError(data.error || "Something went wrong. Please try again.");
         return;
       }
 
@@ -135,212 +93,117 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-2xl font-bold text-purple-700">
-            Unplan
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Link href="/auth/signin">
-              <Button
-                variant="outline"
-                className="text-purple-600 bg-white border-purple-200 hover:bg-purple-50"
-              >
-                Sign In
-              </Button>
-            </Link>
-          </div>
+    <>
+      {/* Custom plane cursor */}
+      <div
+        className={`fixed pointer-events-none z-50 transition-opacity duration-300 ${
+          isOverInteractive ? "opacity-0" : "opacity-100"
+        }`}
+        style={{
+          transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px) translate(-50%, -50%)`,
+        }}
+      >
+        <div className="relative">
+          <Plane
+            className="h-14 w-14 text-black fill-amber-500 rotate-22.5"
+            strokeWidth={1.5}
+          />
         </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md shadow-lg border border-gray-200">
-          <CardHeader className="space-y-1 border-b bg-gray-50 rounded-t-lg">
-            <CardTitle className="text-2xl font-bold text-center text-gray-900">
-              Create your account
-            </CardTitle>
-            <CardDescription className="text-center text-gray-600">
-              Join Unplan today and start exploring unique adventures
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="pt-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                {serverError && (
-                  <Alert className="mb-4 bg-red-50 border-red-200 text-red-800">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{serverError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <User className="mr-2 h-4 w-4 text-gray-500" />
-                          Full Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your full name"
-                            {...field}
-                            disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Mail className="mr-2 h-4 w-4 text-gray-500" />
-                          Email Address
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="Enter your email address"
-                            {...field}
-                            disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Phone className="mr-2 h-4 w-4 text-gray-500" />
-                          Phone Number
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="tel"
-                            placeholder="Enter your phone number"
-                            {...field}
-                            disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Lock className="mr-2 h-4 w-4 text-gray-500" />
-                          Password
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Enter your password"
-                            {...field}
-                            disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Lock className="mr-2 h-4 w-4 text-gray-500" />
-                          Confirm Password
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Confirm your password"
-                            {...field}
-                            disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5 mt-4"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                  {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
-            <div className="text-center text-sm text-gray-600 pt-2">
-              Already have an account?{" "}
-              <Link
-                href="/auth/signin"
-                className="font-medium text-purple-600 hover:text-purple-500"
-              >
-                Sign in instead
-              </Link>
-            </div>
-          </CardFooter>
-        </Card>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2024 Unplan. All rights reserved.</p>
-            <div className="flex justify-center space-x-4 mt-2">
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
-                Privacy Policy
-              </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
-                Terms of Service
-              </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
-                Help
-              </Link>
+      {/* Hide default cursor when custom cursor is visible */}
+      <style jsx global>{`
+        @media (min-width: 768px) {
+          body {
+            cursor: none;
+          }
+          .interactive {
+            cursor: pointer;
+          }
+          button,
+          a,
+          input,
+          textarea,
+          .interactive {
+            cursor: pointer;
+          }
+        }
+      `}</style>
+
+      <DotGridBackgroundProvider
+        dotSize={4}
+        gap={20}
+        baseColor="#c3c3c3"
+        activeColor="#7c3aed"
+        proximity={140}
+        shockRadius={200}
+        shockStrength={6}
+      >
+        <div className="min-h-screen flex flex-col" ref={contentRef}>
+          <PageHeader />
+
+          {/* Main Content */}
+          <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <motion.div
+              className="mb-6"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-4xl font-black text-black">Create Account</h1>
+              <p className="text-lg font-bold text-black mt-2">
+                Join the adventure and start planning your next trip
+              </p>
+            </motion.div>
+
+            <DecoElements />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Form Card */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="lg:col-span-2"
+              >
+                <SignupForm
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  serverError={serverError}
+                />
+              </motion.div>
+
+              {/* Info Card */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="lg:col-span-1"
+              >
+                <BenefitsCard />
+              </motion.div>
             </div>
+
+            {/* Additional decorative elements */}
+            <motion.div
+              className="absolute top-[20%] left-[5%] w-8 h-8 bg-yellow-300 border-3 border-black rounded-full hidden md:block"
+              animate={{
+                scale: [1, 1.2, 1],
+                backgroundColor: ["#fde047", "#fbbf24", "#fde047"],
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+            ></motion.div>
+
+            <motion.div
+              className="absolute bottom-[10%] right-[5%] w-10 h-10 bg-blue-400 border-3 border-black rounded-2xl hidden md:block"
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 6, repeat: Infinity }}
+            ></motion.div>
           </div>
+
+          <PageFooter />
         </div>
-      </footer>
-    </div>
+      </DotGridBackgroundProvider>
+    </>
   );
 }
