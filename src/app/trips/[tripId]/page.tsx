@@ -9,8 +9,10 @@ import {
   DollarSign,
   Star,
   MessageCircle,
-  Languages,
+  Languages
 } from "lucide-react";
+import { ChatButton } from "@/components/chat/ChatButton";
+import { requireUser } from "@/lib/roleGaurd";
 
 type Props = {
   params: Promise<{
@@ -21,7 +23,7 @@ type Props = {
 export default async function MountainBikingAdventure({ params }: Props) {
   const tripId = (await params).tripId;
   const trip = await getTripById(tripId);
-
+  const UserSession = await requireUser();
   if (!trip || "error" in trip) return notFound();
 
   const createdYear = new Date(trip.createdAt).getFullYear();
@@ -30,20 +32,20 @@ export default async function MountainBikingAdventure({ params }: Props) {
     "Available year-round",
     `${trip.noOfDays} days`,
     `Max ${trip.maxParticipants} people`,
-    `₹${trip.price} per person`,
+    `₹${trip.price} per person`
   ];
 
   const highlights = [
     [
       "Conquer challenging alpine single-track trails",
       "Experience breathtaking mountain panoramas",
-      "High-quality mountain bike rentals included",
+      "High-quality mountain bike rentals included"
     ],
     [
       "Ride through picturesque Swiss villages",
       "Professional guides with local knowledge",
-      "Authentic alpine accommodation",
-    ],
+      "Authentic alpine accommodation"
+    ]
   ];
 
   const hostInfo = {
@@ -51,14 +53,14 @@ export default async function MountainBikingAdventure({ params }: Props) {
     image: trip.host.image || "https://via.placeholder.com/60",
     email: trip.host.hostEmail,
     description: trip.host.description,
-    createdYear,
+    createdYear
   };
 
   const tripStats = {
     price: trip.price,
     noOfDays: trip.noOfDays,
     maxParticipants: trip.maxParticipants,
-    languages: trip.languages.join(", "),
+    languages: trip.languages.join(", ")
   };
 
   // Function to get random color from a set of neobrutalist colors
@@ -68,7 +70,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
       "bg-pink-400",
       "bg-blue-400",
       "bg-green-500",
-      "bg-orange-400",
+      "bg-orange-400"
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -311,15 +313,14 @@ export default async function MountainBikingAdventure({ params }: Props) {
               Book Now
             </button>
           </Link>
-
-          <button
-            className="w-full bg-white text-black font-black uppercase tracking-wider
-            border-3 border-black rounded-lg py-3 px-4
-            hover:bg-gray-100
-            transition-all duration-200"
-          >
-            Message Host
-          </button>
+          {UserSession.user && UserSession.user.id && (
+            <ChatButton
+              currentUserId={UserSession.user.id}
+              hostId={trip.host.user.id}
+              travelPlanId={trip.travelPlanId}
+              hostName={trip.host.user.name}
+            />
+          )}
         </div>
 
         {/* Host Card */}

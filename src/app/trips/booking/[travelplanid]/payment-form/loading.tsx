@@ -1,5 +1,5 @@
 // import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import { DollarSign } from "lucide-react";
 
 export default function BookingPageLoading() {
   return (
@@ -72,9 +72,13 @@ export default function BookingPageLoading() {
     //   </div>
     // </div>
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="text-center">
-        <Loader2 className="h-12 w-12 animate-spin text-black mx-auto mb-4" />
-        <p className="text-black text-lg">Redirecting to Payment...</p>
+      <div className="flex flex-col items-center">
+        <div className="animate-bounce bg-yellow-300 border-4 border-black rounded-lg h-20 w-20 flex items-center justify-center shadow-[4px_4px_0_0_rgba(0,0,0,1)] mb-6">
+          <DollarSign className="h-10 w-10 text-black" />
+        </div>
+        <p className="text-2xl font-extrabold text-black">
+          Redirecting to Payment...
+        </p>
       </div>
     </div>
   );

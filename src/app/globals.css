@@ -125,3 +125,18 @@
   /* overflow: hidden; */
   overscroll-behavior: none;
 }
+.neo-input {
+  background: #f3f4f6;
+  border: 2px solid #000;
+  border-radius: 0.75rem;
+  box-shadow: 4px 4px 0 0 #000;
+  font-weight: bold;
+  color: #222;
+  padding: 0.75rem 1rem;
+  transition: box-shadow 0.2s;
+}
+.neo-input:focus {
+  outline: none;
+  border-color: #a21caf;
+  box-shadow: 2px 2px 0 0 #a21caf;
+}
