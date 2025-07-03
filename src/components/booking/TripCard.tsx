@@ -20,16 +20,16 @@ export function TripCard({
   imageUrl,
   whatsIncluded,
   cancellationPolicy,
-  hostInfo,
+  hostInfo
 }: TripCardProps) {
-  // Function to get random color from a set of neobrutalist colors
+  // Muted neo-brutalist color palette
   const getRandomBgColor = () => {
     const colors = [
-      "bg-yellow-300",
-      "bg-pink-400",
-      "bg-blue-400",
-      "bg-green-500",
-      "bg-orange-400",
+      "bg-[#f5f5e6]", // muted beige
+      "bg-[#d3dae6]", // muted blue
+      "bg-[#d7dbcb]", // muted olive
+      "bg-[#e6dad3]", // muted clay
+      "bg-[#e3e3e3]" // muted gray
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -38,7 +38,7 @@ export function TripCard({
     <div className="border-3 border-black rounded-xl overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] bg-white">
       {/* Image with decorative elements */}
       <div className="relative h-48 w-full border-b-3 border-black overflow-hidden">
-        <div className="absolute top-0 right-0 bg-yellow-300 border-l-3 border-b-3 border-black z-10 p-2 font-black text-black">
+        <div className="absolute top-0 right-0 bg-[#f5f5e6] border-l-3 border-b-3 border-black z-10 p-2 font-black text-black">
           <div className="flex items-center gap-1">
             <Users className="h-5 w-5" strokeWidth={2.5} />
             <span>Max {maxPeople}</span>
@@ -54,7 +54,7 @@ export function TripCard({
       </div>
 
       {/* Card Header */}
-      <div className="p-4 border-b-3 border-black bg-purple-600 text-white">
+      <div className="p-4 border-b-3 border-black bg-[#bcb7c5] text-black">
         <h3 className="text-xl font-black uppercase tracking-tight">{title}</h3>
       </div>
 
@@ -83,9 +83,9 @@ export function TripCard({
         </div>
 
         {/* Cancellation Policy */}
-        <div className="border-3 border-black rounded-lg p-3 bg-white">
+        <div className="border-3 border-black rounded-lg p-3 bg-[#d3dae6]">
           <h4 className="font-black uppercase mb-2 flex items-center gap-2">
-            <div className="bg-blue-400 p-1.5 rounded-md border-2 border-black">
+            <div className="bg-white p-1.5 rounded-md border-2 border-black">
               <Shield className="h-4 w-4 text-black" strokeWidth={2.5} />
             </div>
             Cancellation Policy
@@ -94,7 +94,7 @@ export function TripCard({
         </div>
 
         {/* Host Info */}
-        <div className="border-3 border-black rounded-lg p-3 bg-pink-400">
+        <div className="border-3 border-black rounded-lg p-3 bg-[#e6dad3]">
           <h4 className="font-black uppercase mb-2 flex items-center gap-2">
             <div className="bg-white p-1.5 rounded-md border-2 border-black">
               <User className="h-4 w-4 text-black" strokeWidth={2.5} />

@@ -12,7 +12,7 @@ import {
   User,
   Users,
   FileText,
-  BriefcaseMedical,
+  BriefcaseMedical
 } from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
@@ -47,7 +47,7 @@ const baseGuestInfoSchema = z.object({
     .regex(/^[+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .min(10, "Phone number must be at least 10 digits")
     .max(20, "Phone number must be less than 20 characters"),
-  isteamLead: z.boolean().default(false),
+  isteamLead: z.boolean().default(false)
 });
 
 const baseGuestInformationFormSchema = z.object({
@@ -62,13 +62,13 @@ const baseGuestInformationFormSchema = z.object({
   specialRequirements: z
     .string()
     .max(500, "Special requirements must be less than 500 characters")
-    .optional(),
+    .optional()
 });
 
 const guestInformationFormSchema = baseGuestInformationFormSchema
   .refine((data) => data.guests.length === data.participants, {
     message: "Number of guest forms must match selected number of guests",
-    path: ["guests"],
+    path: ["guests"]
   })
   .refine(
     (data) => {
@@ -78,7 +78,7 @@ const guestInformationFormSchema = baseGuestInformationFormSchema
     },
     {
       message: "Exactly one guest must be designated as the team lead",
-      path: ["guests"],
+      path: ["guests"]
     }
   );
 
@@ -94,7 +94,7 @@ interface GuestInformationFormProps {
 export function GuestInformationForm({
   onBack,
   onContinue,
-  maxGuests = 8,
+  maxGuests = 8
 }: GuestInformationFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
@@ -103,8 +103,8 @@ export function GuestInformationForm({
       lastName: "",
       memberEmail: "",
       phone: "",
-      isteamLead: true,
-    },
+      isteamLead: true
+    }
   ]);
   const [specialRequirements, setSpecialRequirements] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -112,14 +112,14 @@ export function GuestInformationForm({
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Function to get random color from a set of neobrutalist colors
+  // Function to get random color from a set of muted neo-brutalist colors
   const getRandomBgColor = () => {
     const colors = [
-      "bg-yellow-300",
-      "bg-pink-400",
-      "bg-blue-400",
-      "bg-green-500",
-      "bg-orange-400",
+      "bg-[#f5f5e6]", // muted beige
+      "bg-[#d3dae6]", // muted blue
+      "bg-[#d7dbcb]", // muted olive
+      "bg-[#e6dad3]", // muted clay
+      "bg-[#e3e3e3]" // muted gray
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -177,7 +177,7 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false,
+          isteamLead: false
         });
       }
     } else if (num < currentForms.length) {
@@ -198,8 +198,8 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false,
-        },
+          isteamLead: false
+        }
       ]);
     }
   };
@@ -264,7 +264,7 @@ export function GuestInformationForm({
     const formData: BookingFormData = {
       guests: guestForms,
       specialRequirements: specialRequirements || undefined,
-      participants: numberOfGuests,
+      participants: numberOfGuests
     };
 
     const validation = guestInformationFormSchema.safeParse(formData);
@@ -301,7 +301,7 @@ export function GuestInformationForm({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 border-b-3 border-black pb-4 mb-6">
-        <div className="bg-blue-400 p-2 rounded-lg border-2 border-black">
+        <div className="bg-[#d3dae6] p-2 rounded-lg border-2 border-black">
           <Users className="h-6 w-6 text-black" strokeWidth={2.5} />
         </div>
         <h2 className="text-2xl font-black text-black uppercase tracking-tight">
@@ -310,7 +310,7 @@ export function GuestInformationForm({
       </div>
 
       {hasErrors && (
-        <div className="border-3 border-black rounded-xl p-4 bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
+        <div className="border-3 border-black rounded-xl p-4 bg-[#e9cfcf] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
             <h3 className="font-black uppercase">Error</h3>
@@ -322,7 +322,7 @@ export function GuestInformationForm({
       )}
 
       {/* Number of Guests */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-yellow-300 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#f5f5e6] p-4">
         <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
           <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
             <Users className="w-5 h-5 text-black" strokeWidth={2.5} />
@@ -343,7 +343,7 @@ export function GuestInformationForm({
                   ${
                     numberOfGuests === num
                       ? "bg-black text-white shadow-none"
-                      : "bg-white text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      : "bg-white hover:text-white/[0.7] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   }`}
               >
                 {num}
@@ -361,7 +361,6 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      {/* Guest Forms */}
       <div className="space-y-4">
         <div className="flex items-center justify-between mb-2 border-b-2 border-black pb-2">
           <h3 className="text-lg font-black uppercase">Guest Details</h3>
@@ -517,7 +516,6 @@ export function GuestInformationForm({
                 </div>
               </div>
 
-              {/* Team Lead Selection */}
               {numberOfGuests > 1 && (
                 <div className="pt-4 border-t-2 border-black">
                   <div className="flex items-center space-x-2">
@@ -540,7 +538,6 @@ export function GuestInformationForm({
                 </div>
               )}
 
-              {/* Primary contact note for single guest or team lead */}
               {(numberOfGuests === 1 || guest.isteamLead) && (
                 <div className="pt-4 border-t-2 border-black">
                   <p className="bg-white border-2 border-black p-2 rounded-md font-bold text-xs">
@@ -553,7 +550,6 @@ export function GuestInformationForm({
           </div>
         ))}
 
-        {/* Add Guest Button */}
         {canAddMoreForms && (
           <Button
             onClick={addGuestForm}
@@ -569,7 +565,7 @@ export function GuestInformationForm({
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="bg-green-400 border-3 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-[#d7dbcb] border-3 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <p className="font-bold">
               All guest forms added. You can increase the number of guests above
               to add more.
@@ -579,7 +575,7 @@ export function GuestInformationForm({
       </div>
 
       {/* Special Requirements */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-blue-400 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#d3dae6] p-4">
         <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
           <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
             <BriefcaseMedical
@@ -609,7 +605,7 @@ export function GuestInformationForm({
                 : ""
             }`}
           />
-          <p className="bg-white border-2 border-black p-2 rounded-md font-bold">
+          <p className="bg-white border-2 border-black p-2 rounded-md mt-2 font-bold">
             Maximum 500 characters ({specialRequirements.length}/500)
           </p>
           {getFieldError("specialRequirements") && (
@@ -620,8 +616,7 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      {/* Summary Card */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-orange-400 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e6dad3] p-4">
         <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
           <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
             <FileText className="w-5 h-5 text-black" strokeWidth={2.5} />
@@ -671,12 +666,11 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between pt-6 border-t-3 border-black">
         <Button
           onClick={onBack}
           disabled={isSubmitting}
-          className="bg-white text-black font-black uppercase 
+          className="bg-white text-black hover:text-white/[0.7] font-black uppercase 
                    border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                    hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                    hover:translate-x-[2px] hover:translate-y-[2px]
@@ -687,7 +681,7 @@ export function GuestInformationForm({
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-purple-600 text-white font-black uppercase 
+          className="bg-[#bcb7c5] text-black font-black hover:text-white/[0.7] uppercase 
                    border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                    hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                    hover:translate-x-[2px] hover:translate-y-[2px]

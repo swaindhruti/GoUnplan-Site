@@ -8,7 +8,7 @@ interface HeroSectionProps {
 
 export const HeroSection = ({
   searchTerm,
-  onSearchChange,
+  onSearchChange
 }: HeroSectionProps) => {
   return (
     <div className="bg-purple-600 border-b-3 border-black text-white py-16 px-8 relative overflow-hidden">
@@ -33,7 +33,7 @@ export const HeroSection = ({
 
         <div className="flex items-center gap-4 max-w-3xl">
           {/* Search icon as separate element */}
-          <div className="bg-yellow-300 p-3 rounded-lg border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex-shrink-0">
+          <div className="bg-[#b7c3d0] p-3 rounded-lg border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex-shrink-0">
             <Search className="h-7 w-7 text-black" strokeWidth={2.5} />
           </div>
 

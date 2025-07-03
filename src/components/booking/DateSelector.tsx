@@ -11,13 +11,13 @@ import { z } from "zod";
 const baseDateSelectionSchema = z.object({
   startDate: z.date({
     required_error: "Start date is required",
-    invalid_type_error: "Please select a valid date",
+    invalid_type_error: "Please select a valid date"
   }),
   endDate: z.date({
     required_error: "End date is required",
-    invalid_type_error: "Please select a valid date",
+    invalid_type_error: "Please select a valid date"
   }),
-  duration: z.number().min(1, "Duration must be at least 1 day"),
+  duration: z.number().min(1, "Duration must be at least 1 day")
 });
 
 // Enhanced schema with refinements for full validation
@@ -26,12 +26,12 @@ const dateSelectionSchema = baseDateSelectionSchema
     (data) => !isBefore(startOfDay(data.startDate), startOfDay(new Date())),
     {
       message: "Start date cannot be in the past",
-      path: ["startDate"],
+      path: ["startDate"]
     }
   )
   .refine((data) => isAfter(data.endDate, data.startDate), {
     message: "End date must be after start date",
-    path: ["endDate"],
+    path: ["endDate"]
   });
 
 interface DateSelectorProps {
@@ -43,7 +43,7 @@ interface DateSelectorProps {
 export function DateSelector({
   tripDuration,
   onDateChange,
-  selectedDate,
+  selectedDate
 }: DateSelectorProps) {
   const [date, setDate] = useState<Date | undefined>(selectedDate);
   const [availabilityFilter, setAvailabilityFilter] = useState<
@@ -59,7 +59,7 @@ export function DateSelector({
       const validation = dateSelectionSchema.safeParse({
         startDate: newDate,
         endDate: endDate,
-        duration: tripDuration,
+        duration: tripDuration
       });
 
       if (validation.success) {
@@ -76,7 +76,7 @@ export function DateSelector({
   const availabilityOptions = [
     { value: "weekend" as const, label: "Every weekend" },
     { value: "summer" as const, label: "Summer months" },
-    { value: "all" as const, label: "All year round" },
+    { value: "all" as const, label: "All year round" }
   ];
 
   // Helper function to check if date should be disabled based on filter
@@ -103,7 +103,7 @@ export function DateSelector({
   return (
     <div className="space-y-6">
       {/* Trip Duration Card */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-green-500 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#d7dbcb] p-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
             <Clock className="w-5 h-5 text-black" strokeWidth={2.5} />
@@ -128,7 +128,7 @@ export function DateSelector({
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="border-3 border-black rounded-xl p-4 bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-3 border-black rounded-xl p-4 bg-[#e9cfcf] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
             <h3 className="font-black uppercase">Error</h3>
@@ -146,7 +146,7 @@ export function DateSelector({
         <label className="block text-lg font-black uppercase mb-4">
           Select Start Date
         </label>
-        <div className="bg-blue-100 border-3 border-black rounded-lg p-4">
+        <div className="bg-[#d3dae6] border-3 border-black rounded-lg p-4">
           <Calendar
             mode="single"
             selected={date}
@@ -154,26 +154,25 @@ export function DateSelector({
             disabled={isDateDisabled}
             className="w-full"
             classNames={{
-              day_selected:
-                "bg-purple-600 text-white hover:bg-purple-700 font-black rounded-md border-2 border-black",
-              day_today:
-                "bg-yellow-300 text-black font-black border-2 border-black",
-              day_disabled: "text-gray-300 opacity-50",
-              day: "hover:bg-blue-200 rounded-md hover:font-bold",
+              day_selected: "bg-[#222] text-white font-black rounded-md w-full",
+              day_today: "bg-[#444] text-white font-black rounded-md w-full",
+              day_disabled: "text-gray-300 opacity-50 w-full",
+              day: "bg-white text-black font-black rounded-md w-full transition-colors duration-100 hover:bg-[#bcb7c5] hover:text-black",
               head_cell: "font-black uppercase text-xs",
-              cell: "text-center font-bold p-0",
-              button: "w-9 h-9 p-0 font-bold hover:bg-blue-200",
-              nav_button: "border-2 border-black bg-white hover:bg-yellow-300",
+              cell: "text-center font-bold p-0 w-full",
+              button:
+                "w-9 h-9 p-0 font-bold hover:bg-[#bcb7c5] hover:text-black w-full transition-colors duration-100",
+              nav_button: "bg-white hover:bg-[#e6dad3]",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
-              caption: "font-black text-black",
+              caption: "font-black text-black"
             }}
           />
         </div>
       </div>
 
       {/* Availability Filters */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-orange-400 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#f5f5e6] p-4">
         <h3 className="text-lg font-black uppercase mb-3">Available Dates</h3>
         <div className="flex flex-wrap gap-2">
           {availabilityOptions.map((option) => (
@@ -197,7 +196,7 @@ export function DateSelector({
       </div>
 
       {/* Quick Date Selection */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-pink-400 p-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e6dad3] p-4">
         <h3 className="text-lg font-black uppercase mb-3">Quick Selection</h3>
         <div className="grid grid-cols-2 gap-3">
           <Button

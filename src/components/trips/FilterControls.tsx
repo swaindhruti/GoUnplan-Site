@@ -13,7 +13,7 @@ export const FilterControls = ({
   setShowFilters,
   activeFiltersCount,
   filteredTripsCount,
-  clearAllFilters,
+  clearAllFilters
 }: FilterControlsProps) => {
   return (
     <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
@@ -26,7 +26,7 @@ export const FilterControls = ({
             transition-all duration-150
             ${
               showFilters
-                ? "bg-green-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1"
+                ? "bg-[#bfcab3] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1"
                 : "bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1"
             }
           `}
@@ -64,7 +64,7 @@ export const FilterControls = ({
         )}
       </div>
 
-      <div className="bg-yellow-300 border-3 border-black px-5 py-3 rounded-lg font-bold text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+      <div className="bg-[#e5e7eb] border-3 border-black px-5 py-3 rounded-lg font-bold text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
         <span className="text-lg font-black mr-1">{filteredTripsCount}</span>
         <span className="uppercase tracking-wider">
           {filteredTripsCount === 1 ? "trip" : "trips"} found

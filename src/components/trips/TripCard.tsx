@@ -9,11 +9,11 @@ interface TripCardProps {
 export const TripCard = ({ trip }: TripCardProps) => {
   // Pick a random background color from these options
   const bgColors = [
-    "bg-yellow-300",
-    "bg-pink-400",
-    "bg-blue-400",
-    "bg-green-500",
-    "bg-orange-400",
+    "bg-[#e5e7eb]", // muted gray
+    "bg-[#d6cec3]", // soft beige
+    "bg-[#b7c3d0]", // dusty blue
+    "bg-[#bfcab3]", // olive gray
+    "bg-[#d3b8ae]" // soft clay
   ];
   const randomBgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
@@ -53,21 +53,21 @@ export const TripCard = ({ trip }: TripCardProps) => {
 
         <div className="space-y-3">
           <div className="flex items-center text-base font-bold">
-            <div className="bg-pink-400 p-1.5 rounded-md border-2 border-black mr-3">
+            <div className="bg-[#b7c3d0] p-1.5 rounded-md border-2 border-black mr-3">
               <Compass className="h-5 w-5 text-black" strokeWidth={2.5} />
             </div>
             {trip.city}, {trip.state}, {trip.country}
           </div>
 
           <div className="flex items-center text-base font-bold">
-            <div className="bg-green-400 p-1.5 rounded-md border-2 border-black mr-3">
+            <div className="bg-[#bfcab3] p-1.5 rounded-md border-2 border-black mr-3">
               <Calendar className="h-5 w-5 text-black" strokeWidth={2.5} />
             </div>
             {trip.noOfDays} {trip.noOfDays === 1 ? "Day" : "Days"}
           </div>
 
           <div className="flex items-center text-base font-bold">
-            <div className="bg-yellow-300 p-1.5 rounded-md border-2 border-black mr-3">
+            <div className="bg-[#e5e7eb] p-1.5 rounded-md border-2 border-black mr-3">
               <DollarSign className="h-5 w-5 text-black" strokeWidth={2.5} />
             </div>
             <span className="text-xl font-black">

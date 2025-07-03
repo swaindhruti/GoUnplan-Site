@@ -12,7 +12,7 @@ import {
   DollarSign,
   Users,
   ArrowLeft,
-  ChevronDown,
+  ChevronDown
 } from "lucide-react";
 
 interface PaymentFormProps {
@@ -35,11 +35,11 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   // Function to get random background color for cards
   const getRandomBgColor = () => {
     const colors = [
-      "bg-yellow-300",
-      "bg-pink-400",
-      "bg-blue-400",
-      "bg-green-500",
-      "bg-orange-400",
+      "bg-[#f5f5e6]", // muted beige
+      "bg-[#d3dae6]", // muted blue
+      "bg-[#d7dbcb]", // muted olive
+      "bg-[#e6dad3]", // muted clay
+      "bg-[#e3e3e3]" // muted gray
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -63,11 +63,11 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-[#f5f5e6] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8 flex flex-col">
-          <div className="inline-block bg-purple-500 border-3 border-black rounded-xl px-8 py-4 mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] max-w-2xl justify-center mx-auto">
-            <h1 className="text-3xl font-black text-white uppercase tracking-tight">
+          <div className="inline-block bg-[#bcb7c5] border-3 border-black rounded-xl px-8 py-4 mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] max-w-2xl justify-center mx-auto">
+            <h1 className="text-3xl font-black text-black uppercase tracking-tight">
               Payment Details
             </h1>
           </div>
@@ -102,14 +102,14 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
 
             {isExpanded && (
               <div className="p-4 space-y-4">
-                <div className="bg-gray-100 border-2 border-black p-3 rounded-md font-bold">
+                <div className="bg-[#e3e3e3] border-2 border-black p-3 rounded-md font-bold">
                   <span className="block text-lg font-black">
                     {tripData.title || "Adventure Trip"}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="bg-blue-400 border-2 border-black p-3 rounded-md">
+                  <div className="bg-[#d3dae6] border-2 border-black p-3 rounded-md">
                     <div className="flex items-center gap-2 mb-1">
                       <Calendar
                         className="w-4 h-4 text-black"
@@ -122,7 +122,7 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
                     </p>
                   </div>
 
-                  <div className="bg-yellow-300 border-2 border-black p-3 rounded-md">
+                  <div className="bg-[#f5f5e6] border-2 border-black p-3 rounded-md">
                     <div className="flex items-center gap-2 mb-1">
                       <Users className="w-4 h-4 text-black" strokeWidth={2.5} />
                       <span className="font-bold">Guests</span>
@@ -134,7 +134,7 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
                   </div>
                 </div>
 
-                <div className="bg-green-500 border-2 border-black p-3 rounded-md">
+                <div className="bg-[#d7dbcb] border-2 border-black p-3 rounded-md">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign
                       className="w-4 h-4 text-black"
@@ -174,7 +174,7 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
 
           {/* Payment Card Info */}
           <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
-            <div className="bg-purple-500 text-white border-b-3 border-black p-4">
+            <div className="bg-[#bcb7c5] text-black border-b-3 border-black p-4">
               <div className="flex items-center gap-2">
                 <div className="bg-white p-1.5 rounded-md border-2 border-black">
                   <CreditCard
@@ -232,7 +232,7 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
                 />
               </div>
 
-              <div className="flex items-center gap-2 bg-yellow-300 border-2 border-black p-3 rounded-md font-bold">
+              <div className="flex items-center gap-2 bg-[#e6dad3] border-2 border-black p-3 rounded-md font-bold">
                 <Lock className="w-5 h-5 text-black" strokeWidth={2.5} />
                 <span>Your payment information is secure and encrypted</span>
               </div>
@@ -240,19 +240,19 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
           </div>
 
           {/* Terms and Policies */}
-          <div className="border-3 border-black rounded-xl p-4 bg-pink-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-3 border-black rounded-xl p-4 bg-[#e9cfcf] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <p className="bg-white border-2 border-black p-3 rounded-md font-bold text-center">
               By completing this payment, you agree to our{" "}
               <a
                 href="#"
-                className="underline decoration-2 decoration-black hover:bg-yellow-300 transition-colors"
+                className="underline decoration-2 decoration-black hover:bg-[#f5f5e6] transition-colors"
               >
                 Terms & Conditions
               </a>{" "}
               and{" "}
               <a
                 href="#"
-                className="underline decoration-2 decoration-black hover:bg-yellow-300 transition-colors"
+                className="underline decoration-2 decoration-black hover:bg-[#f5f5e6] transition-colors"
               >
                 Cancellation Policy
               </a>
