@@ -9,8 +9,10 @@ import {
   DollarSign,
   Star,
   MessageCircle,
-  Languages,
+  Languages
 } from "lucide-react";
+import { ChatButton } from "@/components/chat/ChatButton";
+import { requireUser } from "@/lib/roleGaurd";
 
 type Props = {
   params: Promise<{
@@ -21,7 +23,7 @@ type Props = {
 export default async function MountainBikingAdventure({ params }: Props) {
   const tripId = (await params).tripId;
   const trip = await getTripById(tripId);
-
+  const UserSession = await requireUser();
   if (!trip || "error" in trip) return notFound();
 
   const createdYear = new Date(trip.createdAt).getFullYear();
@@ -30,20 +32,20 @@ export default async function MountainBikingAdventure({ params }: Props) {
     "Available year-round",
     `${trip.noOfDays} days`,
     `Max ${trip.maxParticipants} people`,
-    `₹${trip.price} per person`,
+    `₹${trip.price} per person`
   ];
 
   const highlights = [
     [
       "Conquer challenging alpine single-track trails",
       "Experience breathtaking mountain panoramas",
-      "High-quality mountain bike rentals included",
+      "High-quality mountain bike rentals included"
     ],
     [
       "Ride through picturesque Swiss villages",
       "Professional guides with local knowledge",
-      "Authentic alpine accommodation",
-    ],
+      "Authentic alpine accommodation"
+    ]
   ];
 
   const hostInfo = {
@@ -51,24 +53,24 @@ export default async function MountainBikingAdventure({ params }: Props) {
     image: trip.host.image || "https://via.placeholder.com/60",
     email: trip.host.hostEmail,
     description: trip.host.description,
-    createdYear,
+    createdYear
   };
 
   const tripStats = {
     price: trip.price,
     noOfDays: trip.noOfDays,
     maxParticipants: trip.maxParticipants,
-    languages: trip.languages.join(", "),
+    languages: trip.languages.join(", ")
   };
 
   // Function to get random color from a set of neobrutalist colors
   const getRandomBgColor = () => {
     const colors = [
-      "bg-yellow-300",
-      "bg-pink-400",
-      "bg-blue-400",
-      "bg-green-500",
-      "bg-orange-400",
+      "bg-zinc-200",
+      "bg-stone-200",
+      "bg-slate-200",
+      "bg-gray-200",
+      "bg-neutral-200"
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -76,10 +78,10 @@ export default async function MountainBikingAdventure({ params }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero Section */}
-      <section className="bg-purple-600 border-3 border-black rounded-xl text-white py-12 px-6 text-center mb-8 relative overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
+      <section className="bg-slate-200 border-3 border-black rounded-xl text-black py-12 px-6 text-center mb-8 relative overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
         {/* Decorative elements */}
-        <div className="absolute -left-8 -top-8 w-32 h-32 bg-yellow-300 border-3 border-black rounded-3xl rotate-12 z-0"></div>
-        <div className="absolute -right-4 -top-4 w-20 h-20 bg-pink-400 border-3 border-black rounded-full z-0"></div>
+        <div className="absolute -left-8 -top-8 w-32 h-32 bg-zinc-300 border-3 border-black rounded-3xl rotate-12 z-0"></div>
+        <div className="absolute -right-4 -top-4 w-20 h-20 bg-stone-300 border-3 border-black rounded-full z-0"></div>
 
         <div className="relative z-10">
           <h1 className="text-4xl md:text-5xl font-black mb-2 uppercase tracking-tight">
@@ -107,7 +109,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
       {/* Highlights Section */}
       <section className="mb-10">
         <div className="flex items-center gap-3 border-b-3 border-black pb-2 mb-6">
-          <div className="bg-green-400 p-2 rounded-lg border-2 border-black">
+          <div className="bg-stone-300 p-2 rounded-lg border-2 border-black">
             <Star className="h-6 w-6 text-black" strokeWidth={2.5} />
           </div>
           <h2 className="text-2xl font-black text-black uppercase tracking-tight">
@@ -145,19 +147,19 @@ export default async function MountainBikingAdventure({ params }: Props) {
           <TabsList className="w-full grid grid-cols-3 bg-white border-b-3 border-black p-0 h-auto divide-x-3 divide-black rounded-2xl border-3 ">
             <TabsTrigger
               value="itinerary"
-              className="py-3 font-black uppercase data-[state=active]:bg-blue-400 data-[state=active]:text-black rounded-2xl"
+              className="py-3 font-black uppercase data-[state=active]:bg-slate-300 data-[state=active]:text-black rounded-2xl"
             >
               Itinerary
             </TabsTrigger>
             <TabsTrigger
               value="included"
-              className="py-3 font-black uppercase data-[state=active]:bg-pink-400 data-[state=active]:text-black rounded-2xl"
+              className="py-3 font-black uppercase data-[state=active]:bg-stone-300 data-[state=active]:text-black rounded-2xl"
             >
               What&apos;s Included
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
-              className="py-3 font-black uppercase data-[state=active]:bg-yellow-300 data-[state=active]:text-black rounded-2xl"
+              className="py-3 font-black uppercase data-[state=active]:bg-zinc-200 data-[state=active]:text-black rounded-2xl"
             >
               Reviews
             </TabsTrigger>
@@ -202,7 +204,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
           </TabsContent>
 
           <TabsContent value="included" className="bg-white p-6 m-0 font-bold">
-            <div className="border-3 border-black rounded-xl p-4 bg-green-400">
+            <div className="border-3 border-black rounded-xl p-4 bg-stone-200">
               <h3 className="font-black uppercase mb-3">
                 Included in the price:
               </h3>
@@ -265,7 +267,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
         {/* Booking Card */}
         <div className="border-3 border-black rounded-xl bg-white p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-yellow-300 p-2 rounded-lg border-2 border-black">
+            <div className="bg-zinc-300 p-2 rounded-lg border-2 border-black">
               <DollarSign className="h-6 w-6 text-black" strokeWidth={2.5} />
             </div>
             <p className="text-3xl font-black">
@@ -283,7 +285,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="bg-pink-400 p-1.5 rounded-md border-2 border-black">
+              <div className="bg-stone-300 p-1.5 rounded-md border-2 border-black">
                 <Users className="h-5 w-5 text-black" strokeWidth={2.5} />
               </div>
               <span className="font-bold">
@@ -292,7 +294,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="bg-blue-400 p-1.5 rounded-md border-2 border-black">
+              <div className="bg-neutral-300 p-1.5 rounded-md border-2 border-black">
                 <Languages className="h-5 w-5 text-black" strokeWidth={2.5} />
               </div>
               <span className="font-bold">{tripStats.languages}</span>
@@ -301,7 +303,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
 
           <Link href={`/trips/booking/${trip.travelPlanId}`}>
             <button
-              className="w-full bg-purple-600 text-white font-black uppercase tracking-wider
+              className="w-full bg-slate-700 text-white font-black uppercase tracking-wider
               border-3 border-black rounded-lg py-3 px-4 mb-3
               shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
               hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
@@ -311,21 +313,20 @@ export default async function MountainBikingAdventure({ params }: Props) {
               Book Now
             </button>
           </Link>
-
-          <button
-            className="w-full bg-white text-black font-black uppercase tracking-wider
-            border-3 border-black rounded-lg py-3 px-4
-            hover:bg-gray-100
-            transition-all duration-200"
-          >
-            Message Host
-          </button>
+          {UserSession.user && UserSession.user.id && (
+            <ChatButton
+              currentUserId={UserSession.user.id}
+              hostId={trip.host.user.id}
+              travelPlanId={trip.travelPlanId}
+              hostName={trip.host.user.name}
+            />
+          )}
         </div>
 
         {/* Host Card */}
         <div className="border-3 border-black rounded-xl bg-white p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex items-center gap-3 border-b-3 border-black pb-3 mb-4">
-            <div className="bg-orange-400 p-2 rounded-lg border-2 border-black">
+            <div className="bg-stone-300 p-2 rounded-lg border-2 border-black">
               <MessageCircle className="h-6 w-6 text-black" strokeWidth={2.5} />
             </div>
             <h3 className="text-xl font-black text-black uppercase tracking-tight">
@@ -337,7 +338,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
             <div className="border-3 border-black rounded-full overflow-hidden">
               <Avatar className="h-16 w-16">
                 <AvatarImage src={hostInfo.image} />
-                <AvatarFallback className="bg-blue-400 text-xl font-black">
+                <AvatarFallback className="bg-slate-300 text-xl font-black">
                   {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
                 </AvatarFallback>
               </Avatar>
@@ -358,7 +359,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
           </div>
 
           <button
-            className="mt-4 bg-blue-400 text-black font-black uppercase tracking-wider
+            className="mt-4 bg-zinc-200 text-black font-black uppercase tracking-wider
             border-3 border-black rounded-lg py-2 px-4
             shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
             hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]

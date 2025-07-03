@@ -1,3 +1,5 @@
+import { Role } from "@prisma/client";
+
 export type BookingStatus =
   | "PENDING"
   | "CONFIRMED"
@@ -41,16 +43,16 @@ export interface BookingData {
 
 export interface User {
   id: string;
-  email: string;
+  email?: string;
   name: string;
   bio?: string | null;
-  phone: string;
-  password: string;
-  role: string;
+  phone?: string;
+  password?: string;
+  role: Role;
   image?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  appliedForHost: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  appliedForHost?: boolean;
 }
 
 export interface HostProfile {

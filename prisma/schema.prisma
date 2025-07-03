@@ -23,6 +23,10 @@ model User {
   hostProfile    HostProfile?
   reviews        Review[]
 
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  chatParticipants ChatParticipant[]
+
   @@map("users")
 }
 
@@ -160,6 +164,54 @@ model Review {
   @@map("reviews")
 }
 
+
+model Chat {
+  id               String            @id @default(cuid())
+  travelPlanId     String?           // Optional: link to specific travel plan
+  lastMessageAt    DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  participants     ChatParticipant[]
+  messages         Message[]
+
+  @@map("chats")
+}
+
+model ChatParticipant {
+  id               String   @id @default(cuid())
+  chatId           String
+  userId           String
+  joinedAt         DateTime @default(now())
+  lastReadAt       DateTime @default(now())
+  isActive         Boolean  @default(true)
+  
+  chat             Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@map("chat_participants")
+}
+
+model Message {
+  id         String      @id @default(cuid())
+  chatId     String
+  senderId   String
+  receiverId String
+  content    String
+  type       MessageType @default(TEXT)
+  isRead     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender     User        @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User        @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt])
+  @@index([receiverId, isRead])
+  @@map("messages")
+}
+
 enum Role {
   USER
   HOST
@@ -176,4 +228,11 @@ enum BookingStatus {
 enum TravelPlanStatus {
   ACTIVE
   INACTIVE
+}
+
+
+enum MessageType {
+  TEXT
+  FILE
+  IMAGE
 }

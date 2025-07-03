@@ -97,7 +97,9 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
           />
         )}
 
-        {activeTab === "messages" && <MessageSection />}
+        {activeTab === "messages" && (
+          <MessageSection userSession={hostData.id || ""} />
+        )}
       </div>
     </div>
   );

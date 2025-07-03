@@ -8,7 +8,7 @@ import {
   MapPin,
   FileText,
   ArrowRight,
-  Edit2,
+  Edit2
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import { updateFormSubmittedStatus } from "@/actions/booking/actions";
@@ -25,18 +25,18 @@ export interface BookingSummaryProps {
 const BookingSummary: React.FC<BookingSummaryProps> = ({
   booking,
   travelPlan,
-  loading = false,
+  loading = false
 }) => {
   const router = useRouter();
 
   // Function to get random background color for cards
   const getRandomBgColor = () => {
     const colors = [
-      "bg-yellow-300",
-      "bg-pink-400",
-      "bg-blue-400",
-      "bg-green-500",
-      "bg-orange-400",
+      "bg-gray-200", // light muted gray
+      "bg-gray-300", // slightly darker muted gray
+      "bg-stone-200", // warm muted beige
+      "bg-slate-200", // cool muted blue-gray
+      "bg-zinc-200" // neutral muted gray
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -83,7 +83,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
     return new Date(dateString).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     });
   };
 
@@ -91,7 +91,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
     if (!amount) return "₹0";
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "INR",
+      currency: "INR"
     }).format(amount);
   };
 
@@ -132,8 +132,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <div className="inline-block bg-purple-500 border-3 border-black rounded-xl px-8 py-4 mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            <h1 className="text-3xl font-black text-white uppercase tracking-tight">
+          <div className="inline-block bg-zinc-400 border-3 border-black rounded-xl px-8 py-4 mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <h1 className="text-3xl font-black text-black uppercase tracking-tight">
               Booking Summary
             </h1>
           </div>
@@ -143,7 +143,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
         </div>
 
         <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
-          <div className="bg-blue-400 text-black border-b-3 border-black p-6">
+          <div className="bg-slate-200 text-black border-b-3 border-black p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="bg-white p-2 rounded-md border-2 border-black">
                 <MapPin className="w-6 h-6 text-black" strokeWidth={2.5} />
@@ -248,7 +248,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                     </span>
                   </div>
                   {booking?.refundAmount && booking.refundAmount > 0 && (
-                    <div className="flex justify-between bg-green-500 border-2 border-black p-2 rounded-md">
+                    <div className="flex justify-between bg-stone-300 border-2 border-black p-2 rounded-md">
                       <span>Refund amount:</span>
                       <span className="font-black">
                         {formatCurrency(booking.refundAmount)}
@@ -261,7 +261,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
 
             {/* Team Members Card */}
             {booking.guests && booking.guests.length > 0 && (
-              <div className="border-3 border-black rounded-xl p-4 bg-pink-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-3 border-black rounded-xl p-4 bg-gray-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center gap-2 mb-4 border-b-2 border-black pb-2">
                   <div className="bg-white p-1.5 rounded-md border-2 border-black">
                     <Users className="w-5 h-5 text-black" strokeWidth={2.5} />
@@ -279,7 +279,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                       <div className="flex items-center gap-3">
                         <div
                           className={`p-2 ${
-                            member.isteamLead ? "bg-yellow-300" : "bg-gray-200"
+                            member.isteamLead ? "bg-stone-300" : "bg-gray-100"
                           } border-2 border-black rounded-md`}
                         >
                           <User
@@ -312,7 +312,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
 
             {/* Special Requirements Card */}
             {booking.specialRequirements && (
-              <div className="border-3 border-black rounded-xl p-4 bg-green-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-3 border-black rounded-xl p-4 bg-slate-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center gap-2 mb-2 border-b-2 border-black pb-2">
                   <div className="bg-white p-1.5 rounded-md border-2 border-black">
                     <FileText
@@ -331,7 +331,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
             )}
 
             {/* Booking Information */}
-            <div className="grid md:grid-cols-2 gap-4 bg-yellow-300 p-4 border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="grid md:grid-cols-2 gap-4 bg-gray-200 p-4 border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <div className="bg-white p-2 border-2 border-black rounded-md font-bold text-center">
                 <span className="font-black">Booking ID: </span>
                 <span className="font-mono">{booking.id}</span>
@@ -358,7 +358,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                   }}
                   className="flex-1 bg-white text-black font-black uppercase 
                            border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                           hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                           hover:bg-gray-200 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                            hover:translate-x-[2px] hover:translate-y-[2px]
                            transition-all duration-200 py-3 px-6 rounded-md
                            disabled:opacity-50 disabled:cursor-not-allowed
@@ -375,9 +375,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                       `/trips/booking/${booking.travelPlanId}/payment-form`
                     );
                   }}
-                  className="flex-1 bg-purple-600 text-white font-black uppercase 
+                  className="flex-1 bg-zinc-400 text-black font-black uppercase 
                            border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                           hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                           hover:bg-zinc-300 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                            hover:translate-x-[2px] hover:translate-y-[2px]
                            transition-all duration-200 py-3 px-6 rounded-md
                            disabled:opacity-50 disabled:cursor-not-allowed
@@ -403,7 +403,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
                 By proceeding, you agree to our{" "}
                 <a
                   href="#"
-                  className="underline decoration-2 decoration-black hover:bg-yellow-300 transition-colors"
+                  className="underline decoration-2 decoration-black hover:bg-gray-200 transition-colors"
                 >
                   Terms & Conditions
                 </a>
