@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, Home } from "lucide-react";
+import { AlertCircle, ArrowLeft, Home, User } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,18 +44,21 @@ function ErrorContent() {
   }, [searchParams]);
 
   return (
-    <CardContent className="pt-6">
+    <CardContent className="p-6">
       {error && (
-        <Alert
-          variant="destructive"
-          className="mb-6 bg-red-50 border-red-200 text-red-800"
-        >
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+        <Alert className="mb-6 bg-[#ffadad] border-3 border-black rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-white p-1.5 rounded-full border-2 border-black">
+            <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
+          </div>
+          <div>
+            <AlertTitle className="font-black text-black">Error</AlertTitle>
+            <AlertDescription className="font-bold text-black">
+              {error}
+            </AlertDescription>
+          </div>
         </Alert>
       )}
-      <div className="text-center text-sm text-gray-600 mt-2 bg-gray-50 p-4 rounded-lg">
+      <div className="bg-white border-3 border-black rounded-xl p-4 text-center font-bold text-black">
         <p>Please try again or contact support if the issue persists.</p>
         <p className="mt-2">
           You can also try using a different authentication method.
@@ -68,11 +71,11 @@ function ErrorContent() {
 // Fallback component to show while loading
 function ErrorFallback() {
   return (
-    <CardContent className="pt-6">
+    <CardContent className="p-6">
       <div className="flex justify-center items-center h-20">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-3 border-black"></div>
       </div>
-      <div className="text-center text-sm text-gray-600 mt-2 bg-gray-50 p-4 rounded-lg">
+      <div className="bg-white border-3 border-black rounded-xl p-4 text-center font-bold text-black">
         <p>Loading error details...</p>
       </div>
     </CardContent>
@@ -81,25 +84,29 @@ function ErrorFallback() {
 
 export default function AuthError() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-[#f9f9ff]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-[#e0c6ff] border-b-3 border-black py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-2xl font-bold text-purple-700">
+          <Link
+            href="/"
+            className="text-2xl font-black text-black flex items-center"
+          >
+            <div className="bg-white p-2 rounded-md border-2 border-black mr-2">
+              <User className="h-6 w-6 text-black" strokeWidth={2.5} />
+            </div>
             Unplan
           </Link>
           <div className="flex items-center space-x-4">
             <Link href="/auth/signin">
               <Button
-                variant="outline"
-                className="text-purple-600 bg-white border-purple-200 hover:bg-purple-50"
+                className="bg-white text-black font-black uppercase 
+                         border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                         hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                         hover:translate-x-[2px] hover:translate-y-[2px]
+                         transition-all duration-200 px-6 py-3"
               >
                 Sign In
-              </Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button className="bg-purple-600 text-white hover:bg-purple-700">
-                Get Started
               </Button>
             </Link>
           </div>
@@ -108,15 +115,15 @@ export default function AuthError() {
 
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md shadow-lg border border-gray-200">
-          <CardHeader className="space-y-1 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-            <div className="mx-auto h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+        <Card className="w-full max-w-md border-3 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden py-0">
+          <CardHeader className="space-y-1 border-b-3 border-black bg-[#ffadad] p-6">
+            <div className="bg-white p-3 rounded-full border-3 border-black mx-auto mb-3 w-16 h-16 flex items-center justify-center">
+              <AlertCircle className="h-8 w-8 text-black" strokeWidth={2.5} />
             </div>
-            <CardTitle className="text-2xl font-bold text-center text-gray-900">
+            <CardTitle className="text-2xl font-black text-black uppercase text-center">
               Authentication Error
             </CardTitle>
-            <CardDescription className="text-center text-gray-600">
+            <CardDescription className="text-black font-bold text-center">
               There was a problem with your authentication request
             </CardDescription>
           </CardHeader>
@@ -126,25 +133,36 @@ export default function AuthError() {
             <ErrorContent />
           </Suspense>
 
-          <CardFooter className="flex flex-col space-y-3 pt-2">
+          <CardFooter className="flex flex-col space-y-4 pt-4 pb-6 border-t-3 border-black bg-[#fdffb6] p-6">
             <Button
               asChild
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5"
+              className="w-full bg-[#a0c4ff] text-black font-black uppercase 
+                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                       hover:translate-x-[2px] hover:translate-y-[2px]
+                       transition-all duration-200 py-4 h-14
+                       rounded-xl"
             >
               <Link
                 href="/auth/signin"
-                className="flex items-center justify-center"
+                className="flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Sign In
+                <ArrowLeft className="h-5 w-5" strokeWidth={2.5} />
+                Back to Sign In
               </Link>
             </Button>
             <Button
               asChild
-              variant="outline"
-              className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 py-5"
+              className="w-full bg-white text-black font-black uppercase 
+                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                       hover:translate-x-[2px] hover:translate-y-[2px]
+                       transition-all duration-200 py-4 h-14
+                       rounded-xl"
             >
-              <Link href="/" className="flex items-center justify-center">
-                <Home className="mr-2 h-4 w-4" /> Return to Home
+              <Link href="/" className="flex items-center justify-center gap-2">
+                <Home className="h-5 w-5" strokeWidth={2.5} />
+                Return to Home
               </Link>
             </Button>
           </CardFooter>
@@ -152,18 +170,29 @@ export default function AuthError() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6">
+      <footer className="bg-[#e0c6ff] border-t-3 border-black py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2024 Unplan. All rights reserved.</p>
-            <div className="flex justify-center space-x-4 mt-2">
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+          <div className="text-center">
+            <p className="font-bold text-black">
+              © 2024 Unplan. All rights reserved.
+            </p>
+            <div className="flex justify-center space-x-6 mt-3">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Terms of Service
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Help
               </Link>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,11 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Trash2,
   Plus,
-  AlertCircle,
   User,
   Users,
   FileText,
-  BriefcaseMedical
+  BriefcaseMedical,
 } from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
@@ -47,7 +46,7 @@ const baseGuestInfoSchema = z.object({
     .regex(/^[+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .min(10, "Phone number must be at least 10 digits")
     .max(20, "Phone number must be less than 20 characters"),
-  isteamLead: z.boolean().default(false)
+  isteamLead: z.boolean().default(false),
 });
 
 const baseGuestInformationFormSchema = z.object({
@@ -62,13 +61,13 @@ const baseGuestInformationFormSchema = z.object({
   specialRequirements: z
     .string()
     .max(500, "Special requirements must be less than 500 characters")
-    .optional()
+    .optional(),
 });
 
 const guestInformationFormSchema = baseGuestInformationFormSchema
   .refine((data) => data.guests.length === data.participants, {
     message: "Number of guest forms must match selected number of guests",
-    path: ["guests"]
+    path: ["guests"],
   })
   .refine(
     (data) => {
@@ -78,7 +77,7 @@ const guestInformationFormSchema = baseGuestInformationFormSchema
     },
     {
       message: "Exactly one guest must be designated as the team lead",
-      path: ["guests"]
+      path: ["guests"],
     }
   );
 
@@ -94,7 +93,7 @@ interface GuestInformationFormProps {
 export function GuestInformationForm({
   onBack,
   onContinue,
-  maxGuests = 8
+  maxGuests = 8,
 }: GuestInformationFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
@@ -103,8 +102,8 @@ export function GuestInformationForm({
       lastName: "",
       memberEmail: "",
       phone: "",
-      isteamLead: true
-    }
+      isteamLead: true,
+    },
   ]);
   const [specialRequirements, setSpecialRequirements] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -112,16 +111,24 @@ export function GuestInformationForm({
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Function to get random color from a set of muted neo-brutalist colors
-  const getRandomBgColor = () => {
-    const colors = [
-      "bg-[#f5f5e6]", // muted beige
-      "bg-[#d3dae6]", // muted blue
-      "bg-[#d7dbcb]", // muted olive
-      "bg-[#e6dad3]", // muted clay
-      "bg-[#e3e3e3]" // muted gray
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
+  // Fixed colors for guest cards - defined once and reused
+  const guestCardColors = useMemo(
+    () => [
+      "bg-[#fdffb6]", // pale yellow
+      "bg-[#caffbf]", // light green
+      "bg-[#e0c6ff]", // soft lavender
+      "bg-[#a0c4ff]", // baby blue
+      "bg-[#ffd6ff]", // pink lavender
+      "bg-[#fdffb6]", // repeat for more than 5 guests
+      "bg-[#caffbf]",
+      "bg-[#e0c6ff]",
+    ],
+    []
+  );
+
+  // Get color by guest index - consistent assignment
+  const getGuestCardColor = (index: number): string => {
+    return guestCardColors[index % guestCardColors.length];
   };
 
   const validateField = (
@@ -177,7 +184,7 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false
+          isteamLead: false,
         });
       }
     } else if (num < currentForms.length) {
@@ -198,8 +205,8 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false
-        }
+          isteamLead: false,
+        },
       ]);
     }
   };
@@ -264,7 +271,7 @@ export function GuestInformationForm({
     const formData: BookingFormData = {
       guests: guestForms,
       specialRequirements: specialRequirements || undefined,
-      participants: numberOfGuests
+      participants: numberOfGuests,
     };
 
     const validation = guestInformationFormSchema.safeParse(formData);
@@ -296,50 +303,36 @@ export function GuestInformationForm({
     return validationErrors[errorKey]?.[0];
   };
 
-  const hasErrors: boolean = Object.keys(validationErrors).length > 0;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 border-b-3 border-black pb-4 mb-6">
-        <div className="bg-[#d3dae6] p-2 rounded-lg border-2 border-black">
-          <Users className="h-6 w-6 text-black" strokeWidth={2.5} />
+        <div className="bg-[#caffbf] p-2.5 rounded-lg border-2 border-black">
+          <Users className="h-7 w-7 text-black" strokeWidth={2.5} />
         </div>
-        <h2 className="text-2xl font-black text-black uppercase tracking-tight">
+        <h2 className="text-3xl font-black text-black uppercase tracking-tight">
           Guest Information
         </h2>
       </div>
 
-      {hasErrors && (
-        <div className="border-3 border-black rounded-xl p-4 bg-[#e9cfcf] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
-            <h3 className="font-black uppercase">Error</h3>
-          </div>
-          <p className="font-bold">
-            Please correct the errors below before continuing.
-          </p>
-        </div>
-      )}
-
       {/* Number of Guests */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#f5f5e6] p-4">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
-          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
-            <Users className="w-5 h-5 text-black" strokeWidth={2.5} />
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#fdffb6] p-5">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
+          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
+            <Users className="w-6 h-6 text-black" strokeWidth={2.5} />
           </div>
-          <h3 className="text-lg font-black uppercase">Number of Guests</h3>
+          <h3 className="text-xl font-black uppercase">Number of Guests</h3>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="guests" className="font-bold text-black">
+        <div className="space-y-3">
+          <Label htmlFor="guests" className="font-bold text-black text-lg">
             Select number of guests
           </Label>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mt-2">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-2">
             {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
               <Button
                 key={num}
                 onClick={() => handleNumberOfGuestsChange(num.toString())}
-                className={`border-3 border-black font-black text-lg py-2 px-3
+                className={`border-3 border-black font-black text-xl py-3 px-4
                   ${
                     numberOfGuests === num
                       ? "bg-black text-white shadow-none"
@@ -350,21 +343,21 @@ export function GuestInformationForm({
               </Button>
             ))}
           </div>
-          <p className="bg-white border-2 border-black p-2 rounded-md mt-2 font-bold">
+          <p className="bg-white border-2 border-black p-3 rounded-md mt-2 font-bold text-lg">
             Maximum {maxGuests} people per booking
           </p>
           {getFieldError("participants") && (
-            <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold">
+            <p className="bg-[#ffadad] border-2 border-black p-3 rounded-md font-bold text-lg">
               {getFieldError("participants")}
             </p>
           )}
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between mb-2 border-b-2 border-black pb-2">
-          <h3 className="text-lg font-black uppercase">Guest Details</h3>
-          <div className="bg-white border-2 border-black rounded-md px-2 py-1 font-bold">
+      <div className="space-y-5">
+        <div className="flex items-center justify-between mb-3 border-b-2 border-black pb-3">
+          <h3 className="text-xl font-black uppercase">Guest Details</h3>
+          <div className="bg-[#a0c4ff] border-2 border-black rounded-md px-4 py-2 font-bold text-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             {guestForms.length} of {numberOfGuests} guest
             {numberOfGuests > 1 ? "s" : ""}
           </div>
@@ -373,17 +366,19 @@ export function GuestInformationForm({
         {guestForms.map((guest, index) => (
           <div
             key={index}
-            className={`border-3 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${getRandomBgColor()}`}
+            className={`border-3 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${getGuestCardColor(
+              index
+            )}`}
           >
             <div className="bg-white border-b-3 border-black flex items-center justify-between p-4">
-              <div className="flex items-center gap-2">
-                <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
-                  <User className="w-5 h-5 text-black" strokeWidth={2.5} />
+              <div className="flex items-center gap-3">
+                <div className="bg-[#e0c6ff] p-2.5 rounded-md border-2 border-black flex-shrink-0">
+                  <User className="w-6 h-6 text-black" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-black uppercase">
+                <h3 className="font-black uppercase text-xl">
                   Guest {index + 1}
                   {guest.isteamLead && (
-                    <span className="ml-2 bg-black text-white px-2 py-0.5 text-xs rounded-md uppercase">
+                    <span className="ml-2 bg-black text-white px-3 py-0.5 text-sm rounded-md uppercase">
                       Team Lead
                     </span>
                   )}
@@ -392,21 +387,21 @@ export function GuestInformationForm({
               {guestForms.length > 1 && (
                 <Button
                   onClick={() => removeGuestForm(index)}
-                  className="bg-white border-2 border-black text-black hover:bg-red-400 
+                  className="bg-white border-2 border-black text-black hover:bg-[#ffadad] 
                             font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none 
-                            hover:translate-x-[2px] hover:translate-y-[2px]"
+                            hover:translate-x-[2px] hover:translate-y-[2px] p-2.5"
                 >
-                  <Trash2 className="w-4 h-4" strokeWidth={2.5} />
+                  <Trash2 className="w-5 h-5" strokeWidth={2.5} />
                 </Button>
               )}
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="p-5 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label
                     htmlFor={`firstName-${index}`}
-                    className="font-bold text-black"
+                    className="font-bold text-black text-lg"
                   >
                     First Name <span className="text-red-600">*</span>
                   </Label>
@@ -417,14 +412,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "firstName", e.target.value)
                     }
-                    className={`border-2 border-black bg-white ${
+                    className={`border-2 border-black bg-white text-lg ${
                       getFieldError("firstName", index)
                         ? "border-red-600 border-3"
                         : ""
                     }`}
                   />
                   {getFieldError("firstName", index) && (
-                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
+                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
                       {getFieldError("firstName", index)}
                     </p>
                   )}
@@ -433,7 +428,7 @@ export function GuestInformationForm({
                 <div className="space-y-2">
                   <Label
                     htmlFor={`lastName-${index}`}
-                    className="font-bold text-black"
+                    className="font-bold text-black text-lg"
                   >
                     Last Name <span className="text-red-600">*</span>
                   </Label>
@@ -444,14 +439,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "lastName", e.target.value)
                     }
-                    className={`border-2 border-black bg-white ${
+                    className={`border-2 border-black bg-white text-lg ${
                       getFieldError("lastName", index)
                         ? "border-red-600 border-3"
                         : ""
                     }`}
                   />
                   {getFieldError("lastName", index) && (
-                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
+                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
                       {getFieldError("lastName", index)}
                     </p>
                   )}
@@ -462,7 +457,7 @@ export function GuestInformationForm({
                 <div className="space-y-2">
                   <Label
                     htmlFor={`memberEmail-${index}`}
-                    className="font-bold text-black"
+                    className="font-bold text-black text-lg"
                   >
                     Email Address <span className="text-red-600">*</span>
                   </Label>
@@ -474,14 +469,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "memberEmail", e.target.value)
                     }
-                    className={`border-2 border-black bg-white ${
+                    className={`border-2 border-black bg-white text-lg ${
                       getFieldError("memberEmail", index)
                         ? "border-red-600 border-3"
                         : ""
                     }`}
                   />
                   {getFieldError("memberEmail", index) && (
-                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
+                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
                       {getFieldError("memberEmail", index)}
                     </p>
                   )}
@@ -490,7 +485,7 @@ export function GuestInformationForm({
                 <div className="space-y-2">
                   <Label
                     htmlFor={`phone-${index}`}
-                    className="font-bold text-black"
+                    className="font-bold text-black text-lg"
                   >
                     Phone Number <span className="text-red-600">*</span>
                   </Label>
@@ -502,14 +497,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "phone", e.target.value)
                     }
-                    className={`border-2 border-black bg-white ${
+                    className={`border-2 border-black bg-white text-lg ${
                       getFieldError("phone", index)
                         ? "border-red-600 border-3"
                         : ""
                     }`}
                   />
                   {getFieldError("phone", index) && (
-                    <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold text-xs">
+                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
                       {getFieldError("phone", index)}
                     </p>
                   )}
@@ -518,7 +513,7 @@ export function GuestInformationForm({
 
               {numberOfGuests > 1 && (
                 <div className="pt-4 border-t-2 border-black">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <input
                       type="checkbox"
                       id={`teamLead-${index}`}
@@ -526,11 +521,11 @@ export function GuestInformationForm({
                       onChange={(e) =>
                         updateGuestForm(index, "isteamLead", e.target.checked)
                       }
-                      className="w-5 h-5 border-2 border-black"
+                      className="w-6 h-6 border-2 border-black"
                     />
                     <Label
                       htmlFor={`teamLead-${index}`}
-                      className="font-bold text-black"
+                      className="font-bold text-black text-lg"
                     >
                       Make this person the primary contact (Team Lead)
                     </Label>
@@ -540,7 +535,7 @@ export function GuestInformationForm({
 
               {(numberOfGuests === 1 || guest.isteamLead) && (
                 <div className="pt-4 border-t-2 border-black">
-                  <p className="bg-white border-2 border-black p-2 rounded-md font-bold text-xs">
+                  <p className="bg-white border-2 border-black p-3 rounded-md font-bold">
                     <strong>Note:</strong> This person will be the primary
                     contact for the booking.
                   </p>
@@ -553,20 +548,21 @@ export function GuestInformationForm({
         {canAddMoreForms && (
           <Button
             onClick={addGuestForm}
-            className="w-full border-3 border-black text-black font-black uppercase 
+            className="w-full border-3 border-black text-black font-black uppercase text-lg
                      bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 
                      hover:translate-x-[2px] hover:translate-y-[2px] 
-                     hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                     hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                     py-5"
           >
-            <Plus className="w-5 h-5 mr-2" strokeWidth={2.5} />
+            <Plus className="w-6 h-6 mr-2" strokeWidth={2.5} />
             Add Guest ({guestForms.length}/{numberOfGuests})
           </Button>
         )}
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="bg-[#d7dbcb] border-3 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <p className="font-bold">
+          <div className="bg-[#a0c4ff] border-3 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <p className="font-bold text-lg">
               All guest forms added. You can increase the number of guests above
               to add more.
             </p>
@@ -575,21 +571,24 @@ export function GuestInformationForm({
       </div>
 
       {/* Special Requirements */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#d3dae6] p-4">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
-          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e0c6ff] p-5">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
+          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
             <BriefcaseMedical
-              className="w-5 h-5 text-black"
+              className="w-6 h-6 text-black"
               strokeWidth={2.5}
             />
           </div>
-          <h3 className="text-lg font-black uppercase">
+          <h3 className="text-xl font-black uppercase">
             Special Requirements (Optional)
           </h3>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="requirements" className="font-bold text-black">
+        <div className="space-y-3">
+          <Label
+            htmlFor="requirements"
+            className="font-bold text-black text-lg"
+          >
             Any dietary restrictions, accessibility needs, medical conditions,
             or other special requests
           </Label>
@@ -599,39 +598,39 @@ export function GuestInformationForm({
             value={specialRequirements}
             onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
             rows={4}
-            className={`border-2 border-black bg-white ${
+            className={`border-2 border-black bg-white text-lg ${
               getFieldError("specialRequirements")
                 ? "border-red-600 border-3"
                 : ""
             }`}
           />
-          <p className="bg-white border-2 border-black p-2 rounded-md mt-2 font-bold">
+          <p className="bg-white border-2 border-black p-3 rounded-md mt-2 font-bold">
             Maximum 500 characters ({specialRequirements.length}/500)
           </p>
           {getFieldError("specialRequirements") && (
-            <p className="bg-red-200 border-2 border-black p-2 rounded-md font-bold">
+            <p className="bg-[#ffadad] border-2 border-black p-3 rounded-md font-bold">
               {getFieldError("specialRequirements")}
             </p>
           )}
         </div>
       </div>
 
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e6dad3] p-4">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-2">
-          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
-            <FileText className="w-5 h-5 text-black" strokeWidth={2.5} />
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#ffd6ff] p-5">
+        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
+          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
+            <FileText className="w-6 h-6 text-black" strokeWidth={2.5} />
           </div>
-          <h3 className="text-lg font-black uppercase">Booking Summary</h3>
+          <h3 className="text-xl font-black uppercase">Booking Summary</h3>
         </div>
 
-        <div className="space-y-2 bg-white border-2 border-black p-4 rounded-lg">
-          <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
-            <span className="font-bold">Number of Guests:</span>
-            <span className="font-black">{numberOfGuests}</span>
+        <div className="space-y-3 bg-white border-2 border-black p-5 rounded-lg">
+          <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
+            <span className="font-bold text-lg">Number of Guests:</span>
+            <span className="font-black text-lg">{numberOfGuests}</span>
           </div>
-          <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
-            <span className="font-bold">Forms Completed:</span>
-            <span className="font-black">
+          <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
+            <span className="font-bold text-lg">Forms Completed:</span>
+            <span className="font-black text-lg">
               {
                 guestForms.filter(
                   (guest) =>
@@ -645,20 +644,20 @@ export function GuestInformationForm({
             </span>
           </div>
           {numberOfGuests > 1 && (
-            <div className="flex justify-between border-b-2 border-dashed border-black pb-2">
-              <span className="font-bold">Team Lead:</span>
-              <span className="font-black">
+            <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
+              <span className="font-bold text-lg">Team Lead:</span>
+              <span className="font-black text-lg">
                 {guestForms.find((g) => g.isteamLead)?.firstName ||
                   "Not selected"}
               </span>
             </div>
           )}
           {specialRequirements && (
-            <div className="pt-2 border-t-2 border-black">
-              <span className="font-bold block mb-1">
+            <div className="pt-3 border-t-2 border-black">
+              <span className="font-bold block mb-2 text-lg">
                 Special Requirements:
               </span>
-              <p className="bg-gray-100 p-2 border-2 border-black rounded-md">
+              <p className="bg-[#f9f9ff] p-3 border-2 border-black rounded-md text-lg">
                 {specialRequirements}
               </p>
             </div>
@@ -670,22 +669,22 @@ export function GuestInformationForm({
         <Button
           onClick={onBack}
           disabled={isSubmitting}
-          className="bg-white text-black hover:text-white/[0.7] font-black uppercase 
+          className="bg-white text-black hover:text-white/[0.7] font-black uppercase text-xl
                    border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                    hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                    hover:translate-x-[2px] hover:translate-y-[2px]
-                   transition-all duration-200"
+                   transition-all duration-200 py-5 px-6"
         >
           Back to Dates
         </Button>
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-[#bcb7c5] text-black font-black hover:text-white/[0.7] uppercase 
+          className="bg-[#caffbf] text-black font-black hover:text-white/[0.7] uppercase text-xl
                    border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                    hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
                    hover:translate-x-[2px] hover:translate-y-[2px]
-                   transition-all duration-200"
+                   transition-all duration-200 py-5 px-6"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
         </Button>

@@ -11,13 +11,13 @@ import { z } from "zod";
 const baseDateSelectionSchema = z.object({
   startDate: z.date({
     required_error: "Start date is required",
-    invalid_type_error: "Please select a valid date"
+    invalid_type_error: "Please select a valid date",
   }),
   endDate: z.date({
     required_error: "End date is required",
-    invalid_type_error: "Please select a valid date"
+    invalid_type_error: "Please select a valid date",
   }),
-  duration: z.number().min(1, "Duration must be at least 1 day")
+  duration: z.number().min(1, "Duration must be at least 1 day"),
 });
 
 // Enhanced schema with refinements for full validation
@@ -26,12 +26,12 @@ const dateSelectionSchema = baseDateSelectionSchema
     (data) => !isBefore(startOfDay(data.startDate), startOfDay(new Date())),
     {
       message: "Start date cannot be in the past",
-      path: ["startDate"]
+      path: ["startDate"],
     }
   )
   .refine((data) => isAfter(data.endDate, data.startDate), {
     message: "End date must be after start date",
-    path: ["endDate"]
+    path: ["endDate"],
   });
 
 interface DateSelectorProps {
@@ -43,7 +43,7 @@ interface DateSelectorProps {
 export function DateSelector({
   tripDuration,
   onDateChange,
-  selectedDate
+  selectedDate,
 }: DateSelectorProps) {
   const [date, setDate] = useState<Date | undefined>(selectedDate);
   const [availabilityFilter, setAvailabilityFilter] = useState<
@@ -59,7 +59,7 @@ export function DateSelector({
       const validation = dateSelectionSchema.safeParse({
         startDate: newDate,
         endDate: endDate,
-        duration: tripDuration
+        duration: tripDuration,
       });
 
       if (validation.success) {
@@ -76,7 +76,7 @@ export function DateSelector({
   const availabilityOptions = [
     { value: "weekend" as const, label: "Every weekend" },
     { value: "summer" as const, label: "Summer months" },
-    { value: "all" as const, label: "All year round" }
+    { value: "all" as const, label: "All year round" },
   ];
 
   // Helper function to check if date should be disabled based on filter
@@ -103,20 +103,20 @@ export function DateSelector({
   return (
     <div className="space-y-6">
       {/* Trip Duration Card */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#d7dbcb] p-4">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="bg-white p-1.5 rounded-md border-2 border-black flex-shrink-0">
-            <Clock className="w-5 h-5 text-black" strokeWidth={2.5} />
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#a0c4ff] p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
+            <Clock className="w-6 h-6 text-black" strokeWidth={2.5} />
           </div>
-          <h3 className="text-lg font-black uppercase">
+          <h3 className="text-xl font-black uppercase">
             Trip Duration: {tripDuration} days
           </h3>
         </div>
 
         {date && (
-          <div className="mt-2 bg-white border-2 border-black rounded-lg p-2 font-bold">
+          <div className="mt-3 bg-white border-2 border-black rounded-lg p-3 font-bold text-lg">
             <div className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4" strokeWidth={2.5} />
+              <CalendarIcon className="w-5 h-5" strokeWidth={2.5} />
               <span>
                 Selected: {format(date, "MMM dd, yyyy")} -{" "}
                 {format(addDays(date, tripDuration - 1), "MMM dd, yyyy")}
@@ -128,12 +128,12 @@ export function DateSelector({
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="border-3 border-black rounded-xl p-4 bg-[#e9cfcf] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertCircle className="h-5 w-5 text-black" strokeWidth={2.5} />
-            <h3 className="font-black uppercase">Error</h3>
+        <div className="border-3 border-black rounded-xl p-5 bg-[#ffadad] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-3 mb-3">
+            <AlertCircle className="h-6 w-6 text-black" strokeWidth={2.5} />
+            <h3 className="font-black uppercase text-xl">Error</h3>
           </div>
-          <ul className="list-disc list-inside space-y-1 font-bold">
+          <ul className="list-disc list-inside space-y-2 font-bold text-base">
             {validationErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
@@ -142,11 +142,11 @@ export function DateSelector({
       )}
 
       {/* Calendar Section */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-4">
-        <label className="block text-lg font-black uppercase mb-4">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-5">
+        <label className="block text-xl font-black uppercase mb-4">
           Select Start Date
         </label>
-        <div className="bg-[#d3dae6] border-3 border-black rounded-lg p-4">
+        <div className="bg-[#e0c6ff] border-3 border-black rounded-lg p-4">
           <Calendar
             mode="single"
             selected={date}
@@ -157,29 +157,29 @@ export function DateSelector({
               day_selected: "bg-[#222] text-white font-black rounded-md w-full",
               day_today: "bg-[#444] text-white font-black rounded-md w-full",
               day_disabled: "text-gray-300 opacity-50 w-full",
-              day: "bg-white text-black font-black rounded-md w-full transition-colors duration-100 hover:bg-[#bcb7c5] hover:text-black",
-              head_cell: "font-black uppercase text-xs",
+              day: "bg-white text-black font-black rounded-md w-full transition-colors duration-100 hover:bg-[#caffbf] hover:text-black",
+              head_cell: "font-black uppercase text-sm",
               cell: "text-center font-bold p-0 w-full",
               button:
-                "w-9 h-9 p-0 font-bold hover:bg-[#bcb7c5] hover:text-black w-full transition-colors duration-100",
-              nav_button: "bg-white hover:bg-[#e6dad3]",
+                "w-10 h-10 p-0 font-bold hover:bg-[#caffbf] hover:text-black w-full transition-colors duration-100",
+              nav_button: "bg-white hover:bg-[#fdffb6]",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
-              caption: "font-black text-black"
+              caption: "font-black text-black text-lg",
             }}
           />
         </div>
       </div>
 
       {/* Availability Filters */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#f5f5e6] p-4">
-        <h3 className="text-lg font-black uppercase mb-3">Available Dates</h3>
-        <div className="flex flex-wrap gap-2">
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#fdffb6] p-5">
+        <h3 className="text-xl font-black uppercase mb-4">Available Dates</h3>
+        <div className="flex flex-wrap gap-3">
           {availabilityOptions.map((option) => (
             <Button
               key={option.value}
               onClick={() => setAvailabilityFilter(option.value)}
-              className={`border-2 border-black hover:bg-white font-black uppercase text-xs py-2 px-3
+              className={`border-2 border-black hover:bg-white font-black uppercase text-base py-2.5 px-4
                 ${
                   availabilityFilter === option.value
                     ? "bg-black text-white shadow-none hover:bg-black"
@@ -190,44 +190,44 @@ export function DateSelector({
             </Button>
           ))}
         </div>
-        <p className="text-sm font-bold mt-2 bg-white border-2 border-black rounded-md p-2">
+        <p className="text-base font-bold mt-3 bg-white border-2 border-black rounded-md p-3">
           Filter available dates based on your preference
         </p>
       </div>
 
       {/* Quick Date Selection */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e6dad3] p-4">
-        <h3 className="text-lg font-black uppercase mb-3">Quick Selection</h3>
+      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#caffbf] p-5">
+        <h3 className="text-xl font-black uppercase mb-4">Quick Selection</h3>
         <div className="grid grid-cols-2 gap-3">
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 7))}
-            className="border-2 border-black bg-white text-black font-bold justify-start 
+            className="border-2 border-black bg-white text-black font-bold justify-start text-base
                      shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
           >
             Next Week
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 14))}
-            className="border-2 border-black bg-white text-black font-bold justify-start
+            className="border-2 border-black bg-white text-black font-bold justify-start text-base
                      shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
           >
             In 2 Weeks
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 30))}
-            className="border-2 border-black bg-white text-black font-bold justify-start
+            className="border-2 border-black bg-white text-black font-bold justify-start text-base
                      shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
           >
             Next Month
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 60))}
-            className="border-2 border-black bg-white text-black font-bold justify-start
+            className="border-2 border-black bg-white text-black font-bold justify-start text-base
                      shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white"
+                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
           >
             In 2 Months
           </Button>

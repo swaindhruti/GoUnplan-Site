@@ -6,7 +6,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { AlertCircle, ArrowRight, User, Mail, Phone, Lock } from "lucide-react";
+import { AlertCircle, User, Mail, Phone, Lock, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -135,18 +134,27 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-[#f9f9ff]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-[#e0c6ff] border-b-3 border-black py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-2xl font-bold text-purple-700">
+          <Link
+            href="/"
+            className="text-2xl font-black text-black flex items-center"
+          >
+            <div className="bg-white p-2 rounded-md border-2 border-black mr-2">
+              <User className="h-6 w-6 text-black" strokeWidth={2.5} />
+            </div>
             Unplan
           </Link>
           <div className="flex items-center space-x-4">
             <Link href="/auth/signin">
               <Button
-                variant="outline"
-                className="text-purple-600 bg-white border-purple-200 hover:bg-purple-50"
+                className="bg-white text-black font-black uppercase 
+                         border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                         hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                         hover:translate-x-[2px] hover:translate-y-[2px]
+                         transition-all duration-200 px-6 py-3"
               >
                 Sign In
               </Button>
@@ -157,48 +165,71 @@ export default function SignUpPage() {
 
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md shadow-lg border border-gray-200">
-          <CardHeader className="space-y-1 border-b bg-gray-50 rounded-t-lg">
-            <CardTitle className="text-2xl font-bold text-center text-gray-900">
-              Create your account
-            </CardTitle>
-            <CardDescription className="text-center text-gray-600">
+        <Card className="w-full max-w-xl pt-0 pb-0 border-3 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          <CardHeader className="space-y-1 border-b-3 border-black bg-[#fdffb6] p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-white p-2 rounded-md border-2 border-black">
+                <UserPlus className="h-6 w-6 text-black" strokeWidth={2.5} />
+              </div>
+              <CardTitle className="text-2xl font-black text-black uppercase">
+                Create your account
+              </CardTitle>
+            </div>
+            <CardDescription className="text-black font-bold">
               Join Unplan today and start exploring unique adventures
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 p-6">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
                 {serverError && (
-                  <Alert className="mb-4 bg-red-50 border-red-200 text-red-800">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{serverError}</AlertDescription>
+                  <Alert className="mb-4 bg-[#ffadad] border-3 border-black rounded-xl p-4 flex items-center gap-3">
+                    <div className="bg-white p-1 rounded-full border-2 border-black">
+                      <AlertCircle
+                        className="h-4 w-4 text-black"
+                        strokeWidth={2.5}
+                      />
+                    </div>
+                    <AlertDescription className="font-bold text-black">
+                      {serverError}
+                    </AlertDescription>
                   </Alert>
                 )}
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <User className="mr-2 h-4 w-4 text-gray-500" />
-                          Full Name
-                        </FormLabel>
+                      <FormItem className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-[#fdffb6] p-1.5 rounded-md border-2 border-black">
+                            <User
+                              className="h-5 w-5 text-black"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          <FormLabel className="text-base font-bold text-black">
+                            Full Name
+                          </FormLabel>
+                        </div>
                         <FormControl>
                           <Input
                             placeholder="Enter your full name"
                             {...field}
                             disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="px-4 py-3 border-3 border-black rounded-xl bg-white text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#fdffb6]"
                           />
                         </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
+                        {form.formState.errors.name && (
+                          <p className="mt-2 font-bold text-red-600 bg-[#ffadad] border-2 border-black p-2 rounded-md">
+                            {form.formState.errors.name.message}
+                          </p>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -207,21 +238,32 @@ export default function SignUpPage() {
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Mail className="mr-2 h-4 w-4 text-gray-500" />
-                          Email Address
-                        </FormLabel>
+                      <FormItem className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-[#a0c4ff] p-1.5 rounded-md border-2 border-black">
+                            <Mail
+                              className="h-5 w-5 text-black"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          <FormLabel className="text-base font-bold text-black">
+                            Email Address
+                          </FormLabel>
+                        </div>
                         <FormControl>
                           <Input
                             type="email"
                             placeholder="Enter your email address"
                             {...field}
                             disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="px-4 py-3 border-3 border-black rounded-xl bg-white text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#a0c4ff]"
                           />
                         </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
+                        {form.formState.errors.email && (
+                          <p className="mt-2 font-bold text-red-600 bg-[#ffadad] border-2 border-black p-2 rounded-md">
+                            {form.formState.errors.email.message}
+                          </p>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -230,21 +272,32 @@ export default function SignUpPage() {
                     control={form.control}
                     name="phone"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Phone className="mr-2 h-4 w-4 text-gray-500" />
-                          Phone Number
-                        </FormLabel>
+                      <FormItem className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-[#caffbf] p-1.5 rounded-md border-2 border-black">
+                            <Phone
+                              className="h-5 w-5 text-black"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          <FormLabel className="text-base font-bold text-black">
+                            Phone Number
+                          </FormLabel>
+                        </div>
                         <FormControl>
                           <Input
                             type="tel"
                             placeholder="Enter your phone number"
                             {...field}
                             disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="px-4 py-3 border-3 border-black rounded-xl bg-white text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#caffbf]"
                           />
                         </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
+                        {form.formState.errors.phone && (
+                          <p className="mt-2 font-bold text-red-600 bg-[#ffadad] border-2 border-black p-2 rounded-md">
+                            {form.formState.errors.phone.message}
+                          </p>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -253,21 +306,32 @@ export default function SignUpPage() {
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Lock className="mr-2 h-4 w-4 text-gray-500" />
-                          Password
-                        </FormLabel>
+                      <FormItem className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-[#e0c6ff] p-1.5 rounded-md border-2 border-black">
+                            <Lock
+                              className="h-5 w-5 text-black"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          <FormLabel className="text-base font-bold text-black">
+                            Password
+                          </FormLabel>
+                        </div>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="Enter your password"
                             {...field}
                             disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="px-4 py-3 border-3 border-black rounded-xl bg-white text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#e0c6ff]"
                           />
                         </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
+                        {form.formState.errors.password && (
+                          <p className="mt-2 font-bold text-red-600 bg-[#ffadad] border-2 border-black p-2 rounded-md">
+                            {form.formState.errors.password.message}
+                          </p>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -276,21 +340,32 @@ export default function SignUpPage() {
                     control={form.control}
                     name="confirmPassword"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm font-medium text-gray-700">
-                          <Lock className="mr-2 h-4 w-4 text-gray-500" />
-                          Confirm Password
-                        </FormLabel>
+                      <FormItem className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="bg-[#ffd6ff] p-1.5 rounded-md border-2 border-black">
+                            <Lock
+                              className="h-5 w-5 text-black"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          <FormLabel className="text-base font-bold text-black">
+                            Confirm Password
+                          </FormLabel>
+                        </div>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="Confirm your password"
                             {...field}
                             disabled={isLoading}
-                            className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="px-4 py-3 border-3 border-black rounded-xl bg-white text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#ffd6ff]"
                           />
                         </FormControl>
-                        <FormMessage className="text-red-600 text-sm" />
+                        {form.formState.errors.confirmPassword && (
+                          <p className="mt-2 font-bold text-red-600 bg-[#ffadad] border-2 border-black p-2 rounded-md">
+                            {form.formState.errors.confirmPassword.message}
+                          </p>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -298,43 +373,69 @@ export default function SignUpPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5 mt-4"
+                  className="w-full bg-[#a0c4ff] hover:bg-[#fdffb6] text-black font-black uppercase 
+                           border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                           hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                           hover:translate-x-[2px] hover:translate-y-[2px]
+                           transition-all duration-200 py-6 mt-6 h-16
+                           disabled:opacity-50 disabled:cursor-not-allowed
+                           rounded-xl text-lg flex items-center justify-center"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                  {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin h-5 w-5 border-2 border-black border-t-transparent rounded-full"></div>
+                      <span>Creating Account...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <UserPlus className="h-5 w-5" strokeWidth={2.5} />
+                      <span>Create Account</span>
+                    </div>
+                  )}
                 </Button>
               </form>
             </Form>
           </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
-            <div className="text-center text-sm text-gray-600 pt-2">
+          <CardFooter className="flex justify-center border-t-3 border-black pt-6 pb-6 bg-[#fdffb6]">
+            <p className="text-base font-bold text-black">
               Already have an account?{" "}
               <Link
                 href="/auth/signin"
-                className="font-medium text-purple-600 hover:text-purple-500"
+                className="underline decoration-2 font-black hover:bg-white"
               >
                 Sign in instead
               </Link>
-            </div>
+            </p>
           </CardFooter>
         </Card>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6">
+      <footer className="bg-[#e0c6ff] border-t-3 border-black py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2024 Unplan. All rights reserved.</p>
-            <div className="flex justify-center space-x-4 mt-2">
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+          <div className="text-center">
+            <p className="font-bold text-black">
+              © 2024 Unplan. All rights reserved.
+            </p>
+            <div className="flex justify-center space-x-6 mt-3">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Terms of Service
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-purple-600">
+              <Link
+                href="#"
+                className="font-bold text-black border-b-2 border-black hover:bg-[#fdffb6] px-1"
+              >
                 Help
               </Link>
             </div>
