@@ -36,7 +36,6 @@ export const FilterAndTrip = () => {
 
   return (
     <div id="filtertrip" className="h-screen relative overflow-hidden">
-      {/* Background Image */}
       <Image
         src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751847044/joshua-earle--87JyMb9ZfU-unsplash_accpod.jpg"
         alt="Filter and Trip"
@@ -44,14 +43,9 @@ export const FilterAndTrip = () => {
         className="object-cover"
         priority
       />
-
-      {/* Stronger Overlay for Better Contrast */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/50" />
-
-      {/* Content Container */}
       <div className="relative z-10 flex items-center justify-center h-full p-4">
         <div className="w-full max-w-6xl">
-          {/* Header with Text Shadow */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
               Plan Your Perfect
@@ -65,13 +59,9 @@ export const FilterAndTrip = () => {
               lifetime.
             </p>
           </div>
-
-          {/* Enhanced Form Card with Better Visibility */}
           <div className="backdrop-blur-2xl bg-white/25 border border-white/40 rounded-3xl p-8 md:p-12 shadow-2xl">
             <form onSubmit={handleSearch} className="space-y-8">
-              {/* Form Fields Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Destination */}
                 <div className="space-y-3">
                   <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
                     <MapPin className="w-4 h-4 text-purple-300" />
@@ -88,8 +78,6 @@ export const FilterAndTrip = () => {
                     <Search className="absolute right-3 top-3 w-5 h-5 text-gray-600" />
                   </div>
                 </div>
-
-                {/* Check-in Date */}
                 <div className="space-y-3">
                   <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
                     <Calendar className="w-4 h-4 text-purple-300" />
@@ -121,8 +109,6 @@ export const FilterAndTrip = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-
-                {/* Check-out Date */}
                 <div className="space-y-3">
                   <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
                     <Calendar className="w-4 h-4 text-purple-300" />
@@ -157,8 +143,6 @@ export const FilterAndTrip = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-
-                {/* Travelers */}
                 <div className="space-y-3 h-full">
                   <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
                     <Users className="w-4 h-4 text-purple-300" />
@@ -178,8 +162,6 @@ export const FilterAndTrip = () => {
                   </Select>
                 </div>
               </div>
-
-              {/* Enhanced Search Button */}
               <div className="flex justify-center pt-4">
                 <Button
                   type="submit"
@@ -191,8 +173,6 @@ export const FilterAndTrip = () => {
                 </Button>
               </div>
             </form>
-
-            {/* Bottom Link with Better Contrast */}
             <div className="text-center mt-8 pt-6 border-t border-white/30">
               <p className="text-white font-medium drop-shadow-md">
                 Not sure where to go?{" "}

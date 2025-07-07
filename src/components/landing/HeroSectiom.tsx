@@ -35,11 +35,11 @@ export const HeroSection = () => {
         grabCursor={true}
         freeMode={false}
         watchSlidesProgress={true}
-        pagination={{
-          clickable: true,
-          dynamicBullets: true
-        }}
-        navigation={true}
+        // pagination={{
+        //   clickable: true,
+        //   dynamicBullets: true
+        // }}
+        // navigation={true}
         className="h-full w-full [&_.swiper-slide-active]:scale-100 [&_.swiper-slide]:transition-transform [&_.swiper-slide]:duration-1000"
         style={
           {
@@ -65,7 +65,7 @@ export const HeroSection = () => {
         ))}
       </Swiper>
       <Button
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full shadow-lg z-40 hover:bg-gray-200 transition-colors duration-300"
+        className="absolute bottom-10 left-1/2 text-xl bg-purple-600/[0.4] backdrop-blur-2xl hover:bg-purple-700/[0.4] font-semibold transform -translate-x-1/2  text-white px-10 py-8 border-[1px] border-purple-500/[0.3] rounded-full shadow-lg z-40  transition-colors duration-300"
         onClick={() =>
           smoothScrollToSection("#filtertrip", {
             offset: 0,
