@@ -24,13 +24,13 @@ export const FindMyVibe = () => {
   ];
   return (
     <>
-      <div className="min-h-screen bg-purple-500/[0.03] px-10 py-20 gap-6 flex justify-center items-center">
+      <div className="min-h-screen bg-purple-500/[0.05] px-10 py-20 gap-6 flex justify-center items-center">
         <div className="w-1/4 flex flex-col items-center justify-center gap-y-5">
           <div className="h-[50vh]">
             <div className="space-y-12">
               <div className="space-y-5">
-                <div className="inline-flex items-center px-6 py-4 bg-purple-100 rounded-full">
-                  <span className="text-purple-600 text-lg font-semibold tracking-wide uppercase">
+                <div className="inline-flex items-center px-8 py-2 bg-purple-100 rounded-full">
+                  <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
                     Choose Your Vibe!
                   </span>
                 </div>

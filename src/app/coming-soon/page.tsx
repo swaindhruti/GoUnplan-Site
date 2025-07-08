@@ -1,5 +1,6 @@
 "use client";
 
+import AboutUs from "@/components/landing/AboutUs";
 import { FilterAndTrip } from "@/components/landing/FilterAndTrip";
 import { FindMyVibe } from "@/components/landing/FindMyVibe";
 import { HeroSection } from "@/components/landing/HeroSectiom";
@@ -13,6 +14,7 @@ export default function Home() {
       <FilterAndTrip />
       <FindMyVibe />
       <ReadyToStart />
+      <AboutUs />
     </>
   );
 }
