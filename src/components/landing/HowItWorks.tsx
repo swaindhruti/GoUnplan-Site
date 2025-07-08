@@ -3,30 +3,32 @@ import { Card } from "@/components/ui/card";
 
 export const HowItWorksSection = () => {
   return (
-    <div className="relative -mt-20">
+    <div className="relative">
       {/* Background Image Section */}
-      <div className="h-[80vh] relative">
+      <div className="h-[60vh] sm:h-[70vh] lg:h-[80vh] relative">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg)`,
           }}
         >
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 h-full flex items-center justify-center">
-          <div className="container mx-auto px-6 lg:px-12">
-            <div className="grid lg:grid-cols-2 gap-28 items-center max-w-6xl mx-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-28 items-center max-w-6xl mx-auto">
               {/* Left Content */}
-              <div className="text-left">
+              <div className="text-center lg:text-left order-1 px-4">
                 <div>
-                  <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
+                  <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white/30 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-white/40 drop-shadow-lg">
                     HOW IT WORKS
                   </span>
-                  <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight tracking-tight">
-                    Simple Steps to
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white leading-tight tracking-tight drop-shadow-2xl">
+                    Simple
+                    <br />
+                    Steps to
                     <br />
                     Adventure
                   </h1>
@@ -34,19 +36,19 @@ export const HowItWorksSection = () => {
               </div>
 
               {/* Right Content Card */}
-              <Card className="p-8 lg:p-12 bg-white/95 backdrop-blur-sm shadow-2xl transform translate-y-36 relative z-30">
-                <div className="space-y-6">
+              <Card className="p-4 sm:p-6 lg:p-12 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl order-2 max-w-lg mx-auto lg:mx-0">
+                <div className="space-y-3 sm:space-y-4 lg:space-y-6">
                   {/* Step 1: Search & Discover */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Search className="w-6 h-6 text-purple-600" />
+                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
+                        <Search className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
                         Search & Discover
                       </h3>
                     </div>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm lg:text-base text-white/90 leading-relaxed font-medium drop-shadow-md">
                       Browse through our curated collection of unique
                       destinations and experiences tailored to your interests
                       and preferences.
@@ -54,19 +56,19 @@ export const HowItWorksSection = () => {
                   </div>
 
                   {/* Divider Line */}
-                  <div className="border-t border-purple-200"></div>
+                  <div className="border-t border-white/30"></div>
 
                   {/* Step 2: Plan & Customize */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-purple-600" />
+                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
                         Plan & Customize
                       </h3>
                     </div>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm lg:text-base text-white/90 leading-relaxed font-medium drop-shadow-md">
                       Work with our expert team to customize your itinerary,
                       select accommodations, and plan activities that match your
                       style.
@@ -74,19 +76,19 @@ export const HowItWorksSection = () => {
                   </div>
 
                   {/* Divider Line */}
-                  <div className="border-t border-purple-200"></div>
+                  <div className="border-t border-white/30"></div>
 
                   {/* Step 3: Book & Explore */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-purple-600" />
+                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
+                        <MapPin className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
                         Book & Explore
                       </h3>
                     </div>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm lg:text-base text-white/90 leading-relaxed font-medium drop-shadow-md">
                       Confirm your booking and embark on your unforgettable
                       journey with 24/7 support throughout your adventure.
                     </p>
@@ -97,9 +99,6 @@ export const HowItWorksSection = () => {
           </div>
         </div>
       </div>
-
-      {/* Bottom spacing for the protruding card */}
-      <div className="h-20 bg-purple-500/[0.1]"></div>
     </div>
   );
 };

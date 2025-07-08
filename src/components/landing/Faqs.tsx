@@ -54,43 +54,43 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="min-h-[30vh] bg-purple-500/[0.1] px-10 py-16">
+    <section className="min-h-[50vh] bg-purple-500/[0.1] px-4 sm:px-6 lg:px-10 py-8 sm:py-12 lg:py-16">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="flex justify-center">
+          <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <Badge
                 variant="outline"
-                className="bg-white text-purple-600 text-[16px] font-semibold tracking-wide uppercase rounded-full py-2 px-8"
+                className="bg-white text-purple-600 text-sm sm:text-[16px] font-semibold tracking-wide uppercase rounded-full py-1.5 px-4 sm:py-2 sm:px-8"
               >
                 FAQ
               </Badge>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 pt-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6">
               Frequently Asked Questions
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
               Find answers to common questions about our services and booking
               process
             </p>
           </div>
 
           {/* FAQ Items */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {faqs.map((faq) => (
               <motion.div
                 key={faq.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: faq.id * 0.1 }}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
               >
                 <button
                   onClick={() => toggleItem(faq.id)}
-                  className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                  className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
                 >
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 pr-4">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 pr-3 sm:pr-4 leading-tight">
                     {faq.question}
                   </h3>
                   <motion.div
@@ -98,7 +98,7 @@ export default function FAQSection() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown className="w-6 h-6 text-purple-500" />
+                    <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
                   </motion.div>
                 </button>
 
@@ -111,8 +111,8 @@ export default function FAQSection() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="px-8 pb-6 pt-2">
-                        <p className="text-gray-600 leading-relaxed">
+                      <div className="px-4 sm:px-6 lg:px-8 pb-4 sm:pb-5 lg:pb-6 pt-2">
+                        <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>
@@ -128,12 +128,12 @@ export default function FAQSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="text-center mt-12"
+            className="text-center mt-8 sm:mt-10 lg:mt-12"
           >
-            <p className="text-gray-600 mb-4">
+            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
               Still have questions? We&apos;re here to help!
             </p>
-            <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200">
+            <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full transition-colors duration-200 text-sm sm:text-base">
               Contact Support
             </button>
           </motion.div>

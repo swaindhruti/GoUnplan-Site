@@ -52,26 +52,26 @@ export default function ReviewSection() {
   const currentTestimonial = testimonials[currentIndex];
 
   return (
-    <section className="min-h-[30vh] bg-purple-500/[0.1] px-10 py-16">
+    <section className="min-h-[80vh] sm:min-h-[70vh] lg:min-h-[60vh] bg-purple-500/[0.1] px-4 sm:px-6 lg:px-10 py-8 sm:py-12 lg:py-16">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto text-center">
           {/* Header */}
-          <div>
-            <div className="flex justify-center">
+          <div className="mb-8 sm:mb-12 lg:mb-16">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <Badge
                 variant="outline"
-                className="bg-white text-purple-600 text-[16px] font-semibold tracking-wide uppercase rounded-full py-2 px-8"
+                className="bg-white text-purple-600 text-sm sm:text-[16px] font-semibold tracking-wide uppercase rounded-full py-1.5 px-4 sm:py-2 sm:px-8"
               >
                 TESTIMONIALS
               </Badge>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-12 pt-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 lg:mb-12">
               Top Reviews
             </h2>
           </div>
 
           {/* Testimonial Content */}
-          <div className="relative min-h-[40vh] flex items-center justify-center">
+          <div className="relative min-h-[300px] sm:min-h-[350px] lg:min-h-[400px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentTestimonial.id}
@@ -79,12 +79,12 @@ export default function ReviewSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="absolute inset-0 flex flex-col items-center justify-center"
+                className="absolute inset-0 flex flex-col items-center justify-center px-4"
               >
                 {/* Quote Icon */}
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                   <svg
-                    className="w-12 h-12 mx-auto text-purple-500"
+                    className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto text-purple-500"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -92,12 +92,12 @@ export default function ReviewSection() {
                   </svg>
                 </div>
 
-                <blockquote className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl leading-relaxed">
+                <blockquote className="text-base sm:text-lg lg:text-xl text-gray-600 mb-8 sm:mb-10 lg:mb-12 max-w-3xl leading-relaxed">
                   &quot;{currentTestimonial.text}&quot;
                 </blockquote>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-4 border-white shadow-lg">
+                  <div className="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden mb-3 sm:mb-4 border-4 border-white shadow-lg">
                     <Image
                       src={currentTestimonial.image || "/placeholder.svg"}
                       alt={currentTestimonial.name}
@@ -106,7 +106,7 @@ export default function ReviewSection() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h4 className="text-xl font-semibold text-gray-900">
+                  <h4 className="text-lg sm:text-xl font-semibold text-gray-900">
                     {currentTestimonial.name}
                   </h4>
                 </div>
