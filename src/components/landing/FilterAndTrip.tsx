@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { FindPackagesButton } from "./common";
 
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState("");
@@ -35,7 +36,10 @@ export const FilterAndTrip = () => {
   };
 
   return (
-    <div id="filtertrip" className="h-screen relative overflow-hidden">
+    <div
+      id="filtertrip"
+      className="min-h-screen py-10 relative flex items-center justify-center overflow-hidden"
+    >
       <Image
         src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751847044/joshua-earle--87JyMb9ZfU-unsplash_accpod.jpg"
         alt="Filter and Trip"
@@ -53,7 +57,7 @@ export const FilterAndTrip = () => {
                 Adventure
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-white/95 max-w-2xl mx-auto drop-shadow-lg">
+            <p className="text-lg md:text-xl font-roboto text-white/95 max-w-2xl mx-auto drop-shadow-lg">
               Discover unique experiences tailored to your vibe. Let us handle
               the details while you focus on creating memories that last a
               lifetime.
@@ -61,7 +65,7 @@ export const FilterAndTrip = () => {
           </div>
           <div className="backdrop-blur-2xl bg-white/25 border border-white/40 rounded-3xl p-8 md:p-12 shadow-2xl">
             <form onSubmit={handleSearch} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 font-roboto md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-3">
                   <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
                     <MapPin className="w-4 h-4 text-purple-300" />
@@ -163,14 +167,7 @@ export const FilterAndTrip = () => {
                 </div>
               </div>
               <div className="flex justify-center pt-4">
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-12 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-2xl hover:shadow-purple-500/25 border border-white/20"
-                >
-                  <Search className="w-5 h-5 mr-2" />
-                  Discover Adventures
-                </Button>
+                <FindPackagesButton label="Discover Adventures" />
               </div>
             </form>
             <div className="text-center mt-8 pt-6 border-t border-white/30">

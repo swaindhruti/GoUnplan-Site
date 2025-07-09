@@ -156,3 +156,64 @@
 .font-montserrat {
   font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
 }
+/* Sketch highlight effect */
+.highlight-wavy,
+.highlight-circle,
+.highlight-stroke,
+.highlight-oval {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+/* Wavy Underline */
+.highlight-wavy::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.05em;
+  width: 100%;
+  height: 0.6em;
+  background: url("/underline-wavy.svg") no-repeat center/contain;
+  z-index: -1;
+}
+
+/* Circular Sketch */
+.highlight-circle::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  bottom: -10%;
+  width: 120%;
+  height: 140%;
+  background: url("/circle-sketch.svg") no-repeat center/contain;
+  z-index: -1;
+}
+
+/* Highlighter Stroke */
+.highlight-stroke::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.05em;
+  width: 100%;
+  height: 0.8em;
+  background: url("/highlight-stroke.svg") no-repeat center/contain;
+  z-index: -1;
+}
+
+/* Oval Sketch */
+.highlight-oval::after {
+  content: "";
+  position: absolute;
+  left: -5%;
+  bottom: -5%;
+  width: 110%;
+  height: 130%;
+  background: url("/oval-sketch.svg") no-repeat center/contain;
+  z-index: -1;
+}
+
+:root {
+  overflow-x: hidden;
+}

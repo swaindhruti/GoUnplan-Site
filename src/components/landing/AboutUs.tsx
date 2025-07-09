@@ -57,7 +57,7 @@ export default function AboutUs() {
         </div>
 
         <div className="pt-8">
-          <FindPackagesButton />
+          <FindPackagesButton label="Find Packages" />
         </div>
       </div>
     </section>

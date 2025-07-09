@@ -15,7 +15,7 @@ import { TopHosts } from "@/components/landing/TopHosts";
 
 export default function Home() {
   return (
-    <>
+    <div className="overflow-y-hidden">
       <HeroSection />
       <FilterAndTrip />
       <FindMyVibe />
@@ -28,6 +28,6 @@ export default function Home() {
       <AboutUs />
       <ReadyToStart />
       <FAQSection />
-    </>
+    </div>
   );
 }

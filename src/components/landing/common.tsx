@@ -28,13 +28,13 @@ export const SectionLabel = ({ label }: { label: ReactNode }) => {
   );
 };
 
-export const FindPackagesButton = () => {
+export const FindPackagesButton = ({ label }: { label: string }) => {
   return (
     <Button
-      className="bg-purple-500 font-poppins hover:bg-purple-600 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+      className="bg-purple-500  font-poppins hover:bg-purple-600 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
       size="lg"
     >
-      Find Packages
+      {label}
       <ArrowRight className="ml-2 h-5 w-5" />
     </Button>
   );
@@ -151,12 +151,12 @@ export const Carousels = ({
       : (hosts as Host[]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center px-4 py-10 md:px-10">
+    <div className="h-auto md:min-h-screen flex justify-center items-center px-4 py-10 md:px-10">
       <div className="w-full max-w-6xl">
         <div className="mb-4 flex justify-center">
           <SectionLabel label={SectionTitle} />
         </div>
-        <div className="mb-20 text-center flex justify-center">
+        <div className="mb-4 md:mb-20 text-center flex justify-center">
           <h2 className="text-xl font-playfair sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
             {Description}
           </h2>
@@ -222,7 +222,7 @@ export const Carousels = ({
                         </p>
                       </>
                     ) : (
-                      <h3 className="text-xl font-semibold text-black">
+                      <h3 className="text-lg font-normal md:font-medium text-black">
                         {(item as Host).name}
                       </h3>
                     )}
