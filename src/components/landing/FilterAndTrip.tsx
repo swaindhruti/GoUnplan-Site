@@ -47,7 +47,7 @@ export const FilterAndTrip = () => {
       <div className="relative z-10 flex items-center justify-center h-full p-4">
         <div className="w-full max-w-6xl">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
+            <h1 className="text-4xl font-playfair md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
               Plan Your Perfect
               <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
                 Adventure

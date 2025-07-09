@@ -32,20 +32,20 @@ export const FindMyVibe = () => {
               <div className="space-y-5">
                 <SectionLabel label="Choose Your Vibe!" />
 
-                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-4xl font-playfair lg:text-5xl font-bold text-gray-900 leading-tight">
                   Popular
                   <br />
                   <span className="text-gray-800">Vibes</span>
                 </h1>
 
-                <p className="text-[16px] text-gray-600 max-w-md">
+                <p className="text-[16px] font-roboto text-gray-600 max-w-md">
                   Join us as we explore the wonders of the globe, one incredible
                   journey at a time.
                 </p>
               </div>
 
               <Button
-                className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="bg-purple-500 font-poppins hover:bg-purple-600 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 size="lg"
               >
                 Find Packages
@@ -60,7 +60,7 @@ export const FindMyVibe = () => {
               fill
               className="object-cover rounded-[90px] shadow-lg"
             />
-            <div className="text-3xl font-semibold absolute bottom-6 flex justify-center w-full font-mono tracking-tighter  text-white">
+            <div className="text-3xl font-playfair font-semibold absolute bottom-6 flex justify-center w-full font-mono tracking-tighter  text-white">
               Cultural
             </div>
           </div>
@@ -77,7 +77,7 @@ export const FindMyVibe = () => {
                 fill
                 className="object-cover rounded-[90px] shadow-lg "
               />
-              <div className="text-3xl font-semibold absolute bottom-6 flex justify-center w-full font-mono tracking-tighter  text-white">
+              <div className="text-3xl font-bold absolute bottom-6 flex justify-center w-full font-playfair   text-white">
                 {vibe.label}
               </div>
             </div>

@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Button } from "../ui/button";
 import { smoothScrollToSection } from "../global/Handlescroll";
+import { ArrowRight } from "lucide-react";
 
 export const HeroSection = () => {
   const images = [
@@ -64,19 +65,24 @@ export const HeroSection = () => {
           </SwiperSlide>
         ))}
       </Swiper>
-      <Button
-        className="absolute bottom-10 left-1/2 text-xl bg-purple-600/[0.4] backdrop-blur-2xl hover:bg-purple-700/[0.4] font-semibold transform -translate-x-1/2  text-white px-10 py-8 border-[1px] border-purple-500/[0.3] rounded-full shadow-lg z-40  transition-colors duration-300"
-        onClick={() =>
-          smoothScrollToSection("#filtertrip", {
-            offset: 0,
-            duration: 1.2,
-            onStart: () => console.log("Scroll started"),
-            onComplete: () => console.log("Scroll completed")
-          })
-        }
-      >
-        Explore More
-      </Button>
+      <div className="flex justify-center">
+        {" "}
+        <Button
+          onClick={() =>
+            smoothScrollToSection("#filtertrip", {
+              offset: 0,
+              duration: 1.2,
+              onStart: () => console.log("Scroll started"),
+              onComplete: () => console.log("Scroll completed")
+            })
+          }
+          className="bg-purple-600 font-poppins absolute bottom-10  z-40 flex justify-center hover:bg-purple-700 text-white px-10 py-8 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          size="lg"
+        >
+          Explore More
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
+      </div>
     </div>
   );
 };

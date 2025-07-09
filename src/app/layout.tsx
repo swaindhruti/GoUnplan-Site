@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Playfair_Display,
+  Roboto_Condensed,
+  Roboto, // Add this line
+  Poppins,
+  Montserrat
+} from "next/font/google";
 import SessionProvider from "@/components/providers/sessionProviders";
 import "./globals.css";
 import { PostHogProvider } from "./providers";
@@ -12,6 +20,32 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"]
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-playfair"
+});
+const robotoCondensed = Roboto_Condensed({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-roboto-condensed"
+});
+const roboto = Roboto({
+  // Add this block
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto"
+});
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins"
+});
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-montserrat"
 });
 
 export const metadata: Metadata = {
@@ -27,7 +61,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`
+          ${geistSans.variable} 
+          ${playfair.variable} 
+          ${geistMono.variable} 
+          ${robotoCondensed.variable}
+          ${roboto.variable}
+          ${poppins.variable}
+          ${montserrat.variable}
+          antialiased
+        `}
       >
         <PostHogProvider>
           <SessionProvider>{children}</SessionProvider>

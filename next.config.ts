@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       "res.cloudinary.com",
       "images.unsplash.com",
       "avatar.iran.liara.run",
-      "images.pexels.com"
+      "images.pexels.com",
+      "oq7nempxaa.ufs.sh"
     ]
   }
 };

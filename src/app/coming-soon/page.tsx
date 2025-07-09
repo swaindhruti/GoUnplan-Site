@@ -11,6 +11,7 @@ import { WhyUsSection } from "@/components/landing/WhyUs";
 import { HowItWorksSection } from "@/components/landing/HowItWorks";
 import ReviewSection from "@/components/landing/ReviewSection";
 import FAQSection from "@/components/landing/Faqs";
+import { TopHosts } from "@/components/landing/TopHosts";
 
 export default function Home() {
   return (
@@ -19,11 +20,13 @@ export default function Home() {
       <FilterAndTrip />
       <FindMyVibe />
       <TopDestinations />
-      <ReadyToStart />
-      <AboutUs />
+
       <WhyUsSection />
       <HowItWorksSection />
       <ReviewSection />
+      <TopHosts />
+      <AboutUs />
+      <ReadyToStart />
       <FAQSection />
     </>
   );
