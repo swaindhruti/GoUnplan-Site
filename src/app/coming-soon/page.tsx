@@ -5,6 +5,8 @@ import { FilterAndTrip } from "@/components/landing/FilterAndTrip";
 import { FindMyVibe } from "@/components/landing/FindMyVibe";
 import { HeroSection } from "@/components/landing/HeroSectiom";
 import { ReadyToStart } from "@/components/landing/ReadyToStart";
+import { TopDestinations } from "@/components/landing/TopDestinations";
+// import { ReadyToStart } from "@/components/landing/ReadyTostart";
 import { WhyUsSection } from "@/components/landing/WhyUs";
 import { HowItWorksSection } from "@/components/landing/HowItWorks";
 import ReviewSection from "@/components/landing/ReviewSection";
@@ -16,6 +18,7 @@ export default function Home() {
       <HeroSection />
       <FilterAndTrip />
       <FindMyVibe />
+      <TopDestinations />
       <ReadyToStart />
       <AboutUs />
       <WhyUsSection />

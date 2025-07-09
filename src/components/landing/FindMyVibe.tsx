@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
+import { SectionLabel } from "./common";
 
 export const FindMyVibe = () => {
   const vibes = [
@@ -29,11 +30,7 @@ export const FindMyVibe = () => {
           <div className="h-[50vh]">
             <div className="space-y-12">
               <div className="space-y-5">
-                <div className="inline-flex items-center px-8 py-2 bg-purple-100 rounded-full">
-                  <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
-                    Choose Your Vibe!
-                  </span>
-                </div>
+                <SectionLabel label="Choose Your Vibe!" />
 
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
                   Popular

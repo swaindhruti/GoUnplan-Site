@@ -10,8 +10,9 @@ import {
 // import { Button } from "@/components/ui/button";
 // import { Card } from "@/components/ui/card";
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Button } from "../ui/button";
+import { SectionLabel } from "./common";
 
 export default function AboutUs() {
   return (
@@ -21,12 +22,7 @@ export default function AboutUs() {
           <div className="relative"></div>
           <div className="space-y-5">
             <div className="flex items-center gap-2 rounded-full">
-              <Badge
-                variant="outline"
-                className="bg-white text-purple-600 text-[16px] font-semibold tracking-wide uppercase rounded-full  py-2 px-8 "
-              >
-                ABOUT US
-              </Badge>
+              <SectionLabel label="About Us" />
             </div>
 
             <div className="space-y-4">
