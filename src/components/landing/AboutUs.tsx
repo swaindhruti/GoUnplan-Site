@@ -1,9 +1,12 @@
-import { Check } from "lucide-react";
+/* import { Check } from "lucide-react";/*  */
 import { FindPackagesButton, SectionLabel } from "./common";
 
 export default function AboutUs() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-purple-50 to-white min-h-screen flex items-center">
+    <section
+      id="about"
+      className="relative overflow-hidden bg-gradient-to-b from-purple-50 to-white min-h-screen flex items-center"
+    >
       {/* Background Image Overlay */}
       <div className="absolute inset-0 z-0">
         <div
@@ -17,7 +20,7 @@ export default function AboutUs() {
       </div>
 
       {/* Content Wrapper */}
-      <div className="relative z-10 mx-auto max-w-4xl w-full px-6 py-16 flex flex-col items-center justify-center">
+      <div className="relativSe z-10 mx-auto max-w-4xl w-full px-6 py-16 flex flex-col items-center justify-center">
         <SectionLabel label="About Us" />
 
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-extrabold text-white leading-tight text-center mt-6">
@@ -40,7 +43,7 @@ export default function AboutUs() {
             experiences that leave you with stories worth telling.
           </span>
         </p>
-        <div className="flex flex-wrap justify-center gap-3 mt-8">
+        {/*  <div className="flex flex-wrap justify-center gap-3 mt-8">
           {[
             "Budget-Friendly",
             "Luxurious Getaways",
@@ -54,7 +57,7 @@ export default function AboutUs() {
               <span className="text-sm font-medium text-gray-800">{item}</span>
             </div>
           ))}
-        </div>
+        </div> */}
 
         <div className="pt-8">
           <FindPackagesButton label="Find Packages" />

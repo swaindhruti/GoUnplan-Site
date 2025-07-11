@@ -5,7 +5,6 @@ import { Button } from "../ui/button";
 export const ReadyToStart = () => {
   return (
     <div className="relative py-20 sm:py-28 md:py-36">
-      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -13,11 +12,8 @@ export const ReadyToStart = () => {
             "url(https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg)"
         }}
       >
-        {/* Blurred Overlay */}
         <div className="absolute inset-0 backdrop-blur-md bg-black/30" />
       </div>
-
-      {/* Content */}
       <div className="relative z-10 flex items-center justify-center h-full px-4">
         <div className="max-w-3xl w-full bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl p-6 sm:p-10 md:p-12 rounded-xl text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-playfair leading-snug sm:leading-tight mb-6 text-white">

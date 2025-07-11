@@ -170,14 +170,16 @@ export const Carousels = ({
             {data.map((item) => (
               <CarouselItem
                 key={item.id}
-                className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                className={`pl-2 md:pl-4 basis-full sm:basis-1/2 ${
+                  type === "hosts" ? "lg:basis-1/4" : "lg:basis-1/3"
+                }`}
               >
                 <div className="flex flex-col items-center">
                   <Card
                     className={`rounded-[90px] ${
                       type === "destinations"
                         ? "h-[60vh] w-full"
-                        : "h-[40vh] w-[70%]"
+                        : "h-[40vh] w-full"
                     } relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer`}
                   >
                     <Image

@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -28,12 +28,19 @@ export default function TripsPage() {
 
   const searchParams = useSearchParams();
   const vibeParam = searchParams.get("vibe");
+  const travelersParam = searchParams.get("travelers");
+  const checkInParam = searchParams.get("checkIn");
+  const checkOutParam = searchParams.get("checkOut");
+  const daysParam = searchParams.get("days");
 
   useEffect(() => {
-    if (vibeParam) {
-      updateFilter("vibeFilter", [vibeParam]);
-    }
-  }, [vibeParam, updateFilter]);
+    if (vibeParam) updateFilter("vibeFilter", [vibeParam]);
+    if (travelersParam) updateFilter("travelersFilter", [travelersParam]);
+    if (checkInParam) updateFilter("checkInFilter", [checkInParam]);
+    if (checkOutParam) updateFilter("checkOutFilter", [checkOutParam]);
+    if (daysParam) updateFilter("daysFilter", [daysParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vibeParam, travelersParam, checkInParam, checkOutParam, daysParam]);
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -187,14 +194,14 @@ export default function TripsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      {/* Hero section with search */}
+      {/* Hero section with search 
       <HeroSection
         searchTerm={filters.searchTerm}
         onSearchChange={handleSearchChange}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Filter controls section */}
+        {/* Filter controls section 
         <div className="mb-8">
           <FilterControls
             showFilters={showFilters}
@@ -218,13 +225,13 @@ export default function TripsPage() {
           )}
         </div>
 
-        {/* Loading state */}
+        {/* Loading state 
         {isLoading && <LoadingSkeleton />}
 
-        {/* Error state */}
+        {/* Error state 
         {error && <ErrorDisplay error={error} />}
 
-        {/* Results grid */}
+        {/* Results grid 
         {!isLoading && !error && filteredTrips.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredTrips.map((trip) => (
@@ -233,7 +240,7 @@ export default function TripsPage() {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty state 
         {!isLoading && !error && filteredTrips.length === 0 && (
           <EmptyState onClearFilters={clearAllFilters} />
         )}
@@ -241,3 +248,4 @@ export default function TripsPage() {
     </div>
   );
 }
+ */

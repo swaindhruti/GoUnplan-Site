@@ -41,7 +41,6 @@ const testimonials = [
 ];
 
 export default function ReviewSection() {
-  // Memoize testimonials to avoid unnecessary re-renders
   const slides = useMemo(
     () =>
       testimonials.map((testimonial) => (
