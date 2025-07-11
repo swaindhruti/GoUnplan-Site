@@ -2,12 +2,15 @@
 
 import React from "react";
 import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
+/* import { Swiper, SwiperSlide } from "swiper/modules"; */
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { Button } from "../ui/button";
 import { smoothScrollToSection } from "../global/Handlescroll";
-import { ArrowRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import Header from "./Header";
+import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 export const HeroSection = () => {
   const slides = [
@@ -16,7 +19,8 @@ export const HeroSection = () => {
         "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg",
       text: (
         <>
-          your journey’s <span className="highlight-wavy">love language</span>
+          your journey&apos;s{" "}
+          <span className="highlight-wavy">love language</span>
         </>
       )
     },
@@ -53,6 +57,7 @@ export const HeroSection = () => {
 
   return (
     <div className="relative w-full h-screen min-h-[600px]">
+      <Header />
       <Swiper
         modules={[Autoplay]}
         slidesPerView={1}
@@ -77,8 +82,6 @@ export const HeroSection = () => {
               sizes="100vw"
               className="object-cover transition-transform duration-1000 ease-in-out"
             />
-
-            {/* Overlay Text */}
             <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center">
               <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-playfair font-bold leading-tight drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
                 {slide.text}
@@ -88,7 +91,6 @@ export const HeroSection = () => {
         ))}
       </Swiper>
 
-      {/* Explore Button */}
       <div className="absolute bottom-6 sm:bottom-10 w-full z-40 flex justify-center">
         <Button
           onClick={() =>
@@ -99,11 +101,29 @@ export const HeroSection = () => {
               onComplete: () => console.log("Scroll completed")
             })
           }
-          className="bg-purple-600 font-poppins hover:bg-purple-700 text-white px-6 py-4 sm:px-10 sm:py-5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          className="group relative bg-black/50 backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
           size="lg"
         >
-          Explore More
-          <ArrowRight className="ml-2 h-5 w-5" />
+          <span className="relative z-10 flex items-center">
+            Explore More
+            <motion.div
+              className="ml-3 flex flex-col items-center opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+              animate={{
+                y: [0, 4, 0]
+              }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut"
+              }}
+            >
+              <ChevronDown className="h-3 w-3" />
+            </motion.div>
+          </span>
+
+          {/* Elegant hover effect overlay */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/0 via-purple-400/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </Button>
       </div>
     </div>

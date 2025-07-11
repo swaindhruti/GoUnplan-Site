@@ -20,19 +20,35 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { FindPackagesButton } from "./common";
+import { useRouter } from "next/navigation";
 
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [travelers, setTravelers] = useState("1");
+  const [vibe, setVibe] = useState("");
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ destination, checkIn, checkOut, travelers });
+    const params = new URLSearchParams();
+    if (vibe) params.append("vibe", vibe);
+    if (travelers) params.append("travelers", travelers);
+    if (checkIn) params.append("checkIn", checkIn.toISOString());
+    if (checkOut) params.append("checkOut", checkOut.toISOString());
+    if (checkIn && checkOut) {
+      const days = Math.max(
+        1,
+        Math.ceil(
+          (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      );
+      params.append("days", days.toString());
+    }
+    router.push(`/trips?${params.toString()}`);
   };
 
   return (
@@ -165,9 +181,30 @@ export const FilterAndTrip = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-3">
+                  <Label className="text-white font-semibold flex items-center gap-2 drop-shadow-md">
+                    Vibe
+                  </Label>
+                  <Select value={vibe} onValueChange={setVibe}>
+                    <SelectTrigger className="bg-white/40 w-full h-12 border-white/50 text-gray-900 rounded-xl focus:bg-white/60 focus:border-purple-400 transition-all duration-200 font-medium shadow-lg">
+                      <SelectValue placeholder="Select vibe" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
+                      <SelectItem value="Cultural">Cultural</SelectItem>
+                      <SelectItem value="Adventure">Adventure</SelectItem>
+                      <SelectItem value="Relaxation">Relaxation</SelectItem>
+                      <SelectItem value="Nature">Nature</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="flex justify-center pt-4">
-                <FindPackagesButton label="Discover Adventures" />
+                <Button
+                  type="submit"
+                  className="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-purple-700 transition"
+                >
+                  Go To Trips
+                </Button>
               </div>
             </form>
             <div className="text-center mt-8 pt-6 border-t border-white/30">

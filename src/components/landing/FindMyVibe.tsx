@@ -1,32 +1,48 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FindPackagesButton, SectionLabel } from "./common";
 
+const vibeDescriptions: Record<string, string> = {
+  Cultural:
+    "Immerse yourself in local traditions, art, and history for a truly authentic experience.",
+  Adventure: "Thrilling activities and wild landscapes for adrenaline seekers.",
+  Relaxation: "Unwind in serene destinations designed for peace and comfort.",
+  Nature: "Explore breathtaking natural wonders and scenic escapes."
+};
+
 export const FindMyVibe = () => {
+  const router = useRouter();
+
   const vibes = [
     {
       label: "Cultural",
       src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg"
     },
     {
-      label: "Cultural",
+      label: "Adventure",
       src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
     },
     {
-      label: "Cultural",
+      label: "Relaxation",
       src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751847044/joshua-earle--87JyMb9ZfU-unsplash_accpod.jpg"
     },
     {
-      label: "Cultural",
+      label: "Nature",
       src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg"
     }
   ];
 
+  const handleVibeClick = (vibeLabel: string) => {
+    router.push(`/trips?vibe=${encodeURIComponent(vibeLabel)}`);
+  };
+
   return (
-    <div className="min-h-screen bg-purple-500/[0.05]  justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-10">
-      {/* Left Section */}
+    <div
+      id="vibes"
+      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-10"
+    >
       <div className="w-full lg:w-1/4 flex flex-col items-center gap-y-10">
-        {/* Text Section */}
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
@@ -45,27 +61,32 @@ export const FindMyVibe = () => {
             <FindPackagesButton label="Find Packages" />
           </div>
         </div>
-
-        {/* Featured Image */}
-        <div className="w-full h-[300px] sm:h-[350px] md:h-[400px] relative">
+        <div
+          onClick={() => handleVibeClick("Adventure")}
+          className="w-full h-[300px] cursor-pointer sm:h-[350px] md:h-[400px] relative group"
+        >
           <Image
             src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
-            alt="Find My Vibe"
+            alt="Adventure"
             fill
             className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"
           />
-          <div className="text-xl sm:text-2xl md:text-3xl font-playfair font-semibold absolute bottom-4 w-full text-center text-white">
-            Cultural
+          <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-playfair font-semibold text-white mb-2">
+              Adventure
+            </div>
+            <div className="text-base sm:text-lg text-white/90 font-roboto text-center">
+              {vibeDescriptions["Adventure"]}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Right Section: Vibe Grid */}
       <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
         {vibes.map((vibe, index) => (
           <div
             key={index}
-            className="relative h-[250px] sm:h-[300px] md:h-[350px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg"
+            onClick={() => handleVibeClick(vibe.label)}
+            className="relative h-[250px] sm:h-[300px] md:h-[350px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform group"
           >
             <Image
               src={vibe.src}
@@ -73,8 +94,13 @@ export const FindMyVibe = () => {
               fill
               className="object-cover"
             />
-            <div className="text-xl sm:text-2xl md:text-3xl font-playfair font-semibold absolute bottom-4 w-full text-center text-white">
-              {vibe.label}
+            <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-playfair font-semibold text-white mb-2">
+                {vibe.label}
+              </div>
+              <div className="text-base sm:text-lg text-white/90 font-roboto text-center">
+                {vibeDescriptions[vibe.label]}
+              </div>
             </div>
           </div>
         ))}

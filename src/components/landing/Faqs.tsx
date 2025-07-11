@@ -90,7 +90,7 @@ export default function FAQSection() {
                   onClick={() => toggleItem(faq.id)}
                   className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
                 >
-                  <h3 className="text-base font-poppins sm:text-lg lg:text-xl font-semibold text-gray-900 pr-3 sm:pr-4 leading-tight">
+                  <h3 className="text-base font-playfair sm:text-lg lg:text-xl font-semibold text-gray-900 pr-3 sm:pr-4 leading-tight">
                     {faq.question}
                   </h3>
                   <motion.div
