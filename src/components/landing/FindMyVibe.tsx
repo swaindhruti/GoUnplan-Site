@@ -40,9 +40,9 @@ export const FindMyVibe = () => {
   return (
     <div
       id="vibes"
-      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-10"
+      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-16"
     >
-      <div className="w-full lg:w-1/4 flex flex-col items-center gap-y-10">
+      <div className="w-full lg:w-1/4 flex flex-col items-center gap-y-16">
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
@@ -81,7 +81,7 @@ export const FindMyVibe = () => {
           </div>
         </div>
       </div>
-      <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-16">
         {vibes.map((vibe, index) => (
           <div
             key={index}

@@ -14,17 +14,15 @@ import { ArrowRight } from "lucide-react";
 
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
-    <>
-      <div
-        className={`font-montserrat inline-flex items-center px-8 py-2 ${
-          label === "About Us" ? "bg-white" : "bg-purple-100"
-        }  rounded-full`}
-      >
-        <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
-          {label}
-        </span>
-      </div>
-    </>
+    <div
+      className={`font-montserrat inline-flex items-center px-8 py-2 ${
+        label === "About Us" ? "bg-white" : "bg-purple-100"
+      }  rounded-full`}
+    >
+      <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
+        {label}
+      </span>
+    </div>
   );
 };
 
@@ -166,11 +164,11 @@ export const Carousels = ({
           opts={{ align: "start", loop: true }}
           className="w-full pb-20"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-mx-6">
             {data.map((item) => (
               <CarouselItem
                 key={item.id}
-                className={`pl-2 md:pl-4 basis-full sm:basis-1/2 ${
+                className={`px-6 basis-full sm:basis-1/2 ${
                   type === "hosts" ? "lg:basis-1/4" : "lg:basis-1/3"
                 }`}
               >
@@ -203,7 +201,7 @@ export const Carousels = ({
                       type === "destinations"
                         ? "-mt-[100px] size-50"
                         : "-mt-[60px] size-30"
-                    } z-30 rounded-full bg-white p-6 flex flex-col font-roboto items-center justify-center space-y-3 text-center`}
+                    } z-30 rounded-full bg-purple-50 p-6 flex flex-col font-roboto items-center justify-center space-y-3 text-center`}
                   >
                     {type === "destinations" ? (
                       <>
@@ -224,7 +222,7 @@ export const Carousels = ({
                         </p>
                       </>
                     ) : (
-                      <h3 className="text-lg font-normal md:font-medium text-black">
+                      <h3 className="text-lg font-normal text-black">
                         {(item as Host).name}
                       </h3>
                     )}
