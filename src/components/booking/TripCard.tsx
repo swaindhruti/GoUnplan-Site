@@ -23,34 +23,37 @@ export function TripCard({
   cancellationPolicy,
   hostInfo,
 }: TripCardProps) {
-  // Vibrant neo-brutalist color palette
+  // Premium color palette
   const cardColors = useMemo(
     () => ({
-      header: "bg-[#a0c4ff]", // baby blue
-      included: "bg-[#caffbf]", // light green
-      cancellation: "bg-[#fdffb6]", // pale yellow
-      hostInfo: "bg-[#ffd6ff]", // pink lavender
-      maxPeople: "bg-[#e0c6ff]", // soft lavender
-      checkmark: "bg-[#8b5cf6]", // purple
-      border: "border-black border-3",
-      shadow: "shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]",
-      innerShadow: "shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+      header: "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50",
+      included:
+        "bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50",
+      cancellation:
+        "bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50",
+      hostInfo:
+        "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50",
+      maxPeople: "bg-gradient-to-r from-purple-400 to-pink-400",
+      checkmark: "bg-gradient-to-r from-purple-600 to-pink-600",
+      border: "border border-white/60",
+      shadow: "shadow-xl hover:shadow-2xl",
+      innerShadow: "shadow-lg",
     }),
     []
   );
 
   return (
     <div
-      className={`${cardColors.border} rounded-xl overflow-hidden ${cardColors.shadow} bg-white max-w-md w-full mx-auto`}
+      className={`${cardColors.border} rounded-3xl overflow-hidden ${cardColors.shadow} bg-white/90 backdrop-blur-xl max-w-md w-full mx-auto transition-all duration-300 hover:scale-105`}
     >
       {/* Image with decorative elements */}
-      <div className="relative h-56 w-full border-b-3 border-black overflow-hidden">
+      <div className="relative h-56 w-full overflow-hidden">
         <div
-          className={`absolute top-0 right-0 ${cardColors.maxPeople} border-l-3 border-b-3 border-black z-10 p-3 font-black text-black`}
+          className={`absolute top-4 right-4 ${cardColors.maxPeople} backdrop-blur-xl border border-white/60 z-10 p-3 font-bold text-white rounded-xl shadow-lg`}
         >
           <div className="flex items-center gap-2">
-            <Users className="h-6 w-6" strokeWidth={2.5} />
-            <span className="text-lg">Max {maxPeople}</span>
+            <Users className="h-5 w-5" strokeWidth={2.5} />
+            <span className="text-sm">Max {maxPeople}</span>
           </div>
         </div>
 
@@ -60,40 +63,43 @@ export function TripCard({
           fill
           className="object-cover"
         />
+
+        {/* Premium overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
       </div>
 
       {/* Card Header */}
       <div
-        className={`p-5 border-b-3 border-black ${cardColors.header} text-black`}
+        className={`p-6 border-b border-white/30 ${cardColors.header} text-gray-800`}
       >
-        <h3 className="text-2xl font-black uppercase tracking-tight">
+        <h3 className="text-2xl font-playfair font-bold tracking-tight">
           {title}
         </h3>
       </div>
 
       {/* Card Content */}
-      <div className="p-5 space-y-6">
+      <div className="p-6 space-y-6">
         {/* What's Included Section */}
         <div
-          className={`${cardColors.included} ${cardColors.border} rounded-lg p-4 ${cardColors.innerShadow}`}
+          className={`${cardColors.included} ${cardColors.border} rounded-2xl p-5 ${cardColors.innerShadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
         >
-          <h4 className="font-black uppercase mb-3 text-xl">
+          <h4 className="font-bold mb-4 text-xl text-gray-800">
             What&apos;s included
           </h4>
-          <ul className="font-bold space-y-3 text-lg">
+          <ul className="font-medium space-y-3 text-base">
             {whatsIncluded.slice(0, 4).map((item, index) => (
               <li key={index} className="flex items-start gap-3">
                 <span
-                  className={`${cardColors.checkmark} h-6 w-6 flex items-center justify-center border-2 border-black rounded-full flex-shrink-0 mt-0.5 text-white`}
+                  className={`${cardColors.checkmark} h-6 w-6 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5 text-white shadow-lg`}
                 >
                   <Check className="h-4 w-4" strokeWidth={3} />
                 </span>
-                <span>{item}</span>
+                <span className="text-gray-700">{item}</span>
               </li>
             ))}
             {whatsIncluded.length > 4 && (
-              <li className="mt-2">
-                <span className="bg-white px-3 py-1.5 border-2 border-black rounded-md inline-block font-black text-base">
+              <li className="mt-3">
+                <span className="backdrop-blur-xl bg-white/80 px-4 py-2 border border-white/60 rounded-xl inline-block font-semibold text-sm text-gray-700 shadow-lg">
                   +{whatsIncluded.length - 4} more included
                 </span>
               </li>
@@ -103,35 +109,35 @@ export function TripCard({
 
         {/* Cancellation Policy */}
         <div
-          className={`${cardColors.cancellation} ${cardColors.border} rounded-lg p-4 ${cardColors.innerShadow}`}
+          className={`${cardColors.cancellation} ${cardColors.border} rounded-2xl p-5 ${cardColors.innerShadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
         >
-          <h4 className="font-black uppercase mb-3 flex items-center gap-3 text-xl">
-            <div className="bg-white p-2 rounded-md border-2 border-black">
-              <Shield className="h-5 w-5 text-black" strokeWidth={2.5} />
+          <h4 className="font-bold mb-4 flex items-center gap-3 text-xl text-gray-800">
+            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-xl shadow-lg">
+              <Shield className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
             Cancellation Policy
           </h4>
-          <p className="font-bold text-base bg-white p-3 border-2 border-black rounded-md">
+          <p className="font-medium text-sm backdrop-blur-xl bg-white/80 p-4 border border-white/60 rounded-xl text-gray-700 shadow-lg">
             {cancellationPolicy}
           </p>
         </div>
 
         {/* Host Info */}
         <div
-          className={`${cardColors.hostInfo} ${cardColors.border} rounded-lg p-4 ${cardColors.innerShadow}`}
+          className={`${cardColors.hostInfo} ${cardColors.border} rounded-2xl p-5 ${cardColors.innerShadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
         >
-          <h4 className="font-black uppercase mb-3 flex items-center gap-3 text-xl">
-            <div className="bg-white p-2 rounded-md border-2 border-black">
-              <User className="h-5 w-5 text-black" strokeWidth={2.5} />
+          <h4 className="font-bold mb-4 flex items-center gap-3 text-xl text-gray-800">
+            <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-2 rounded-xl shadow-lg">
+              <User className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
             Your Host
           </h4>
-          <div className="space-y-3 font-bold">
-            <p className="text-xl font-black">{hostInfo.name}</p>
-            <p className="text-base bg-white inline-block px-3 py-1.5 border-2 border-black rounded-md">
+          <div className="space-y-3 font-medium">
+            <p className="text-xl font-bold text-gray-800">{hostInfo.name}</p>
+            <p className="text-sm backdrop-blur-xl bg-white/80 inline-block px-4 py-2 border border-white/60 rounded-xl text-gray-700 shadow-lg">
               {hostInfo.experience}
             </p>
-            <p className="text-base mt-3 bg-white p-4 border-2 border-black rounded-md">
+            <p className="text-sm mt-3 backdrop-blur-xl bg-white/80 p-4 border border-white/60 rounded-xl text-gray-700 shadow-lg">
               {hostInfo.description ||
                 "Experienced guide ready to show you the best spots and hidden gems!"}
             </p>

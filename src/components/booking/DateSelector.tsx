@@ -101,23 +101,26 @@ export function DateSelector({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Trip Duration Card */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#a0c4ff] p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <Clock className="w-6 h-6 text-black" strokeWidth={2.5} />
+      <div className="backdrop-blur-xl bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
+            <Clock className="w-7 h-7 text-white" strokeWidth={2.5} />
           </div>
-          <h3 className="text-xl font-black uppercase">
+          <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Trip Duration: {tripDuration} days
           </h3>
         </div>
 
         {date && (
-          <div className="mt-3 bg-white border-2 border-black rounded-lg p-3 font-bold text-lg">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5" strokeWidth={2.5} />
-              <span>
+          <div className="mt-4 backdrop-blur-xl bg-white/80 border border-white/60 rounded-xl p-4 font-semibold text-lg shadow-lg">
+            <div className="flex items-center gap-3">
+              <CalendarIcon
+                className="w-6 h-6 text-purple-600"
+                strokeWidth={2.5}
+              />
+              <span className="text-gray-800">
                 Selected: {format(date, "MMM dd, yyyy")} -{" "}
                 {format(addDays(date, tripDuration - 1), "MMM dd, yyyy")}
               </span>
@@ -128,12 +131,12 @@ export function DateSelector({
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="border-3 border-black rounded-xl p-5 bg-[#ffadad] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center gap-3 mb-3">
-            <AlertCircle className="h-6 w-6 text-black" strokeWidth={2.5} />
-            <h3 className="font-black uppercase text-xl">Error</h3>
+        <div className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 rounded-2xl p-6 shadow-xl animate-fade-in">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertCircle className="h-7 w-7 text-red-600" strokeWidth={2.5} />
+            <h3 className="font-bold text-xl text-red-700">Validation Error</h3>
           </div>
-          <ul className="list-disc list-inside space-y-2 font-bold text-base">
+          <ul className="list-disc list-inside space-y-2 font-medium text-base text-red-700">
             {validationErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
@@ -142,11 +145,11 @@ export function DateSelector({
       )}
 
       {/* Calendar Section */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-5">
-        <label className="block text-xl font-black uppercase mb-4">
+      <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-3xl shadow-2xl p-6">
+        <label className="block text-2xl font-playfair font-bold text-gray-800 mb-6">
           Select Start Date
         </label>
-        <div className="bg-[#e0c6ff] border-3 border-black rounded-lg p-4">
+        <div className="backdrop-blur-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-2xl p-6 shadow-lg">
           <Calendar
             mode="single"
             selected={date}
@@ -154,85 +157,110 @@ export function DateSelector({
             disabled={isDateDisabled}
             className="w-full"
             classNames={{
-              day_selected: "bg-[#222] text-white font-black rounded-md w-full",
-              day_today: "bg-[#444] text-white font-black rounded-md w-full",
-              day_disabled: "text-gray-300 opacity-50 w-full",
-              day: "bg-white text-black font-black rounded-md w-full transition-colors duration-100 hover:bg-[#caffbf] hover:text-black",
-              head_cell: "font-black uppercase text-sm",
-              cell: "text-center font-bold p-0 w-full",
+              day_selected:
+                "bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl w-full shadow-lg",
+              day_today:
+                "bg-gradient-to-r from-purple-400 to-pink-400 text-white font-bold rounded-xl w-full shadow-lg",
+              day_disabled:
+                "text-gray-400 opacity-50 w-full cursor-not-allowed",
+              day: "bg-white/80 backdrop-blur-xl text-gray-800 font-medium rounded-xl w-full transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 hover:shadow-lg hover:scale-105",
+              head_cell: "font-bold uppercase text-sm text-gray-700",
+              cell: "text-center font-medium p-0 w-full",
               button:
-                "w-10 h-10 p-0 font-bold hover:bg-[#caffbf] hover:text-black w-full transition-colors duration-100",
-              nav_button: "bg-white hover:bg-[#fdffb6]",
+                "w-12 h-12 p-0 font-medium hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 w-full transition-all duration-300 rounded-xl",
+              nav_button:
+                "bg-white/80 backdrop-blur-xl hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 border border-white/60 rounded-xl shadow-lg",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
-              caption: "font-black text-black text-lg",
+              caption: "font-bold text-gray-800 text-lg",
             }}
           />
         </div>
       </div>
 
       {/* Availability Filters */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#fdffb6] p-5">
-        <h3 className="text-xl font-black uppercase mb-4">Available Dates</h3>
-        <div className="flex flex-wrap gap-3">
+      <div className="backdrop-blur-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
+          Available Dates
+        </h3>
+        <div className="flex flex-wrap gap-4">
           {availabilityOptions.map((option) => (
             <Button
               key={option.value}
               onClick={() => setAvailabilityFilter(option.value)}
-              className={`border-2 border-black hover:bg-white font-black uppercase text-base py-2.5 px-4
-                ${
-                  availabilityFilter === option.value
-                    ? "bg-black text-white shadow-none hover:bg-black"
-                    : "bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
-                }`}
+              className={`font-semibold text-base py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                availabilityFilter === option.value
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30"
+                  : "bg-white/80 backdrop-blur-xl border border-white/60 text-gray-700 hover:bg-white hover:shadow-2xl hover:shadow-purple-500/20"
+              }`}
             >
               {option.label}
             </Button>
           ))}
         </div>
-        <p className="text-base font-bold mt-3 bg-white border-2 border-black rounded-md p-3">
+        <p className="text-base font-medium mt-4 backdrop-blur-xl bg-white/80 border border-white/60 rounded-xl p-4 text-gray-700">
           Filter available dates based on your preference
         </p>
       </div>
 
       {/* Quick Date Selection */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#caffbf] p-5">
-        <h3 className="text-xl font-black uppercase mb-4">Quick Selection</h3>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="backdrop-blur-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
+          Quick Selection
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 7))}
-            className="border-2 border-black bg-white text-black font-bold justify-start text-base
-                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
+            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
+                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
+                     transition-all duration-300 py-4 rounded-xl"
           >
             Next Week
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 14))}
-            className="border-2 border-black bg-white text-black font-bold justify-start text-base
-                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
+            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
+                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
+                     transition-all duration-300 py-4 rounded-xl"
           >
             In 2 Weeks
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 30))}
-            className="border-2 border-black bg-white text-black font-bold justify-start text-base
-                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
+            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
+                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
+                     transition-all duration-300 py-4 rounded-xl"
           >
             Next Month
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 60))}
-            className="border-2 border-black bg-white text-black font-bold justify-start text-base
-                     shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] 
-                     hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-white py-3"
+            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
+                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
+                     transition-all duration-300 py-4 rounded-xl"
           >
             In 2 Months
           </Button>
         </div>
       </div>
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

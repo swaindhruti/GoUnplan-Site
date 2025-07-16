@@ -13,60 +13,58 @@ export const FilterControls = ({
   setShowFilters,
   activeFiltersCount,
   filteredTripsCount,
-  clearAllFilters
+  clearAllFilters,
 }: FilterControlsProps) => {
   return (
-    <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-wrap justify-between items-center gap-6">
+      <div className="flex items-center gap-4">
         <button
           className={`
-            relative px-4 py-3 font-extrabold text-sm uppercase tracking-wider
-            border-3 border-black rounded-lg
-            flex items-center gap-2
-            transition-all duration-150
+            relative px-6 py-4 font-semibold text-sm tracking-wide
+            rounded-2xl flex items-center gap-3 transition-all duration-300
             ${
               showFilters
-                ? "bg-[#bfcab3] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1"
-                : "bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1"
+                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105"
+                : "bg-white/80 backdrop-blur-sm border border-white/40 text-gray-700 hover:bg-white hover:shadow-lg hover:scale-105"
             }
           `}
           onClick={() => setShowFilters(!showFilters)}
         >
-          <Filter className="h-5 w-5" strokeWidth={2.5} />
+          <Filter className="h-5 w-5" />
           <span>Filters</span>
           {activeFiltersCount > 0 && (
-            <div className="bg-pink-500 border-2 border-black text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">
+            <div className="bg-white/90 text-purple-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
               {activeFiltersCount}
             </div>
           )}
           {showFilters ? (
-            <ChevronUp className="h-5 w-5" strokeWidth={2.5} />
+            <ChevronUp className="h-5 w-5 transition-transform duration-300" />
           ) : (
-            <ChevronDown className="h-5 w-5" strokeWidth={2.5} />
+            <ChevronDown className="h-5 w-5 transition-transform duration-300" />
           )}
         </button>
 
         {activeFiltersCount > 0 && (
           <button
             className="
-              px-4 py-3 font-bold text-sm uppercase
-              border-3 border-black rounded-lg
-              bg-red-400 text-black
-              hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1
-              transition-all duration-150
-              flex items-center gap-2
+              px-6 py-4 font-semibold text-sm tracking-wide
+              rounded-2xl bg-red-500/90 backdrop-blur-sm border border-red-400/50 text-white
+              hover:bg-red-500 hover:shadow-lg hover:scale-105
+              transition-all duration-300 flex items-center gap-3
             "
             onClick={clearAllFilters}
           >
-            <X className="h-5 w-5" strokeWidth={2.5} />
+            <X className="h-5 w-5" />
             Clear all
           </button>
         )}
       </div>
 
-      <div className="bg-[#e5e7eb] border-3 border-black px-5 py-3 rounded-lg font-bold text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-        <span className="text-lg font-black mr-1">{filteredTripsCount}</span>
-        <span className="uppercase tracking-wider">
+      <div className="bg-white/80 backdrop-blur-sm border border-white/40 px-6 py-4 rounded-2xl font-semibold text-gray-700 shadow-lg">
+        <span className="text-2xl font-bold text-purple-600 mr-2">
+          {filteredTripsCount}
+        </span>
+        <span className="tracking-wide">
           {filteredTripsCount === 1 ? "trip" : "trips"} found
         </span>
       </div>

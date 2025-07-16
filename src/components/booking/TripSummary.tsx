@@ -14,63 +14,64 @@ export function TripSummary({
   duration,
   location,
 }: TripSummaryProps) {
-  // Consistent color palette
+  // Premium color palette
   const summaryColors = useMemo(
     () => ({
-      dates: "bg-[#fdffb6]", // pale yellow
-      duration: "bg-[#caffbf]", // light green
-      location: "bg-[#e0c6ff]", // soft lavender
-      shadow: "shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
-      border: "border-black border-2",
+      dates:
+        "bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50",
+      duration:
+        "bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50",
+      location:
+        "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50",
+      shadow: "shadow-xl hover:shadow-2xl",
+      border: "border border-white/60",
     }),
     []
   );
 
   return (
-    <div className="font-bold">
-      <div className="space-y-4">
-        <div
-          className={`flex items-center gap-4 ${summaryColors.border} rounded-lg p-4 ${summaryColors.dates} ${summaryColors.shadow}`}
-        >
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <Calendar className="w-6 h-6 text-black" strokeWidth={2.5} />
+    <div className="font-semibold space-y-4">
+      <div
+        className={`flex items-center gap-4 ${summaryColors.border} rounded-xl p-4 ${summaryColors.dates} ${summaryColors.shadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
+      >
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl shadow-lg flex-shrink-0">
+          <Calendar className="w-6 h-6 text-white" strokeWidth={2.5} />
+        </div>
+        <div>
+          <div className="text-sm uppercase font-bold tracking-wide mb-1 text-gray-700">
+            Dates
           </div>
-          <div>
-            <div className="text-sm uppercase font-black tracking-wide mb-1">
-              Dates
-            </div>
-            <div className="text-lg font-bold">
-              {startDate} - {endDate}
-            </div>
+          <div className="text-lg font-semibold text-gray-800">
+            {startDate} - {endDate}
           </div>
         </div>
+      </div>
 
-        <div
-          className={`flex items-center gap-4 ${summaryColors.border} rounded-lg p-4 ${summaryColors.duration} ${summaryColors.shadow}`}
-        >
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <Clock className="w-6 h-6 text-black" strokeWidth={2.5} />
-          </div>
-          <div>
-            <div className="text-sm uppercase font-black tracking-wide mb-1">
-              Duration
-            </div>
-            <div className="text-lg font-bold">{duration}</div>
-          </div>
+      <div
+        className={`flex items-center gap-4 ${summaryColors.border} rounded-xl p-4 ${summaryColors.duration} ${summaryColors.shadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
+      >
+        <div className="bg-gradient-to-r from-green-400 to-emerald-400 p-3 rounded-xl shadow-lg flex-shrink-0">
+          <Clock className="w-6 h-6 text-white" strokeWidth={2.5} />
         </div>
+        <div>
+          <div className="text-sm uppercase font-bold tracking-wide mb-1 text-gray-700">
+            Duration
+          </div>
+          <div className="text-lg font-semibold text-gray-800">{duration}</div>
+        </div>
+      </div>
 
-        <div
-          className={`flex items-center gap-4 ${summaryColors.border} rounded-lg p-4 ${summaryColors.location} ${summaryColors.shadow}`}
-        >
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <MapPin className="w-6 h-6 text-black" strokeWidth={2.5} />
+      <div
+        className={`flex items-center gap-4 ${summaryColors.border} rounded-xl p-4 ${summaryColors.location} ${summaryColors.shadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
+      >
+        <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg flex-shrink-0">
+          <MapPin className="w-6 h-6 text-white" strokeWidth={2.5} />
+        </div>
+        <div>
+          <div className="text-sm uppercase font-bold tracking-wide mb-1 text-gray-700">
+            Location
           </div>
-          <div>
-            <div className="text-sm uppercase font-black tracking-wide mb-1">
-              Location
-            </div>
-            <div className="text-lg font-bold">{location}</div>
-          </div>
+          <div className="text-lg font-semibold text-gray-800">{location}</div>
         </div>
       </div>
     </div>

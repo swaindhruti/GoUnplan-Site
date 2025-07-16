@@ -1,167 +1,153 @@
 import Link from "next/link";
-import { Map, Compass, Calendar, DollarSign, Languages } from "lucide-react";
+import { Compass, Calendar, Languages, ArrowRight } from "lucide-react";
 import { Trip } from "@/types/trips";
+import Image from "next/image";
 
 interface TripCardProps {
   trip: Trip;
+  onClick?: () => void;
+  isSelected?: boolean;
 }
 
-export const TripCard = ({ trip }: TripCardProps) => {
-  // Enhanced with vibrant multi-color variations
-  const bgColors = [
-    "bg-[#e0c6ff]", // soft lavender
-    "bg-[#ffd6ff]", // pink lavender
-    "bg-[#9bf6ff]", // cyan blue
-    "bg-[#ffadad]", // light coral
-    "bg-[#caffbf]", // light green
-    "bg-[#fdffb6]", // pale yellow
-    "bg-[#ffc6ff]", // pale magenta
-    "bg-[#a0c4ff]", // baby blue
-    "bg-[#bdb2ff]", // periwinkle
-    "bg-[#fffffc]", // ivory
-  ];
-  const randomBgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
-
-  // Icon container colors
-  const iconColors = [
-    { bg: "bg-[#ffc8dd]", text: "text-black" }, // pink
-    { bg: "bg-[#caffbf]", text: "text-black" }, // green
-    { bg: "bg-[#a0c4ff]", text: "text-black" }, // blue
-    { bg: "bg-[#fdffb6]", text: "text-black" }, // yellow/orange
-    { bg: "bg-[#e0c6ff]", text: "text-black" }, // purple
-  ];
-
-  const compassColor = iconColors[0];
-  const calendarColor = iconColors[1];
-  const dollarColor = iconColors[2];
-
+export const TripCard = ({
+  trip,
+  onClick,
+  isSelected = false,
+}: TripCardProps) => {
   return (
     <div
-      className={`
-        border-3 border-black rounded-xl overflow-hidden
-        bg-white shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]
-        hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] 
-        transition-all duration-200
-        hover:translate-y-1 hover:translate-x-1
-        transform flex flex-col h-full
-      `}
+      className={`group relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl border border-white/60 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 cursor-pointer ${
+        isSelected ? "ring-4 ring-purple-400 ring-opacity-50 scale-105" : ""
+      }`}
+      onClick={onClick}
     >
-      {/* Card Header with Map Icon */}
-      <div
-        className={`${randomBgColor} border-b-3 border-black h-48 flex items-center justify-center relative overflow-hidden`}
-      >
-        <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
-        <div className="bg-white border-3 border-black rounded-xl p-3 rotate-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-          <Map className="h-16 w-16 text-black" strokeWidth={2} />
-        </div>
-      </div>
+      {/* Card Header with Background Image */}
+      <div className="relative h-64 overflow-hidden">
+        <Image
+          src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+          alt={trip.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-      {/* Card Title */}
-      <div className="p-5 border-b-3 border-black bg-white">
-        <h3 className="text-3xl font-black text-black uppercase tracking-tight leading-tight">
-          {trip.title}
-        </h3>
+        {/* Premium overlay effect */}
+        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* Card Content */}
-      <div className="p-5 space-y-4 flex-grow">
-        <p className="text-black text-lg font-bold line-clamp-2 border-b-2 border-dashed border-black pb-3">
-          {trip.description}
-        </p>
-
-        <div className="space-y-3">
-          <div className="flex items-center text-lg font-bold text-black">
-            <div
-              className={`${compassColor.bg} p-2 rounded-md border-2 border-black mr-3`}
-            >
-              <Compass
-                className={`h-6 w-6 ${compassColor.text}`}
-                strokeWidth={2.5}
-              />
-            </div>
-            {trip.city}, {trip.state}, {trip.country}
-          </div>
-
-          <div className="flex items-center text-lg font-bold text-black">
-            <div
-              className={`${calendarColor.bg} p-2 rounded-md border-2 border-black mr-3`}
-            >
-              <Calendar
-                className={`h-6 w-6 ${calendarColor.text}`}
-                strokeWidth={2.5}
-              />
-            </div>
-            {trip.noOfDays} {trip.noOfDays === 1 ? "Day" : "Days"}
-          </div>
-
-          <div className="flex items-center text-lg font-bold text-black">
-            <div
-              className={`${dollarColor.bg} p-2 rounded-md border-2 border-black mr-3`}
-            >
-              <DollarSign
-                className={`h-6 w-6 ${dollarColor.text}`}
-                strokeWidth={2.5}
-              />
-            </div>
-            <span className="text-2xl font-black text-black">
+      <div className="p-6 space-y-4">
+        {/* Title and Price */}
+        <div className="flex justify-between items-start">
+          <h3 className="text-2xl font-playfair font-bold text-gray-800 leading-tight group-hover:text-purple-600 transition-colors duration-300 flex-1 pr-4">
+            {trip.title}
+          </h3>
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl px-4 py-2 shadow-xl shadow-purple-500/25 flex-shrink-0">
+            <span className="text-white font-bold text-lg">
               ${trip.price.toLocaleString()}
             </span>
           </div>
         </div>
 
+        {/* Description */}
+        <p className="text-gray-600 leading-relaxed line-clamp-2">
+          {trip.description}
+        </p>
+
+        {/* Trip Details */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-2 rounded-xl shadow-sm">
+              <Calendar className="w-5 h-5 text-purple-600" />
+            </div>
+            <span className="text-gray-700 font-medium">
+              {trip.noOfDays} {trip.noOfDays === 1 ? "Day" : "Days"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-pink-100 to-pink-200 p-2 rounded-xl shadow-sm">
+              <Compass className="w-5 h-5 text-pink-600" />
+            </div>
+            <span className="text-gray-700 font-medium">
+              {trip.city}, {trip.state}, {trip.country}
+            </span>
+          </div>
+        </div>
+
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 pt-3">
+        <div className="flex flex-wrap gap-2 pt-2">
           {trip.languages.length > 0 && (
-            <div className="flex items-center bg-[#a0c4ff] px-3 py-2 border-2 border-black rounded text-base font-black uppercase text-black">
-              <Languages
-                className="h-5 w-5 mr-1.5 text-black"
-                strokeWidth={2.5}
-              />
-              {trip.languages.join(", ")}
+            <div className="flex items-center bg-gradient-to-r from-blue-100 to-blue-200 px-3 py-1.5 rounded-full shadow-sm">
+              <Languages className="w-4 h-4 mr-1.5 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">
+                {trip.languages.join(", ")}
+              </span>
             </div>
           )}
 
-          {trip.vibes.map((vibe, index) => {
-            // Rotate through different tag colors
+          {trip.vibes.slice(0, 2).map((vibe, index) => {
             const tagColors = [
-              "bg-[#caffbf]",
-              "bg-[#ffadad]",
-              "bg-[#fdffb6]",
-              "bg-[#ffc6ff]",
-              "bg-[#bdb2ff]",
+              "bg-gradient-to-r from-green-100 to-green-200 text-green-700",
+              "bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700",
+              "bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700",
+              "bg-gradient-to-r from-pink-100 to-pink-200 text-pink-700",
+              "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-700",
             ];
             const tagColor = tagColors[index % tagColors.length];
 
             return (
               <span
                 key={vibe}
-                className={`${tagColor} text-black px-3 py-2 border-2 border-black rounded text-base font-black uppercase`}
+                className={`${tagColor} px-3 py-1.5 rounded-full text-sm font-medium shadow-sm`}
               >
                 {vibe}
               </span>
             );
           })}
+
+          {trip.vibes.length > 2 && (
+            <span className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+              +{trip.vibes.length - 2} more
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Card Footer - Always at bottom */}
-      <div className="p-5 mt-auto">
+      {/* Card Footer */}
+      <div className="p-6 pt-0">
         <Link href={`/trips/${trip.travelPlanId}`} className="block">
-          <button
-            className="
-              w-full bg-black text-white font-black uppercase tracking-wider
-              border-3 border-black rounded-lg py-4 px-4
-              shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-              hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)]
-              hover:translate-x-[2px] hover:translate-y-[2px]
-              transition-all duration-200
-              text-xl
-            "
-          >
-            View Details
+          <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 flex items-center justify-center gap-2 group/btn">
+            <span>View Details</span>
+            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
           </button>
         </Link>
       </div>
+
+      {/* Premium Hover Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
+
+      {/* Premium border glow effect */}
+      <div className="absolute inset-0 rounded-3xl border border-transparent group-hover:border-purple-300/30 transition-all duration-500 pointer-events-none" />
     </div>
   );
 };

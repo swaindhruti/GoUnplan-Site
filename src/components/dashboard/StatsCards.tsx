@@ -8,98 +8,72 @@ interface StatsCardsProps {
 
 export function StatsCards({ profile, bookings }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
       {/* Total Bookings Card */}
-      <div className="bg-white border-3 border-black rounded-xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <div className="bg-yellow-300 border-b-3 border-black px-5 py-3 flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-black uppercase tracking-wide">
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Total Bookings
           </h3>
-          <div className="w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <ShoppingBag className="h-5 w-5 text-black" />
+          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+            <ShoppingBag className="h-6 w-6 text-blue-600" />
           </div>
         </div>
-
-        <div className="p-5">
-          <div className="text-3xl font-black text-black mb-1">
-            {profile?.bookingCounts.total || 0}
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-700 font-bold">All time bookings</p>
-            {/* Decorative element */}
-            <div className="w-3 h-3 bg-purple-400 border-2 border-black rounded-full"></div>
-          </div>
+        <div className="text-3xl font-bold text-gray-900 mb-2">
+          {profile?.bookingCounts.total || 0}
         </div>
+        <p className="text-gray-600 font-medium">All time bookings</p>
       </div>
 
       {/* Upcoming Trips Card */}
-      <div className="bg-white border-3 border-black rounded-xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <div className="bg-green-500 border-b-3 border-black px-5 py-3 flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-black uppercase tracking-wide">
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Upcoming Trips
           </h3>
-          <div className="w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <Calendar className="h-5 w-5 text-black" />
+          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+            <Calendar className="h-6 w-6 text-green-600" />
           </div>
         </div>
-
-        <div className="p-5">
-          <div className="text-3xl font-black text-black mb-1">
-            {profile?.bookingCounts.confirmed || 0}
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-700 font-bold">
-              Confirmed bookings
-            </p>
-          </div>
+        <div className="text-3xl font-bold text-gray-900 mb-2">
+          {profile?.bookingCounts.confirmed || 0}
         </div>
+        <p className="text-gray-600 font-medium">Confirmed bookings</p>
       </div>
 
       {/* Completed Trips Card */}
-      <div className="bg-white border-3 border-black rounded-xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <div className="bg-blue-400 border-b-3 border-black px-5 py-3 flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-black uppercase tracking-wide">
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Completed Trips
           </h3>
-          <div className="w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <Clock className="h-5 w-5 text-black" />
+          <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+            <Clock className="h-6 w-6 text-purple-600" />
           </div>
         </div>
-
-        <div className="p-5">
-          <div className="text-3xl font-black text-black mb-1">
-            {profile?.bookingCounts.completed || 0}
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-700 font-bold">Travel memories</p>
-            {/* Decorative element */}
-            <div className="w-3 h-3 bg-pink-500 border-2 border-black rounded-full"></div>
-          </div>
+        <div className="text-3xl font-bold text-gray-900 mb-2">
+          {profile?.bookingCounts.completed || 0}
         </div>
+        <p className="text-gray-600 font-medium">Travel memories</p>
       </div>
 
       {/* Spent on Travel Card */}
-      <div className="bg-white border-3 border-black rounded-xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <div className="bg-pink-500 border-b-3 border-black px-5 py-3 flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-black uppercase tracking-wide">
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Spent on Travel
           </h3>
-          <div className="w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <DollarSign className="h-5 w-5 text-black" />
+          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+            <DollarSign className="h-6 w-6 text-emerald-600" />
           </div>
         </div>
-
-        <div className="p-5">
-          <div className="text-3xl font-black text-black mb-1">
-            $
-            {bookings
-              .reduce((sum, booking) => sum + booking.totalPrice, 0)
-              .toLocaleString()}
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-700 font-bold">Total expenses</p>
-          </div>
+        <div className="text-3xl font-bold text-gray-900 mb-2">
+          $
+          {bookings
+            .reduce((sum, booking) => sum + booking.totalPrice, 0)
+            .toLocaleString()}
         </div>
+        <p className="text-gray-600 font-medium">Total expenses</p>
       </div>
     </div>
   );

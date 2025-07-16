@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { User, Crown, TrendingUp } from "lucide-react";
 import { HostData } from "../types";
 
 type HeaderProps = {
@@ -7,36 +7,67 @@ type HeaderProps = {
 
 export const Header = ({ hostData }: HeaderProps) => {
   return (
-    <div className="bg-purple-600 border-black relative overflow-hidden">
-      {/* Yellow accent shape */}
-      <div className="absolute -left-8 -top-8 w-32 h-32 bg-yellow-300 rounded-3xl  z-0"></div>
+    <div className="relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-16 overflow-hidden">
+      {/* Premium background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/20" />
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.15),transparent_50%)]" />
+      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.15),transparent_50%)]" />
 
-      <div className="max-w-7xl mx-auto flex justify-between px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="py-2 relative">
-          <h1 className="text-4xl md:text-5xl font-black text-white  uppercase">
-            Host Dashboard
-          </h1>
-          <p className="mt-2 text-white font-bold">
-            Manage your trips, bookings, and profile
-          </p>
-        </div>
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+            backgroundSize: "20px 20px",
+          }}
+        />
+      </div>
 
-        <div className="flex items-center gap-3">
-          <div className="h-16 w-16 bg-green-500 border-3 border-black rounded-lg  flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <User size={30} className="text-black" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse" />
+              <span className="text-purple-300 text-sm font-medium tracking-wide uppercase">
+                Host Dashboard
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+              Welcome back,
+              <span className="block bg-gradient-to-r from-purple-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                {hostData.name}
+              </span>
+            </h1>
+            <p className="text-xl text-slate-300 font-medium max-w-2xl leading-relaxed">
+              Manage your travel experiences, track performance, and grow your
+              hosting business with precision and style.
+            </p>
           </div>
-          <div className="bg-yellow-300 border-3 border-black rounded-md px-4 py-2  shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <span className="text-xl font-black text-black">
-              {hostData.name}
-            </span>
+
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-1 rounded-2xl">
+                <div className="bg-slate-800 p-4 rounded-xl">
+                  <User size={32} className="text-purple-300" />
+                </div>
+              </div>
+              <div className="absolute -top-2 -right-2 bg-emerald-500 rounded-full p-1">
+                <Crown size={12} className="text-white" />
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-5 h-5 text-emerald-400" />
+                <span className="text-2xl font-bold text-white">
+                  {hostData.name}
+                </span>
+              </div>
+              <p className="text-slate-300 text-sm font-medium">Premium Host</p>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Decorative elements */}
-      <div className="absolute top-1/3 right-2/4 h-10 w-10 bg-orange-500 rounded-full border-3 border-black"></div>
-      <div className="absolute bottom-3 left-1/3 h-6 w-6 bg-blue-400 rounded-lg border-2 border-black"></div>
-      <div className="absolute top-1/2 right-10 h-8 w-8 bg-green-400 border-2 border-black rounded-full"></div>
     </div>
   );
 };

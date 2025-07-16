@@ -28,41 +28,41 @@ export function ReviewsTab({
   handleSubmitReview,
 }: ReviewsTabProps) {
   return (
-    <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
-      <div className="border-b-4 border-black bg-pink-500 px-6 py-4">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-slate-50 p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-black text-black uppercase">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
               Trip Reviews
             </h3>
-            <p className="text-sm font-bold text-black">
+            <p className="text-gray-600 font-medium">
               Share your experiences and see your past reviews
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-8">
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="mb-6 bg-yellow-300 p-1 border-3 border-black rounded-lg">
+          <TabsList className="mb-8 bg-gray-100 p-2 rounded-xl">
             <TabsTrigger
               value="pending"
-              className="data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-extrabold"
+              className="data-[state=active]:bg-slate-700 data-[state=active]:text-white font-semibold rounded-lg transition-all duration-300"
             >
               Pending Reviews
               {pendingReviews.length > 0 && (
-                <span className="ml-2 bg-red-400 text-black border-2 border-black text-xs rounded-full px-2 py-1 font-extrabold">
+                <span className="ml-2 bg-red-100 text-red-800 text-xs rounded-full px-3 py-1 font-semibold">
                   {pendingReviews.length}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger
               value="submitted"
-              className="data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-extrabold"
+              className="data-[state=active]:bg-slate-700 data-[state=active]:text-white font-semibold rounded-lg transition-all duration-300"
             >
               My Reviews
               {reviewStats.count > 0 && (
-                <span className="ml-2 bg-purple-400 text-black border-2 border-black text-xs rounded-full px-2 py-1 font-extrabold">
+                <span className="ml-2 bg-slate-100 text-slate-800 text-xs rounded-full px-3 py-1 font-semibold">
                   {reviewStats.count}
                 </span>
               )}
@@ -88,14 +88,14 @@ export function ReviewsTab({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="mx-auto h-20 w-20 bg-yellow-300 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-                  <Star className="h-10 w-10 text-black" />
+              <div className="text-center py-16">
+                <div className="mx-auto h-24 w-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-6">
+                  <Star className="h-12 w-12 text-slate-600" />
                 </div>
-                <p className="mt-2 text-xl font-black text-black">
+                <p className="text-2xl font-bold text-gray-900 mb-4">
                   You don&apos;t have any trips to review right now.
                 </p>
-                <p className="text-gray-700 font-bold">
+                <p className="text-gray-600 font-medium">
                   Completed trips will appear here for you to review.
                 </p>
               </div>
@@ -106,31 +106,33 @@ export function ReviewsTab({
           <TabsContent value="submitted">
             {userReviews.length > 0 ? (
               <div>
-                <div className="bg-purple-400 border-3 border-black rounded-lg p-4 mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between">
-                  <div>
-                    <p className="text-black font-extrabold">
-                      Your Review Stats
-                    </p>
-                    <p className="text-black font-bold text-sm">
-                      You&apos;ve reviewed {reviewStats.count} trips with an
-                      average rating of{" "}
-                      <span className="font-black">
-                        {reviewStats.averageRating}
-                      </span>
-                      /5
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-5 w-5 ${
-                          star <= Math.round(reviewStats.averageRating)
-                            ? "text-yellow-300 fill-yellow-300 stroke-black"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
+                <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-lg mb-2 text-gray-900">
+                        Your Review Stats
+                      </p>
+                      <p className="text-gray-600 font-medium">
+                        You&apos;ve reviewed {reviewStats.count} trips with an
+                        average rating of{" "}
+                        <span className="font-semibold text-slate-700">
+                          {reviewStats.averageRating}
+                        </span>
+                        /5
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-6 w-6 ${
+                            star <= Math.round(reviewStats.averageRating)
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -141,14 +143,14 @@ export function ReviewsTab({
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="mx-auto h-20 w-20 bg-purple-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-                  <Star className="h-10 w-10 text-black" />
+              <div className="text-center py-16">
+                <div className="mx-auto h-24 w-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-6">
+                  <Star className="h-12 w-12 text-slate-600" />
                 </div>
-                <p className="mt-2 text-xl font-black text-black">
+                <p className="text-2xl font-bold text-gray-900 mb-4">
                   You haven&apos;t submitted any reviews yet.
                 </p>
-                <p className="text-gray-700 font-bold">
+                <p className="text-gray-600 font-medium">
                   After completing a trip, you can share your experience here.
                 </p>
               </div>

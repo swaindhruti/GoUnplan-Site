@@ -12,6 +12,8 @@ import {
   Users,
   FileText,
   BriefcaseMedical,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
@@ -111,17 +113,17 @@ export function GuestInformationForm({
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Fixed colors for guest cards - defined once and reused
+  // Premium color palette for guest cards
   const guestCardColors = useMemo(
     () => [
-      "bg-[#fdffb6]", // pale yellow
-      "bg-[#caffbf]", // light green
-      "bg-[#e0c6ff]", // soft lavender
-      "bg-[#a0c4ff]", // baby blue
-      "bg-[#ffd6ff]", // pink lavender
-      "bg-[#fdffb6]", // repeat for more than 5 guests
-      "bg-[#caffbf]",
-      "bg-[#e0c6ff]",
+      "bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50",
+      "bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50",
+      "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50",
+      "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50",
+      "bg-gradient-to-r from-pink-100 to-rose-100 border-pink-200/50",
+      "bg-gradient-to-r from-emerald-100 to-teal-100 border-emerald-200/50",
+      "bg-gradient-to-r from-violet-100 to-purple-100 border-violet-200/50",
+      "bg-gradient-to-r from-amber-100 to-yellow-100 border-amber-200/50",
     ],
     []
   );
@@ -304,60 +306,66 @@ export function GuestInformationForm({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 border-b-3 border-black pb-4 mb-6">
-        <div className="bg-[#caffbf] p-2.5 rounded-lg border-2 border-black">
-          <Users className="h-7 w-7 text-black" strokeWidth={2.5} />
+    <div className="space-y-8">
+      <div className="flex items-center gap-4 border-b border-white/30 pb-6 mb-8">
+        <div className="bg-gradient-to-r from-green-400 to-emerald-400 p-4 rounded-2xl shadow-lg">
+          <Users className="h-8 w-8 text-white" strokeWidth={2.5} />
         </div>
-        <h2 className="text-3xl font-black text-black uppercase tracking-tight">
+        <h2 className="text-3xl font-playfair font-bold text-gray-800">
           Guest Information
         </h2>
       </div>
 
       {/* Number of Guests */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#fdffb6] p-5">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <Users className="w-6 h-6 text-black" strokeWidth={2.5} />
+      <div className="backdrop-blur-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl shadow-lg">
+            <Users className="w-7 h-7 text-white" strokeWidth={2.5} />
           </div>
-          <h3 className="text-xl font-black uppercase">Number of Guests</h3>
+          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+            Number of Guests
+          </h3>
         </div>
 
-        <div className="space-y-3">
-          <Label htmlFor="guests" className="font-bold text-black text-lg">
+        <div className="space-y-4">
+          <Label
+            htmlFor="guests"
+            className="font-semibold text-gray-700 text-lg"
+          >
             Select number of guests
           </Label>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-2">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-3">
             {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
               <Button
                 key={num}
                 onClick={() => handleNumberOfGuestsChange(num.toString())}
-                className={`border-3 border-black font-black text-xl py-3 px-4
-                  ${
-                    numberOfGuests === num
-                      ? "bg-black text-white shadow-none"
-                      : "bg-white hover:text-white/[0.7] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                  }`}
+                className={`font-bold text-lg py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                  numberOfGuests === num
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30"
+                    : "bg-white/80 backdrop-blur-xl border border-white/60 text-gray-700 hover:bg-white hover:shadow-2xl hover:shadow-purple-500/20"
+                }`}
               >
                 {num}
               </Button>
             ))}
           </div>
-          <p className="bg-white border-2 border-black p-3 rounded-md mt-2 font-bold text-lg">
+          <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl mt-4 font-semibold text-gray-700 shadow-lg">
             Maximum {maxGuests} people per booking
           </p>
           {getFieldError("participants") && (
-            <p className="bg-[#ffadad] border-2 border-black p-3 rounded-md font-bold text-lg">
+            <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-4 rounded-xl font-semibold text-red-700 shadow-lg animate-fade-in">
               {getFieldError("participants")}
             </p>
           )}
         </div>
       </div>
 
-      <div className="space-y-5">
-        <div className="flex items-center justify-between mb-3 border-b-2 border-black pb-3">
-          <h3 className="text-xl font-black uppercase">Guest Details</h3>
-          <div className="bg-[#a0c4ff] border-2 border-black rounded-md px-4 py-2 font-bold text-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6 border-b border-white/30 pb-4">
+          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+            Guest Details
+          </h3>
+          <div className="backdrop-blur-xl bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200/50 rounded-xl px-6 py-3 font-bold text-lg shadow-lg">
             {guestForms.length} of {numberOfGuests} guest
             {numberOfGuests > 1 ? "s" : ""}
           </div>
@@ -366,19 +374,19 @@ export function GuestInformationForm({
         {guestForms.map((guest, index) => (
           <div
             key={index}
-            className={`border-3 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${getGuestCardColor(
+            className={`backdrop-blur-xl border border-white/60 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 ${getGuestCardColor(
               index
             )}`}
           >
-            <div className="bg-white border-b-3 border-black flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-[#e0c6ff] p-2.5 rounded-md border-2 border-black flex-shrink-0">
-                  <User className="w-6 h-6 text-black" strokeWidth={2.5} />
+            <div className="backdrop-blur-xl bg-white/80 border-b border-white/30 flex items-center justify-between p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
+                  <User className="w-7 h-7 text-white" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-black uppercase text-xl">
+                <h3 className="font-bold text-xl text-gray-800">
                   Guest {index + 1}
                   {guest.isteamLead && (
-                    <span className="ml-2 bg-black text-white px-3 py-0.5 text-sm rounded-md uppercase">
+                    <span className="ml-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 text-sm rounded-xl uppercase font-semibold shadow-lg">
                       Team Lead
                     </span>
                   )}
@@ -387,23 +395,23 @@ export function GuestInformationForm({
               {guestForms.length > 1 && (
                 <Button
                   onClick={() => removeGuestForm(index)}
-                  className="bg-white border-2 border-black text-black hover:bg-[#ffadad] 
-                            font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none 
-                            hover:translate-x-[2px] hover:translate-y-[2px] p-2.5"
+                  className="bg-white/80 backdrop-blur-xl border border-white/60 text-red-600 hover:bg-red-500 hover:text-white 
+                            font-semibold shadow-lg hover:shadow-2xl hover:shadow-red-500/20 
+                            hover:scale-105 transition-all duration-300 p-3 rounded-xl"
                 >
                   <Trash2 className="w-5 h-5" strokeWidth={2.5} />
                 </Button>
               )}
             </div>
 
-            <div className="p-5 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
                   <Label
                     htmlFor={`firstName-${index}`}
-                    className="font-bold text-black text-lg"
+                    className="font-semibold text-gray-700 text-lg"
                   >
-                    First Name <span className="text-red-600">*</span>
+                    First Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id={`firstName-${index}`}
@@ -412,25 +420,25 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "firstName", e.target.value)
                     }
-                    className={`border-2 border-black bg-white text-lg ${
+                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
                       getFieldError("firstName", index)
-                        ? "border-red-600 border-3"
-                        : ""
+                        ? "border-red-400 shadow-red-500/20"
+                        : "hover:border-purple-400 hover:shadow-purple-500/20"
                     }`}
                   />
                   {getFieldError("firstName", index) && (
-                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
+                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
                       {getFieldError("firstName", index)}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor={`lastName-${index}`}
-                    className="font-bold text-black text-lg"
+                    className="font-semibold text-gray-700 text-lg"
                   >
-                    Last Name <span className="text-red-600">*</span>
+                    Last Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id={`lastName-${index}`}
@@ -439,27 +447,27 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "lastName", e.target.value)
                     }
-                    className={`border-2 border-black bg-white text-lg ${
+                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
                       getFieldError("lastName", index)
-                        ? "border-red-600 border-3"
-                        : ""
+                        ? "border-red-400 shadow-red-500/20"
+                        : "hover:border-purple-400 hover:shadow-purple-500/20"
                     }`}
                   />
                   {getFieldError("lastName", index) && (
-                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
+                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
                       {getFieldError("lastName", index)}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
                   <Label
                     htmlFor={`memberEmail-${index}`}
-                    className="font-bold text-black text-lg"
+                    className="font-semibold text-gray-700 text-lg"
                   >
-                    Email Address <span className="text-red-600">*</span>
+                    Email Address <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id={`memberEmail-${index}`}
@@ -469,25 +477,25 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "memberEmail", e.target.value)
                     }
-                    className={`border-2 border-black bg-white text-lg ${
+                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
                       getFieldError("memberEmail", index)
-                        ? "border-red-600 border-3"
-                        : ""
+                        ? "border-red-400 shadow-red-500/20"
+                        : "hover:border-purple-400 hover:shadow-purple-500/20"
                     }`}
                   />
                   {getFieldError("memberEmail", index) && (
-                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
+                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
                       {getFieldError("memberEmail", index)}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor={`phone-${index}`}
-                    className="font-bold text-black text-lg"
+                    className="font-semibold text-gray-700 text-lg"
                   >
-                    Phone Number <span className="text-red-600">*</span>
+                    Phone Number <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id={`phone-${index}`}
@@ -497,14 +505,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "phone", e.target.value)
                     }
-                    className={`border-2 border-black bg-white text-lg ${
+                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
                       getFieldError("phone", index)
-                        ? "border-red-600 border-3"
-                        : ""
+                        ? "border-red-400 shadow-red-500/20"
+                        : "hover:border-purple-400 hover:shadow-purple-500/20"
                     }`}
                   />
                   {getFieldError("phone", index) && (
-                    <p className="bg-[#ffadad] border-2 border-black p-2 rounded-md font-bold">
+                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
                       {getFieldError("phone", index)}
                     </p>
                   )}
@@ -512,8 +520,8 @@ export function GuestInformationForm({
               </div>
 
               {numberOfGuests > 1 && (
-                <div className="pt-4 border-t-2 border-black">
-                  <div className="flex items-center space-x-3">
+                <div className="pt-6 border-t border-white/30">
+                  <div className="flex items-center space-x-4">
                     <input
                       type="checkbox"
                       id={`teamLead-${index}`}
@@ -521,11 +529,11 @@ export function GuestInformationForm({
                       onChange={(e) =>
                         updateGuestForm(index, "isteamLead", e.target.checked)
                       }
-                      className="w-6 h-6 border-2 border-black"
+                      className="w-6 h-6 border-2 border-purple-400 rounded-lg accent-purple-600"
                     />
                     <Label
                       htmlFor={`teamLead-${index}`}
-                      className="font-bold text-black text-lg"
+                      className="font-semibold text-gray-700 text-lg"
                     >
                       Make this person the primary contact (Team Lead)
                     </Label>
@@ -534,8 +542,8 @@ export function GuestInformationForm({
               )}
 
               {(numberOfGuests === 1 || guest.isteamLead) && (
-                <div className="pt-4 border-t-2 border-black">
-                  <p className="bg-white border-2 border-black p-3 rounded-md font-bold">
+                <div className="pt-6 border-t border-white/30">
+                  <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl font-medium text-gray-700 shadow-lg">
                     <strong>Note:</strong> This person will be the primary
                     contact for the booking.
                   </p>
@@ -548,21 +556,19 @@ export function GuestInformationForm({
         {canAddMoreForms && (
           <Button
             onClick={addGuestForm}
-            className="w-full border-3 border-black text-black font-black uppercase text-lg
-                     bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 
-                     hover:translate-x-[2px] hover:translate-y-[2px] 
-                     hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                     py-5"
+            className="w-full backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold text-lg
+                     shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
+                     transition-all duration-300 py-6 rounded-2xl"
           >
-            <Plus className="w-6 h-6 mr-2" strokeWidth={2.5} />
+            <Plus className="w-6 h-6 mr-3" strokeWidth={2.5} />
             Add Guest ({guestForms.length}/{numberOfGuests})
           </Button>
         )}
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="bg-[#a0c4ff] border-3 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <p className="font-bold text-lg">
+          <div className="backdrop-blur-xl bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200/50 rounded-2xl p-6 shadow-xl">
+            <p className="font-semibold text-lg text-gray-700">
               All guest forms added. You can increase the number of guests above
               to add more.
             </p>
@@ -571,23 +577,23 @@ export function GuestInformationForm({
       </div>
 
       {/* Special Requirements */}
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#e0c6ff] p-5">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
+      <div className="backdrop-blur-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
+          <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
             <BriefcaseMedical
-              className="w-6 h-6 text-black"
+              className="w-7 h-7 text-white"
               strokeWidth={2.5}
             />
           </div>
-          <h3 className="text-xl font-black uppercase">
+          <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Special Requirements (Optional)
           </h3>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Label
             htmlFor="requirements"
-            className="font-bold text-black text-lg"
+            className="font-semibold text-gray-700 text-lg"
           >
             Any dietary restrictions, accessibility needs, medical conditions,
             or other special requests
@@ -598,39 +604,48 @@ export function GuestInformationForm({
             value={specialRequirements}
             onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
             rows={4}
-            className={`border-2 border-black bg-white text-lg ${
+            className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
               getFieldError("specialRequirements")
-                ? "border-red-600 border-3"
-                : ""
+                ? "border-red-400 shadow-red-500/20"
+                : "hover:border-purple-400 hover:shadow-purple-500/20"
             }`}
           />
-          <p className="bg-white border-2 border-black p-3 rounded-md mt-2 font-bold">
+          <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl mt-3 font-semibold text-gray-700 shadow-lg">
             Maximum 500 characters ({specialRequirements.length}/500)
           </p>
           {getFieldError("specialRequirements") && (
-            <p className="bg-[#ffadad] border-2 border-black p-3 rounded-md font-bold">
+            <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-4 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
               {getFieldError("specialRequirements")}
             </p>
           )}
         </div>
       </div>
 
-      <div className="border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#ffd6ff] p-5">
-        <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-          <div className="bg-white p-2.5 rounded-md border-2 border-black flex-shrink-0">
-            <FileText className="w-6 h-6 text-black" strokeWidth={2.5} />
+      {/* Booking Summary */}
+      <div className="backdrop-blur-xl bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
+          <div className="bg-gradient-to-r from-pink-400 to-rose-400 p-3 rounded-xl shadow-lg">
+            <FileText className="w-7 h-7 text-white" strokeWidth={2.5} />
           </div>
-          <h3 className="text-xl font-black uppercase">Booking Summary</h3>
+          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+            Booking Summary
+          </h3>
         </div>
 
-        <div className="space-y-3 bg-white border-2 border-black p-5 rounded-lg">
-          <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
-            <span className="font-bold text-lg">Number of Guests:</span>
-            <span className="font-black text-lg">{numberOfGuests}</span>
+        <div className="space-y-4 backdrop-blur-xl bg-white/80 border border-white/60 p-6 rounded-2xl shadow-lg">
+          <div className="flex justify-between border-b border-white/30 pb-4">
+            <span className="font-semibold text-lg text-gray-700">
+              Number of Guests:
+            </span>
+            <span className="font-bold text-lg text-gray-800">
+              {numberOfGuests}
+            </span>
           </div>
-          <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
-            <span className="font-bold text-lg">Forms Completed:</span>
-            <span className="font-black text-lg">
+          <div className="flex justify-between border-b border-white/30 pb-4">
+            <span className="font-semibold text-lg text-gray-700">
+              Forms Completed:
+            </span>
+            <span className="font-bold text-lg text-gray-800">
               {
                 guestForms.filter(
                   (guest) =>
@@ -644,20 +659,22 @@ export function GuestInformationForm({
             </span>
           </div>
           {numberOfGuests > 1 && (
-            <div className="flex justify-between border-b-2 border-dashed border-black pb-3">
-              <span className="font-bold text-lg">Team Lead:</span>
-              <span className="font-black text-lg">
+            <div className="flex justify-between border-b border-white/30 pb-4">
+              <span className="font-semibold text-lg text-gray-700">
+                Team Lead:
+              </span>
+              <span className="font-bold text-lg text-gray-800">
                 {guestForms.find((g) => g.isteamLead)?.firstName ||
                   "Not selected"}
               </span>
             </div>
           )}
           {specialRequirements && (
-            <div className="pt-3 border-t-2 border-black">
-              <span className="font-bold block mb-2 text-lg">
+            <div className="pt-4 border-t border-white/30">
+              <span className="font-semibold block mb-3 text-lg text-gray-700">
                 Special Requirements:
               </span>
-              <p className="bg-[#f9f9ff] p-3 border-2 border-black rounded-md text-lg">
+              <p className="backdrop-blur-xl bg-gradient-to-r from-gray-50 to-gray-100 p-4 border border-gray-200/50 rounded-xl text-lg text-gray-700 shadow-lg">
                 {specialRequirements}
               </p>
             </div>
@@ -665,30 +682,46 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      <div className="flex justify-between pt-6 border-t-3 border-black">
+      <div className="flex justify-between pt-8 border-t border-white/30">
         <Button
           onClick={onBack}
           disabled={isSubmitting}
-          className="bg-white text-black hover:text-white/[0.7] font-black uppercase text-xl
-                   border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                   hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                   hover:translate-x-[2px] hover:translate-y-[2px]
-                   transition-all duration-200 py-5 px-6"
+          className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 hover:text-white font-semibold text-xl
+                   shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105
+                   transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
         >
+          <ArrowLeft className="w-6 h-6" />
           Back to Dates
         </Button>
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-[#caffbf] text-black font-black hover:text-white/[0.7] uppercase text-xl
-                   border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                   hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                   hover:translate-x-[2px] hover:translate-y-[2px]
-                   transition-all duration-200 py-5 px-6"
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 text-xl
+                   shadow-xl hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-105
+                   transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
+          <ArrowRight className="w-6 h-6" />
         </Button>
       </div>
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

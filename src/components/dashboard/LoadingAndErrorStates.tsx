@@ -8,25 +8,34 @@ interface LoadingStateProps {
 export function LoadingAndErrorStates({ loading, error }: LoadingStateProps) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-bounce bg-yellow-300 border-3 border-black rounded-lg h-16 w-16 flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-          <User className="h-8 w-8 text-black" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-24 w-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-6 animate-pulse">
+            <User className="h-12 w-12 text-slate-600" />
+          </div>
+          <p className="text-2xl font-bold text-gray-900 mb-4">
+            Loading your dashboard...
+          </p>
+          <div className="w-32 h-2 bg-slate-200 rounded-full mx-auto animate-pulse"></div>
         </div>
-        <span className="ml-3 text-xl font-black">
-          Loading your dashboard...
-        </span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-            <AlertCircle className="h-10 w-10 text-black" />
+          <div className="mx-auto h-24 w-24 bg-red-100 rounded-2xl flex items-center justify-center mb-6">
+            <AlertCircle className="h-12 w-12 text-red-600" />
           </div>
-          <p className="mt-2 text-xl font-black text-black">Error: {error}</p>
+          <p className="text-2xl font-bold text-gray-900 mb-4">
+            Error: {error}
+          </p>
+          <p className="text-gray-600 font-medium">
+            Please try refreshing the page or contact support if the problem
+            persists.
+          </p>
         </div>
       </div>
     );

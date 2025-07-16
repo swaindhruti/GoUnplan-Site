@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ChatContainer from "@/components/chat/ChatContainer";
 import { getUserChats } from "@/actions/chat/actions";
 import { TransformedChat } from "@/types/chats";
+import { MessageSquare } from "lucide-react";
 
 export const MessageSection = ({ userSession }: { userSession: string }) => {
   const [initialChats, setInitialChats] = useState<TransformedChat[]>();
@@ -23,15 +24,36 @@ export const MessageSection = ({ userSession }: { userSession: string }) => {
 
   if (!userId) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-        <p className="text-gray-600">Loading chat...</p>
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Messages</h2>
+          <p className="text-gray-600 font-medium">
+            Communicate with your guests and travelers
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="mx-auto h-16 w-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4 animate-pulse">
+            <MessageSquare className="h-8 w-8 text-purple-600" />
+          </div>
+          <p className="text-gray-600 font-medium">Loading chat...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-0">
-      <ChatContainer currentUserId={userId} initialChats={initialChats} />
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Messages</h2>
+        <p className="text-gray-600 font-medium">
+          Communicate with your guests and travelers
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <ChatContainer currentUserId={userId} initialChats={initialChats} />
+      </div>
     </div>
   );
 };

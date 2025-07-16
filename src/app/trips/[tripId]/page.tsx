@@ -10,6 +10,7 @@ import {
   Star,
   MessageCircle,
   Languages,
+  ArrowLeft,
 } from "lucide-react";
 import { ChatButton } from "@/components/chat/ChatButton";
 import { requireUser } from "@/lib/roleGaurd";
@@ -63,319 +64,330 @@ export default async function MountainBikingAdventure({ params }: Props) {
     languages: trip.languages.join(", "),
   };
 
-  // Function to get random color from a set of soft pastel colors
-  const getRandomBgColor = () => {
-    const colors = [
-      "bg-[#e0c6ff]", // soft lavender
-      "bg-[#ffd6ff]", // pink lavender
-      "bg-[#caffbf]", // light green
-      "bg-[#a0c4ff]", // baby blue
-      "bg-[#fdffb6]", // pale yellow
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
       {/* Hero Section */}
-      <section className="bg-[#e0c6ff] border-3 border-black rounded-xl text-black py-16 px-8 text-center mb-12 relative overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
-        {/* Decorative elements */}
-        <div className="absolute -left-8 -top-8 w-32 h-32 bg-[#ffd6ff] border-3 border-black rounded-3xl rotate-12 z-0"></div>
-        <div className="absolute -right-4 -top-4 w-20 h-20 bg-[#a0c4ff] border-3 border-black rounded-full z-0"></div>
+      <section className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 py-20 overflow-hidden">
+        {/* Premium background effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/10" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.3),transparent_50%)]" />
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(236,72,153,0.3),transparent_50%)]" />
 
-        <div className="relative z-10">
-          <h1 className="text-6xl md:text-7xl font-black mb-4 uppercase tracking-tight">
-            {trip.title}
-          </h1>
-          <p className="text-3xl font-bold">{trip.destination}</p>
+        <div className="relative z-10 max-w-7xl mx-auto px-4">
+          {/* Back Button */}
+          <Link
+            href="/trips"
+            className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-8 transition-colors duration-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Trips</span>
+          </Link>
 
-          <div className="flex flex-wrap justify-center gap-5 mt-10">
-            {heroTags.map((tag, i) => (
-              <span
-                key={i}
-                className={
-                  tag.includes("₹")
-                    ? "bg-[#fdffb6] px-6 py-3 text-black text-xl border-2 border-black rounded-lg font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    : "bg-white px-6 py-3 text-black text-xl border-2 border-black rounded-lg font-bold"
-                }
+          <div className="text-center">
+            <h1 className="text-4xl font-playfair md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+              {trip.title}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/95 mb-8 drop-shadow-lg font-medium">
+              {trip.destination}
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-4 mt-10">
+              {heroTags.map((tag, i) => (
+                <span
+                  key={i}
+                  className={`backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl px-6 py-3 text-white font-semibold shadow-xl transition-all duration-300 hover:bg-white/30 hover:scale-105 ${
+                    tag.includes("₹")
+                      ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-400/50"
+                      : ""
+                  }`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        {/* Highlights Section */}
+        <section className="mb-16">
+          <div className="flex items-center gap-4 mb-12">
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-2xl shadow-xl">
+              <Star className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="text-3xl font-playfair md:text-4xl font-bold text-gray-800">
+              Trip Highlights
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {highlights.map((group, idx) => (
+              <div
+                key={idx}
+                className="backdrop-blur-xl bg-white/80 border border-white/60 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02]"
               >
-                {tag}
-              </span>
+                <ul className="space-y-6">
+                  {group.map((point, i) => (
+                    <li key={i} className="flex items-start gap-4">
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-8 w-8 flex items-center justify-center rounded-full flex-shrink-0 mt-1 shadow-lg">
+                        <span className="text-white font-bold text-sm">✓</span>
+                      </div>
+                      <span className="text-gray-700 font-medium text-lg leading-relaxed">
+                        {point}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Highlights Section */}
-      <section className="mb-14">
-        <div className="flex items-center gap-4 border-b-3 border-black pb-3 mb-10">
-          <div className="bg-[#ffd6ff] p-3 rounded-lg border-2 border-black">
-            <Star className="h-8 w-8 text-black" strokeWidth={2.5} />
-          </div>
-          <h2 className="text-4xl font-black text-black uppercase tracking-tight">
-            Trip Highlights
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-10">
-          {highlights.map((group, idx) => (
-            <div
-              key={idx}
-              className={`${getRandomBgColor()} border-3 border-black rounded-xl p-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]`}
-            >
-              <ul className="space-y-4 font-bold text-xl">
-                {group.map((point, i) => (
-                  <li key={i} className="flex items-start gap-4">
-                    <span className="bg-white h-7 w-7 flex items-center justify-center border-2 border-black rounded-full flex-shrink-0 mt-1">
-                      ✓
-                    </span>
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Tabs Section */}
-      <div className="mb-14">
-        <Tabs
-          defaultValue="itinerary"
-          className="border-3 border-black rounded-2xl overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] pt-4 px-4"
-        >
-          <TabsList className="w-full grid grid-cols-3 bg-white border-b-3 border-black p-0 h-auto divide-x-3 divide-black rounded-2xl border-3 ">
-            <TabsTrigger
-              value="itinerary"
-              className="py-5 font-black text-xl uppercase data-[state=active]:bg-[#e0c6ff] data-[state=active]:text-black rounded-2xl"
-            >
-              Itinerary
-            </TabsTrigger>
-            <TabsTrigger
-              value="included"
-              className="py-5 font-black text-xl uppercase data-[state=active]:bg-[#caffbf] data-[state=active]:text-black rounded-2xl"
-            >
-              What&apos;s Included
-            </TabsTrigger>
-            <TabsTrigger
-              value="reviews"
-              className="py-5 font-black text-xl uppercase data-[state=active]:bg-[#fdffb6] data-[state=active]:text-black rounded-2xl"
-            >
-              Reviews
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="itinerary" className="bg-white p-0 m-0">
-            {trip.dayWiseItinerary.map((day, index) => (
-              <div
-                key={index}
-                className={`p-10 ${
-                  index !== trip.dayWiseItinerary.length - 1
-                    ? "border-b-3 border-black"
-                    : ""
-                }`}
+        {/* Tabs Section */}
+        <div className="mb-16">
+          <Tabs
+            defaultValue="itinerary"
+            className="backdrop-blur-xl bg-white/80 border border-white/60 rounded-3xl overflow-hidden shadow-2xl"
+          >
+            <TabsList className="w-full grid grid-cols-3 bg-white/90 backdrop-blur-xl border-b border-white/60 p-0 h-auto rounded-none">
+              <TabsTrigger
+                value="itinerary"
+                className="py-6 font-semibold text-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
               >
-                <div className="flex gap-5">
-                  <div className="bg-[#ffc6ff] p-3 h-min rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <Calendar
-                      className="h-8 w-8 text-black"
-                      strokeWidth={2.5}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-3xl mb-4 uppercase">
-                      Day {day.dayNumber}: {day.title}
-                    </h3>
-                    <p className="mb-6 font-bold text-xl">{day.description}</p>
-                    <div className="grid grid-cols-2 gap-4 text-lg">
-                      <div className="border-2 border-black rounded-lg p-4 font-bold bg-[#fdffb6] bg-opacity-40">
-                        <strong className="uppercase">Meals:</strong>{" "}
-                        {day.meals}
-                      </div>
-                      <div className="border-2 border-black rounded-lg p-4 font-bold bg-[#caffbf] bg-opacity-40">
-                        <strong className="uppercase">Stay:</strong>{" "}
-                        {day.accommodation}
+                Itinerary
+              </TabsTrigger>
+              <TabsTrigger
+                value="included"
+                className="py-6 font-semibold text-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+              >
+                What&apos;s Included
+              </TabsTrigger>
+              <TabsTrigger
+                value="reviews"
+                className="py-6 font-semibold text-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+              >
+                Reviews
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="itinerary" className="p-0 m-0">
+              {trip.dayWiseItinerary.map((day, index) => (
+                <div
+                  key={index}
+                  className={`p-10 ${
+                    index !== trip.dayWiseItinerary.length - 1
+                      ? "border-b border-white/60"
+                      : ""
+                  }`}
+                >
+                  <div className="flex gap-6">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 h-min rounded-2xl shadow-xl">
+                      <Calendar className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-2xl mb-4 text-gray-800">
+                        Day {day.dayNumber}: {day.title}
+                      </h3>
+                      <p className="mb-6 text-gray-600 text-lg leading-relaxed">
+                        {day.description}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-200 rounded-2xl p-4">
+                          <strong className="text-gray-800 font-semibold">
+                            Meals:
+                          </strong>{" "}
+                          <span className="text-gray-600">{day.meals}</span>
+                        </div>
+                        <div className="bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 rounded-2xl p-4">
+                          <strong className="text-gray-800 font-semibold">
+                            Stay:
+                          </strong>{" "}
+                          <span className="text-gray-600">
+                            {day.accommodation}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="included" className="p-10 m-0">
+              <div className="backdrop-blur-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-3xl p-8 shadow-xl">
+                <h3 className="font-bold text-2xl mb-6 text-gray-800">
+                  Included in the price:
+                </h3>
+                <ul className="space-y-4">
+                  {[
+                    "All meals during the trip",
+                    "Comfortable lodging for all nights",
+                    "Professional guide fees",
+                    "Equipment rentals",
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-center gap-4">
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-7 w-7 flex items-center justify-center rounded-full shadow-lg">
+                        <span className="text-white font-bold text-sm">✓</span>
+                      </div>
+                      <span className="text-gray-700 font-medium text-lg">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                  <li className="flex items-center gap-4">
+                    <div className="bg-gradient-to-r from-red-500 to-pink-500 h-7 w-7 flex items-center justify-center rounded-full shadow-lg">
+                      <span className="text-white font-bold text-sm">✗</span>
+                    </div>
+                    <span className="text-gray-700 font-medium text-lg">
+                      Flights not included
+                    </span>
+                  </li>
+                </ul>
               </div>
-            ))}
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="included" className="bg-white p-10 m-0 font-bold">
-            <div className="border-3 border-black rounded-xl p-6 bg-[#caffbf]">
-              <h3 className="font-black uppercase mb-5 text-2xl">
-                Included in the price:
-              </h3>
-              <ul className="space-y-4 text-xl">
-                <li className="flex items-center gap-4">
-                  <span className="bg-white h-7 w-7 flex items-center justify-center border-2 border-black rounded-full">
-                    ✓
-                  </span>
-                  All meals during the trip
-                </li>
-                <li className="flex items-center gap-4">
-                  <span className="bg-white h-7 w-7 flex items-center justify-center border-2 border-black rounded-full">
-                    ✓
-                  </span>
-                  Comfortable lodging for all nights
-                </li>
-                <li className="flex items-center gap-4">
-                  <span className="bg-white h-7 w-7 flex items-center justify-center border-2 border-black rounded-full">
-                    ✓
-                  </span>
-                  Professional guide fees
-                </li>
-                <li className="flex items-center gap-4">
-                  <span className="bg-white h-7 w-7 flex items-center justify-center border-2 border-black rounded-full">
-                    ✓
-                  </span>
-                  Equipment rentals
-                </li>
-                <li className="flex items-center gap-4">
-                  <span className="bg-[#ffadad] h-7 w-7 flex items-center justify-center border-2 border-black rounded-full">
-                    ✗
-                  </span>
-                  Flights not included
-                </li>
-              </ul>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="reviews" className="bg-white p-10 m-0">
-            <div className="border-3 border-black rounded-xl p-6 bg-[#fdffb6]">
-              <div className="flex items-center gap-4 mb-6">
-                <Star
-                  className="h-10 w-10 text-black fill-black"
-                  strokeWidth={2.5}
-                />
-                <span className="text-5xl font-black">4.9</span>
-                <span className="font-bold text-xl">
-                  (124 verified reviews)
-                </span>
+            <TabsContent value="reviews" className="p-10 m-0">
+              <div className="backdrop-blur-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-3xl p-8 shadow-xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-3 rounded-2xl shadow-lg">
+                    <Star className="h-8 w-8 text-white fill-white" />
+                  </div>
+                  <div>
+                    <span className="text-4xl font-bold text-gray-800">
+                      4.9
+                    </span>
+                    <span className="text-gray-600 font-medium text-lg ml-2">
+                      (124 verified reviews)
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-700 font-medium text-xl italic">
+                  &quot;The best biking trip of my life! Incredible views and
+                  amazing guides!&quot;
+                </p>
               </div>
-              <p className="font-bold text-xl">
-                &quot;The best biking trip of my life! Incredible views and
-                amazing guides!&quot;
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Bottom Cards */}
-      <div className="grid md:grid-cols-2 gap-10">
-        {/* Booking Card */}
-        <div className="border-3 border-black rounded-xl bg-white p-8 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center gap-5 mb-7">
-            <div className="bg-[#a0c4ff] p-3 rounded-lg border-2 border-black">
-              <DollarSign className="h-8 w-8 text-black" strokeWidth={2.5} />
-            </div>
-            <p className="text-5xl font-black">
-              ₹{tripStats.price}
-              <span className="text-xl font-bold ml-2">per person</span>
-            </p>
-          </div>
-
-          <div className="space-y-5 mb-8">
-            <div className="flex items-center gap-5">
-              <div className="bg-[#caffbf] p-3 rounded-md border-2 border-black">
-                <Calendar className="h-7 w-7 text-black" strokeWidth={2.5} />
-              </div>
-              <span className="font-bold text-xl">
-                {tripStats.noOfDays} days
-              </span>
-            </div>
-
-            <div className="flex items-center gap-5">
-              <div className="bg-[#ffd6ff] p-3 rounded-md border-2 border-black">
-                <Users className="h-7 w-7 text-black" strokeWidth={2.5} />
-              </div>
-              <span className="font-bold text-xl">
-                Up to {tripStats.maxParticipants} people
-              </span>
-            </div>
-
-            <div className="flex items-center gap-5">
-              <div className="bg-[#fdffb6] p-3 rounded-md border-2 border-black">
-                <Languages className="h-7 w-7 text-black" strokeWidth={2.5} />
-              </div>
-              <span className="font-bold text-xl">{tripStats.languages}</span>
-            </div>
-          </div>
-
-          <Link href={`/trips/booking/${trip.travelPlanId}`}>
-            <button
-              className="w-full bg-black text-white font-black uppercase tracking-wider
-              border-3 border-black rounded-lg py-5 px-6 mb-4
-              shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-              hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-              hover:translate-x-[2px] hover:translate-y-[2px]
-              transition-all duration-200 text-2xl"
-            >
-              Book Now
-            </button>
-          </Link>
-          {UserSession.user && UserSession.user.id && (
-            <ChatButton
-              currentUserId={UserSession.user.id}
-              hostId={trip.host.user.id}
-              travelPlanId={trip.travelPlanId}
-              hostName={trip.host.user.name}
-            />
-          )}
+            </TabsContent>
+          </Tabs>
         </div>
 
-        {/* Host Card */}
-        <div className="border-3 border-black rounded-xl bg-white p-8 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center gap-5 border-b-3 border-black pb-5 mb-6">
-            <div className="bg-[#e0c6ff] p-3 rounded-lg border-2 border-black">
-              <MessageCircle className="h-8 w-8 text-black" strokeWidth={2.5} />
-            </div>
-            <h3 className="text-3xl font-black text-black uppercase tracking-tight">
-              About Your Host
-            </h3>
-          </div>
-
-          <div className="flex gap-6 items-center">
-            <div className="border-3 border-black rounded-full overflow-hidden">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={hostInfo.image} />
-                <AvatarFallback className="bg-[#a0c4ff] text-3xl font-black">
-                  {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            <div>
-              <p className="font-black text-2xl">{hostInfo.name}</p>
-              <div className="flex items-center">
-                <Star className="h-6 w-6 fill-yellow-400 stroke-black" />
-                <span className="font-bold ml-2 text-xl">
-                  4.9 (124 reviews)
+        {/* Bottom Cards */}
+        <div className="grid md:grid-cols-2 gap-10">
+          {/* Booking Card */}
+          <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02]">
+            <div className="flex items-center gap-5 mb-8">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-2xl shadow-xl">
+                <DollarSign className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <p className="text-4xl font-bold text-gray-800">
+                  ₹{tripStats.price}
+                </p>
+                <span className="text-lg font-medium text-gray-600">
+                  per person
                 </span>
               </div>
-              <p className="font-bold text-xl">
-                Host since {hostInfo.createdYear}
-              </p>
-              <p className="font-bold text-xl">{hostInfo.email}</p>
             </div>
+
+            <div className="space-y-6 mb-8">
+              <div className="flex items-center gap-4">
+                <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-3 rounded-xl shadow-sm">
+                  <Calendar className="h-6 w-6 text-green-600" />
+                </div>
+                <span className="font-medium text-gray-700 text-lg">
+                  {tripStats.noOfDays} days
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-3 rounded-xl shadow-sm">
+                  <Users className="h-6 w-6 text-blue-600" />
+                </div>
+                <span className="font-medium text-gray-700 text-lg">
+                  Up to {tripStats.maxParticipants} people
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-3 rounded-xl shadow-sm">
+                  <Languages className="h-6 w-6 text-orange-600" />
+                </div>
+                <span className="font-medium text-gray-700 text-lg">
+                  {tripStats.languages}
+                </span>
+              </div>
+            </div>
+
+            <Link href={`/trips/booking/${trip.travelPlanId}`}>
+              <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 text-xl mb-4">
+                Book Now
+              </button>
+            </Link>
+            {UserSession.user && UserSession.user.id && (
+              <ChatButton
+                currentUserId={UserSession.user.id}
+                hostId={trip.host.user.id}
+                travelPlanId={trip.travelPlanId}
+                hostName={trip.host.user.name}
+              />
+            )}
           </div>
 
-          <div className="mt-6 p-5 border-2 border-dashed border-black bg-[#ffd6ff] bg-opacity-30 font-bold text-xl">
-            {hostInfo.description}
-          </div>
+          {/* Host Card */}
+          <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02]">
+            <div className="flex items-center gap-5 border-b border-white/60 pb-6 mb-6">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-2xl shadow-xl">
+                <MessageCircle className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800">
+                About Your Host
+              </h3>
+            </div>
 
-          <button
-            className="mt-6 bg-[#e0c6ff] text-black font-black uppercase tracking-wider
-            border-3 border-black rounded-lg py-4 px-6
-            shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
-            hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]
-            hover:translate-x-[2px] hover:translate-y-[2px]
-            transition-all duration-200 text-xl"
-          >
-            View Profile
-          </button>
+            <div className="flex gap-6 items-center mb-6">
+              <div className="relative">
+                <Avatar className="h-20 w-20 border-4 border-white shadow-xl">
+                  <AvatarImage src={hostInfo.image} />
+                  <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl font-bold">
+                    {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <div>
+                <p className="font-bold text-xl text-gray-800">
+                  {hostInfo.name}
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                      />
+                    ))}
+                  </div>
+                  <span className="font-medium text-gray-600">
+                    4.9 (124 reviews)
+                  </span>
+                </div>
+                <p className="font-medium text-gray-600">
+                  Host since {hostInfo.createdYear}
+                </p>
+                <p className="font-medium text-gray-600">{hostInfo.email}</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6 mb-6">
+              <p className="text-gray-700 font-medium leading-relaxed">
+                {hostInfo.description}
+              </p>
+            </div>
+
+            <button className="w-full bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-gray-800 font-semibold py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+              View Profile
+            </button>
+          </div>
         </div>
       </div>
     </div>

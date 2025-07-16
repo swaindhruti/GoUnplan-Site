@@ -36,13 +36,11 @@ export function BookingsTab({
   const getStatusBadge = (status: string) => {
     const statusStyles = {
       confirmed:
-        "bg-green-500 border-2 border-black text-black font-extrabold px-3 py-1 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+        "bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-lg",
       pending:
-        "bg-yellow-300 border-2 border-black text-black font-extrabold px-3 py-1 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-      completed:
-        "bg-blue-400 border-2 border-black text-black font-extrabold px-3 py-1 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-      cancelled:
-        "bg-red-400 border-2 border-black text-black font-extrabold px-3 py-1 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+        "bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg",
+      completed: "bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg",
+      cancelled: "bg-red-100 text-red-800 font-semibold px-4 py-2 rounded-lg",
     };
 
     const statusKey = status.toLowerCase() as keyof typeof statusStyles;
@@ -56,44 +54,44 @@ export function BookingsTab({
   };
 
   return (
-    <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
-      <div className="border-b-4 border-black bg-blue-400 px-6 py-4">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-slate-50 p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-black text-black uppercase">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
               Your Bookings
             </h3>
-            <p className="text-sm font-bold text-black">
+            <p className="text-gray-600 font-medium">
               Manage your travel bookings
             </p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-4">
             <button
               onClick={() => setBookingFilter("all")}
-              className={`px-4 py-2 text-sm font-extrabold rounded-lg transition-colors border-3 border-black ${
+              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
                 bookingFilter === "all"
-                  ? "bg-yellow-300 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-black hover:bg-gray-100"
+                  ? "bg-slate-700 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               All
             </button>
             <button
               onClick={() => setBookingFilter("confirmed")}
-              className={`px-4 py-2 text-sm font-extrabold rounded-lg transition-colors border-3 border-black ${
+              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
                 bookingFilter === "confirmed"
-                  ? "bg-green-500 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-black hover:bg-gray-100"
+                  ? "bg-slate-700 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               Confirmed
             </button>
             <button
               onClick={() => setBookingFilter("pending")}
-              className={`px-4 py-2 text-sm font-extrabold rounded-lg transition-colors border-3 border-black ${
+              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
                 bookingFilter === "pending"
-                  ? "bg-purple-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-black hover:bg-gray-100"
+                  ? "bg-slate-700 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               Pending
@@ -105,27 +103,27 @@ export function BookingsTab({
       <div className="overflow-x-auto">
         {filteredBookings.length > 0 ? (
           <Table>
-            <TableHeader className="bg-yellow-300 border-b-4 border-black">
+            <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Trip
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Destination
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Dates
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Price
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Participants
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Status
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-extrabold text-black uppercase">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   Actions
                 </TableHead>
               </TableRow>
@@ -134,19 +132,19 @@ export function BookingsTab({
               {filteredBookings.map((booking) => (
                 <TableRow
                   key={booking.id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-gray-50 transition-all duration-300"
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-lg bg-purple-500 border-2 border-black flex items-center justify-center text-white font-extrabold text-sm mr-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="h-12 w-12 rounded-xl bg-slate-700 flex items-center justify-center text-white font-semibold text-lg mr-4">
                         {booking.travelPlan.title.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-bold text-black">
+                      <span className="font-semibold text-gray-900">
                         {booking.travelPlan.title}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-800 font-medium">
+                  <TableCell className="px-6 py-4 text-gray-700 font-medium">
                     {[
                       booking.travelPlan.city,
                       booking.travelPlan.state,
@@ -155,16 +153,16 @@ export function BookingsTab({
                       .filter(Boolean)
                       .join(", ")}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-800 font-medium">
+                  <TableCell className="px-6 py-4 text-gray-700 font-medium">
                     {formatDateRange(booking.startDate, booking.endDate)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <div className="font-extrabold text-black bg-green-500 border-2 border-black px-2 py-1 rounded-md shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block">
+                    <div className="font-semibold text-white bg-slate-700 px-4 py-2 rounded-lg inline-block">
                       ${booking.totalPrice.toLocaleString()}
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="bg-blue-400 font-extrabold text-black border-2 border-black rounded-full w-8 h-8 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="bg-slate-100 font-semibold text-slate-700 rounded-full w-10 h-10 flex items-center justify-center">
                       {booking.participants}
                     </span>
                   </TableCell>
@@ -174,7 +172,7 @@ export function BookingsTab({
                   <TableCell className="px-6 py-4">
                     <Button
                       onClick={() => router.push(`/bookings/${booking.id}`)}
-                      className="bg-purple-500 text-white hover:bg-purple-600 font-extrabold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+                      className="bg-slate-700 text-white hover:bg-slate-800 font-semibold shadow-sm"
                     >
                       View Details
                     </Button>
@@ -184,19 +182,19 @@ export function BookingsTab({
             </TableBody>
           </Table>
         ) : (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <div className="text-center">
-              <div className="mx-auto h-20 w-20 bg-pink-500 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-                <Calendar className="h-10 w-10 text-black" />
+              <div className="mx-auto h-24 w-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-6">
+                <Calendar className="h-12 w-12 text-slate-600" />
               </div>
-              <p className="mt-2 text-xl font-black text-black">
+              <p className="text-2xl font-bold text-gray-900 mb-4">
                 {bookings.length === 0
                   ? "No bookings found. Start by booking your first trip!"
                   : `No ${bookingFilter} bookings found.`}
               </p>
-              <div className="mt-6">
+              <div className="mt-8">
                 <Link href="/trips">
-                  <Button className="bg-green-500 text-black hover:bg-green-400 border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all font-extrabold">
+                  <Button className="bg-slate-700 text-white hover:bg-slate-800 font-semibold px-8 py-3 shadow-sm">
                     Explore Trips
                   </Button>
                 </Link>

@@ -1,6 +1,14 @@
 "use client";
 import { RevenueAnalytics } from "../types";
-import { DollarSign, TrendingDown, AlertCircle, BarChart3 } from "lucide-react";
+import {
+  DollarSign,
+  TrendingDown,
+  AlertCircle,
+  BarChart3,
+  TrendingUp,
+  Target,
+  Award,
+} from "lucide-react";
 
 type EarningsSectionProps = {
   revenueData: RevenueAnalytics | null;
@@ -16,140 +24,187 @@ export const EarningsSection = ({
   return (
     <>
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-3xl font-black text-black uppercase tracking-tight">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="h-1 w-8 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full" />
+            <span className="text-emerald-600 text-sm font-semibold tracking-wide uppercase">
+              Financial Analytics
+            </span>
+          </div>
+          <h2 className="text-3xl font-bold text-slate-900">
             Revenue Analytics
           </h2>
-          <p className="mt-1 text-gray-700 font-bold">
-            Track your earnings, bookings, and financial performance
+          <p className="text-slate-600 font-medium">
+            Track your earnings, bookings, and financial performance with
+            precision
           </p>
         </div>
       </div>
 
       {revenueLoading ? (
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="animate-bounce bg-yellow-300 border-3 border-black rounded-lg h-16 w-16 flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-            <DollarSign className="h-8 w-8 text-black" />
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-2xl flex items-center justify-center mb-4 animate-pulse">
+            <DollarSign className="h-8 w-8 text-emerald-600" />
           </div>
-          <span className="text-xl font-bold text-black">
+          <span className="text-xl font-semibold text-slate-900">
             Loading revenue data...
           </span>
         </div>
       ) : revenueError ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <div className="text-center">
-            <div className="mx-auto h-20 w-20 bg-red-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-              <AlertCircle className="h-10 w-10 text-black" />
+            <div className="mx-auto h-20 w-20 bg-red-100 rounded-2xl flex items-center justify-center mb-4">
+              <AlertCircle className="h-10 w-10 text-red-600" />
             </div>
-            <p className="mt-2 text-xl font-bold text-black">{revenueError}</p>
+            <p className="text-xl font-semibold text-slate-900">
+              {revenueError}
+            </p>
           </div>
         </div>
       ) : revenueData ? (
         <>
           {/* Revenue Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-green-500 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-black uppercase">
-                  Net Revenue
-                </h3>
-                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-black" />
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-emerald-600" />
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-emerald-600">
+                    ₹{revenueData.summary.netRevenue.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-emerald-500 font-medium">
+                    +12.5%
+                  </div>
                 </div>
               </div>
-              <p className="mt-2 text-3xl font-black text-black">
-                ₹{revenueData.summary.netRevenue.toLocaleString()}
+              <h3 className="text-slate-700 font-semibold text-lg mb-1">
+                Net Revenue
+              </h3>
+              <p className="text-slate-500 text-base">
+                Total earnings after fees
               </p>
             </div>
 
-            <div className="bg-blue-400 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-black uppercase">
-                  Confirmed Bookings
-                </h3>
-                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-black" />
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-purple-600">
+                    {revenueData.confirmed.bookingCount}
+                  </div>
+                  <div className="text-sm text-purple-500 font-medium">
+                    +8.2%
+                  </div>
                 </div>
               </div>
-              <p className="mt-2 text-3xl font-black text-black">
-                {revenueData.confirmed.bookingCount}
-              </p>
-              <p className="mt-1 text-sm font-extrabold text-black">
-                ₹{revenueData.confirmed.revenue.toLocaleString()} total revenue
+              <h3 className="text-slate-700 font-semibold text-lg mb-1">
+                Confirmed Bookings
+              </h3>
+              <p className="text-slate-500 text-base">
+                Successful reservations
               </p>
             </div>
 
-            <div
-              className={`${
-                revenueData.summary.cancellationRate > 10
-                  ? "bg-red-400"
-                  : "bg-yellow-300"
-              } rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6`}
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-black uppercase">
-                  Cancellation Rate
-                </h3>
-                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-black" />
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <Target className="h-6 w-6 text-orange-600" />
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-orange-600">
+                    {revenueData.summary.cancellationRate}%
+                  </div>
+                  <div className="text-sm text-orange-500 font-medium">
+                    -2.1%
+                  </div>
                 </div>
               </div>
-              <p className="mt-2 text-3xl font-black text-black">
-                {revenueData.summary.cancellationRate}%
-              </p>
-              <p className="mt-1 text-sm font-extrabold text-black">
-                {revenueData.cancelled.bookingCount} cancelled bookings
-              </p>
+              <h3 className="text-slate-700 font-semibold text-lg mb-1">
+                Cancellation Rate
+              </h3>
+              <p className="text-slate-500 text-base">Cancelled bookings</p>
             </div>
 
-            <div className="bg-yellow-300 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-black uppercase">
-                  Revenue at Risk
-                </h3>
-                <div className="h-10 w-10 bg-white border-3 border-black rounded-lg flex items-center justify-center">
-                  <TrendingDown className="h-6 w-6 text-black" />
+            <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-12 w-12 bg-red-100 rounded-xl flex items-center justify-center">
+                  <TrendingDown className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-red-600">
+                    ₹{revenueData.summary.revenueAtRisk.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-red-500 font-medium">+5.3%</div>
                 </div>
               </div>
-              <p className="mt-2 text-3xl font-black text-black">
-                ₹{revenueData.summary.revenueAtRisk.toLocaleString()}
-              </p>
-              <p className="mt-1 text-sm font-extrabold text-black">
-                {revenueData.pending.bookingCount} pending bookings
-              </p>
+              <h3 className="text-slate-700 font-semibold text-lg mb-1">
+                Revenue at Risk
+              </h3>
+              <p className="text-slate-500 text-base">Pending confirmations</p>
             </div>
           </div>
 
           {/* Detailed Revenue Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Confirmed Bookings */}
-            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
-              <div className="border-b-4 border-black bg-purple-600 px-6 py-4">
-                <h3 className="text-xl font-black text-white uppercase">
-                  Confirmed Bookings
-                </h3>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">
+                      Confirmed Bookings
+                    </h3>
+                    <p className="text-slate-600 font-medium text-base">
+                      Successful reservations and revenue
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <Award className="h-6 w-6 text-emerald-600" />
+                  </div>
+                </div>
               </div>
               <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">Total Revenue</span>
-                    <span className="font-extrabold text-black bg-green-500 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Total Revenue
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        From confirmed bookings
+                      </p>
+                    </div>
+                    <span className="font-bold text-emerald-700 bg-emerald-100 rounded-lg px-4 py-2 text-base">
                       ₹{revenueData.confirmed.revenue.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">
-                      Number of Bookings
-                    </span>
-                    <span className="font-extrabold text-black bg-blue-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Number of Bookings
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        Confirmed reservations
+                      </p>
+                    </div>
+                    <span className="font-bold text-purple-700 bg-purple-100 rounded-lg px-4 py-2 text-base">
                       {revenueData.confirmed.bookingCount}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">
-                      Average Booking Value
-                    </span>
-                    <span className="font-extrabold text-black bg-yellow-300 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Average Booking Value
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        Per confirmed booking
+                      </p>
+                    </div>
+                    <span className="font-bold text-blue-700 bg-blue-100 rounded-lg px-4 py-2 text-base">
                       ₹
                       {revenueData.confirmed.bookingCount > 0
                         ? Math.round(
@@ -164,33 +219,60 @@ export const EarningsSection = ({
             </div>
 
             {/* Cancelled Bookings */}
-            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden">
-              <div className="border-b-4 border-black bg-pink-500 px-6 py-4">
-                <h3 className="text-xl font-black text-black uppercase">
-                  Cancelled Bookings
-                </h3>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">
+                      Cancelled Bookings
+                    </h3>
+                    <p className="text-slate-600 font-medium text-base">
+                      Cancellations and refunds
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <AlertCircle className="h-6 w-6 text-orange-600" />
+                  </div>
+                </div>
               </div>
               <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">
-                      Total Booking Value
-                    </span>
-                    <span className="font-extrabold text-black bg-blue-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Total Booking Value
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        Before cancellation
+                      </p>
+                    </div>
+                    <span className="font-bold text-blue-700 bg-blue-100 rounded-lg px-4 py-2 text-base">
                       ₹{revenueData.cancelled.bookingValue.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">Total Refunds</span>
-                    <span className="font-extrabold text-black bg-red-400 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Total Refunds
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        Processed refunds
+                      </p>
+                    </div>
+                    <span className="font-bold text-red-700 bg-red-100 rounded-lg px-4 py-2 text-base">
                       ₹{revenueData.cancelled.refundAmount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-black font-bold">
-                      Number of Cancellations
-                    </span>
-                    <span className="font-extrabold text-black bg-yellow-300 border-2 border-black rounded-md px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0)]">
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-100">
+                    <div>
+                      <span className="text-slate-700 font-semibold text-base">
+                        Number of Cancellations
+                      </span>
+                      <p className="text-slate-500 text-base">
+                        Cancelled bookings
+                      </p>
+                    </div>
+                    <span className="font-bold text-orange-700 bg-orange-100 rounded-lg px-4 py-2 text-base">
                       {revenueData.cancelled.bookingCount}
                     </span>
                   </div>
@@ -199,35 +281,44 @@ export const EarningsSection = ({
             </div>
 
             {/* Monthly Revenue Analysis */}
-            <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] overflow-hidden lg:col-span-2">
-              <div className="border-b-4 border-black bg-blue-400 px-6 py-4">
-                <h3 className="text-xl font-black text-black uppercase">
-                  Monthly Revenue Analysis
-                </h3>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden lg:col-span-2">
+              <div className="bg-gradient-to-r from-slate-50 to-purple-50 p-6 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">
+                      Monthly Revenue Analysis
+                    </h3>
+                    <p className="text-slate-600 font-medium text-base">
+                      Revenue trends and performance insights
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
               </div>
-              <div className="p-6 relative">
-                {/* Decorative elements */}
-                <div className="absolute bottom-4 right-8 h-8 w-8 bg-yellow-300 border-3 border-black rounded-lg"></div>
-                <div className="absolute top-4 left-8 h-6 w-6 bg-pink-500 border-2 border-black rounded-full"></div>
-
+              <div className="p-6">
                 <div className="flex items-center justify-center h-64">
-                  <p className="text-black font-bold px-4 py-3 bg-gray-100 border-3 border-black rounded-md">
-                    {revenueData.monthlyTrend.length === 0
-                      ? "No monthly trend data available yet"
-                      : "Monthly trend data available. Implement chart visualization here."}
-                  </p>
+                  <div className="text-center p-8 bg-gradient-to-br from-slate-50 to-purple-50 rounded-2xl border border-slate-200">
+                    <BarChart3 className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                    <p className="text-slate-600 font-medium text-base">
+                      {revenueData.monthlyTrend.length === 0
+                        ? "No monthly trend data available yet"
+                        : "Monthly trend data available. Implement chart visualization here."}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </>
       ) : (
-        <div className="bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] p-12">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12">
           <div className="text-center">
-            <div className="mx-auto h-20 w-20 bg-blue-400 border-3 border-black rounded-lg flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
-              <DollarSign className="h-10 w-10 text-black" />
+            <div className="mx-auto h-20 w-20 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-2xl flex items-center justify-center mb-4">
+              <DollarSign className="h-10 w-10 text-emerald-600" />
             </div>
-            <p className="mt-2 text-xl font-bold text-black">
+            <p className="text-xl font-semibold text-slate-900">
               No revenue data available
             </p>
           </div>
