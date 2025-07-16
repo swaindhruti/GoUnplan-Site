@@ -11,6 +11,8 @@ import {
   EmptyState,
   ErrorDisplay,
 } from "@/components/trips/LoadingStates";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // Animated Counter Component
 const AnimatedCounter = ({
@@ -21,8 +23,15 @@ const AnimatedCounter = ({
   duration?: number;
 }) => {
   const [count, setCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     let startTime: number;
     let animationFrame: number;
 
@@ -39,7 +48,12 @@ const AnimatedCounter = ({
 
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
-  }, [value, duration]);
+  }, [value, duration, mounted]);
+
+  // Return 0 during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return <span className="text-purple-600 font-bold">0</span>;
+  }
 
   return <span className="text-purple-600 font-bold">{count}</span>;
 };
@@ -63,6 +77,22 @@ const FloatingActionButton = ({
 );
 
 export default function TripsPage() {
+  const { status } = useSession();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  // Handle authentication and mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (mounted && status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [mounted, status, router]);
+
   const { trips, isLoading, error } = useTripsData();
   const {
     filters,
@@ -80,13 +110,15 @@ export default function TripsPage() {
 
   // Scroll to top functionality
   useEffect(() => {
+    if (!mounted) return;
+
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [mounted]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -277,6 +309,29 @@ export default function TripsPage() {
       }
     }, 100);
   }, []);
+
+  // Show loading while checking authentication or not mounted
+  if (!mounted || status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <LoadingSkeleton />
+      </div>
+    );
+  }
+
+  // Show unauthorized page if not authenticated
+  if (status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600">Please sign in to view trips.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
