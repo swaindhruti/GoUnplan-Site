@@ -13,12 +13,9 @@ export const HowItWorksSection = () => {
         >
           <div className="absolute inset-0 bg-black/30" />
         </div>
-
-        {/* Content */}
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-28 items-center max-w-6xl mx-auto">
-              {/* Left Content */}
               <div className="text-center lg:text-left order-1 px-4">
                 <div>
                   <span className="inline-block px-3  py-1.5 sm:px-4 sm:py-2 bg-white/30 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-white/40 drop-shadow-lg">
@@ -33,11 +30,8 @@ export const HowItWorksSection = () => {
                   </h1>
                 </div>
               </div>
-
-              {/* Right Content Card */}
               <Card className="p-4 sm:p-6 lg:p-12 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl order-2 max-w-lg mx-auto lg:mx-0">
                 <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-                  {/* Step 1: Search & Discover */}
                   <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                     <div className="flex items-center gap-3 sm:gap-4">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
@@ -70,11 +64,7 @@ export const HowItWorksSection = () => {
                       style.
                     </p>
                   </div>
-
-                  {/* Divider Line */}
                   <div className="border-t border-white/30"></div>
-
-                  {/* Step 3: Book & Explore */}
                   <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                     <div className="flex items-center gap-3 sm:gap-4">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">

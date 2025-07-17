@@ -1,42 +1,37 @@
 "use client";
-import { ArrowRight } from "lucide-react";
-import { Button } from "../ui/button";
+
+import Image from "next/image";
+import { PrimaryButton } from "./common";
 
 export const ReadyToStart = () => {
   return (
-    <div className="relative py-36">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url(https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg)"
-        }}
-      >
-        {/* Blurred Overlay */}
-        <div className="absolute inset-0 backdrop-blur-md" />
-      </div>
+    <div className="relative py-20 sm:py-28 md:py-36 px-32 bg-white">
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10 h-full px-4 sm:px-8 md:px-16">
+        {/* Left Text Section */}
+        <div className="w-full md:w-1/2 text-center md:text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-playfair leading-snug sm:leading-tight mb-6 text-black">
+            Get started
+            <br />
+            with us
+          </h1>
 
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-center h-full">
-        <div className="container mx-auto px-8">
-          <div className="text-white max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl p-10 rounded-xl">
-            <h1 className="text-6xl font-bold leading-tight mb-6">
-              Ready to Start Your
-              <br />
-              Adventure?
-            </h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 font-roboto leading-relaxed">
+            Let us help you create the perfect journey. Our travel experts are
+            ready to craft your dream vacation.
+          </p>
 
-            <p className="text-xl mb-8 leading-relaxed opacity-90">
-              Let us help you create the perfect journey. Our travel experts are
-              ready to craft your dream vacation.
-            </p>
+          <PrimaryButton label="Start Planning" />
+        </div>
 
-            <Button className="bg-white text-purple-600 px-8 py-8 rounded-lg font-semibold text-xl hover:bg-purple-50 transition-colors duration-200 flex items-center gap-3 group">
-              Start Planning
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
+        {/* Right Image Section */}
+        <div className="w-full md:w-1/2">
+          <Image
+            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg"
+            alt="Adventure illustration"
+            className="w-full h-auto max-w-md mx-auto"
+            width={500}
+            height={500}
+          />
         </div>
       </div>
     </div>

@@ -14,28 +14,23 @@ import { ArrowRight } from "lucide-react";
 
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
-    <>
-      <div
-        className={`font-montserrat inline-flex items-center px-8 py-2 ${
-          label === "About Us" ? "bg-white" : "bg-purple-100"
-        }  rounded-full`}
-      >
-        <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
-          {label}
-        </span>
-      </div>
-    </>
+    <div
+      className={`font-montserrat inline-flex items-center px-8 py-2 ${
+        label === "About Us" ? "bg-white" : "bg-purple-100"
+      }  rounded-full`}
+    >
+      <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
+        {label}
+      </span>
+    </div>
   );
 };
 
-export const FindPackagesButton = () => {
+export const PrimaryButton = ({ label }: { label: string }) => {
   return (
-    <Button
-      className="bg-purple-500 font-poppins hover:bg-purple-600 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-      size="lg"
-    >
-      Find Packages
-      <ArrowRight className="ml-2 h-5 w-5" />
+    <Button className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
+      {label}
+      <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
     </Button>
   );
 };
@@ -151,12 +146,12 @@ export const Carousels = ({
       : (hosts as Host[]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center px-4 py-10 md:px-10">
+    <div className="h-auto md:min-h-screen flex justify-center items-center px-4 py-10 md:px-10">
       <div className="w-full max-w-6xl">
         <div className="mb-4 flex justify-center">
           <SectionLabel label={SectionTitle} />
         </div>
-        <div className="mb-20 text-center flex justify-center">
+        <div className="mb-4 md:mb-20 text-center flex justify-center">
           <h2 className="text-xl font-playfair sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
             {Description}
           </h2>
@@ -166,18 +161,20 @@ export const Carousels = ({
           opts={{ align: "start", loop: true }}
           className="w-full pb-20"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-mx-6">
             {data.map((item) => (
               <CarouselItem
                 key={item.id}
-                className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                className={`px-6 basis-full sm:basis-1/2 ${
+                  type === "hosts" ? "lg:basis-1/4" : "lg:basis-1/3"
+                }`}
               >
                 <div className="flex flex-col items-center">
                   <Card
                     className={`rounded-[90px] ${
                       type === "destinations"
                         ? "h-[60vh] w-full"
-                        : "h-[40vh] w-[70%]"
+                        : "h-[40vh] w-full"
                     } relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer`}
                   >
                     <Image
@@ -201,7 +198,7 @@ export const Carousels = ({
                       type === "destinations"
                         ? "-mt-[100px] size-50"
                         : "-mt-[60px] size-30"
-                    } z-30 rounded-full bg-white p-6 flex flex-col font-roboto items-center justify-center space-y-3 text-center`}
+                    } z-30 rounded-full bg-purple-50 p-6 flex flex-col font-roboto items-center justify-center space-y-3 text-center`}
                   >
                     {type === "destinations" ? (
                       <>
@@ -222,7 +219,7 @@ export const Carousels = ({
                         </p>
                       </>
                     ) : (
-                      <h3 className="text-xl font-semibold text-black">
+                      <h3 className="text-lg font-normal text-black">
                         {(item as Host).name}
                       </h3>
                     )}

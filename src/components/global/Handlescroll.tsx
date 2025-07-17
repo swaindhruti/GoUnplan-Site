@@ -1,56 +1,27 @@
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-// Register the ScrollTo plugin
 gsap.registerPlugin(ScrollToPlugin);
 
-// Smooth scroll to section function
-export const smoothScrollToSection = (
-  targetElement: string | HTMLElement,
-  options: {
-    duration?: number;
-    ease?: string;
-    offset?: number;
-    onComplete?: (() => void) | null;
-    onStart?: (() => void) | null;
-  } = {}
-) => {
-  const defaults = {
-    duration: 1.5,
-    ease: "power2.inOut",
-    offset: 0,
-    onComplete: null,
-    onStart: null
-  };
+type ScrollOptions = {
+  location: string | number;
+  duration?: number;
+  ease?: string;
+};
 
-  const config = { ...defaults, ...options };
-
-  const target =
-    typeof targetElement === "string"
-      ? document.querySelector(targetElement)
-      : targetElement;
-
-  if (!target) {
-    console.warn("Target element not found");
+export const handleScroll = ({
+  location,
+  duration = 1.5,
+  ease = "power3.inOut"
+}: ScrollOptions): void => {
+  if (typeof location !== "string" && typeof location !== "number") {
+    console.error("Invalid scroll location. Must be a string or number.");
     return;
   }
-  // Use getBoundingClientRect for more robust offset calculation
-  const scrollY = window.scrollY || window.pageYOffset;
-  const targetPosition =
-    (target as HTMLElement).getBoundingClientRect().top +
-    scrollY +
-    (config.offset ?? 0);
 
   gsap.to(window, {
-    duration: config.duration,
-    scrollTo: {
-      y: targetPosition,
-      autoKill: true,
-      onAutoKill: () =>
-        console.log("Scroll animation killed by user interaction")
-    },
-    ease: config.ease,
-    onStart: config.onStart ?? undefined,
-    onComplete: config.onComplete ?? undefined
+    duration,
+    scrollTo: location,
+    ease
   });
 };
