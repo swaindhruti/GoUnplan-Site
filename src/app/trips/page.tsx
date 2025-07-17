@@ -13,6 +13,7 @@ import {
 } from "@/components/trips/LoadingStates";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "@/components/global/buttons";
 
 // Floating Action Button
 const FloatingActionButton = ({
@@ -271,7 +272,7 @@ export default function TripsPage() {
       >
         {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-black/40" />
-
+        <BackButton isWhite={true} route="/" />
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-16">
           <div className="text-center mb-12">

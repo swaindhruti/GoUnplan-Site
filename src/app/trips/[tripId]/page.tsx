@@ -9,11 +9,11 @@ import {
   DollarSign,
   Star,
   MessageCircle,
-  Languages,
-  ArrowLeft
+  Languages
 } from "lucide-react";
 import { ChatButton } from "@/components/chat/ChatButton";
 import { requireUser } from "@/lib/roleGaurd";
+import { BackButton } from "@/components/global/buttons";
 
 type Props = {
   params: Promise<{
@@ -81,13 +81,7 @@ export default async function MountainBikingAdventure({ params }: Props) {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4">
           {/* Back Button */}
-          <Link
-            href="/trips"
-            className="inline-flex items-center gap-2 text-white hover:text-white/90 mb-8 transition-colors duration-300 bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20 hover:bg-black/30"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium font-roboto">Back to Trips</span>
-          </Link>
+          <BackButton isWhite={true} route="/trips" />
 
           <div className="text-center">
             <h1 className="text-4xl font-playfair md:text-6xl font-bold text-white mb-6 drop-shadow-2xl text-shadow-lg">
