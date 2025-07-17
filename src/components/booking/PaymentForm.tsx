@@ -28,20 +28,6 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // Updated color palette to match BookingSummary component
-  const cardColors = useMemo(
-    () => ({
-      header: "bg-[#a0c4ff]",
-      title: "bg-[#e0c6ff]",
-      tripDetails: "bg-[#fdffb6]", // pale yellow
-      pricing: "bg-[#caffbf]", // light green
-      teamMembers: "bg-[#ffd6ff]", // pink lavender
-      bookingInfo: "bg-[#a0c4ff]", // baby blue
-      totalAmount: "bg-[#1e293b]", // dark slate
-    }),
-    []
-  );
-
   const subtotal = useMemo(
     () => tripData.numberOfGuests * tripData.pricePerPerson,
     [tripData.numberOfGuests, tripData.pricePerPerson]
@@ -61,77 +47,72 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9ff] py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8 flex flex-col">
-          <div
-            className={`inline-block ${cardColors.header} border-3 border-black rounded-xl px-8 py-4 mb-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mx-auto`}
-          >
-            <h1 className="text-4xl font-black text-black uppercase tracking-tight">
-              Payment Details
-            </h1>
-          </div>
-          <p className="font-bold text-lg text-black bg-white inline-block px-5 py-3 border-3 border-black rounded-lg mx-auto">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 font-playfair">
+            Payment Details
+          </h1>
+          <p className="text-gray-600 font-roboto max-w-2xl mx-auto">
             Please review your trip summary before proceeding
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Trip Summary */}
-          <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
-            <div
-              className={`${cardColors.title} text-black border-b-3 border-black p-6`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                  <MapPin className="w-7 h-7 text-black" strokeWidth={2.5} />
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Trip Header */}
+            <div className="bg-purple-50 border-b border-purple-100 p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <MapPin className="w-6 h-6 text-purple-600" />
                 </div>
-                <h2 className="text-2xl font-black uppercase">
-                  {tripData.title || "Trip Summary"}
-                </h2>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 font-playfair">
+                    {tripData.title || "Trip Summary"}
+                  </h2>
+                </div>
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="ml-auto bg-white p-2 rounded-md border-2 border-black"
+                  className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                 >
                   <ChevronDown
-                    className={`w-5 h-5 text-black transition-transform ${
+                    className={`w-5 h-5 text-gray-600 transition-transform ${
                       isExpanded ? "transform rotate-180" : ""
                     }`}
-                    strokeWidth={2.5}
                   />
                 </button>
               </div>
             </div>
 
             {isExpanded && (
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Trip Details */}
-                  <div
-                    className={`border-3 border-black rounded-xl p-5 ${cardColors.tripDetails} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                  >
-                    <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-                      <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                        <Calendar
-                          className="w-6 h-6 text-black"
-                          strokeWidth={2.5}
-                        />
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="bg-purple-100 p-2.5 rounded-lg">
+                        <Calendar className="w-5 h-5 text-purple-600" />
                       </div>
-                      <h3 className="font-black text-xl text-black uppercase">
+                      <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                         Trip Details
                       </h3>
                     </div>
 
-                    <div className="space-y-3 font-bold">
-                      <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                        <span>Trip Dates:</span>
-                        <span className="font-black">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-600 font-roboto">
+                          Trip Dates:
+                        </span>
+                        <span className="font-semibold text-gray-900 font-roboto">
                           {tripData.startDate} - {tripData.endDate}
                         </span>
                       </div>
-                      <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                        <span>Participants:</span>
-                        <span className="font-black">
+                      <div className="flex justify-between items-center py-3">
+                        <span className="text-gray-600 font-roboto">
+                          Participants:
+                        </span>
+                        <span className="font-semibold text-gray-900 font-roboto">
                           {tripData.numberOfGuests}
                         </span>
                       </div>
@@ -139,90 +120,92 @@ export function PaymentForm({ onComplete, tripData }: PaymentFormProps) {
                   </div>
 
                   {/* Pricing Details */}
-                  <div
-                    className={`border-3 border-black rounded-xl p-5 ${cardColors.pricing} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                  >
-                    <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-                      <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                        <DollarSign
-                          className="w-6 h-6 text-black"
-                          strokeWidth={2.5}
-                        />
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="bg-purple-100 p-2.5 rounded-lg">
+                        <DollarSign className="w-5 h-5 text-purple-600" />
                       </div>
-                      <h3 className="font-black text-xl text-black uppercase">
+                      <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                         Pricing
                       </h3>
                     </div>
 
-                    <div className="space-y-3 font-bold">
-                      <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                        <span>Price per person:</span>
-                        <span className="font-black">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-600 font-roboto">
+                          Price per person:
+                        </span>
+                        <span className="font-semibold text-gray-900 font-roboto">
                           ${tripData.pricePerPerson}
                         </span>
                       </div>
-                      <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                        <span>
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-600 font-roboto">
                           Subtotal (${tripData.pricePerPerson} ×{" "}
                           {tripData.numberOfGuests}):
                         </span>
-                        <span className="font-black">${subtotal}</span>
+                        <span className="font-semibold text-gray-900 font-roboto">
+                          ${subtotal}
+                        </span>
                       </div>
-                      <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                        <span>Service fee (10%):</span>
-                        <span className="font-black">${serviceFee}</span>
+                      <div className="flex justify-between items-center py-3">
+                        <span className="text-gray-600 font-roboto">
+                          Service fee (10%):
+                        </span>
+                        <span className="font-semibold text-gray-900 font-roboto">
+                          ${serviceFee}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Total Amount */}
-                <div
-                  className={`flex justify-between ${cardColors.totalAmount} border-3 border-black p-4 rounded-xl text-white text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                >
-                  <span className="font-black text-xl">TOTAL AMOUNT</span>
-                  <span className="font-black text-xl">${total}</span>
+                <div className="flex justify-between items-center bg-purple-50 border border-purple-200 p-6 rounded-xl">
+                  <span className="text-xl font-bold text-gray-900 font-playfair">
+                    Total Amount
+                  </span>
+                  <span className="text-2xl font-bold text-purple-600 font-roboto">
+                    ${total}
+                  </span>
                 </div>
               </div>
             )}
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6 border-black">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6">
             <Button
               onClick={handleBack}
               disabled={isProcessing}
-              className="bg-white text-black font-black uppercase 
-                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                       hover:translate-x-[2px] hover:translate-y-[2px]
-                       transition-all duration-200 py-6 px-12
+              className="bg-white text-gray-700 font-semibold text-base
+                       border border-gray-300 rounded-xl py-3 px-6
+                       hover:bg-gray-50 hover:border-gray-400
+                       transition-all duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       flex items-center justify-center gap-2 h-16"
+                       flex items-center justify-center gap-2 font-montserrat"
             >
-              <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
+              <ArrowLeft className="w-5 h-5" />
               Back to Booking
             </Button>
             <Button
               onClick={handlePayment}
               disabled={isProcessing}
-              className={`${cardColors.header} text-black font-black uppercase 
-                       border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                       hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                       hover:translate-x-[2px] hover:translate-y-[2px]
-                       hover:text-white
-                       transition-all duration-200 py-6 px-12
+              className="bg-purple-600 text-white font-semibold text-base
+                       border border-purple-600 rounded-xl py-3 px-6
+                       hover:bg-purple-700 hover:border-purple-700
+                       transition-all duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       flex-1 flex items-center justify-center h-16`}
+                       flex-1 flex items-center justify-center gap-2 font-montserrat"
             >
               {isProcessing ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin h-5 w-5 border-2 border-black border-t-transparent rounded-full"></div>
+                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                   Processing...
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" strokeWidth={2.5} />
+                  <DollarSign className="w-5 h-5" />
                   Continue to Payment
                 </div>
               )}

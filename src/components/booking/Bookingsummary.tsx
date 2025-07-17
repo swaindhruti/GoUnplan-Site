@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   Calendar,
   Users,
@@ -25,21 +25,6 @@ export interface BookingSummaryProps {
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
   ({ booking, travelPlan, loading = false }) => {
     const router = useRouter();
-
-    // Memoized background color assignments for consistent colors between renders
-    const cardColors = useMemo(() => {
-      return {
-        header: "bg-[#a0c4ff]",
-        title: "bg-[#e0c6ff]",
-        tripDetails: "bg-[#fdffb6]", // pale yellow
-        pricing: "bg-[#caffbf]", // light green
-        teamMembers: "bg-[#ffd6ff]", // pink lavender
-        specialRequirements: "bg-[#bde0fe]", // light blue
-        bookingInfo: "bg-[#a0c4ff]", // baby blue
-        totalAmount: "bg-[#1e293b]", // dark slate
-        leadLabel: "bg-[#8b5cf6]", // purple
-      };
-    }, []);
 
     const formatDate = useCallback(
       (dateString: Date | string | undefined | null): string => {
@@ -86,31 +71,31 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     const getStatusColor = useCallback((status: string | undefined): string => {
       switch (status) {
         case "CONFIRMED":
-          return "bg-green-400 border-black border-2 text-black font-black";
+          return "bg-green-100 text-green-800 border-green-200";
         case "PENDING":
-          return "bg-yellow-300 border-black border-2 text-black font-black";
+          return "bg-yellow-100 text-yellow-800 border-yellow-200";
         case "CANCELLED":
-          return "bg-red-400 border-black border-2 text-black font-black";
+          return "bg-red-100 text-red-800 border-red-200";
         case "REFUNDED":
-          return "bg-blue-400 border-black border-2 text-black font-black";
+          return "bg-blue-100 text-blue-800 border-blue-200";
         default:
-          return "bg-gray-300 border-black border-2 text-black font-black";
+          return "bg-gray-100 text-gray-800 border-gray-200";
       }
     }, []);
 
     // Loading state
     if (loading) {
       return (
-        <div className="min-h-screen bg-[#f5f5ff] py-10 px-4">
+        <div className="min-h-screen bg-gray-50 py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="border-3 border-black rounded-xl p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
-              <div className="animate-pulse space-y-4">
-                <div className="h-10 bg-[#e0c6ff] border-2 border-black rounded w-1/3 mx-auto"></div>
-                <div className="h-6 bg-[#a0c4ff] border-2 border-black rounded w-1/2 mx-auto"></div>
-                <div className="space-y-4 mt-10">
-                  <div className="h-40 bg-[#fdffb6] border-2 border-black rounded"></div>
-                  <div className="h-32 bg-[#caffbf] border-2 border-black rounded"></div>
-                  <div className="h-56 bg-[#ffd6ff] border-2 border-black rounded"></div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="animate-pulse space-y-6">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                <div className="space-y-6 mt-8">
+                  <div className="h-40 bg-gray-200 rounded-xl"></div>
+                  <div className="h-32 bg-gray-200 rounded-xl"></div>
+                  <div className="h-56 bg-gray-200 rounded-xl"></div>
                 </div>
               </div>
             </div>
@@ -122,13 +107,13 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     // Error state
     if (!booking) {
       return (
-        <div className="min-h-screen bg-[#fff5f5] py-10 px-4">
+        <div className="min-h-screen bg-gray-50 py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="border-3 border-black rounded-xl p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-red-400 text-center">
-              <h2 className="text-3xl font-black text-black mb-4 uppercase">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 font-playfair">
                 Booking Not Found
               </h2>
-              <p className="text-xl font-bold text-black">
+              <p className="text-gray-600 font-roboto">
                 Unable to load booking details.
               </p>
             </div>
@@ -138,89 +123,91 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     }
 
     return (
-      <div className="min-h-screen bg-[#f9f9ff] py-10 px-4">
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <div
-              className={`inline-block ${cardColors.header} border-3 border-black rounded-xl px-8 py-4 mb-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]`}
-            >
-              <h1 className="text-4xl font-black text-black uppercase tracking-tight">
-                Booking Summary
-              </h1>
-            </div>
-            <p className="font-bold text-lg text-black bg-white inline-block px-5 py-3 border-3 border-black rounded-lg">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 font-playfair">
+              Booking Summary
+            </h1>
+            <p className="text-gray-600 font-roboto max-w-2xl mx-auto">
               Please review your booking details before proceeding to payment
             </p>
           </div>
 
-          <div className="border-3 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
-            <div
-              className={`${cardColors.title} text-black border-b-3 border-black p-6`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                  <MapPin className="w-7 h-7 text-black" strokeWidth={2.5} />
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Trip Header */}
+            <div className="bg-purple-50 border-b border-purple-100 p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <MapPin className="w-6 h-6 text-purple-600" />
                 </div>
-                <h2 className="text-3xl font-black uppercase">
-                  {travelPlan?.title || "Travel Package"}
-                </h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 font-playfair">
+                    {travelPlan?.title || "Travel Package"}
+                  </h2>
+                  <p className="text-purple-600 font-medium font-roboto">
+                    {travelPlan?.destination || "Destination"}
+                  </p>
+                </div>
               </div>
-              <p className="text-xl text-black font-bold mb-2">
-                {travelPlan?.destination || "Destination"}
-              </p>
               {travelPlan?.description && (
-                <p className="bg-white border-2 border-black p-4 rounded-md mt-3 font-bold text-lg">
+                <p className="text-gray-700 font-roboto leading-relaxed">
                   {travelPlan.description}
                 </p>
               )}
             </div>
 
-            <div className="p-6 space-y-7">
+            <div className="p-6 space-y-8">
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Trip Details Card */}
-                <div
-                  className={`border-3 border-black rounded-xl p-5 ${cardColors.tripDetails} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                >
-                  <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-                    <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                      <Calendar
-                        className="w-7 h-7 text-black"
-                        strokeWidth={2.5}
-                      />
+                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-purple-100 p-2.5 rounded-lg">
+                      <Calendar className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="font-black text-2xl text-black uppercase">
+                    <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                       Trip Details
                     </h3>
                   </div>
-                  <div className="space-y-3 font-bold">
-                    <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Check-in:</span>
-                      <span className="font-black">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Check-in:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
                         {formatDate(booking.startDate)}
                       </span>
                     </div>
-                    <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Check-out:</span>
-                      <span className="font-black">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Check-out:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
                         {formatDate(booking.endDate)}
                       </span>
                     </div>
-                    <div className="flex justify-between bg-[#fff8c9] border-2 border-black p-3 rounded-md text-lg">
-                      <span>Duration:</span>
-                      <span className="font-black">{getDuration()} days</span>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Duration:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
+                        {getDuration()} days
+                      </span>
                     </div>
-                    <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Participants:</span>
-                      <span className="font-black">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Participants:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
                         {booking.participants || 0}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Status:</span>
+                    <div className="flex justify-between items-center py-3">
+                      <span className="text-gray-600 font-roboto">Status:</span>
                       <span
-                        className={`px-3 py-1 text-base rounded-md uppercase ${getStatusColor(
+                        className={`px-3 py-1 text-sm rounded-full border ${getStatusColor(
                           booking.status
-                        )}`}
+                        )} font-medium`}
                       >
                         {booking.status || "PENDING"}
                       </span>
@@ -229,38 +216,37 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                 </div>
 
                 {/* Pricing Card */}
-                <div
-                  className={`border-3 border-black rounded-xl p-5 ${cardColors.pricing} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                >
-                  <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-                    <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                      <DollarSign
-                        className="w-7 h-7 text-black"
-                        strokeWidth={2.5}
-                      />
+                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-purple-100 p-2.5 rounded-lg">
+                      <DollarSign className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="font-black text-2xl text-black uppercase">
+                    <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                       Pricing
                     </h3>
                   </div>
-                  <div className="space-y-3 font-bold">
-                    <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Price per person:</span>
-                      <span className="font-black">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Price per person:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
                         {formatCurrency(booking.pricePerPerson)}
                       </span>
                     </div>
-                    <div className="flex justify-between bg-white border-2 border-black p-3 rounded-md text-lg">
-                      <span>Total participants:</span>
-                      <span className="font-black">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600 font-roboto">
+                        Total participants:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-roboto">
                         {booking.participants || 0}
                       </span>
                     </div>
-                    <div
-                      className={`flex justify-between ${cardColors.totalAmount} border-2 border-black p-4 rounded-md text-white text-lg`}
-                    >
-                      <span>Total amount:</span>
-                      <span className="font-black text-xl">
+                    <div className="flex justify-between items-center py-4 bg-purple-50 rounded-lg px-4">
+                      <span className="text-gray-900 font-semibold font-roboto">
+                        Total amount:
+                      </span>
+                      <span className="text-xl font-bold text-purple-600 font-roboto">
                         {formatCurrency(booking.totalPrice)}
                       </span>
                     </div>
@@ -270,155 +256,143 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
               {/* Team Members Card */}
               {booking.guests && booking.guests.length > 0 && (
-                <div
-                  className={`border-3 border-black rounded-xl p-5 ${cardColors.teamMembers} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                >
-                  <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
-                    <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                      <Users className="w-7 h-7 text-black" strokeWidth={2.5} />
+                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-purple-100 p-2.5 rounded-lg">
+                      <Users className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="font-black text-2xl text-black uppercase">
+                    <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                       Team Members ({booking.guests.length})
                     </h3>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {booking.guests.map((member, index) => (
                       <div
                         key={member.memberEmail + index}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white rounded-md border-2 border-black"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100"
                       >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`p-2.5 ${
-                              member.isteamLead ? "bg-[#caffbf]" : "bg-white"
-                            } border-2 border-black rounded-md`}
-                          >
-                            <User
-                              className="w-6 h-6 text-black"
-                              strokeWidth={2.5}
-                            />
+                        <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                          <div className="bg-purple-100 p-2 rounded-lg">
+                            <User className="w-4 h-4 text-purple-600" />
                           </div>
                           <div>
-                            <p className="font-black text-lg text-black">
+                            <p className="font-semibold text-gray-900 font-roboto">
                               {member.firstName} {member.lastName}
-                              {member.isteamLead && (
-                                <span
-                                  className={`ml-2 px-2 py-0.5 ${cardColors.leadLabel} text-white text-xs rounded uppercase font-black`}
-                                >
-                                  Lead
-                                </span>
-                              )}
                             </p>
-                            <p className="font-bold text-lg text-gray-700">
+                            <p className="text-sm text-gray-600 font-roboto">
                               {member.memberEmail}
                             </p>
                           </div>
                         </div>
-                        <div className="mt-2 sm:mt-0 font-bold text-lg border-2 border-black rounded px-3 py-1 bg-white">
-                          {member.phone}
-                        </div>
+                        {member.isteamLead && (
+                          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium border border-purple-200">
+                            Team Lead
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Special Requirements Card */}
+              {/* Special Requirements */}
               {booking.specialRequirements && (
-                <div
-                  className={`border-3 border-black rounded-xl p-5 ${cardColors.specialRequirements} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                >
-                  <div className="flex items-center gap-3 mb-3 border-b-2 border-black pb-3">
-                    <div className="bg-white p-2.5 rounded-md border-2 border-black">
-                      <FileText
-                        className="w-7 h-7 text-black"
-                        strokeWidth={2.5}
-                      />
+                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-purple-100 p-2.5 rounded-lg">
+                      <FileText className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="font-black text-2xl text-black uppercase">
+                    <h3 className="text-xl font-semibold text-gray-900 font-playfair">
                       Special Requirements
                     </h3>
                   </div>
-                  <p className="bg-white border-2 border-black p-4 rounded-md font-bold text-lg">
+                  <p className="text-gray-700 font-roboto leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100">
                     {booking.specialRequirements}
                   </p>
                 </div>
               )}
 
-              {/* Booking Information */}
-              <div
-                className={`grid md:grid-cols-2 gap-4 ${cardColors.bookingInfo} p-5 border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-              >
-                <div className="bg-white p-3 border-2 border-black rounded-md font-bold text-center text-lg">
-                  <span className="font-black">Booking ID: </span>
-                  <span className="font-mono">{booking.id}</span>
+              {/* Booking Info */}
+              <div className="grid md:grid-cols-2 gap-4 bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <div className="bg-white p-4 rounded-lg border border-gray-100">
+                  <span className="text-sm text-gray-600 font-roboto">
+                    Booking ID:{" "}
+                  </span>
+                  <span className="font-mono font-semibold text-gray-900">
+                    {booking.id}
+                  </span>
                 </div>
-                <div className="bg-white p-3 border-2 border-black rounded-md font-bold text-center text-lg">
-                  <span className="font-black">Booked on: </span>
-                  <span>{formatDate(booking.createdAt)}</span>
+                <div className="bg-white p-4 rounded-lg border border-gray-100">
+                  <span className="text-sm text-gray-600 font-roboto">
+                    Booked on:{" "}
+                  </span>
+                  <span className="font-semibold text-gray-900 font-roboto">
+                    {formatDate(booking.createdAt)}
+                  </span>
                   {booking.updatedAt &&
                     booking.updatedAt !== booking.createdAt && (
                       <div className="mt-1">
-                        <span className="font-black">Last updated: </span>
-                        <span>{formatDate(booking.updatedAt)}</span>
+                        <span className="text-sm text-gray-600 font-roboto">
+                          Last updated:{" "}
+                        </span>
+                        <span className="font-semibold text-gray-900 font-roboto">
+                          {formatDate(booking.updatedAt)}
+                        </span>
                       </div>
                     )}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              {booking.formSubmitted && booking.status !== "CANCELLED" && (
-                <div className="flex flex-col sm:flex-row gap-4 pt-5 border-t-3 border-black">
-                  <button
-                    onClick={handleEditDetails}
-                    className="flex-1 bg-white text-black font-black text-xl uppercase 
-                           border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                           hover:bg-[#f0f0ff] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                           hover:translate-x-[2px] hover:translate-y-[2px]
-                           transition-all duration-200 py-4 px-6 rounded-md
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+                <button
+                  onClick={handleEditDetails}
+                  className="flex-1 bg-white text-gray-700 font-semibold text-base
+                           border border-gray-300 rounded-xl py-3 px-6
+                           hover:bg-gray-50 hover:border-gray-400
+                           transition-all duration-200
                            disabled:opacity-50 disabled:cursor-not-allowed
-                           flex items-center justify-center gap-2"
-                    disabled={loading}
-                    type="button"
-                  >
-                    <Edit2 className="w-6 h-6" strokeWidth={2.5} />
-                    Edit Details
-                  </button>
-                  <button
-                    onClick={() => {
-                      router.push(
-                        `/trips/booking/${booking.travelPlanId}/payment-form`
-                      );
-                    }}
-                    className="flex-1 bg-black text-white font-black text-xl uppercase 
-                           border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                           hover:bg-[#1e293b] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                           hover:translate-x-[2px] hover:translate-y-[2px]
-                           transition-all duration-200 py-4 px-6 rounded-md
+                           flex items-center justify-center gap-2 font-montserrat"
+                  disabled={loading}
+                  type="button"
+                >
+                  <Edit2 className="w-5 h-5" />
+                  Edit Details
+                </button>
+
+                <button
+                  onClick={() => {
+                    router.push(
+                      `/trips/booking/${booking.travelPlanId}/payment-form`
+                    );
+                  }}
+                  className="flex-1 bg-purple-600 text-white font-semibold text-base
+                           border border-purple-600 rounded-xl py-3 px-6
+                           hover:bg-purple-700 hover:border-purple-700
+                           transition-all duration-200
                            disabled:opacity-50 disabled:cursor-not-allowed
-                           flex items-center justify-center gap-2"
-                    disabled={loading || booking.status === "CONFIRMED"}
-                    type="button"
-                  >
-                    {booking.status === "CONFIRMED" ? (
-                      "Payment Completed"
-                    ) : (
-                      <>
-                        Continue to Payment
-                        <ArrowRight className="w-6 h-6" strokeWidth={2.5} />
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
+                           flex items-center justify-center gap-2 font-montserrat"
+                  disabled={loading || booking.status === "CONFIRMED"}
+                  type="button"
+                >
+                  {booking.status === "CONFIRMED" ? (
+                    "Payment Completed"
+                  ) : (
+                    <>
+                      Continue to Payment
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
 
               {/* Terms and Conditions */}
-              <div className="text-center bg-[#f9f9ff] border-2 border-black rounded-md p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <p className="font-bold text-lg">
+              <div className="text-center bg-gray-50 border border-gray-100 rounded-xl p-4">
+                <p className="text-gray-600 font-roboto">
                   By proceeding, you agree to our{" "}
                   <a
                     href="#"
-                    className="underline decoration-2 decoration-black hover:bg-[#e0e0ff] transition-colors"
+                    className="text-purple-600 hover:text-purple-700 underline font-medium transition-colors"
                   >
                     Terms & Conditions
                   </a>
