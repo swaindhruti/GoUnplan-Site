@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,26 +112,6 @@ export function GuestInformationForm({
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Premium color palette for guest cards
-  const guestCardColors = useMemo(
-    () => [
-      "bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50",
-      "bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50",
-      "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50",
-      "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50",
-      "bg-gradient-to-r from-pink-100 to-rose-100 border-pink-200/50",
-      "bg-gradient-to-r from-emerald-100 to-teal-100 border-emerald-200/50",
-      "bg-gradient-to-r from-violet-100 to-purple-100 border-violet-200/50",
-      "bg-gradient-to-r from-amber-100 to-yellow-100 border-amber-200/50",
-    ],
-    []
-  );
-
-  // Get color by guest index - consistent assignment
-  const getGuestCardColor = (index: number): string => {
-    return guestCardColors[index % guestCardColors.length];
-  };
 
   const validateField = (
     field: string,
@@ -307,9 +287,9 @@ export function GuestInformationForm({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-4 border-b border-white/30 pb-6 mb-8">
-        <div className="bg-gradient-to-r from-green-400 to-emerald-400 p-4 rounded-2xl shadow-lg">
-          <Users className="h-8 w-8 text-white" strokeWidth={2.5} />
+      <div className="flex items-center gap-4 border-b border-purple-100 pb-6 mb-8">
+        <div className="bg-purple-100 p-4 rounded-2xl">
+          <Users className="h-8 w-8 text-purple-600" strokeWidth={2.5} />
         </div>
         <h2 className="text-3xl font-playfair font-bold text-gray-800">
           Guest Information
@@ -317,10 +297,10 @@ export function GuestInformationForm({
       </div>
 
       {/* Number of Guests */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl shadow-lg">
-            <Users className="w-7 h-7 text-white" strokeWidth={2.5} />
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
+        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
+          <div className="bg-purple-100 p-3 rounded-xl">
+            <Users className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
           <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Number of Guests
@@ -339,21 +319,21 @@ export function GuestInformationForm({
               <Button
                 key={num}
                 onClick={() => handleNumberOfGuestsChange(num.toString())}
-                className={`font-bold text-lg py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                className={`font-bold text-lg py-3 px-4 rounded-xl transition-all duration-300 font-montserrat border border-purple-100 ${
                   numberOfGuests === num
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30"
-                    : "bg-white/80 backdrop-blur-xl border border-white/60 text-gray-700 hover:bg-white hover:shadow-2xl hover:shadow-purple-500/20"
+                    ? "bg-purple-600 text-white"
+                    : "bg-white text-purple-700 hover:bg-purple-50"
                 }`}
               >
                 {num}
               </Button>
             ))}
           </div>
-          <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl mt-4 font-semibold text-gray-700 shadow-lg">
+          <p className="bg-white border border-purple-50 p-4 rounded-xl mt-4 font-semibold text-gray-700">
             Maximum {maxGuests} people per booking
           </p>
           {getFieldError("participants") && (
-            <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-4 rounded-xl font-semibold text-red-700 shadow-lg animate-fade-in">
+            <p className="bg-red-50 border border-red-200 p-4 rounded-xl font-semibold text-red-700">
               {getFieldError("participants")}
             </p>
           )}
@@ -361,11 +341,11 @@ export function GuestInformationForm({
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between mb-6 border-b border-white/30 pb-4">
+        <div className="flex items-center justify-between mb-6 border-b border-purple-100 pb-4">
           <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Guest Details
           </h3>
-          <div className="backdrop-blur-xl bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200/50 rounded-xl px-6 py-3 font-bold text-lg shadow-lg">
+          <div className="bg-purple-100 border border-purple-200 rounded-xl px-6 py-3 font-bold text-lg">
             {guestForms.length} of {numberOfGuests} guest
             {numberOfGuests > 1 ? "s" : ""}
           </div>
@@ -374,19 +354,17 @@ export function GuestInformationForm({
         {guestForms.map((guest, index) => (
           <div
             key={index}
-            className={`backdrop-blur-xl border border-white/60 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 ${getGuestCardColor(
-              index
-            )}`}
+            className="bg-white border border-purple-100 rounded-2xl overflow-hidden shadow-sm"
           >
-            <div className="backdrop-blur-xl bg-white/80 border-b border-white/30 flex items-center justify-between p-6">
+            <div className="bg-white border-b border-purple-100 flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
-                  <User className="w-7 h-7 text-white" strokeWidth={2.5} />
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <User className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
                 </div>
                 <h3 className="font-bold text-xl text-gray-800">
                   Guest {index + 1}
                   {guest.isteamLead && (
-                    <span className="ml-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 text-sm rounded-xl uppercase font-semibold shadow-lg">
+                    <span className="ml-3 bg-purple-600 text-white px-4 py-1 text-sm rounded-xl uppercase font-semibold">
                       Team Lead
                     </span>
                   )}
@@ -395,9 +373,7 @@ export function GuestInformationForm({
               {guestForms.length > 1 && (
                 <Button
                   onClick={() => removeGuestForm(index)}
-                  className="bg-white/80 backdrop-blur-xl border border-white/60 text-red-600 hover:bg-red-500 hover:text-white 
-                            font-semibold shadow-lg hover:shadow-2xl hover:shadow-red-500/20 
-                            hover:scale-105 transition-all duration-300 p-3 rounded-xl"
+                  className="bg-white border border-purple-100 text-red-600 hover:bg-red-50 font-semibold p-3 rounded-xl"
                 >
                   <Trash2 className="w-5 h-5" strokeWidth={2.5} />
                 </Button>
@@ -420,14 +396,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "firstName", e.target.value)
                     }
-                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
+                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
                       getFieldError("firstName", index)
-                        ? "border-red-400 shadow-red-500/20"
-                        : "hover:border-purple-400 hover:shadow-purple-500/20"
+                        ? "border-red-400"
+                        : "hover:border-purple-400"
                     }`}
                   />
                   {getFieldError("firstName", index) && (
-                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
+                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
                       {getFieldError("firstName", index)}
                     </p>
                   )}
@@ -447,14 +423,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "lastName", e.target.value)
                     }
-                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
+                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
                       getFieldError("lastName", index)
-                        ? "border-red-400 shadow-red-500/20"
-                        : "hover:border-purple-400 hover:shadow-purple-500/20"
+                        ? "border-red-400"
+                        : "hover:border-purple-400"
                     }`}
                   />
                   {getFieldError("lastName", index) && (
-                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
+                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
                       {getFieldError("lastName", index)}
                     </p>
                   )}
@@ -477,14 +453,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "memberEmail", e.target.value)
                     }
-                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
+                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
                       getFieldError("memberEmail", index)
-                        ? "border-red-400 shadow-red-500/20"
-                        : "hover:border-purple-400 hover:shadow-purple-500/20"
+                        ? "border-red-400"
+                        : "hover:border-purple-400"
                     }`}
                   />
                   {getFieldError("memberEmail", index) && (
-                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
+                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
                       {getFieldError("memberEmail", index)}
                     </p>
                   )}
@@ -505,14 +481,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "phone", e.target.value)
                     }
-                    className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
+                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
                       getFieldError("phone", index)
-                        ? "border-red-400 shadow-red-500/20"
-                        : "hover:border-purple-400 hover:shadow-purple-500/20"
+                        ? "border-red-400"
+                        : "hover:border-purple-400"
                     }`}
                   />
                   {getFieldError("phone", index) && (
-                    <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-3 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
+                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
                       {getFieldError("phone", index)}
                     </p>
                   )}
@@ -520,7 +496,7 @@ export function GuestInformationForm({
               </div>
 
               {numberOfGuests > 1 && (
-                <div className="pt-6 border-t border-white/30">
+                <div className="pt-6 border-t border-purple-100">
                   <div className="flex items-center space-x-4">
                     <input
                       type="checkbox"
@@ -542,8 +518,8 @@ export function GuestInformationForm({
               )}
 
               {(numberOfGuests === 1 || guest.isteamLead) && (
-                <div className="pt-6 border-t border-white/30">
-                  <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl font-medium text-gray-700 shadow-lg">
+                <div className="pt-6 border-t border-purple-100">
+                  <p className="bg-white border border-purple-50 p-4 rounded-xl font-medium text-gray-700">
                     <strong>Note:</strong> This person will be the primary
                     contact for the booking.
                   </p>
@@ -556,9 +532,7 @@ export function GuestInformationForm({
         {canAddMoreForms && (
           <Button
             onClick={addGuestForm}
-            className="w-full backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold text-lg
-                     shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
-                     transition-all duration-300 py-6 rounded-2xl"
+            className="w-full bg-white border border-purple-100 text-purple-700 font-semibold text-lg font-montserrat hover:bg-purple-50 transition-all duration-300 py-6 rounded-2xl"
           >
             <Plus className="w-6 h-6 mr-3" strokeWidth={2.5} />
             Add Guest ({guestForms.length}/{numberOfGuests})
@@ -567,7 +541,7 @@ export function GuestInformationForm({
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="backdrop-blur-xl bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200/50 rounded-2xl p-6 shadow-xl">
+          <div className="bg-white border border-purple-100 rounded-2xl p-6">
             <p className="font-semibold text-lg text-gray-700">
               All guest forms added. You can increase the number of guests above
               to add more.
@@ -577,11 +551,11 @@ export function GuestInformationForm({
       </div>
 
       {/* Special Requirements */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
-          <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
+        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
+          <div className="bg-purple-100 p-3 rounded-xl">
             <BriefcaseMedical
-              className="w-7 h-7 text-white"
+              className="w-7 h-7 text-purple-600"
               strokeWidth={2.5}
             />
           </div>
@@ -604,17 +578,17 @@ export function GuestInformationForm({
             value={specialRequirements}
             onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
             rows={4}
-            className={`backdrop-blur-xl bg-white/80 border border-white/60 text-lg rounded-xl shadow-lg transition-all duration-300 ${
+            className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
               getFieldError("specialRequirements")
-                ? "border-red-400 shadow-red-500/20"
-                : "hover:border-purple-400 hover:shadow-purple-500/20"
+                ? "border-red-400"
+                : "hover:border-purple-400"
             }`}
           />
-          <p className="backdrop-blur-xl bg-white/80 border border-white/60 p-4 rounded-xl mt-3 font-semibold text-gray-700 shadow-lg">
+          <p className="bg-white border border-purple-50 p-4 rounded-xl mt-3 font-semibold text-gray-700">
             Maximum 500 characters ({specialRequirements.length}/500)
           </p>
           {getFieldError("specialRequirements") && (
-            <p className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 p-4 rounded-xl font-medium text-red-700 shadow-lg animate-fade-in">
+            <p className="bg-red-50 border border-red-200 p-4 rounded-xl font-medium text-red-700">
               {getFieldError("specialRequirements")}
             </p>
           )}
@@ -622,18 +596,18 @@ export function GuestInformationForm({
       </div>
 
       {/* Booking Summary */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-        <div className="flex items-center gap-4 mb-6 border-b border-white/30 pb-4">
-          <div className="bg-gradient-to-r from-pink-400 to-rose-400 p-3 rounded-xl shadow-lg">
-            <FileText className="w-7 h-7 text-white" strokeWidth={2.5} />
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
+        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
+          <div className="bg-purple-100 p-3 rounded-xl">
+            <FileText className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
           <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Booking Summary
           </h3>
         </div>
 
-        <div className="space-y-4 backdrop-blur-xl bg-white/80 border border-white/60 p-6 rounded-2xl shadow-lg">
-          <div className="flex justify-between border-b border-white/30 pb-4">
+        <div className="space-y-4 bg-white border border-purple-50 p-6 rounded-2xl">
+          <div className="flex justify-between border-b border-purple-100 pb-4">
             <span className="font-semibold text-lg text-gray-700">
               Number of Guests:
             </span>
@@ -641,7 +615,7 @@ export function GuestInformationForm({
               {numberOfGuests}
             </span>
           </div>
-          <div className="flex justify-between border-b border-white/30 pb-4">
+          <div className="flex justify-between border-b border-purple-100 pb-4">
             <span className="font-semibold text-lg text-gray-700">
               Forms Completed:
             </span>
@@ -659,7 +633,7 @@ export function GuestInformationForm({
             </span>
           </div>
           {numberOfGuests > 1 && (
-            <div className="flex justify-between border-b border-white/30 pb-4">
+            <div className="flex justify-between border-b border-purple-100 pb-4">
               <span className="font-semibold text-lg text-gray-700">
                 Team Lead:
               </span>
@@ -670,11 +644,11 @@ export function GuestInformationForm({
             </div>
           )}
           {specialRequirements && (
-            <div className="pt-4 border-t border-white/30">
+            <div className="pt-4 border-t border-purple-100">
               <span className="font-semibold block mb-3 text-lg text-gray-700">
                 Special Requirements:
               </span>
-              <p className="backdrop-blur-xl bg-gradient-to-r from-gray-50 to-gray-100 p-4 border border-gray-200/50 rounded-xl text-lg text-gray-700 shadow-lg">
+              <p className="bg-gray-50 p-4 border border-gray-200 rounded-xl text-lg text-gray-700">
                 {specialRequirements}
               </p>
             </div>
@@ -682,13 +656,11 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      <div className="flex justify-between pt-8 border-t border-white/30">
+      <div className="flex justify-between pt-8 border-t border-purple-100">
         <Button
           onClick={onBack}
           disabled={isSubmitting}
-          className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 hover:text-white font-semibold text-xl
-                   shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105
-                   transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
+          className="bg-white border border-purple-100 text-purple-700 hover:bg-purple-50 font-semibold text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
         >
           <ArrowLeft className="w-6 h-6" />
           Back to Dates
@@ -696,32 +668,12 @@ export function GuestInformationForm({
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 text-xl
-                   shadow-xl hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-105
-                   transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
+          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
           <ArrowRight className="w-6 h-6" />
         </Button>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { DateSelector } from "./DateSelector";
 import { TripSummary } from "./TripSummary";
-import { TripCard } from "./TripCard";
 import { BookingProgress } from "./BookingProgress";
 import { GuestInformationForm } from "./GuestInformation";
 import { format, addDays } from "date-fns";
@@ -15,12 +14,13 @@ import {
   Calendar,
   Users,
   CheckCircle,
-  MapPin,
-  Clock,
-  Save,
-  ArrowRight,
-  Sparkles,
+  DollarSign,
+  MessageCircle,
+  Languages,
+  Star,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BackButton } from "@/components/global/buttons";
 
 interface BookingPageProps {
   userId: string;
@@ -30,46 +30,9 @@ interface BookingPageProps {
   Step?: number;
 }
 
-// Animated Counter Component
-const AnimatedCounter = ({
-  value,
-  duration = 2000,
-  className = "",
-}: {
-  value: number;
-  duration?: number;
-  className?: string;
-}) => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      setCount(Math.floor(progress * value));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value, duration]);
-
-  return <span className={className}>{count}</span>;
-};
-
-// Enhanced Loading Component with premium design
-const EnhancedLoadingState = ({ tripData }: { tripData: TravelPlan }) => {
+const EnhancedLoadingState = () => {
   const [loadingText, setLoadingText] = useState("Preparing your booking...");
   const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
-
   useEffect(() => {
     const messages = [
       "Preparing your booking...",
@@ -77,128 +40,40 @@ const EnhancedLoadingState = ({ tripData }: { tripData: TravelPlan }) => {
       "Securing your spot...",
       "Almost ready...",
     ];
-
     let messageIndex = 0;
     let progressValue = 0;
-
     const interval = setInterval(() => {
       progressValue += 25;
       setProgress(progressValue);
-      setCurrentStep(messageIndex);
-
       if (messageIndex < messages.length - 1) {
         setLoadingText(messages[messageIndex]);
         messageIndex++;
       }
-
       if (progressValue >= 100) {
         clearInterval(interval);
         setLoadingText("Finalizing booking...");
       }
     }, 800);
-
     return () => clearInterval(interval);
   }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 py-12 overflow-hidden">
-      {/* Premium background effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/10" />
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.3),transparent_50%)]" />
-      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(236,72,153,0.3),transparent_50%)]" />
-
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="backdrop-blur-3xl bg-white/15 border border-white/25 rounded-3xl p-10 shadow-2xl shadow-purple-900/20 text-center max-w-md w-full animate-fade-in-up">
-            {/* Trip Info Card */}
-            <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-6 mb-8 shadow-xl">
-              <h2 className="text-2xl font-playfair font-bold text-white mb-4 drop-shadow-lg">
-                {tripData.title}
-              </h2>
-              <div className="flex items-center justify-center gap-6 text-white/90 font-medium">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  <span>
-                    {tripData.city}, {tripData.state}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  <span>{tripData.noOfDays} days</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Animated Loading Icon */}
-            <div className="mb-8">
-              <div className="relative">
-                <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-6 rounded-full shadow-2xl shadow-purple-500/30 mb-4 inline-block animate-pulse">
-                  <Save className="h-16 w-16 text-white" strokeWidth={2.5} />
-                </div>
-                <Loader2 className="h-12 w-12 animate-spin text-purple-400 absolute -top-2 -right-2 bg-white/90 backdrop-blur-xl rounded-full border-2 border-purple-300 p-2 shadow-lg" />
-
-                {/* Floating sparkles */}
-                <div className="absolute -top-4 -left-4 animate-bounce">
-                  <Sparkles className="h-6 w-6 text-yellow-300" />
-                </div>
-                <div
-                  className="absolute -bottom-4 -right-4 animate-bounce"
-                  style={{ animationDelay: "0.5s" }}
-                >
-                  <Sparkles className="h-6 w-6 text-pink-300" />
-                </div>
-              </div>
-            </div>
-
-            {/* Loading Text */}
-            <div className="mb-8">
-              <p className="text-2xl font-playfair font-bold text-white mb-3 drop-shadow-lg animate-fade-in">
-                {loadingText}
-              </p>
-              <p className="text-lg font-medium text-white/80">
-                Please don&apos;t close this page
-              </p>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-full h-4 overflow-hidden shadow-inner">
-                <div
-                  className="bg-gradient-to-r from-purple-400 to-pink-400 h-full transition-all duration-700 ease-out shadow-lg"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <p className="text-sm font-bold mt-3 text-white/90">
-                <AnimatedCounter value={progress} duration={500} />% Complete
-              </p>
-            </div>
-
-            {/* Progress Steps */}
-            <div className="grid grid-cols-4 gap-2 mb-8">
-              {["Prep", "Check", "Secure", "Ready"].map((step, index) => (
-                <div
-                  key={step}
-                  className={`text-xs font-bold p-2 rounded-lg transition-all duration-300 ${
-                    index <= currentStep
-                      ? "bg-gradient-to-r from-purple-400 to-pink-400 text-white shadow-lg"
-                      : "bg-white/20 text-white/60"
-                  }`}
-                >
-                  {step}
-                </div>
-              ))}
-            </div>
-
-            {/* Info Card */}
-            <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-4 text-left">
-              <p className="text-base font-medium text-white/90">
-                💡 <span className="font-bold">Did you know?</span> Your booking
-                is secured with our free cancellation policy up to 14 days
-                before your trip!
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-md border border-purple-100 rounded-2xl shadow-sm p-8 text-center">
+        <div className="mb-6 flex justify-center">
+          <Loader2 className="h-10 w-10 text-purple-600 animate-spin" />
         </div>
+        <h2 className="text-xl font-semibold mb-2 text-gray-900">
+          {loadingText}
+        </h2>
+        <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+          <div
+            className="bg-purple-600 h-2 rounded-full transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <p className="text-sm text-gray-500">
+          Please don&apos;t close this page
+        </p>
       </div>
     </div>
   );
@@ -212,17 +87,14 @@ export function BookingPage({
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
   const bookingData = useBookingStore((state) => state.bookingData);
   const isLoading = useBookingStore((state) => state.isLoading);
-  const error = useBookingStore((state) => state.error);
   const updateBookingData = useBookingStore((state) => state.updateBookingData);
   const updateDateSelection = useBookingStore(
     (state) => state.updateDateSelection
   );
   const updateGuestInfo = useBookingStore((state) => state.updateGuestInfo);
   const createNewBooking = useBookingStore((state) => state.createNewBooking);
-
   const [startDate, setStartDate] = useState<Date>(
     bookingData.startDate || new Date()
   );
@@ -260,7 +132,6 @@ export function BookingPage({
     async (newStartDate: Date, newEndDate: Date) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
-
       await updateDateSelection({
         startDate: newStartDate,
         endDate: newEndDate,
@@ -271,7 +142,6 @@ export function BookingPage({
 
   const handleContinue = useCallback(async () => {
     setIsTransitioning(true);
-
     if (currentStep === 1 && !bookingData.id) {
       const initialBookingData = {
         userId,
@@ -283,15 +153,12 @@ export function BookingPage({
         status: "PENDING" as const,
         totalPrice: (tripData?.price || 0) * numberOfGuests,
       };
-
       const newBooking = await createNewBooking(initialBookingData);
       if (!newBooking) {
-        console.error("Failed to create booking");
         setIsTransitioning(false);
         return;
       }
     }
-
     if (currentStep < 3) {
       setTimeout(() => {
         setCurrentStep((prev) => prev + 1);
@@ -323,13 +190,11 @@ export function BookingPage({
   const handleGuestInfoSubmit = useCallback(
     async (guestCount: number, guestData: BookingFormData) => {
       setNumberOfGuests(guestCount);
-
       const success = await updateGuestInfo({
         participants: guestCount,
         guests: guestData.guests,
         specialRequirements: guestData.specialRequirements,
       });
-
       if (success) {
         handleContinue();
       }
@@ -337,57 +202,76 @@ export function BookingPage({
     [updateGuestInfo, handleContinue]
   );
 
-  const displayTripData = useMemo(
-    () => ({
-      title: tripData.title,
-      duration: tripData.noOfDays,
-      maxPeople: tripData.maxParticipants,
-      location: `${tripData.city}, ${tripData.state}, ${tripData.country}`,
-      pricePerPerson: tripData.price,
-      imageUrl: "/placeholder.svg?height=300&width=400",
-      whatsIncluded: tripData.includedActivities,
-      cancellationPolicy:
-        "Free cancellation up to 14 days before the trip. 50% refund for cancellations 7-14 days before. No refund for cancellations within 7 days of the trip start date.",
-      hostInfo: {
-        name: tripData.host?.user.name || "",
-        experience: "Professional travel guide with 5+ years experience",
-        description: tripData.host?.description || "",
-      },
-    }),
-    [tripData]
-  );
+  const createdYear = new Date(tripData.createdAt || new Date()).getFullYear();
+  const heroTags = [
+    "Available year-round",
+    `${tripData.noOfDays} days`,
+    `Max ${tripData.maxParticipants} people`,
+    `₹${tripData.price} per person`,
+  ];
+  const hostInfo = {
+    name: tripData.host?.user.name || "Host",
+    image: tripData.host?.image || "https://via.placeholder.com/60",
+    email: tripData.host?.hostEmail || "",
+    description: tripData.host?.description || "",
+    createdYear,
+  };
+  const tripStats = {
+    price: tripData.price,
+    noOfDays: tripData.noOfDays,
+    maxParticipants: tripData.maxParticipants,
+    languages: tripData.languages?.join(", ") || "English",
+  };
 
-  // Show enhanced loading state
   if (isLoading) {
-    return <EnhancedLoadingState tripData={tripData} />;
+    return <EnhancedLoadingState />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
-      {/* Premium Hero Section */}
-      <div className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 py-16 overflow-hidden">
-        {/* Premium background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/10" />
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.3),transparent_50%)]" />
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(236,72,153,0.3),transparent_50%)]" />
-
-        <div className="relative z-10 container mx-auto px-6 py-8 max-w-7xl">
-          {/* Error state */}
-          {error && (
-            <div className="backdrop-blur-xl bg-red-500/20 border border-red-400/30 rounded-2xl p-6 mb-8 shadow-xl animate-fade-in">
-              <p className="text-white font-semibold text-lg">{error}</p>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section
+        className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat border-b border-purple-100"
+        style={{
+          backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`,
+        }}
+      >
+        {/* Black overlay for readability, now lighter */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/50" />
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative z-10 max-w-5xl mx-auto px-4">
+          <BackButton isWhite={true} route="/trips" />
+          <div className="text-center mt-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-xl font-playfair">
+              Book Your Adventure
+            </h1>
+            <p className="text-lg text-white mb-4 font-roboto">
+              {tripData.title} - {tripData.destination}
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mt-4">
+              {heroTags.map((tag, i) => (
+                <span
+                  key={i}
+                  className={`bg-white/20 border border-white/30 rounded-xl px-4 py-2 text-white font-medium text-sm backdrop-blur-md font-roboto`}
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
-          )}
-
-          <div className="text-center mb-12">
-            <div className="inline-block backdrop-blur-xl bg-white/20 border border-white/30 text-white py-4 px-8 rounded-2xl shadow-2xl mb-8 animate-fade-in-up">
-              <h1 className="text-4xl font-playfair font-bold uppercase tracking-tight drop-shadow-lg">
-                {tripData.title}
-              </h1>
-            </div>
-
-            {/* Interactive Progress Steps */}
-            <div className="flex justify-center items-center gap-6 mt-12">
+          </div>
+        </div>
+      </section>
+      {/* Main Content */}
+      <div className="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-8 font-roboto">
+        {/* Main Booking Form */}
+        <div className="md:col-span-2">
+          <div
+            className={`bg-white border border-purple-100 rounded-2xl shadow-sm p-8 transition-all duration-500 ${
+              isTransitioning ? "opacity-50 scale-95" : "opacity-100 scale-100"
+            }`}
+          >
+            {/* Progress Steps */}
+            <div className="flex justify-center items-center gap-6 mb-8">
               {[
                 { icon: Calendar, label: "Select Date", step: 1 },
                 { icon: Users, label: "Guest Info", step: 2 },
@@ -395,142 +279,147 @@ export function BookingPage({
               ].map(({ icon: Icon, label, step }, index) => (
                 <div key={step} className="flex flex-col items-center">
                   <div
-                    className={`flex items-center justify-center h-20 w-20 rounded-full border-2 transition-all duration-500 shadow-xl ${
+                    className={`flex items-center justify-center h-12 w-12 rounded-full border-2 ${
                       currentStep >= step
-                        ? "bg-gradient-to-r from-purple-400 to-pink-400 border-white/50 text-white shadow-purple-500/30 scale-110"
-                        : "bg-white/20 backdrop-blur-xl border-white/30 text-white/60"
+                        ? "bg-purple-600 border-purple-600 text-white"
+                        : "bg-white border-purple-100 text-purple-400"
                     }`}
                   >
-                    <Icon className="h-10 w-10" strokeWidth={2} />
+                    <Icon className="h-6 w-6" strokeWidth={2} />
                   </div>
-                  <span className="text-white/90 font-medium mt-3 text-sm">
+                  <span className="text-xs text-gray-700 mt-2 font-roboto">
                     {label}
                   </span>
-
-                  {/* Progress Line */}
                   {index < 2 && (
-                    <div className="h-1 w-16 bg-white/30 rounded-full mt-4 overflow-hidden">
-                      <div
-                        className={`h-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-1000 ${
-                          currentStep > step ? "w-full" : "w-0"
-                        }`}
-                      />
-                    </div>
+                    <div className="h-1 w-8 bg-purple-100 rounded-full mt-2" />
                   )}
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="relative bg-gradient-to-b from-white via-purple-50/30 to-white">
-        <div className="container mx-auto px-6 py-16 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-2">
-              <div
-                className={`backdrop-blur-xl bg-white/90 border border-white/60 rounded-3xl shadow-2xl p-8 transition-all duration-500 ${
-                  isTransitioning
-                    ? "opacity-50 scale-95"
-                    : "opacity-100 scale-100"
-                }`}
-              >
-                {currentStep === 1 && (
-                  <>
-                    <div className="flex items-center gap-4 border-b border-white/30 pb-6 mb-8">
-                      <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-4 rounded-2xl shadow-lg">
-                        <Calendar
-                          className="h-8 w-8 text-white"
-                          strokeWidth={2.5}
-                        />
-                      </div>
-                      <h2 className="text-3xl font-playfair font-bold text-gray-800">
-                        Select Your Travel Date
-                      </h2>
-                    </div>
-
-                    <DateSelector
-                      tripDuration={tripData.noOfDays || 0}
-                      onDateChange={handleDateChange}
-                      selectedDate={startDate}
+            {currentStep === 1 && (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 font-playfair">
+                  Select Your Travel Date
+                </h2>
+                <DateSelector
+                  tripDuration={tripData.noOfDays || 0}
+                  onDateChange={handleDateChange}
+                  selectedDate={startDate}
+                />
+                <div className="mt-8">
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 font-playfair">
+                      Trip Summary
+                    </h3>
+                    <TripSummary
+                      startDate={format(startDate, "MMMM dd, yyyy")}
+                      endDate={format(endDate, "MMMM dd, yyyy")}
+                      duration={`${tripData.noOfDays} days`}
+                      location={`${tripData.city}, ${tripData.state}, ${tripData.country}`}
                     />
-
-                    <div className="mt-10">
-                      <div className="backdrop-blur-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-2xl p-6 shadow-xl">
-                        <h3 className="font-bold text-xl text-gray-800 mb-4">
-                          Trip Summary
-                        </h3>
-                        <TripSummary
-                          startDate={format(startDate, "MMMM dd, yyyy")}
-                          endDate={format(endDate, "MMMM dd, yyyy")}
-                          duration={`${tripData.noOfDays} days`}
-                          location={displayTripData.location}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-10 pt-8 border-t border-white/30">
-                      <Button
-                        onClick={handleContinue}
-                        disabled={isTransitioning}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-6 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 flex items-center justify-center gap-3 text-xl group"
-                      >
-                        <span>Continue to Guest Details</span>
-                        <ArrowRight className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-
-                {currentStep === 2 && (
-                  <GuestInformationForm
-                    onBack={handleBack}
-                    onContinue={handleGuestInfoSubmit}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="lg:col-span-1 flex flex-col space-y-6">
-              <TripCard
-                title={displayTripData.title}
-                maxPeople={displayTripData.maxPeople || 1}
-                imageUrl={displayTripData.imageUrl}
-                whatsIncluded={displayTripData.whatsIncluded || []}
-                cancellationPolicy={displayTripData.cancellationPolicy}
-                hostInfo={displayTripData.hostInfo}
+                  </div>
+                </div>
+                <div className="mt-8">
+                  <Button
+                    onClick={handleContinue}
+                    disabled={isTransitioning}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition-all font-montserrat"
+                  >
+                    Continue to Guest Details
+                  </Button>
+                </div>
+              </>
+            )}
+            {currentStep === 2 && (
+              <GuestInformationForm
+                onBack={handleBack}
+                onContinue={handleGuestInfoSubmit}
               />
-
-              <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-2xl p-6 shadow-xl">
-                <BookingProgress bookingData={bookingData} />
+            )}
+          </div>
+        </div>
+        {/* Sidebar */}
+        <div className="flex flex-col space-y-6">
+          {/* Trip Card */}
+          <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <DollarSign className="h-6 w-6 text-purple-600" />
+              <span className="text-2xl font-bold text-gray-900 font-playfair">
+                ₹{tripStats.price}
+              </span>
+              <span className="text-sm text-gray-500 font-roboto">
+                per person
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mb-2">
+              <Calendar className="h-4 w-4 text-purple-500" />
+              <span className="text-gray-700 text-sm font-roboto">
+                {tripStats.noOfDays} days
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mb-2">
+              <Users className="h-4 w-4 text-purple-500" />
+              <span className="text-gray-700 text-sm font-roboto">
+                Up to {tripStats.maxParticipants} people
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mb-2">
+              <Languages className="h-4 w-4 text-purple-500" />
+              <span className="text-gray-700 text-sm font-roboto">
+                {tripStats.languages}
+              </span>
+            </div>
+            <div className="mt-4">
+              <BookingProgress bookingData={bookingData} />
+            </div>
+          </div>
+          {/* Host Card */}
+          <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <MessageCircle className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-gray-900 font-playfair">
+                About Your Host
+              </span>
+            </div>
+            <div className="flex gap-4 items-center mb-4">
+              <Avatar className="h-12 w-12 border-2 border-purple-100">
+                <AvatarImage src={hostInfo.image} />
+                <AvatarFallback className="bg-purple-200 text-purple-700 font-bold font-playfair">
+                  {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-gray-900 font-playfair">
+                  {hostInfo.name}
+                </p>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-3 w-3 text-yellow-400 fill-yellow-400"
+                    />
+                  ))}
+                  <span className="text-xs text-gray-500 ml-1 font-roboto">
+                    4.9 (124 reviews)
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 font-roboto">
+                  Host since {hostInfo.createdYear}
+                </p>
+                <p className="text-xs text-gray-500 font-roboto">
+                  {hostInfo.email}
+                </p>
               </div>
             </div>
+            <div className="text-sm text-gray-700 mb-4 font-roboto">
+              {hostInfo.description}
+            </div>
+            <button className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 font-semibold py-2 rounded-xl transition-all font-montserrat">
+              View Profile
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fadeIn 1s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fadeInUp 1s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

@@ -103,18 +103,17 @@ export function DateSelector({
   return (
     <div className="space-y-8">
       {/* Trip Duration Card */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-4 mb-4">
-          <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-3 rounded-xl shadow-lg">
-            <Clock className="w-7 h-7 text-white" strokeWidth={2.5} />
+          <div className="bg-purple-100 p-3 rounded-xl">
+            <Clock className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
           <h3 className="text-2xl font-playfair font-bold text-gray-800">
             Trip Duration: {tripDuration} days
           </h3>
         </div>
-
         {date && (
-          <div className="mt-4 backdrop-blur-xl bg-white/80 border border-white/60 rounded-xl p-4 font-semibold text-lg shadow-lg">
+          <div className="mt-4 bg-white border border-purple-50 rounded-xl p-4 font-semibold text-lg">
             <div className="flex items-center gap-3">
               <CalendarIcon
                 className="w-6 h-6 text-purple-600"
@@ -145,11 +144,11 @@ export function DateSelector({
       )}
 
       {/* Calendar Section */}
-      <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-3xl shadow-2xl p-6">
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
         <label className="block text-2xl font-playfair font-bold text-gray-800 mb-6">
           Select Start Date
         </label>
-        <div className="backdrop-blur-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-2xl p-6 shadow-lg">
+        <div className="bg-white border border-purple-50 rounded-2xl p-6">
           <Calendar
             mode="single"
             selected={date}
@@ -158,18 +157,17 @@ export function DateSelector({
             className="w-full"
             classNames={{
               day_selected:
-                "bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl w-full shadow-lg",
-              day_today:
-                "bg-gradient-to-r from-purple-400 to-pink-400 text-white font-bold rounded-xl w-full shadow-lg",
+                "bg-purple-600 text-white font-bold rounded-xl w-full",
+              day_today: "bg-purple-400 text-white font-bold rounded-xl w-full",
               day_disabled:
                 "text-gray-400 opacity-50 w-full cursor-not-allowed",
-              day: "bg-white/80 backdrop-blur-xl text-gray-800 font-medium rounded-xl w-full transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 hover:shadow-lg hover:scale-105",
+              day: "bg-white text-gray-800 font-medium rounded-xl w-full transition-all duration-300 hover:bg-purple-50 hover:text-purple-700 hover:shadow-md hover:scale-105",
               head_cell: "font-bold uppercase text-sm text-gray-700",
               cell: "text-center font-medium p-0 w-full",
               button:
-                "w-12 h-12 p-0 font-medium hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 w-full transition-all duration-300 rounded-xl",
+                "w-12 h-12 p-0 font-medium hover:bg-purple-50 hover:text-purple-700 w-full transition-all duration-300 rounded-xl",
               nav_button:
-                "bg-white/80 backdrop-blur-xl hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 border border-white/60 rounded-xl shadow-lg",
+                "bg-white hover:bg-purple-50 border border-purple-100 rounded-xl",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
               caption: "font-bold text-gray-800 text-lg",
@@ -179,7 +177,7 @@ export function DateSelector({
       </div>
 
       {/* Availability Filters */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
         <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
           Available Dates
         </h3>
@@ -188,56 +186,48 @@ export function DateSelector({
             <Button
               key={option.value}
               onClick={() => setAvailabilityFilter(option.value)}
-              className={`font-semibold text-base py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg ${
+              className={`font-semibold text-base py-3 px-6 rounded-xl transition-all duration-300 font-montserrat border border-purple-100 ${
                 availabilityFilter === option.value
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30"
-                  : "bg-white/80 backdrop-blur-xl border border-white/60 text-gray-700 hover:bg-white hover:shadow-2xl hover:shadow-purple-500/20"
+                  ? "bg-purple-600 text-white"
+                  : "bg-white text-purple-700 hover:bg-purple-50"
               }`}
             >
               {option.label}
             </Button>
           ))}
         </div>
-        <p className="text-base font-medium mt-4 backdrop-blur-xl bg-white/80 border border-white/60 rounded-xl p-4 text-gray-700">
+        <p className="text-base font-medium mt-4 bg-white border border-purple-50 rounded-xl p-4 text-gray-700">
           Filter available dates based on your preference
         </p>
       </div>
 
       {/* Quick Date Selection */}
-      <div className="backdrop-blur-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
         <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
           Quick Selection
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 7))}
-            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
-                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
-                     transition-all duration-300 py-4 rounded-xl"
+            className="bg-white border border-purple-100 text-purple-700 font-semibold justify-start text-base font-montserrat hover:bg-purple-50 transition-all duration-300 py-4 rounded-xl"
           >
             Next Week
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 14))}
-            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
-                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
-                     transition-all duration-300 py-4 rounded-xl"
+            className="bg-white border border-purple-100 text-purple-700 font-semibold justify-start text-base font-montserrat hover:bg-purple-50 transition-all duration-300 py-4 rounded-xl"
           >
             In 2 Weeks
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 30))}
-            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
-                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
-                     transition-all duration-300 py-4 rounded-xl"
+            className="bg-white border border-purple-100 text-purple-700 font-semibold justify-start text-base font-montserrat hover:bg-purple-50 transition-all duration-300 py-4 rounded-xl"
           >
             Next Month
           </Button>
           <Button
             onClick={() => handleDateSelect(addDays(new Date(), 60))}
-            className="backdrop-blur-xl bg-white/80 border border-white/60 text-gray-700 font-semibold justify-start text-base
-                     shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 hover:scale-105 
-                     transition-all duration-300 py-4 rounded-xl"
+            className="bg-white border border-purple-100 text-purple-700 font-semibold justify-start text-base font-montserrat hover:bg-purple-50 transition-all duration-300 py-4 rounded-xl"
           >
             In 2 Months
           </Button>
