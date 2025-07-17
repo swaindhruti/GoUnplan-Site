@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { Button } from "../ui/button";
-import { smoothScrollToSection } from "../global/Handlescroll";
+import { handleScroll } from "../global/Handlescroll";
 import { ChevronDown } from "lucide-react";
 import Header from "./Header";
 import { motion } from "framer-motion";
@@ -94,11 +94,10 @@ export const HeroSection = () => {
       <div className="absolute bottom-6 sm:bottom-10 w-full z-40 flex justify-center">
         <Button
           onClick={() =>
-            smoothScrollToSection("#filtertrip", {
-              offset: 0,
-              duration: 1.2,
-              onStart: () => console.log("Scroll started"),
-              onComplete: () => console.log("Scroll completed")
+            handleScroll({
+              location: "#filtertrip",
+              duration: 1.5,
+              ease: "power3.inOut"
             })
           }
           className="group relative bg-black/50 font-montserrat backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Mountain, X } from "lucide-react";
-import { smoothScrollToSection } from "../global/Handlescroll";
+import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -41,11 +41,7 @@ export default function Header() {
   }, [lastScrollY]);
 
   const handleNavClick = (section: string) => {
-    smoothScrollToSection(section, {
-      duration: 1.2,
-      ease: "power2.out",
-      offset: 0
-    });
+    handleScroll({ location: section });
     setIsOpen(false);
   };
 

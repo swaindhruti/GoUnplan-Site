@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
+import { PrimaryButton } from "./common";
 
 const faqs = [
   {
@@ -133,9 +134,9 @@ export default function FAQSection() {
             <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
               Still have questions? We&apos;re here to help!
             </p>
-            <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full transition-colors duration-200 text-sm sm:text-base">
-              Contact Support
-            </button>
+            <div className="flex justify-center">
+              <PrimaryButton label="Contact Us" />
+            </div>
           </motion.div>
         </div>
       </div>
