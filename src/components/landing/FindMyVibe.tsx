@@ -8,7 +8,7 @@ const vibeDescriptions: Record<string, string> = {
     "Immerse yourself in local traditions, art, and history for a truly authentic experience.",
   Adventure: "Thrilling activities and wild landscapes for adrenaline seekers.",
   Relaxation: "Unwind in serene destinations designed for peace and comfort.",
-  Nature: "Explore breathtaking natural wonders and scenic escapes."
+  Nature: "Explore breathtaking natural wonders and scenic escapes.",
 };
 
 export const FindMyVibe = () => {
@@ -17,20 +17,20 @@ export const FindMyVibe = () => {
   const vibes = [
     {
       label: "Cultural",
-      src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg"
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791020/pexels-emre-simsek-27565013-33041565_uqwqch.jpg",
     },
     {
       label: "Adventure",
-      src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791121/pexels-marius-mann-772581-33021041_fvxvqj.jpg",
     },
     {
       label: "Relaxation",
-      src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751847044/joshua-earle--87JyMb9ZfU-unsplash_accpod.jpg"
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791236/pexels-kubra-ercan-2154019843-33019785_qdfrky.jpg",
     },
     {
       label: "Nature",
-      src: "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg"
-    }
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791316/pexels-ishahidsultan-33048368_vwox3l.jpg",
+    },
   ];
 
   const handleVibeClick = (vibeLabel: string) => {
