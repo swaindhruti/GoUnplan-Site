@@ -122,7 +122,7 @@ export const FilterAndTrip = () => {
     >
       <div className="absolute inset-0">
         <Image
-          src="https://images.pexels.com/photos/1174732/pexels-photo-1174732.jpeg"
+          src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787684/1534646_x5pzis.jpg"
           alt="Travel destination"
           fill
           className="object-cover"

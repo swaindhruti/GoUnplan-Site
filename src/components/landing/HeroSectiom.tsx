@@ -16,7 +16,7 @@ export const HeroSection = () => {
   const slides = [
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778417/1192092_zgldao.jpg",
       text: (
         <>
           your journey&apos;s{" "}
@@ -26,7 +26,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787155/1510615_zvcpjw.jpg",
       text: (
         <>
           <span className="highlight-circle">crafted</span> for explorers
@@ -35,7 +35,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752100073/pietro-de-grandi-T7K4aEPoGGk-unsplash_n0hci9.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752788073/pexels-cristian-s-575448225-18041997_fnpdvo.jpg",
       text: (
         <>
           slow travel is the new{" "}
@@ -45,7 +45,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752100078/sergey-pesterev-_VqyrvQi6do-unsplash_ugusf9.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787550/pexels-faruktokluoglu-12823547_jui5dt.jpg",
       text: (
         <>
           powered by stories,{" "}
