@@ -22,8 +22,6 @@ export function Header({ userId }: HeaderProps) {
     };
 
     fetchUnreadCount();
-
-    // Check for unread messages every 30 seconds
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [userId]);

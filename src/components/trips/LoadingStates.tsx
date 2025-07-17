@@ -1,48 +1,56 @@
 import { Search, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 export const LoadingSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {Array.from({ length: 6 }, (_, i) => (
+  <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {Array.from({ length: 6 }).map((_, i) => (
       <div
         key={i}
-        className="group relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-xl border border-white/40 shadow-2xl animate-pulse"
+        className="w-full h-[540px] flex flex-col justify-between rounded-3xl border border-white/40 bg-white/60  p-4"
       >
-        {/* Image skeleton */}
-        <div className="relative h-64 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-200 to-pink-200"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+        {/* Image */}
+        <div className="relative h-64 w-full overflow-hidden rounded-2xl">
+          <Skeleton className="absolute inset-0 w-full h-full" />
         </div>
 
-        {/* Content skeleton */}
-        <div className="p-6 space-y-4">
+        {/* Content */}
+        <div className="flex flex-col justify-between flex-1 py-4 space-y-4">
+          {/* Title + Price */}
+          <div className="flex justify-between items-center">
+            <Skeleton className="h-6 w-2/3 rounded-lg" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+
+          {/* Description */}
           <div className="space-y-2">
-            <div className="h-8 bg-gradient-to-r from-purple-200 to-pink-200 rounded-xl"></div>
-            <div className="h-4 bg-gray-200 rounded-lg w-3/4"></div>
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-3/4 rounded-md" />
           </div>
 
+          {/* Icons */}
           <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="bg-purple-200 p-2 rounded-xl w-10 h-10"></div>
-              <div className="h-4 bg-gray-200 rounded-lg w-24"></div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-4 w-24 rounded-md" />
             </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-pink-200 p-2 rounded-xl w-10 h-10"></div>
-              <div className="h-4 bg-gray-200 rounded-lg w-32"></div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-4 w-32 rounded-md" />
             </div>
           </div>
 
+          {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            <div className="bg-blue-200 px-3 py-1.5 rounded-full w-20 h-8"></div>
-            <div className="bg-green-200 px-3 py-1.5 rounded-full w-16 h-8"></div>
-            <div className="bg-orange-200 px-3 py-1.5 rounded-full w-18 h-8"></div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-14 rounded-full" />
           </div>
         </div>
 
-        {/* Button skeleton */}
-        <div className="p-6 pt-0">
-          <div className="w-full h-14 bg-gradient-to-r from-purple-300 to-pink-300 rounded-2xl"></div>
-        </div>
+        {/* Button */}
+        <Skeleton className="w-full h-12 rounded-2xl mt-2" />
       </div>
     ))}
   </div>

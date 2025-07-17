@@ -69,13 +69,13 @@ export default function ChatContainer({
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-yellow-50 to-white">
-      <div className="w-80 flex-shrink-0 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,1)] m-4 flex flex-col">
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="w-80 flex-shrink-0 bg-slate-50/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg m-4 flex flex-col">
         {hostId && (
-          <div className="p-6 border-b-4 border-black bg-yellow-100 rounded-t-xl">
+          <div className="p-6 border-b border-slate-200/60 bg-slate-100/60 rounded-t-2xl">
             <Button
               onClick={handleStartChat}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-bold border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-colors duration-200"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3 font-semibold border border-purple-700 shadow-md transition-colors duration-200"
             >
               <MessageSquarePlus className="h-4 w-4 mr-2" />
               Start Chat with Host
@@ -100,15 +100,15 @@ export default function ChatContainer({
             otherUser={selectedChat.otherUser}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-white border-4 border-black rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+          <div className="flex-1 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg">
             <div className="text-center max-w-md mx-auto px-6">
-              <div className="w-20 h-20 bg-yellow-100 border-4 border-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
+              <div className="w-20 h-20 bg-slate-100/80 border border-slate-200/60 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <MessageSquarePlus className="h-10 w-10 text-gray-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3">
                 Welcome to Messages
               </h2>
-              <p className="text-gray-700 leading-relaxed font-medium">
+              <p className="text-gray-600 leading-relaxed font-medium">
                 Select a conversation from the sidebar to start messaging, or
                 create a new chat to begin connecting with others.
               </p>

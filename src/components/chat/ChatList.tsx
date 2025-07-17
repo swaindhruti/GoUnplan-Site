@@ -84,10 +84,10 @@ export default function ChatList({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border-4 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+    <div className="flex flex-col h-full bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-lg">
       {/* Header */}
-      <div className="px-6 py-4 border-b-4 border-black bg-yellow-50 rounded-t-xl">
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">
+      <div className="px-6 py-4 border-b border-slate-200/60 bg-slate-100/60 rounded-t-2xl">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight">
           Messages
         </h1>
 
@@ -99,7 +99,7 @@ export default function ChatList({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white border-2 border-black rounded-full font-bold focus:bg-yellow-50 focus:ring-2 focus:ring-blue-500 focus:border-black"
+            className="pl-10 bg-white border border-slate-200 rounded-full font-medium focus:bg-slate-50 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function ChatList({
       {/* Loading indicator */}
       {isPending && (
         <div className="px-6 py-2">
-          <div className="bg-blue-50 text-blue-600 text-sm text-center py-2 rounded-lg">
+          <div className="bg-purple-50 text-purple-600 text-sm text-center py-2 rounded-lg border border-purple-200">
             Refreshing conversations...
           </div>
         </div>
@@ -115,34 +115,34 @@ export default function ChatList({
 
       {/* Chat List */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent">
+        <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
           {filteredChats.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full px-6 py-12 text-center">
-              <div className="w-16 h-16 bg-yellow-100 border-4 border-black rounded-full flex items-center justify-center mb-4 shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
+              <div className="w-16 h-16 bg-slate-100/80 border border-slate-200/60 rounded-full flex items-center justify-center mb-4 shadow-sm">
                 <MessageCircle className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {searchQuery
                   ? "No conversations found"
                   : "No conversations yet"}
               </h3>
-              <p className="text-gray-700 max-w-sm font-medium">
+              <p className="text-gray-600 max-w-sm font-medium">
                 {searchQuery
                   ? "Try adjusting your search terms"
                   : "Start a new conversation to see it here"}
               </p>
             </div>
           ) : (
-            <div className="divide-y-2 divide-black">
+            <div className="divide-y divide-slate-200/60">
               {filteredChats.map((chat) => (
                 <div
                   key={chat.id}
                   onClick={() => handleChatSelect(chat)}
-                  className="px-6 py-4 hover:bg-yellow-50 cursor-pointer transition-colors duration-150 ease-in-out group"
+                  className="px-6 py-4 hover:bg-slate-100/60 cursor-pointer transition-colors duration-150 ease-in-out group"
                 >
                   <div className="flex items-start space-x-4">
                     {/* Avatar with status */}
-                    <div className="relative flex-shrink-0">
+                    <div className="relative overflow-hidden flex-shrink-0">
                       <Image
                         src={
                           chat.otherUser?.image ||
@@ -151,10 +151,10 @@ export default function ChatList({
                         alt={chat.otherUser?.name || "User"}
                         width={48}
                         height={48}
-                        className="rounded-full object-cover border-2 border-black group-hover:ring-yellow-300 transition-all"
+                        className="rounded-full object-cover border-2 border-slate-200 group-hover:border-purple-300 transition-all"
                       />
                       {chat.unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 font-bold border-2 border-black">
+                        <div className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 font-semibold border-2 border-white shadow-sm">
                           {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
                         </div>
                       )}

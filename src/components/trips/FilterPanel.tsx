@@ -5,7 +5,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import ReactSelect, { StylesConfig, MultiValue } from "react-select";
 import { FilterState, SelectOption, DURATION_OPTIONS } from "@/types/trips";
@@ -15,7 +15,7 @@ import {
   MapPin,
   Globe,
   MessageCircle,
-  Zap,
+  Zap
 } from "lucide-react";
 
 interface FilterPanelProps {
@@ -44,11 +44,11 @@ export const FilterPanel = ({
   handlePriceMaxChange,
   handleLanguageChange,
   handleVibeChange,
-  selectStyles,
+  selectStyles
 }: FilterPanelProps) => {
   const languageOptions = filterOptions.languages.map((l) => ({
     value: l,
-    label: l,
+    label: l
   }));
   const vibeOptions = filterOptions.vibes.map((v) => ({ value: v, label: v }));
 
@@ -56,34 +56,34 @@ export const FilterPanel = ({
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Trip Details */}
       <div className="space-y-4">
-        <div className="flex items-center gap-3 pb-2 border-b border-white/30">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-xl shadow-lg">
-            <Clock className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+          <div className="bg-purple-600 p-2 rounded-lg">
+            <Clock className="h-4 w-4 text-white" />
           </div>
-          <h3 className="font-semibold text-white text-lg drop-shadow-md">
+          <h3 className="font-semibold text-gray-900 text-base">
             Trip Details
           </h3>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white/90 flex items-center gap-2 drop-shadow-sm">
-              <DollarSign className="h-4 w-4 text-purple-300" />
+            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-purple-600" />
               Price Range
             </Label>
             <div className="flex gap-3 items-center">
               <Input
                 type="number"
                 placeholder="Min"
-                className="bg-white/95 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg py-3 px-4 font-medium focus:bg-white focus:border-purple-400 transition-all duration-300 text-gray-800"
+                className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
                 value={filters.priceRange[0] === 0 ? "" : filters.priceRange[0]}
                 onChange={handlePriceMinChange}
               />
-              <span className="font-medium text-white/80">to</span>
+              <span className="font-medium text-gray-500 text-sm">to</span>
               <Input
                 type="number"
                 placeholder="Max"
-                className="bg-white/95 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg py-3 px-4 font-medium focus:bg-white focus:border-purple-400 transition-all duration-300 text-gray-800"
+                className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
                 value={
                   filters.priceRange[1] === Infinity
                     ? ""
@@ -95,23 +95,23 @@ export const FilterPanel = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white/90 flex items-center gap-2 drop-shadow-sm">
-              <Clock className="h-4 w-4 text-purple-300" />
+            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-purple-600" />
               Duration
             </Label>
             <Select
               value={filters.daysFilter}
               onValueChange={(value) => updateFilter("daysFilter", value)}
             >
-              <SelectTrigger className="bg-white/95 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg py-3 px-4 font-medium focus:bg-white focus:border-purple-400 transition-all duration-300 text-gray-800">
+              <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                 <SelectValue placeholder="Choose trip length" />
               </SelectTrigger>
-              <SelectContent className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl">
+              <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
                 {DURATION_OPTIONS.map((option) => (
                   <SelectItem
                     key={option.value}
                     value={option.value}
-                    className="font-medium hover:bg-purple-100 focus:bg-purple-100"
+                    className="font-medium hover:bg-purple-50 focus:bg-purple-50 text-gray-900"
                   >
                     {option.label}
                   </SelectItem>
@@ -124,32 +124,30 @@ export const FilterPanel = ({
 
       {/* Location */}
       <div className="space-y-4">
-        <div className="flex items-center gap-3 pb-2 border-b border-white/30">
-          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-2 rounded-xl shadow-lg">
-            <MapPin className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+          <div className="bg-purple-600 p-2 rounded-lg">
+            <MapPin className="h-4 w-4 text-white" />
           </div>
-          <h3 className="font-semibold text-white text-lg drop-shadow-md">
-            Location
-          </h3>
+          <h3 className="font-semibold text-gray-900 text-base">Location</h3>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white/90 flex items-center gap-2 drop-shadow-sm">
-              <Globe className="h-4 w-4 text-purple-300" />
+            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Globe className="h-4 w-4 text-purple-600" />
               Country
             </Label>
             <Select
               value={filters.countryFilter}
               onValueChange={(value) => updateFilter("countryFilter", value)}
             >
-              <SelectTrigger className="bg-white/95 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg py-3 px-4 font-medium focus:bg-white focus:border-purple-400 transition-all duration-300 text-gray-800">
+              <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
-              <SelectContent className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl">
+              <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
                 <SelectItem
                   value="all"
-                  className="font-medium hover:bg-purple-100 focus:bg-purple-100"
+                  className="font-medium hover:bg-purple-50 focus:bg-purple-50 text-gray-900"
                 >
                   All Countries
                 </SelectItem>
@@ -157,7 +155,7 @@ export const FilterPanel = ({
                   <SelectItem
                     key={country}
                     value={country.toLowerCase()}
-                    className="font-medium hover:bg-purple-100 focus:bg-purple-100"
+                    className="font-medium hover:bg-purple-50 focus:bg-purple-50 text-gray-900"
                   >
                     {country}
                   </SelectItem>
@@ -170,19 +168,17 @@ export const FilterPanel = ({
 
       {/* Preferences */}
       <div className="space-y-4">
-        <div className="flex items-center gap-3 pb-2 border-b border-white/30">
-          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-2 rounded-xl shadow-lg">
-            <Zap className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+          <div className="bg-purple-600 p-2 rounded-lg">
+            <Zap className="h-4 w-4 text-white" />
           </div>
-          <h3 className="font-semibold text-white text-lg drop-shadow-md">
-            Preferences
-          </h3>
+          <h3 className="font-semibold text-gray-900 text-base">Preferences</h3>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white/90 flex items-center gap-2 drop-shadow-sm">
-              <MessageCircle className="h-4 w-4 text-purple-300" />
+            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 text-purple-600" />
               Languages
             </Label>
             <ReactSelect
@@ -192,7 +188,7 @@ export const FilterPanel = ({
               options={languageOptions}
               value={filters.languageFilter.map((l) => ({
                 value: l,
-                label: l,
+                label: l
               }))}
               onChange={handleLanguageChange}
               className="react-select-container"
@@ -201,8 +197,8 @@ export const FilterPanel = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white/90 flex items-center gap-2 drop-shadow-sm">
-              <Zap className="h-4 w-4 text-purple-300" />
+            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-purple-600" />
               Vibes
             </Label>
             <ReactSelect
@@ -212,7 +208,7 @@ export const FilterPanel = ({
               options={vibeOptions}
               value={filters.vibeFilter.map((v) => ({
                 value: v,
-                label: v,
+                label: v
               }))}
               onChange={handleVibeChange}
               className="react-select-container"

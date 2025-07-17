@@ -95,7 +95,7 @@ export default function ChatWindow({
 
   useEffect(() => {
     const loadMessages = () => {
-      setLoading(true); // NEO: set loading true
+      setLoading(true);
       startTransition(async () => {
         const result = await getChatMessages(chatId);
         if (result.success && result.messages) {
@@ -110,7 +110,7 @@ export default function ChatWindow({
           }
         }
         setIsInitialized(true);
-        setLoading(false); // NEO: set loading false
+        setLoading(false);
       });
     };
 
@@ -152,7 +152,7 @@ export default function ChatWindow({
       }
     };
 
-    setMessages((prev) => [...prev, optimisticMsg]); // Only update messages
+    setMessages((prev) => [...prev, optimisticMsg]);
 
     try {
       const result = await sendMessage({
@@ -166,11 +166,10 @@ export default function ChatWindow({
         const incompleteMessage =
           result.message as unknown as IncompleteMessage;
         const transformedMessage = transformMessage(incompleteMessage);
-        setMessages(
-          (prev) =>
-            prev
-              .filter((m) => m.id !== optimisticMsg.id) // Remove optimistic
-              .concat(transformedMessage) // Add real
+        setMessages((prev) =>
+          prev
+            .filter((m) => m.id !== optimisticMsg.id)
+            .concat(transformedMessage)
         );
         lastMessageTimeRef.current = new Date(transformedMessage.createdAt);
       } else {
@@ -189,48 +188,49 @@ export default function ChatWindow({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-4 border-black rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+    <div className="flex flex-col h-full bg-slate-50/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b-4 border-black bg-yellow-50 rounded-t-xl shadow-sm">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 bg-slate-100/60 rounded-t-2xl">
         <div className="flex items-center space-x-4">
-          <div className="relative">
+          <div className="relative overflow-hidden">
             <Image
               src={otherUser?.image || "/placeholder.svg?height=48&width=48"}
               alt={otherUser.name || "User"}
               width={48}
               height={48}
-              className="rounded-full object-cover border-2 border-black"
+              className="rounded-full  object-cover border-2 border-slate-200"
             />
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-black rounded-full"></div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full shadow-sm"></div>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-extrabold text-gray-900 truncate">
+            <h2 className="text-lg font-bold text-gray-900 truncate">
               {otherUser.name}
             </h2>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <p className="text-sm text-gray-700 font-bold">Active now</p>
+              <p className="text-sm text-gray-600 font-medium">Active now</p>
             </div>
           </div>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0 border-2 border-black rounded-full"
+          className="h-8 w-8 p-0 border border-slate-200 rounded-full hover:bg-slate-200/60"
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
       </div>
+
       <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent">
+        <div className="h-full overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <div className="w-12 h-12 mb-4 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-gray-700 font-bold">Loading messages...</p>
+              <div className="w-12 h-12 mb-4 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-gray-700 font-medium">Loading messages...</p>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center mb-4">
                 <Image
                   src={
                     otherUser?.image || "/placeholder.svg?height=32&width=32"
@@ -241,10 +241,10 @@ export default function ChatWindow({
                   className="rounded-full"
                 />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Start your conversation
               </h3>
-              <p className="text-gray-500 max-w-sm">
+              <p className="text-gray-600 max-w-sm">
                 Send a message to {otherUser.name} to get the conversation
                 started.
               </p>
@@ -260,19 +260,17 @@ export default function ChatWindow({
                     isCurrentUser ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {/* Avatar/image removed for both users */}
-
                   <div
                     className={`group max-w-xs lg:max-w-md ${
                       isCurrentUser ? "order-1" : "order-2"
                     }`}
                   >
                     <div
-                      className={`px-4 py-2 rounded-2xl border-2 ${
+                      className={`px-4 py-2 rounded-2xl border ${
                         isCurrentUser
-                          ? "bg-blue-600 text-white border-blue-700"
-                          : "bg-gray-100 text-gray-900 border-gray-300"
-                      } font-bold shadow`}
+                          ? "bg-purple-600 text-white border-purple-700 shadow-md"
+                          : "bg-slate-100/80 text-gray-900 border-slate-200/60 shadow-sm"
+                      } font-medium`}
                     >
                       {message.content}
                     </div>
@@ -291,7 +289,7 @@ export default function ChatWindow({
         </div>
       </div>
 
-      <div className="border-t-4 border-black bg-yellow-50 px-6 py-4 rounded-b-xl">
+      <div className="border-t border-slate-200/60 bg-slate-100/60 px-6 py-4 rounded-b-2xl">
         <form onSubmit={handleSendMessage} className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <Input
@@ -299,7 +297,7 @@ export default function ChatWindow({
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder={`Message ${otherUser.name}...`}
-              className="w-full resize-none border-2 border-black rounded-full px-4 py-3 pr-12 font-bold focus:ring-2 focus:ring-blue-500 focus:border-black"
+              className="w-full resize-none border border-slate-200 rounded-full px-4 py-3 pr-12 font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
               disabled={isSending}
               maxLength={1000}
             />
@@ -307,7 +305,7 @@ export default function ChatWindow({
           <Button
             type="submit"
             disabled={!newMessage.trim() || isSending}
-            className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 border-2 border-black disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+            className="h-12 w-12 rounded-full bg-purple-600 hover:bg-purple-700 border border-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-md"
             size="sm"
           >
             <Send className="h-4 w-4" />
