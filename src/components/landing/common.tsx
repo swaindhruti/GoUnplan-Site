@@ -28,10 +28,12 @@ export const SectionLabel = ({ label }: { label: ReactNode }) => {
 
 export const PrimaryButton = ({ label }: { label: string }) => {
   return (
-    <Button className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
-      {label}
-      <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
-    </Button>
+    <div>
+      <Button className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
+        {label}
+        <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+      </Button>
+    </div>
   );
 };
 
