@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FindPackagesButton, SectionLabel } from "./common";
+import { PrimaryButton, SectionLabel } from "./common";
 
 const vibeDescriptions: Record<string, string> = {
   Cultural:
@@ -58,7 +58,7 @@ export const FindMyVibe = () => {
           </p>
 
           <div className="flex justify-center lg:justify-start">
-            <FindPackagesButton label="Find Packages" />
+            <PrimaryButton label="Find Packages" />
           </div>
         </div>
         <div
@@ -86,7 +86,7 @@ export const FindMyVibe = () => {
           <div
             key={index}
             onClick={() => handleVibeClick(vibe.label)}
-            className="relative h-[250px] sm:h-[300px] md:h-[350px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform group"
+            className="relative h-[250px] sm:h-[300px] md:h-[350px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
           >
             <Image
               src={vibe.src}

@@ -101,7 +101,7 @@ export const HeroSection = () => {
               onComplete: () => console.log("Scroll completed")
             })
           }
-          className="group relative bg-black/50 backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
+          className="group relative bg-black/50 font-montserrat backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
           size="lg"
         >
           <span className="relative z-10 flex items-center">
