@@ -18,7 +18,10 @@ import { FormComponentProps } from "@/types/form";
 import { createTravelPlan } from "@/actions/host/action";
 import { useRouter } from "next/navigation";
 import ReactSelect, { StylesConfig, MultiValue } from "react-select";
-import { Plus, Minus, Map, Calendar, FileText } from "lucide-react";
+import { Plus, Minus, Map, Calendar, FileText, Camera, X } from "lucide-react";
+import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
+import Image from "next/image";
+import { useEffect } from "react";
 
 type SelectOption = {
   value: string;
@@ -35,6 +38,7 @@ export const CreateDestinationForm = ({
 }: FormComponentProps) => {
   const schema = FormSchema;
   const router = useRouter();
+  const { uploadedFile, UploadButton } = useCloudinaryUpload();
 
   // Initialize form with proper defaultValues
   const defaultValues = {
@@ -62,7 +66,9 @@ export const CreateDestinationForm = ({
         meals: "",
         accommodation: ""
       }
-    ]
+    ],
+    // Add tripImage field
+    tripImage: ""
   };
 
   const form = useForm<z.infer<typeof schema>>({
@@ -97,6 +103,23 @@ export const CreateDestinationForm = ({
       });
     }
   };
+
+  // Handle image upload
+
+  // Remove uploaded image
+  const removeImage = () => {
+    form.setValue("tripImage", "");
+  };
+
+  // Watch for uploaded file changes
+  useEffect(() => {
+    const handleImageUpload = (imageUrl: string) => {
+      form.setValue("tripImage", imageUrl);
+    };
+    if (uploadedFile?.secure_url) {
+      handleImageUpload(uploadedFile.secure_url);
+    }
+  }, [uploadedFile, form]);
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     // Log the raw form data to check what we're working with
@@ -153,7 +176,8 @@ export const CreateDestinationForm = ({
         city: data.city,
         languages: data.languages || [],
         filters: data.filters || [],
-        dayWiseData: processedDayWiseData // Use the processed data
+        dayWiseData: processedDayWiseData, // Use the processed data
+        tripImage: data.tripImage || "" // Add trip image
       });
 
       if (result?.error) {
@@ -450,6 +474,72 @@ export const CreateDestinationForm = ({
                   })}
                 </div>
 
+                {/* Trip Image Upload Section */}
+                <div className="space-y-4">
+                  <div className="border-b-2 border-black pb-2">
+                    <h3 className="text-lg font-extrabold text-gray-800 flex items-center">
+                      <span className="bg-purple-100 p-1 rounded-md mr-2 border-2 border-black">
+                        <Camera className="h-4 w-4 text-purple-600" />
+                      </span>
+                      Trip Image
+                    </h3>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="tripImage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                          Upload Trip Cover Image
+                        </FormLabel>
+                        <FormControl>
+                          <div className="space-y-4">
+                            {!field.value ? (
+                              <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all">
+                                <Camera className="h-12 w-12 text-gray-400 mb-4" />
+                                <p className="text-sm text-gray-500 mb-4 text-center">
+                                  Upload a stunning image that showcases your
+                                  trip destination
+                                </p>
+                                <UploadButton label="Choose Image" />
+                              </div>
+                            ) : (
+                              <div className="relative group">
+                                <Image
+                                  width={500}
+                                  height={500}
+                                  src={field.value}
+                                  alt="Trip cover"
+                                  className="w-full h-48 object-cover rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                                  <div className="flex gap-2">
+                                    <UploadButton label="Change Image" />
+                                    <button
+                                      type="button"
+                                      onClick={removeImage}
+                                      className="bg-red-500 text-white border-2 border-black rounded-xl px-4 py-2 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-red-600 transition-all flex items-center gap-2"
+                                    >
+                                      <X className="h-4 w-4" />
+                                      Remove
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Upload a high-quality image (JPG, PNG, or WEBP) that
+                          represents your trip destination.
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-extrabold text-gray-900 flex items-center drop-shadow-[1px_1px_0_rgba(0,0,0,1)]">
@@ -650,6 +740,10 @@ export const CreateDestinationForm = ({
                     <li className="flex items-start">
                       <span className="mr-2">✔️</span>
                       <span>Ensure dates and pricing are correct</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔️</span>
+                      <span>Upload a compelling trip cover image</span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2">✔️</span>

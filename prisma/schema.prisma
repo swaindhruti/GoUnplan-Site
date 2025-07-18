@@ -88,6 +88,7 @@ model TravelPlans {
   bookings           Booking[]
   host               HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
   dayWiseItinerary   DayWiseItinerary[]
+  tripImage          String?            @default("https://avatar.iran.liara.run/public")
   reviewCount        Int                @default(0)
   averageRating      Float              @default(0)
   reviews            Review[]
