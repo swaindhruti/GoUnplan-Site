@@ -51,7 +51,7 @@ export default function AboutUs() {
             </span>
           </p>
 
-          <div className="pt-8">
+          <div className="pt-8 max-md:flex max-md:justify-center">
             <PrimaryButton label="Find Packages" />
           </div>
         </div>

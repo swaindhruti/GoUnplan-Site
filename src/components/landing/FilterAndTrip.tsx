@@ -9,7 +9,7 @@ import {
   Users,
   Search,
   ChevronDown,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -22,12 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem
+  SelectItem,
 } from "@/components/ui/select";
 import {
   Popover,
   PopoverTrigger,
-  PopoverContent
+  PopoverContent,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { PrimaryButton } from "./common";
@@ -51,19 +51,19 @@ export const FilterAndTrip = () => {
       label: "Destination",
       icon: <MapPin className="w-4 h-4 text-purple-300" />,
       type: "input",
-      placeholder: "Where to?"
+      placeholder: "Where to?",
     },
     {
       id: "checkIn",
       label: "Check-in",
       icon: <Calendar className="w-4 h-4 text-purple-300" />,
-      type: "date"
+      type: "date",
     },
     {
       id: "checkOut",
       label: "Check-out",
       icon: <Calendar className="w-4 h-4 text-purple-300" />,
-      type: "date"
+      type: "date",
     },
     {
       id: "travelers",
@@ -75,9 +75,9 @@ export const FilterAndTrip = () => {
         { value: "2", label: "2 Travelers" },
         { value: "3", label: "3 Travelers" },
         { value: "4", label: "4 Travelers" },
-        { value: "5", label: "5+ Travelers" }
+        { value: "5", label: "5+ Travelers" },
       ],
-      placeholder: "How many?"
+      placeholder: "How many?",
     },
     {
       id: "vibe",
@@ -90,10 +90,10 @@ export const FilterAndTrip = () => {
         { value: "Relaxation", label: "Relaxation" },
         { value: "Nature", label: "Nature" },
         { value: "Luxury", label: "Luxury" },
-        { value: "Budget", label: "Budget-Friendly" }
+        { value: "Budget", label: "Budget-Friendly" },
       ],
-      placeholder: "Your mood?"
-    }
+      placeholder: "Your mood?",
+    },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -141,7 +141,7 @@ export const FilterAndTrip = () => {
               transition={{
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <Sparkles className="w-8 h-8 text-purple-400" />
@@ -160,7 +160,7 @@ export const FilterAndTrip = () => {
                 delay: 0.8,
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <Sparkles className="w-8 h-8 text-purple-400" />
@@ -280,9 +280,7 @@ export const FilterAndTrip = () => {
             </div>
 
             <div className="flex justify-center pt-4">
-              <button type="submit">
-                <PrimaryButton label="Search Trips" />
-              </button>
+              <PrimaryButton label="Search Trips" type="submit" />
             </div>
           </form>
 

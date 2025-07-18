@@ -5,7 +5,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious
+  CarouselPrevious,
 } from "../ui/carousel";
 import { Card } from "../ui/card";
 import Image from "next/image";
@@ -26,14 +26,37 @@ export const SectionLabel = ({ label }: { label: ReactNode }) => {
   );
 };
 
-export const PrimaryButton = ({ label }: { label: string }) => {
+export const PrimaryButton = ({
+  label,
+  type = "button",
+  asContent = false,
+}: {
+  label: string;
+  type?: "button" | "submit" | "reset";
+  asContent?: boolean;
+}) => {
+  const buttonContent = (
+    <>
+      {label}
+      <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+    </>
+  );
+
+  if (asContent) {
+    return (
+      <div className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
+        {buttonContent}
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <Button className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
-        {label}
-        <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
-      </Button>
-    </div>
+    <Button
+      type={type}
+      className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group"
+    >
+      {buttonContent}
+    </Button>
   );
 };
 
@@ -55,7 +78,7 @@ type Host = {
 export const Carousels = ({
   SectionTitle,
   Description,
-  type
+  type,
 }: {
   SectionTitle?: string;
   Description?: string;
@@ -69,7 +92,7 @@ export const Carousels = ({
       image: "🗼",
       price: "2,499",
       description:
-        "Explore the vibrant culture, stunning architecture, and delicious cuisine of Spain. From the bustling streets of Barcelona to the historic charm of Seville."
+        "Explore the vibrant culture, stunning architecture, and delicious cuisine of Spain. From the bustling streets of Barcelona to the historic charm of Seville.",
     },
     {
       id: 2,
@@ -78,7 +101,7 @@ export const Carousels = ({
       image: "🏯",
       price: "3,299",
       description:
-        "Discover the perfect blend of traditional and modern Japan. Experience ancient temples, cutting-edge technology, and world-class cuisine."
+        "Discover the perfect blend of traditional and modern Japan. Experience ancient temples, cutting-edge technology, and world-class cuisine.",
     },
     {
       id: 3,
@@ -87,7 +110,7 @@ export const Carousels = ({
       image: "🗽",
       price: "1,899",
       description:
-        "The city that never sleeps awaits you. From Broadway shows to world-class museums and iconic landmarks like the Statue of Liberty."
+        "The city that never sleeps awaits you. From Broadway shows to world-class museums and iconic landmarks like the Statue of Liberty.",
     },
     {
       id: 4,
@@ -96,7 +119,7 @@ export const Carousels = ({
       image: "🏰",
       price: "2,199",
       description:
-        "Immerse yourself in royal history, world-class museums, and charming pubs. Experience the perfect blend of tradition and modernity."
+        "Immerse yourself in royal history, world-class museums, and charming pubs. Experience the perfect blend of tradition and modernity.",
     },
     {
       id: 5,
@@ -105,8 +128,8 @@ export const Carousels = ({
       image: "🏙️",
       price: "2,799",
       description:
-        "Experience luxury like never before. From towering skyscrapers to pristine beaches and world-class shopping destinations."
-    }
+        "Experience luxury like never before. From towering skyscrapers to pristine beaches and world-class shopping destinations.",
+    },
   ];
 
   const hosts: Host[] = [
@@ -114,32 +137,32 @@ export const Carousels = ({
       id: 1,
       name: "Maria Rodriguez",
       description:
-        "Expert local guide with 8 years of experience. Specializes in cultural tours and hidden gems. Fluent in English, Spanish, and French."
+        "Expert local guide with 8 years of experience. Specializes in cultural tours and hidden gems. Fluent in English, Spanish, and French.",
     },
     {
       id: 2,
       name: "Hiroshi Tanaka",
       description:
-        "Tokyo native and certified tour guide. Passionate about sharing Japanese culture, history, and the best local food experiences."
+        "Tokyo native and certified tour guide. Passionate about sharing Japanese culture, history, and the best local food experiences.",
     },
     {
       id: 3,
       name: "James Wilson",
       description:
-        "New York local with extensive knowledge of the city's history, art scene, and best kept secrets. 10+ years guiding experience."
+        "New York local with extensive knowledge of the city's history, art scene, and best kept secrets. 10+ years guiding experience.",
     },
     {
       id: 4,
       name: "Emma Thompson",
       description:
-        "London historian and certified guide. Specializes in royal history, architecture, and traditional British culture experiences."
+        "London historian and certified guide. Specializes in royal history, architecture, and traditional British culture experiences.",
     },
     {
       id: 5,
       name: "Ahmed Al-Rashid",
       description:
-        "Dubai local expert offering unique insights into Middle Eastern culture, modern architecture, and luxury experiences."
-    }
+        "Dubai local expert offering unique insights into Middle Eastern culture, modern architecture, and luxury experiences.",
+    },
   ];
 
   const data =
