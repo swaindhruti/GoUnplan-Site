@@ -277,3 +277,41 @@ export const approveTravelPlan = async (travelPlanId: string) => {
     return { error: "Failed to approve travel plan" };
   }
 };
+
+export const getTravelPlanDetails = async (travelPlanId: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const travelPlan = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: travelPlanId },
+      include: {
+        host: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                phone: true,
+                image: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+        dayWiseItinerary: {
+          orderBy: { dayNumber: "asc" },
+        },
+      },
+    });
+
+    if (!travelPlan) {
+      return { error: "Travel plan not found" };
+    }
+
+    return { success: true, travelPlan };
+  } catch (error) {
+    console.error("Error fetching travel plan details:", error);
+    return { error: "Failed to fetch travel plan details" };
+  }
+};

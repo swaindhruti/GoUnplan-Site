@@ -57,21 +57,21 @@ const EnhancedLoadingState = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="w-full max-w-md border border-purple-100 rounded-2xl shadow-sm p-8 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8 text-center">
         <div className="mb-6 flex justify-center">
-          <Loader2 className="h-10 w-10 text-purple-600 animate-spin" />
+          <Loader2 className="h-12 w-12 text-purple-600 animate-spin" />
         </div>
-        <h2 className="text-xl font-semibold mb-2 text-gray-900">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900 font-playfair">
           {loadingText}
         </h2>
-        <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+        <div className="w-full bg-slate-100 rounded-full h-3 mb-6">
           <div
-            className="bg-purple-600 h-2 rounded-full transition-all duration-700"
+            className="bg-gradient-to-r from-purple-600 to-purple-700 h-3 rounded-full transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-600 font-roboto">
           Please don&apos;t close this page
         </p>
       </div>
@@ -228,31 +228,30 @@ export function BookingPage({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       {/* Hero Section */}
       <section
-        className="relative py-20 overflow-hidden bg-cover bg-center bg-no-repeat border-b border-purple-100"
+        className="relative py-24 overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`,
         }}
       >
-        {/* Black overlay for readability, now lighter */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/50" />
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4">
+        {/* Gradient overlay for better readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/70" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
           <BackButton isWhite={true} route="/trips" />
-          <div className="text-center mt-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-xl font-playfair">
+          <div className="text-center mt-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl font-playfair">
               Book Your Adventure
             </h1>
-            <p className="text-lg text-white mb-4 font-roboto">
+            <p className="text-xl md:text-2xl text-white/90 mb-8 font-roboto">
               {tripData.title} - {tripData.destination}
             </p>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
+            <div className="flex flex-wrap justify-center gap-4 mt-8">
               {heroTags.map((tag, i) => (
                 <span
                   key={i}
-                  className={`bg-white/20 border border-white/30 rounded-xl px-4 py-2 text-white font-medium text-sm backdrop-blur-md font-roboto`}
+                  className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-semibold text-base font-roboto shadow-lg"
                 >
                   {tag}
                 </span>
@@ -261,54 +260,59 @@ export function BookingPage({
           </div>
         </div>
       </section>
+
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-8 font-roboto">
-        {/* Main Booking Form */}
-        <div className="md:col-span-2">
-          <div
-            className={`bg-white border border-purple-100 rounded-2xl shadow-sm p-8 transition-all duration-500 ${
-              isTransitioning ? "opacity-50 scale-95" : "opacity-100 scale-100"
-            }`}
-          >
-            {/* Progress Steps */}
-            <div className="flex justify-center items-center gap-6 mb-8">
-              {[
-                { icon: Calendar, label: "Select Date", step: 1 },
-                { icon: Users, label: "Guest Info", step: 2 },
-                { icon: CheckCircle, label: "Confirmation", step: 3 },
-              ].map(({ icon: Icon, label, step }, index) => (
-                <div key={step} className="flex flex-col items-center">
-                  <div
-                    className={`flex items-center justify-center h-12 w-12 rounded-full border-2 ${
-                      currentStep >= step
-                        ? "bg-purple-600 border-purple-600 text-white"
-                        : "bg-white border-purple-100 text-purple-400"
-                    }`}
-                  >
-                    <Icon className="h-6 w-6" strokeWidth={2} />
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid lg:grid-cols-3 gap-12">
+          {/* Main Booking Form */}
+          <div className="lg:col-span-2">
+            <div
+              className={`bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-10 transition-all duration-500 ${
+                isTransitioning
+                  ? "opacity-50 scale-95"
+                  : "opacity-100 scale-100"
+              }`}
+            >
+              {/* Progress Steps */}
+              <div className="flex justify-center items-center gap-8 mb-12">
+                {[
+                  { icon: Calendar, label: "Select Date", step: 1 },
+                  { icon: Users, label: "Guest Info", step: 2 },
+                  { icon: CheckCircle, label: "Confirmation", step: 3 },
+                ].map(({ icon: Icon, label, step }, index) => (
+                  <div key={step} className="flex flex-col items-center">
+                    <div
+                      className={`flex items-center justify-center h-16 w-16 rounded-2xl border-2 transition-all duration-300 ${
+                        currentStep >= step
+                          ? "bg-gradient-to-r from-purple-600 to-purple-700 border-purple-600 text-white shadow-lg"
+                          : "bg-white/60 border-slate-200 text-slate-400"
+                      }`}
+                    >
+                      <Icon className="h-8 w-8" strokeWidth={2} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 mt-3 font-roboto">
+                      {label}
+                    </span>
+                    {index < 2 && (
+                      <div className="h-1 w-12 bg-slate-200 rounded-full mt-3" />
+                    )}
                   </div>
-                  <span className="text-xs text-gray-700 mt-2 font-roboto">
-                    {label}
-                  </span>
-                  {index < 2 && (
-                    <div className="h-1 w-8 bg-purple-100 rounded-full mt-2" />
-                  )}
-                </div>
-              ))}
-            </div>
-            {currentStep === 1 && (
-              <>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 font-playfair">
-                  Select Your Travel Date
-                </h2>
-                <DateSelector
-                  tripDuration={tripData.noOfDays || 0}
-                  onDateChange={handleDateChange}
-                  selectedDate={startDate}
-                />
-                <div className="mt-8">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 font-playfair">
+                ))}
+              </div>
+
+              {currentStep === 1 && (
+                <>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-8 font-playfair">
+                    Select Your Travel Date
+                  </h2>
+                  <DateSelector
+                    tripDuration={tripData.noOfDays || 0}
+                    onDateChange={handleDateChange}
+                    selectedDate={startDate}
+                  />
+
+                  <div className="mt-12">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-playfair">
                       Trip Summary
                     </h3>
                     <TripSummary
@@ -318,105 +322,116 @@ export function BookingPage({
                       location={`${tripData.city}, ${tripData.state}, ${tripData.country}`}
                     />
                   </div>
-                </div>
-                <div className="mt-8">
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isTransitioning}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition-all font-montserrat"
-                  >
-                    Continue to Guest Details
-                  </Button>
-                </div>
-              </>
-            )}
-            {currentStep === 2 && (
-              <GuestInformationForm
-                onBack={handleBack}
-                onContinue={handleGuestInfoSubmit}
-              />
-            )}
-          </div>
-        </div>
-        {/* Sidebar */}
-        <div className="flex flex-col space-y-6">
-          {/* Trip Card */}
-          <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <DollarSign className="h-6 w-6 text-purple-600" />
-              <span className="text-2xl font-bold text-gray-900 font-playfair">
-                ₹{tripStats.price}
-              </span>
-              <span className="text-sm text-gray-500 font-roboto">
-                per person
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <Calendar className="h-4 w-4 text-purple-500" />
-              <span className="text-gray-700 text-sm font-roboto">
-                {tripStats.noOfDays} days
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="h-4 w-4 text-purple-500" />
-              <span className="text-gray-700 text-sm font-roboto">
-                Up to {tripStats.maxParticipants} people
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <Languages className="h-4 w-4 text-purple-500" />
-              <span className="text-gray-700 text-sm font-roboto">
-                {tripStats.languages}
-              </span>
-            </div>
-            <div className="mt-4">
-              <BookingProgress bookingData={bookingData} />
+
+                  <div className="mt-12">
+                    <Button
+                      onClick={handleContinue}
+                      disabled={isTransitioning}
+                      className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-4 text-lg rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-montserrat"
+                    >
+                      Continue to Guest Details
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {currentStep === 2 && (
+                <GuestInformationForm
+                  onBack={handleBack}
+                  onContinue={handleGuestInfoSubmit}
+                />
+              )}
             </div>
           </div>
-          {/* Host Card */}
-          <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <MessageCircle className="h-5 w-5 text-purple-600" />
-              <span className="text-lg font-semibold text-gray-900 font-playfair">
-                About Your Host
-              </span>
-            </div>
-            <div className="flex gap-4 items-center mb-4">
-              <Avatar className="h-12 w-12 border-2 border-purple-100">
-                <AvatarImage src={hostInfo.image} />
-                <AvatarFallback className="bg-purple-200 text-purple-700 font-bold font-playfair">
-                  {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-gray-900 font-playfair">
-                  {hostInfo.name}
-                </p>
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-3 w-3 text-yellow-400 fill-yellow-400"
-                    />
-                  ))}
-                  <span className="text-xs text-gray-500 ml-1 font-roboto">
-                    4.9 (124 reviews)
+
+          {/* Sidebar */}
+          <div className="flex flex-col space-y-8">
+            {/* Trip Card */}
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
+              <div className="flex items-center gap-4 mb-6">
+                <DollarSign className="h-8 w-8 text-purple-600" />
+                <span className="text-3xl font-bold text-gray-900 font-playfair">
+                  ₹{tripStats.price}
+                </span>
+                <span className="text-base text-gray-600 font-roboto">
+                  per person
+                </span>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-4">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  <span className="text-gray-700 font-medium font-roboto">
+                    {tripStats.noOfDays} days
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 font-roboto">
-                  Host since {hostInfo.createdYear}
-                </p>
-                <p className="text-xs text-gray-500 font-roboto">
-                  {hostInfo.email}
-                </p>
+                <div className="flex items-center gap-4">
+                  <Users className="h-5 w-5 text-purple-600" />
+                  <span className="text-gray-700 font-medium font-roboto">
+                    Up to {tripStats.maxParticipants} people
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Languages className="h-5 w-5 text-purple-600" />
+                  <span className="text-gray-700 font-medium font-roboto">
+                    {tripStats.languages}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <BookingProgress bookingData={bookingData} />
               </div>
             </div>
-            <div className="text-sm text-gray-700 mb-4 font-roboto">
-              {hostInfo.description}
+
+            {/* Host Card */}
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
+              <div className="flex items-center gap-4 mb-6">
+                <MessageCircle className="h-6 w-6 text-purple-600" />
+                <span className="text-2xl font-bold text-gray-900 font-playfair">
+                  About Your Host
+                </span>
+              </div>
+
+              <div className="flex gap-4 items-center mb-6">
+                <Avatar className="h-16 w-16 border-2 border-purple-100">
+                  <AvatarImage src={hostInfo.image} />
+                  <AvatarFallback className="bg-purple-200 text-purple-700 font-bold text-lg font-playfair">
+                    {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 font-playfair mb-1">
+                    {hostInfo.name}
+                  </p>
+                  <div className="flex items-center gap-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-4 w-4 text-yellow-400 fill-yellow-400"
+                      />
+                    ))}
+                    <span className="text-sm text-gray-600 ml-2 font-roboto">
+                      4.9 (124 reviews)
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 font-roboto">
+                    Host since {hostInfo.createdYear}
+                  </p>
+                  <p className="text-sm text-gray-600 font-roboto">
+                    {hostInfo.email}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-base text-gray-700 mb-6 font-roboto leading-relaxed">
+                {hostInfo.description}
+              </div>
+
+              <button className="w-full bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 text-purple-700 font-bold py-3 rounded-2xl transition-all duration-300 font-montserrat">
+                View Profile
+              </button>
             </div>
-            <button className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 font-semibold py-2 rounded-xl transition-all font-montserrat">
-              View Profile
-            </button>
           </div>
         </div>
       </div>

@@ -17,7 +17,6 @@ import {
   MessageCircle,
   Zap,
   Filter,
-  X,
 } from "lucide-react";
 import { useState } from "react";
 

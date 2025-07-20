@@ -23,6 +23,7 @@ export default async function BookingSummaryPage({ params }: Props) {
     if (!userSession) {
       redirect("/auth/signin");
     }
+    // Only redirect if form is not submitted and we're not in edit mode
     if (!booking?.formSubmitted) {
       redirect(`/trips/booking/${tripId}`);
     }

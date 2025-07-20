@@ -128,7 +128,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
       {/* Header */}
       <DashboardHeader profile={profile} />
 
@@ -141,34 +141,36 @@ export default function UserDashboard() {
         <StatsCards profile={profile} bookings={bookings} />
 
         {/* Tabbed Content */}
-        {activeTab === "profile" && (
-          <ProfileTab profile={profile} setActiveTab={setActiveTab} />
-        )}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+          {activeTab === "profile" && (
+            <ProfileTab profile={profile} setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === "bookings" && (
-          <BookingsTab
-            bookings={bookings}
-            bookingFilter={bookingFilter}
-            setBookingFilter={setBookingFilter}
-          />
-        )}
+          {activeTab === "bookings" && (
+            <BookingsTab
+              bookings={bookings}
+              bookingFilter={bookingFilter}
+              setBookingFilter={setBookingFilter}
+            />
+          )}
 
-        {activeTab === "reviews" && (
-          <ReviewsTab
-            pendingReviews={pendingReviews}
-            userReviews={userReviews}
-            reviewStats={reviewStats}
-            reviewForm={reviewForm}
-            setReviewForm={setReviewForm}
-            handleSubmitReview={handleSubmitReview}
-          />
-        )}
+          {activeTab === "reviews" && (
+            <ReviewsTab
+              pendingReviews={pendingReviews}
+              userReviews={userReviews}
+              reviewStats={reviewStats}
+              reviewForm={reviewForm}
+              setReviewForm={setReviewForm}
+              handleSubmitReview={handleSubmitReview}
+            />
+          )}
 
-        {(activeTab === "explore" ||
-          activeTab === "messages" ||
-          activeTab === "settings") && (
-          <PlaceholderTab setActiveTab={setActiveTab} />
-        )}
+          {(activeTab === "explore" ||
+            activeTab === "messages" ||
+            activeTab === "settings") && (
+            <PlaceholderTab setActiveTab={setActiveTab} />
+          )}
+        </div>
       </div>
     </div>
   );

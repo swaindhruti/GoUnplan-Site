@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import {
   Table,
   TableBody,
@@ -22,6 +22,10 @@ import {
   User,
   BarChart3,
   MessageSquare,
+  Crown,
+  TrendingUp,
+  Shield,
+  Filter,
 } from "lucide-react";
 import {
   getAllUsers,
@@ -31,7 +35,10 @@ import {
   rejectHostApplication,
   getTotalRevenue,
   updateUserRole,
+  getAlltravelPlanApplications,
+  approveTravelPlan,
 } from "@/actions/admin/action";
+import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
 
 // Define interfaces for your data types
@@ -61,6 +68,19 @@ interface Applicant {
   role: Role;
 }
 
+interface TravelPlan {
+  travelPlanId: string;
+  title: string;
+  description: string;
+  country: string;
+  state: string;
+  city: string;
+  noOfDays: number;
+  price: number;
+  hostId: string;
+  createdAt: Date;
+}
+
 // Define the revenue data structure
 interface RevenueData {
   totalSales: {
@@ -78,6 +98,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [hosts, setHosts] = useState<Host[]>([]);
   const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [travelPlans, setTravelPlans] = useState<TravelPlan[]>([]);
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
     refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
@@ -85,6 +106,16 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("users");
+  const [userFilter, setUserFilter] = useState<
+    "all" | "users" | "hosts" | "admins"
+  >("all");
+  const [applicationFilter, setApplicationFilter] = useState<
+    "all" | "hosts" | "travelplans"
+  >("all");
+  const [selectedTravelPlanId, setSelectedTravelPlanId] = useState<
+    string | null
+  >(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // State for dashboard stats
   const [statsData, setStatsData] = useState({
@@ -125,6 +156,14 @@ export default function AdminDashboard() {
         }
         setApplicants(applicantsResponse.hostApplicants || []);
 
+        // Fetch travel plans
+        const travelPlansResponse = await getAlltravelPlanApplications();
+        if (travelPlansResponse.error) {
+          setError(travelPlansResponse.error);
+          return;
+        }
+        setTravelPlans(travelPlansResponse.travelPlans || []);
+
         // Fetch revenue data
         const revenueResponse = await getTotalRevenue();
         if (revenueResponse.error) {
@@ -137,7 +176,9 @@ export default function AdminDashboard() {
         setStatsData({
           totalUsers: usersResponse.users?.length || 0,
           totalHosts: hostsResponse.hosts?.length || 0,
-          hostApplicants: applicantsResponse.hostApplicants?.length || 0,
+          hostApplicants:
+            (applicantsResponse.hostApplicants?.length || 0) +
+            (travelPlansResponse.travelPlans?.length || 0),
           totalBookings:
             (revenueResponse.totalSales?._count?.id || 0) +
             (revenueResponse.refundAmount?._count?.id || 0),
@@ -234,606 +275,1022 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApproveTravelPlan = async (travelPlanId: string) => {
+    try {
+      const response = await approveTravelPlan(travelPlanId);
+      if (response && response.error) {
+        setError(response.error);
+        return;
+      }
+
+      // Remove from travel plans
+      setTravelPlans(
+        travelPlans.filter((plan) => plan.travelPlanId !== travelPlanId)
+      );
+    } catch (err) {
+      setError("Failed to approve travel plan");
+      console.error(err);
+    }
+  };
+
+  const handleViewTravelPlanDetails = (travelPlanId: string) => {
+    setSelectedTravelPlanId(travelPlanId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTravelPlanId(null);
+  };
+
   // Format date helper function
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString();
   };
 
-  const TabButton = ({
-    label,
-    icon,
-    isActive,
-    onClick,
-  }: {
-    label: string;
-    icon: React.ReactNode;
-    isActive: boolean;
-    onClick: () => void;
-  }) => (
-    <button
-      onClick={onClick}
-      className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all ${
-        isActive
-          ? "bg-purple-100 text-purple-700 border-b-2 border-purple-600"
-          : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
-  );
+  // Filter users based on selected filter
+  const filteredUsers = users.filter((user) => {
+    if (userFilter === "all") return true;
+    if (userFilter === "users") return user.role === "USER";
+    if (userFilter === "hosts") return user.role === "HOST";
+    if (userFilter === "admins") return user.role === "ADMIN";
+    return true;
+  });
+
+  // Define tabs with sophisticated styling and descriptions
+  const tabs = [
+    {
+      id: "users",
+      label: "USERS",
+      icon: <Users className="w-5 h-5" />,
+      description: "User Management",
+    },
+    {
+      id: "hosts",
+      label: "HOSTS",
+      icon: <UserCheck className="w-5 h-5" />,
+      description: "Host Management",
+    },
+    {
+      id: "applicants",
+      label: "APPLICATIONS",
+      icon: <UserPlus className="w-5 h-5" />,
+      description: "Pending Reviews",
+    },
+    {
+      id: "revenue",
+      label: "REVENUE",
+      icon: <BarChart3 className="w-5 h-5" />,
+      description: "Financial Analytics",
+    },
+    {
+      id: "messages",
+      label: "MESSAGES",
+      icon: <MessageSquare className="w-5 h-5" />,
+      description: "Communication",
+    },
+  ];
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-        <span className="ml-3 text-gray-600">Loading admin dashboard...</span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <span className="text-gray-600 font-medium">
+            Loading admin dashboard...
+          </span>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 flex items-center justify-center">
         <div className="text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-red-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.734-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-          <p className="mt-2 text-red-600 font-medium">Error: {error}</p>
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Shield className="h-8 w-8 text-red-600" />
+          </div>
+          <p className="text-red-600 font-medium text-lg">Error: {error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto flex justify-between px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Admin Dashboard
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Manage users, hosts, and monitor platform activity
-            </p>
-          </div>
-          <div className="text-2xl gap-2 flex items-center font-bold text-gray-900">
-            <User size={30} />
-            Admin
+      <div className="relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-16 overflow-hidden">
+        {/* Premium background effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/20" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.15),transparent_50%)]" />
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.15),transparent_50%)]" />
+
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: "20px 20px",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse" />
+                <span className="text-purple-300 text-sm font-medium tracking-wide uppercase">
+                  Admin Dashboard
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+                Platform Management
+                <span className="block bg-gradient-to-r from-purple-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                  Control Center
+                </span>
+              </h1>
+              <p className="text-xl text-slate-300 font-medium max-w-2xl leading-relaxed">
+                Manage users, hosts, monitor revenue, and oversee platform
+                operations with precision and authority.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-1 rounded-2xl">
+                  <div className="bg-slate-800 p-4 rounded-xl">
+                    <Shield size={32} className="text-purple-300" />
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 bg-emerald-500 rounded-full p-1">
+                  <Crown size={12} className="text-white" />
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  <span className="text-2xl font-bold text-white">Admin</span>
+                </div>
+                <p className="text-slate-300 text-sm font-medium">
+                  System Administrator
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white/95 backdrop-blur-sm border-b border-slate-200/50 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 py-4">
-            <TabButton
-              label="Users"
-              icon={<Users className="w-5 h-5" />}
-              isActive={activeTab === "users"}
-              onClick={() => setActiveTab("users")}
-            />
-            <TabButton
-              label="Hosts"
-              icon={<UserCheck className="w-5 h-5" />}
-              isActive={activeTab === "hosts"}
-              onClick={() => setActiveTab("hosts")}
-            />
-            <TabButton
-              label="Applications"
-              icon={<UserPlus className="w-5 h-5" />}
-              isActive={activeTab === "applicants"}
-              onClick={() => setActiveTab("applicants")}
-            />
-            <TabButton
-              label="Revenue"
-              icon={<BarChart3 className="w-5 h-5" />}
-              isActive={activeTab === "revenue"}
-              onClick={() => setActiveTab("revenue")}
-            />
-            <TabButton
-              label="Messages"
-              icon={<MessageSquare className="w-5 h-5" />}
-              isActive={activeTab === "messages"}
-              onClick={() => setActiveTab("messages")}
-            />
+          <div className="flex justify-center space-x-3 overflow-x-auto overflow-y-hidden scrollbar-hide">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  relative group px-8 py-6 font-semibold text-sm uppercase tracking-wider
+                  rounded-xl transition-all duration-300 flex flex-col items-center gap-3 min-w-[140px] flex-shrink-0
+                  ${
+                    activeTab === tab.id
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25 scale-105"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-102"
+                  }
+                `}
+              >
+                <div
+                  className={`
+                  p-3 rounded-lg transition-all duration-300 flex-shrink-0
+                  ${
+                    activeTab === tab.id
+                      ? "bg-white/20"
+                      : "bg-slate-100 group-hover:bg-slate-200"
+                  }
+                `}
+                >
+                  {tab.icon}
+                </div>
+                <div className="text-center space-y-1 flex-shrink-0">
+                  <div className="font-semibold text-sm whitespace-nowrap">
+                    {tab.label}
+                  </div>
+                  <div
+                    className={`text-xs font-medium whitespace-nowrap ${
+                      activeTab === tab.id ? "text-white/80" : "text-slate-500"
+                    }`}
+                  >
+                    {tab.description}
+                  </div>
+                </div>
+                {activeTab === tab.id && (
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-10 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full" />
+                )}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-12">
+          {/* Total Users Card */}
+          <div className="relative group bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-lg border border-blue-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wide">
+                  Total Users
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
                 {statsData.totalUsers.toLocaleString()}
               </div>
-              <p className="text-xs text-gray-600">Registered users</p>
-            </CardContent>
-          </Card>
+              <p className="text-blue-600 font-medium text-sm">
+                Registered users
+              </p>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Hosts</CardTitle>
-              <UserCheck className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{statsData.totalHosts}</div>
-              <p className="text-xs text-gray-600">Active hosts</p>
-            </CardContent>
-          </Card>
+          {/* Total Hosts Card */}
+          <div className="relative group bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl p-6 shadow-lg border border-emerald-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-green-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
+                  Total Hosts
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <UserCheck className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
+                {statsData.totalHosts}
+              </div>
+              <p className="text-emerald-600 font-medium text-sm">
+                Active hosts
+              </p>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Host Applicants
-              </CardTitle>
-              <UserPlus className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+          {/* Host Applicants Card */}
+          <div className="relative group bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-6 shadow-lg border border-amber-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-amber-700 uppercase tracking-wide">
+                  Applications
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <UserPlus className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
                 {statsData.hostApplicants}
               </div>
-              <p className="text-xs text-gray-600">Pending review</p>
-            </CardContent>
-          </Card>
+              <p className="text-amber-600 font-medium text-sm">
+                Host & travel plan applications
+              </p>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Bookings
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+          {/* Total Bookings Card */}
+          <div className="relative group bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl p-6 shadow-lg border border-purple-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-violet-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wide">
+                  Total Bookings
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
                 {statsData.totalBookings}
               </div>
-              <p className="text-xs text-gray-600">All time bookings</p>
-            </CardContent>
-          </Card>
+              <p className="text-purple-600 font-medium text-sm">
+                All time bookings
+              </p>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-              <DollarSign className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+          {/* Total Sales Card */}
+          <div className="relative group bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-green-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-green-700 uppercase tracking-wide">
+                  Total Sales
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <DollarSign className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
                 ${statsData.totalSales.toLocaleString()}
               </div>
-              <p className="text-xs text-gray-600">
-                Confirmed bookings revenue
+              <p className="text-green-600 font-medium text-sm">
+                Platform revenue
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Pending Refunds
-              </CardTitle>
-              <RefreshCw className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+          {/* Pending Refunds Card */}
+          <div className="relative group bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl p-6 shadow-lg border border-red-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/20 to-pink-500/20 rounded-full -translate-y-16 translate-x-16" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-red-700 uppercase tracking-wide">
+                  Pending Refunds
+                </h3>
+                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <RefreshCw className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">
                 ${statsData.pendingRefunds.toLocaleString()}
               </div>
-              <p className="text-xs text-gray-600">Total refund amount</p>
-            </CardContent>
-          </Card>
+              <p className="text-red-600 font-medium text-sm">Refund amount</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabbed Content */}
-        {activeTab === "users" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    User Management
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    View all users and manage their roles
-                  </p>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+          {activeTab === "users" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      User Management
+                    </h3>
+                    <p className="text-gray-600 font-medium">
+                      View all users and manage their roles
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-5 h-5 text-purple-600" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        Filter:
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setUserFilter("all")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          userFilter === "all"
+                            ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        All ({users.length})
+                      </button>
+                      <button
+                        onClick={() => setUserFilter("users")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          userFilter === "users"
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        Users ({users.filter((u) => u.role === "USER").length})
+                      </button>
+                      <button
+                        onClick={() => setUserFilter("hosts")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          userFilter === "hosts"
+                            ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        Hosts ({users.filter((u) => u.role === "HOST").length})
+                      </button>
+                      <button
+                        onClick={() => setUserFilter("admins")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          userFilter === "admins"
+                            ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        Admins ({users.filter((u) => u.role === "ADMIN").length}
+                        )
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-gray-50 border-b border-gray-200">
-                  <TableRow>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Name
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Email
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Phone
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Role
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
-                  {users.length > 0 ? (
-                    users.map((user) => (
-                      <TableRow
-                        key={user.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm mr-3">
-                              {user.name.charAt(0).toUpperCase()}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                    <TableRow>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Name
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Email
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Phone
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Role
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white divide-y divide-slate-200">
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
+                        <TableRow
+                          key={user.id}
+                          className="hover:bg-slate-50 transition-colors"
+                        >
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                {user.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="font-medium text-gray-900">
+                                {user.name}
+                              </span>
                             </div>
-                            <span className="font-medium text-gray-900">
-                              {user.name}
-                            </span>
-                          </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-gray-600">
+                            {user.email}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-gray-600">
+                            {user.phone}
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <Badge
+                              className={
+                                user.role === "ADMIN"
+                                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                                  : user.role === "HOST"
+                                  ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                                  : "bg-gradient-to-r from-slate-600 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                              }
+                            >
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex gap-2">
+                              {user.role !== "ADMIN" && (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                    onClick={() =>
+                                      handleUpdateRole(
+                                        user.email,
+                                        user.role === "USER" ? "HOST" : "USER"
+                                      )
+                                    }
+                                  >
+                                    {user.role === "USER"
+                                      ? "Make Host"
+                                      : "Make User"}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                    onClick={() =>
+                                      handleUpdateRole(user.email, "ADMIN")
+                                    }
+                                  >
+                                    Make Admin
+                                  </Button>
+                                </>
+                              )}
+                              {user.role === "ADMIN" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-gradient-to-r from-slate-600 to-gray-600 text-white hover:from-slate-700 hover:to-gray-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  onClick={() =>
+                                    handleUpdateRole(user.email, "USER")
+                                  }
+                                >
+                                  Make User
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={5}
+                          className="text-center py-8 text-gray-600"
+                        >
+                          No users found with the selected filter
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {user.email}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {user.phone}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Badge
-                            variant={
-                              user.role === "ADMIN"
-                                ? "default"
-                                : user.role === "HOST"
-                                ? "secondary"
-                                : "outline"
-                            }
-                            className={
-                              user.role === "ADMIN"
-                                ? "bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium"
-                                : user.role === "HOST"
-                                ? "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium"
-                                : "bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium"
-                            }
-                          >
-                            {user.role}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          {user.role !== "ADMIN" && (
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "hosts" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Host Management
+                    </h3>
+                    <p className="text-gray-600 font-medium">
+                      View and manage all active hosts on the platform
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                    <TableRow>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Name
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Email
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Phone
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Created At
+                      </TableHead>
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white divide-y divide-slate-200">
+                    {hosts.length > 0 ? (
+                      hosts.map((host) => (
+                        <TableRow
+                          key={host.id}
+                          className="hover:bg-slate-50 transition-colors"
+                        >
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                {host.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="font-medium text-gray-900">
+                                {host.name}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-gray-600">
+                            {host.email}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-gray-600">
+                            {host.phone}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-gray-600">
+                            {formatDate(host.createdAt)}
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-purple-600 bg-white hover:bg-purple-50 hover:text-purple-800 font-medium text-sm"
-                              onClick={() =>
-                                handleUpdateRole(
-                                  user.email,
-                                  user.role === "USER" ? "HOST" : "USER"
-                                )
-                              }
+                              className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
                             >
-                              {user.role === "USER" ? "Make Host" : "Make User"}
+                              View Details
                             </Button>
-                          )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={5}
+                          className="text-center py-8 text-gray-600"
+                        >
+                          No hosts found
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center py-8 text-gray-600"
-                      >
-                        No users found
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "hosts" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Host Management
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    View and manage all active hosts on the platform
-                  </p>
-                </div>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-gray-50 border-b border-gray-200">
-                  <TableRow>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Name
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Email
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Phone
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Created At
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
-                  {hosts.length > 0 ? (
-                    hosts.map((host) => (
-                      <TableRow
-                        key={host.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3">
-                              {host.name.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="font-medium text-gray-900">
-                              {host.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {host.email}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {host.phone}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {formatDate(host.createdAt)}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-purple-600 bg-white hover:bg-purple-50 hover:text-purple-800 font-medium text-sm"
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center py-8 text-gray-600"
-                      >
-                        No hosts found
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "applicants" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+          {activeTab === "applicants" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Applications Review
+                    </h3>
+                    <p className="text-gray-600 font-medium">
+                      Review and manage pending host applications and travel
+                      plans
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-5 h-5 text-amber-600" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        Filter:
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setApplicationFilter("all")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          applicationFilter === "all"
+                            ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        All ({applicants.length + travelPlans.length})
+                      </button>
+                      <button
+                        onClick={() => setApplicationFilter("hosts")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          applicationFilter === "hosts"
+                            ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        Host Applications ({applicants.length})
+                      </button>
+                      <button
+                        onClick={() => setApplicationFilter("travelplans")}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          applicationFilter === "travelplans"
+                            ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                      >
+                        Travel Plans ({travelPlans.length})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Host Applications Table */}
+              {(applicationFilter === "all" ||
+                applicationFilter === "hosts") && (
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-emerald-600" />
                     Host Applications
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Review and manage pending host applications
-                  </p>
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                        <TableRow>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Name
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Email
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Phone
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Applied Date
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Actions
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="bg-white divide-y divide-slate-200">
+                        {applicants.length > 0 ? (
+                          applicants.map((applicant) => (
+                            <TableRow
+                              key={applicant.id}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              <TableCell className="px-6 py-4">
+                                <div className="flex items-center">
+                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                    {applicant.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <span className="font-medium text-gray-900">
+                                    {applicant.name}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                {applicant.email}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                {applicant.phone}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                {formatDate(applicant.createdAt)}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 space-x-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  onClick={() =>
+                                    handleApproveHost(applicant.email)
+                                  }
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  onClick={() =>
+                                    handleRejectHost(applicant.email)
+                                  }
+                                >
+                                  Reject
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={5}
+                              className="text-center py-8 text-gray-600"
+                            >
+                              No host applications found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-gray-50 border-b border-gray-200">
-                  <TableRow>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Name
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Email
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Phone
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Applied Date
-                    </TableHead>
-                    <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
-                  {applicants.length > 0 ? (
-                    applicants.map((applicant) => (
-                      <TableRow
-                        key={applicant.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm mr-3">
-                              {applicant.name.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="font-medium text-gray-900">
-                              {applicant.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {applicant.email}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {applicant.phone}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-600">
-                          {formatDate(applicant.createdAt)}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800"
-                            onClick={() => handleApproveHost(applicant.email)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:text-red-800"
-                            onClick={() => handleRejectHost(applicant.email)}
-                          >
-                            Reject
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center py-8 text-gray-600"
-                      >
-                        No host applications found
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+              )}
 
-        {activeTab === "revenue" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Revenue Overview
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Monitor platform revenue and refunds
-                  </p>
+              {/* Travel Plans Table */}
+              {(applicationFilter === "all" ||
+                applicationFilter === "travelplans") && (
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-purple-600" />
+                    Inactive Travel Plans
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                        <TableRow>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Title
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Location
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Duration
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Price
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Created Date
+                          </TableHead>
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Actions
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="bg-white divide-y divide-slate-200">
+                        {travelPlans.length > 0 ? (
+                          travelPlans.map((plan) => (
+                            <TableRow
+                              key={plan.travelPlanId}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              <TableCell className="px-6 py-4">
+                                <div className="flex items-center">
+                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                    {plan.title.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium text-gray-900 block">
+                                      {plan.title}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      {plan.description.substring(0, 50)}...
+                                    </span>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                <div>
+                                  <div className="font-medium">
+                                    {plan.city}, {plan.state}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {plan.country}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                {plan.noOfDays} days
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                ${plan.price}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-gray-600">
+                                {formatDate(plan.createdAt)}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 space-x-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  onClick={() =>
+                                    handleViewTravelPlanDetails(
+                                      plan.travelPlanId
+                                    )
+                                  }
+                                >
+                                  View Details
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  onClick={() =>
+                                    handleApproveTravelPlan(plan.travelPlanId)
+                                  }
+                                >
+                                  Make Active
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="text-center py-8 text-gray-600"
+                            >
+                              No inactive travel plans found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+
+              {/* Empty state when no applications match filter */}
+              {applicationFilter === "all" &&
+                applicants.length === 0 &&
+                travelPlans.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                      <UserPlus className="h-10 w-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                      No Applications Found
+                    </h3>
+                    <p className="text-gray-600 max-w-md mx-auto text-lg leading-relaxed">
+                      There are currently no pending host applications or
+                      inactive travel plans to review.
+                    </p>
+                  </div>
+                )}
+            </div>
+          )}
+
+          {activeTab === "revenue" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Revenue Overview
+                    </h3>
+                    <p className="text-gray-600 font-medium">
+                      Monitor platform revenue and refunds
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <Card className="border border-gray-200 shadow-sm">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total Sales
-                    </CardTitle>
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-600">
+                <div className="relative group bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-green-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-16 translate-x-16" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-green-700">
+                        Total Sales
+                      </h3>
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <DollarSign className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">
                       ${revenue.totalSales._sum.totalPrice || 0}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-green-600 font-medium text-sm">
                       {revenue.totalSales._count.id || 0} confirmed bookings
                     </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                <Card className="border border-gray-200 shadow-sm">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Refund Amounts
-                    </CardTitle>
-                    <RefreshCw className="h-5 w-5 text-red-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-red-600">
+                <div className="relative group bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl p-6 shadow-lg border border-red-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/20 to-pink-500/20 rounded-full -translate-y-16 translate-x-16" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-red-700">
+                        Refund Amounts
+                      </h3>
+                      <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <RefreshCw className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    <div className="text-3xl font-bold text-red-600 mb-2">
                       ${revenue.refundAmount._sum.refundAmount || 0}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-red-600 font-medium text-sm">
                       {revenue.refundAmount._count.id || 0} cancelled/refunded
                       bookings
                     </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-8 border border-slate-200/50">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
                   Revenue Management
                 </h3>
-                <p className="mb-4 text-gray-700">
+                <p className="mb-6 text-gray-700 leading-relaxed">
                   The admin dashboard allows you to track revenue from confirmed
                   bookings and manage refunds. Use the booking management
                   section to handle any pending refund requests.
                 </p>
 
-                <div className="flex space-x-4 mt-6">
-                  <Button className="bg-purple-600 text-white hover:bg-purple-700">
+                <div className="flex space-x-4">
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl">
                     Download Revenue Report
                   </Button>
                   <Button
                     variant="outline"
-                    className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                    className="text-purple-600 border-purple-300 hover:bg-purple-50 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl"
                   >
                     View Detailed Analytics
                   </Button>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "messages" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
-            <div className="text-center">
-              <MessageSquare className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          {activeTab === "messages" && (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <MessageSquare className="h-10 w-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Message Center
               </h3>
-              <p className="text-gray-600 max-w-md mx-auto">
+              <p className="text-gray-600 max-w-md mx-auto text-lg leading-relaxed">
                 This section is coming soon! You&apos;ll be able to communicate
                 with users and hosts directly from the admin dashboard.
               </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Travel Plan Details Modal */}
+      {isModalOpen && selectedTravelPlanId && (
+        <TravelPlanModal
+          travelPlanId={selectedTravelPlanId}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

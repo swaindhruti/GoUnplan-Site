@@ -13,22 +13,22 @@ export const getTripById = async (tripId: string) => {
         endDate: true,
         price: true,
         travelPlanId: true,
-        maxParticipants: true
-      }
+        maxParticipants: true,
+      },
     });
     const booking = await prisma.booking.findFirst({
       where: {
         userId: session.user.id,
-        travelPlanId: tripId
+        travelPlanId: tripId,
       },
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
       select: {
         guests: true,
         startDate: true,
-        endDate: true
-      }
+        endDate: true,
+      },
     });
 
     return { trip, booking };
