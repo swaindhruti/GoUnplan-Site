@@ -15,6 +15,8 @@ export const CreateDestinationSchema = z.object({
   endDate: z.string().or(z.date()),
   filters: z.array(z.string()).optional().default([]),
   languages: z.array(z.string()).optional().default([]),
+  includedActivities: z.array(z.string()).optional().default([]),
+  restrictions: z.array(z.string()).optional().default([]),
 
   // Properly define the dayWiseData schema
   dayWiseData: z

@@ -7,7 +7,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "tripName",
     placeholder: "Enter the Trip Title",
     className: "col-span-1",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "Destination",
@@ -15,7 +15,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "destination",
     placeholder: "nilgri waterfall",
     className: "col-span-1",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "country",
@@ -23,7 +23,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "country",
     placeholder: "india",
     className: "col-span-1",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "state",
@@ -31,7 +31,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "state",
     placeholder: "odisha",
     className: "col-span-1",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "city",
@@ -39,7 +39,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "city",
     placeholder: "sambalpur",
     className: "col-span-1",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "Price (INR)",
@@ -47,7 +47,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "price",
     placeholder: "14999",
     className: "col-span-1",
-    zod: "number"
+    zod: "number",
   },
   {
     label: "Filter Tags",
@@ -56,7 +56,7 @@ export const CreateDestinationFormData: FormFields[] = [
     placeholder: "Select a filter",
     options: ["Adventure", "Beach", "Historical", "Trekking", "Cultural"],
     className: "col-span-1",
-    zod: "enum[]" // updated
+    zod: "enum[]", // updated
   },
   {
     label: "Start Date",
@@ -64,7 +64,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "startDate",
     placeholder: "Select Start Date",
     className: "col-span-1",
-    zod: "date"
+    zod: "date",
   },
   {
     label: "End Date",
@@ -72,7 +72,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "endDate",
     placeholder: "Select End Date",
     className: "col-span-1",
-    zod: "date"
+    zod: "date",
   },
   {
     label: "Max Limit (People)",
@@ -80,7 +80,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "maxLimit",
     placeholder: "Select maximum",
     className: "col-span-1",
-    zod: "number"
+    zod: "number",
   },
   {
     label: "Description",
@@ -88,7 +88,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "description",
     placeholder: "Describe the trip details, highlights, and more...",
     className: "col-span-2",
-    zod: "string"
+    zod: "string",
   },
   {
     label: "Languages Offered",
@@ -97,7 +97,57 @@ export const CreateDestinationFormData: FormFields[] = [
     placeholder: "Select a language",
     options: ["English", "Hindi", "Spanish", "French"],
     className: "col-span-1",
-    zod: "enum[]"
+    zod: "enum[]",
+  },
+  {
+    label: "What's Included",
+    type: "multi-select",
+    id: "includedActivities",
+    placeholder: "Select what's included",
+    options: [
+      "All meals during the trip",
+      "Comfortable lodging for all nights",
+      "Professional guide fees",
+      "Equipment rentals",
+      "Transportation during the trip",
+      "Entrance fees to attractions",
+      "Travel insurance",
+      "Airport transfers",
+      "Local transportation",
+      "Cultural activities",
+      "Photography services",
+      "First aid kit",
+      "Water and snacks",
+      "WiFi access",
+      "24/7 support",
+    ],
+    className: "col-span-1",
+    zod: "enum[]",
+  },
+  {
+    label: "What's Not Included",
+    type: "multi-select",
+    id: "restrictions",
+    placeholder: "Select what's not included",
+    options: [
+      "International flights",
+      "Domestic flights",
+      "Personal expenses",
+      "Alcoholic beverages",
+      "Travel insurance",
+      "Visa fees",
+      "Personal equipment",
+      "Tips and gratuities",
+      "Optional activities",
+      "Souvenirs",
+      "Laundry services",
+      "Phone calls",
+      "Internet usage",
+      "Medical expenses",
+      "Cancellation insurance",
+    ],
+    className: "col-span-1",
+    zod: "enum[]",
   },
   {
     label: "label",
@@ -105,6 +155,6 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "sectionhead",
     // placeholder: "Select a language",
     className: "col-span-2 py-3 border-b-[1px] border-white  text-3xl",
-    zod: "enum[]"
-  }
+    zod: "enum[]",
+  },
 ];

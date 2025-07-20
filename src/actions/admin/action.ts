@@ -252,3 +252,28 @@ export const getAlltravelPlanApplications = async () => {
     return { error: "Failed to fetch travel plan applications" };
   }
 };
+
+export const approveTravelPlan = async (travelPlanId: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const updatedTravelPlan = await prisma.travelPlans.update({
+      where: { travelPlanId: travelPlanId },
+      data: { status: TravelPlanStatus.ACTIVE },
+    });
+
+    return { success: true, travelPlan: updatedTravelPlan };
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return { error: "Travel plan not found" };
+    }
+    console.error("Error approving travel plan:", error);
+    return { error: "Failed to approve travel plan" };
+  }
+};

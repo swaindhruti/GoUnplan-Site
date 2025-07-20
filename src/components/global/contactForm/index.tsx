@@ -8,7 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,7 +34,7 @@ const getSelectOptions = (options?: string[]) => {
 
 export const CreateDestinationForm = ({
   FormData,
-  FormSchema
+  FormSchema,
 }: FormComponentProps) => {
   const schema = FormSchema;
   const router = useRouter();
@@ -52,7 +52,7 @@ export const CreateDestinationForm = ({
             ? ""
             : field.type === "multi-select"
             ? []
-            : ""
+            : "",
       }),
       {}
     ),
@@ -64,20 +64,20 @@ export const CreateDestinationForm = ({
         description: "",
         activities: [],
         meals: "",
-        accommodation: ""
-      }
+        accommodation: "",
+      },
     ],
     // Add tripImage field
-    tripImage: ""
+    tripImage: "",
   };
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues
+    defaultValues,
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData"
+    name: "dayWiseData",
   });
 
   // Update the addDay function to ensure each day has required fields
@@ -89,7 +89,7 @@ export const CreateDestinationForm = ({
       description: "",
       activities: [],
       meals: "",
-      accommodation: ""
+      accommodation: "",
     });
   };
 
@@ -154,7 +154,7 @@ export const CreateDestinationForm = ({
           description: day.description || "",
           activities: Array.isArray(day.activities) ? day.activities : [],
           meals: day.meals || "",
-          accommodation: day.accommodation || ""
+          accommodation: day.accommodation || "",
         })
       );
 
@@ -164,8 +164,8 @@ export const CreateDestinationForm = ({
         title: data.tripName,
         description: data.description,
         destination: data.destination,
-        includedActivities: [],
-        restrictions: [],
+        includedActivities: data.includedActivities || [],
+        restrictions: data.restrictions || [],
         noOfDays,
         price: data.price,
         startDate: start,
@@ -177,7 +177,7 @@ export const CreateDestinationForm = ({
         languages: data.languages || [],
         filters: data.filters || [],
         dayWiseData: processedDayWiseData, // Use the processed data
-        tripImage: data.tripImage || "" // Add trip image
+        tripImage: data.tripImage || "", // Add trip image
       });
 
       if (result?.error) {
@@ -201,7 +201,7 @@ export const CreateDestinationForm = ({
       ...base,
       backgroundColor: "white",
       borderColor: "#e2e8f0",
-      color: "#333"
+      color: "#333",
     }),
     menu: (base) => ({ ...base, backgroundColor: "white" }),
     option: (base, state) => ({
@@ -211,17 +211,17 @@ export const CreateDestinationForm = ({
         : state.isFocused
         ? "#f3f4f6"
         : "white",
-      color: "#333"
+      color: "#333",
     }),
     multiValue: (base) => ({ ...base, backgroundColor: "#f3f4f6" }),
     multiValueLabel: (base) => ({ ...base, color: "#333" }),
     multiValueRemove: (base) => ({
       ...base,
       color: "#333",
-      ":hover": { backgroundColor: "#e2e8f0" }
+      ":hover": { backgroundColor: "#e2e8f0" },
     }),
     placeholder: (base) => ({ ...base, color: "#94a3b8" }),
-    input: (base) => ({ ...base, color: "#333" })
+    input: (base) => ({ ...base, color: "#333" }),
   };
 
   return (
@@ -424,7 +424,7 @@ export const CreateDestinationForm = ({
                                   value={(field.value as string[])?.map(
                                     (val) => ({
                                       value: val,
-                                      label: val
+                                      label: val,
                                     })
                                   )}
                                   onChange={(
@@ -442,12 +442,12 @@ export const CreateDestinationForm = ({
                                       border: "2px solid #000",
                                       borderRadius: "0.75rem",
                                       boxShadow: "4px 4px 0 0 #000",
-                                      fontWeight: "bold"
+                                      fontWeight: "bold",
                                     }),
                                     multiValue: (base) => ({
                                       ...base,
                                       backgroundColor: "#e9d5ff",
-                                      color: "#6d28d9"
+                                      color: "#6d28d9",
                                     }),
                                     option: (base, state) => ({
                                       ...base,
@@ -457,8 +457,8 @@ export const CreateDestinationForm = ({
                                         ? "#fde68a"
                                         : "#fff",
                                       color: "#333",
-                                      fontWeight: "bold"
-                                    })
+                                      fontWeight: "bold",
+                                    }),
                                   }}
                                   placeholder={data.placeholder}
                                 />
@@ -669,7 +669,7 @@ export const CreateDestinationForm = ({
                                   value={
                                     field.value?.map((act: string) => ({
                                       value: act,
-                                      label: act
+                                      label: act,
                                     })) || []
                                   }
                                   onChange={(
@@ -687,12 +687,12 @@ export const CreateDestinationForm = ({
                                       border: "2px solid #000",
                                       borderRadius: "0.75rem",
                                       boxShadow: "4px 4px 0 0 #000",
-                                      fontWeight: "bold"
+                                      fontWeight: "bold",
                                     }),
                                     multiValue: (base) => ({
                                       ...base,
                                       backgroundColor: "#e9d5ff",
-                                      color: "#6d28d9"
+                                      color: "#6d28d9",
                                     }),
                                     option: (base, state) => ({
                                       ...base,
@@ -702,8 +702,8 @@ export const CreateDestinationForm = ({
                                         ? "#fde68a"
                                         : "#fff",
                                       color: "#333",
-                                      fontWeight: "bold"
-                                    })
+                                      fontWeight: "bold",
+                                    }),
                                   }}
                                 />
                               </FormControl>

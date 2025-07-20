@@ -11,8 +11,7 @@ export const getTripById = async (tripId: string) => {
         dayWiseItinerary: true,
         bookings: {
           where: {
-            userId: session.user.id,
-            travelPlanId: tripId
+            travelPlanId: tripId,
           },
           select: {
             id: true,
@@ -24,15 +23,26 @@ export const getTripById = async (tripId: string) => {
             participants: true,
             status: true,
             pricePerPerson: true,
-            refundAmount: true
-          }
+            refundAmount: true,
+          },
         },
         host: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+        reviews: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     return trip;

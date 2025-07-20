@@ -12,6 +12,8 @@ type FieldId =
   | "maxLimit"
   | "description"
   | "languages"
+  | "includedActivities"
+  | "restrictions"
   | "sectionhead"
   | "dayWiseData";
 
@@ -56,8 +58,8 @@ export type FormDataShape = {
     ? number
     : K extends "startDate" | "endDate"
     ? Date
-    : K extends "filters" | "languages"
-    ? string
+    : K extends "filters" | "languages" | "includedActivities" | "restrictions"
+    ? string[]
     : string;
 };
 
@@ -66,8 +68,8 @@ export type FormInputShape = {
     ? string | number
     : K extends "startDate" | "endDate"
     ? string | Date
-    : K extends "filters" | "languages"
-    ? string
+    : K extends "filters" | "languages" | "includedActivities" | "restrictions"
+    ? string[]
     : string;
 };
 
