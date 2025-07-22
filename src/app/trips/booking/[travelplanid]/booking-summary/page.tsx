@@ -17,7 +17,7 @@ export default async function BookingSummaryPage({ params }: Props) {
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
       getTripById(tripId),
-      requireUser(),
+      requireUser()
     ]);
 
     if (!userSession) {
@@ -32,7 +32,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       <>
         <BookingSummary
           booking={{
-            ...booking,
+            ...booking
           }}
           travelPlan={trip}
         />

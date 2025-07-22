@@ -9,7 +9,7 @@ import { TripCard } from "@/components/trips/TripCard";
 import {
   LoadingSkeleton,
   EmptyState,
-  ErrorDisplay,
+  ErrorDisplay
 } from "@/components/trips/LoadingStates";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,7 @@ import { Search, Filter, Sparkles, X } from "lucide-react";
 const FloatingActionButton = ({
   onClick,
   children,
-  className = "",
+  className = ""
 }: {
   onClick: () => void;
   children: React.ReactNode;
@@ -59,12 +59,11 @@ export default function TripsPage() {
     clearAllFilters,
     filteredTrips,
     activeFiltersCount,
-    filterOptions,
+    filterOptions
   } = useFilters(trips);
 
   const [showFilters, setShowFilters] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
 
   // Scroll to top functionality
@@ -110,12 +109,12 @@ export default function TripsPage() {
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "rgba(147, 51, 234, 0.5)",
-          boxShadow: "0 6px 25px rgba(147, 51, 234, 0.15)",
+          boxShadow: "0 6px 25px rgba(147, 51, 234, 0.15)"
         },
         "&:focus-within": {
           borderColor: "rgb(147, 51, 234)",
-          boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.1)",
-        },
+          boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.1)"
+        }
       }),
       option: (
         baseStyles: Record<string, unknown>,
@@ -131,7 +130,7 @@ export default function TripsPage() {
         fontWeight: state.isSelected ? "600" : "500",
         padding: "10px 14px",
         fontSize: "0.875rem",
-        transition: "all 0.2s ease",
+        transition: "all 0.2s ease"
       }),
       multiValue: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -139,13 +138,13 @@ export default function TripsPage() {
         border: "1px solid rgba(147, 51, 234, 0.3)",
         borderRadius: "0.5rem",
         padding: "2px 6px",
-        margin: "2px 4px 2px 0",
+        margin: "2px 4px 2px 0"
       }),
       multiValueLabel: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(147, 51, 234)",
         fontWeight: "500",
-        fontSize: "0.875rem",
+        fontSize: "0.875rem"
       }),
       multiValueRemove: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -153,28 +152,28 @@ export default function TripsPage() {
         transition: "all 0.2s ease",
         "&:hover": {
           backgroundColor: "rgb(147, 51, 234)",
-          color: "white",
-        },
+          color: "white"
+        }
       }),
       placeholder: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(107, 114, 128)",
-        fontWeight: "400",
+        fontWeight: "400"
       }),
       input: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(55, 65, 81)",
-        fontWeight: "500",
+        fontWeight: "500"
       }),
       indicatorSeparator: () => ({
-        display: "none",
+        display: "none"
       }),
       dropdownIndicator: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(147, 51, 234)",
         "&:hover": {
-          color: "rgb(126, 34, 206)",
-        },
+          color: "rgb(126, 34, 206)"
+        }
       }),
       menu: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -182,16 +181,16 @@ export default function TripsPage() {
         border: "1px solid rgba(147, 51, 234, 0.2)",
         borderRadius: "0.75rem",
         boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
-        overflow: "hidden",
+        overflow: "hidden"
       }),
       menuList: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "6px",
+        padding: "6px"
       }),
       valueContainer: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "4px 8px",
-      }),
+        padding: "4px 8px"
+      })
     }),
     []
   );
@@ -208,7 +207,7 @@ export default function TripsPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateFilter("priceRange", [
         filters.priceRange[0],
-        +e.target.value || Infinity,
+        +e.target.value || Infinity
       ]);
     },
     [updateFilter, filters.priceRange]
@@ -234,19 +233,21 @@ export default function TripsPage() {
     [updateFilter]
   );
 
-  // Interactive trip selection
-  const handleTripSelect = useCallback((tripId: string) => {
-    setSelectedTripId(tripId);
-    // Scroll to the selected trip with smooth animation
-    setTimeout(() => {
-      const element = document.getElementById(`trip-${tripId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 100);
-  }, []);
+  // Handle trip card click - scroll to card
+  const handleTripClick = useCallback((tripId: string) => {
+    const element = document.getElementById(`trip-${tripId}`);
+    if (element) {
+      // Calculate offset to position the card nicely in the viewport
+      const yOffset = -100; // Adjust this value as needed
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
-  // Show loading while checking authentication or not mounted
+      window.scrollTo({
+        top: y,
+        behavior: "smooth"
+      });
+    }
+  }, []);
 
   // Show unauthorized page if not authenticated
   if (status === "unauthenticated") {
@@ -268,7 +269,7 @@ export default function TripsPage() {
       <div
         className="relative min-h-[400px] bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`,
+          backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`
         }}
       >
         {/* Overlay for better text visibility */}
@@ -288,7 +289,7 @@ export default function TripsPage() {
                 transition={{
                   duration: 1.5,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: "easeInOut"
                 }}
               >
                 <Sparkles className="w-8 h-8 text-purple-400" />
@@ -303,7 +304,7 @@ export default function TripsPage() {
                   delay: 0.8,
                   duration: 1.5,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: "easeInOut"
                 }}
               >
                 <Sparkles className="w-8 h-8 text-purple-400" />
@@ -384,7 +385,7 @@ export default function TripsPage() {
               initial={false}
               animate={{
                 height: showFilters ? "auto" : 0,
-                opacity: showFilters ? 1 : 0,
+                opacity: showFilters ? 1 : 0
               }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="overflow-hidden"
@@ -451,6 +452,7 @@ export default function TripsPage() {
                 {filteredTrips.map((trip) => (
                   <motion.div
                     key={trip.travelPlanId}
+                    id={`trip-${trip.travelPlanId}`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -458,8 +460,7 @@ export default function TripsPage() {
                   >
                     <TripCard
                       trip={trip}
-                      isSelected={selectedTripId === trip.travelPlanId}
-                      onClick={() => handleTripSelect(trip.travelPlanId)}
+                      onClick={() => handleTripClick(trip.travelPlanId)}
                     />
                   </motion.div>
                 ))}
