@@ -57,9 +57,9 @@ export function NavigationTabs({
   ];
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm border-b border-slate-200/50 py-10">
+    <div className="bg-white/95 backdrop-blur-sm border-b border-slate-200/50 py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center space-x-3 overflow-x-auto overflow-y-hidden scrollbar-hide">
+        <div className="flex justify-center space-x-3 overflow-x-auto overflow-y-hidden scrollbar-hide py-5">
           {tabs.map((tab) => (
             <button
               key={tab.id}

@@ -6,6 +6,7 @@ import { getUserProfile, getUserBookings } from "@/actions/user/action";
 import {
   getPendingReviewBookings,
   getUserReviews,
+  submitReview,
 } from "@/actions/reviews/action";
 import {
   UserProfile,
@@ -116,10 +117,67 @@ export default function UserDashboard() {
     fetchReviewData();
   }, [activeTab, profile?.id]);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Review submitted:", reviewForm);
-    // Implementation of the review submission logic would go here
+    setReviewForm((prev) => ({
+      ...prev,
+      isSubmitting: true,
+      error: null,
+      success: null,
+    }));
+    try {
+      if (!profile?.id) throw new Error("User not found");
+      const res = await submitReview({
+        userId: profile.id,
+        bookingId: reviewForm.bookingId,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+      });
+      if (res.success) {
+        setReviewForm({
+          bookingId: "",
+          rating: 5,
+          comment: "",
+          isSubmitting: false,
+          success: "Review submitted successfully!",
+          error: null,
+        });
+        // Refresh reviews and pending reviews
+        if (profile.id) {
+          const userReviewsRes = await getUserReviews(profile.id);
+          if (userReviewsRes.success && userReviewsRes.reviews) {
+            setUserReviews(userReviewsRes.reviews || []);
+            setReviewStats({
+              count: userReviewsRes.count || 0,
+              averageRating: userReviewsRes.averageRating || 0,
+            });
+          }
+          const pendingReviewsRes = await getPendingReviewBookings(profile.id);
+          if (pendingReviewsRes.success) {
+            setPendingReviews(pendingReviewsRes.bookings || []);
+          }
+        }
+      } else {
+        setReviewForm((prev) => ({
+          ...prev,
+          isSubmitting: false,
+          error: res.message || "Failed to submit review",
+        }));
+      }
+    } catch (err: unknown) {
+      let errorMsg = "Failed to submit review";
+      if (err && typeof err === "object" && "message" in err) {
+        const maybeError = err as { message?: unknown };
+        if (typeof maybeError.message === "string") {
+          errorMsg = maybeError.message;
+        }
+      }
+      setReviewForm((prev) => ({
+        ...prev,
+        isSubmitting: false,
+        error: errorMsg,
+      }));
+    }
   };
 
   // Render loading or error states
@@ -167,9 +225,7 @@ export default function UserDashboard() {
 
           {(activeTab === "explore" ||
             activeTab === "messages" ||
-            activeTab === "settings") && (
-            <PlaceholderTab setActiveTab={setActiveTab} />
-          )}
+            activeTab === "settings") && <PlaceholderTab />}
         </div>
       </div>
     </div>

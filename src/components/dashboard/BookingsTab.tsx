@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { Booking } from "@/types/dashboard";
@@ -34,112 +35,126 @@ export function BookingsTab({
 
   // Get badge class for booking status
   const getStatusBadge = (status: string) => {
-    const statusStyles = {
-      confirmed:
-        "bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-lg",
-      pending:
-        "bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg",
-      completed: "bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg",
-      cancelled: "bg-red-100 text-red-800 font-semibold px-4 py-2 rounded-lg",
-    };
-
-    const statusKey = status.toLowerCase() as keyof typeof statusStyles;
-    const className = statusStyles[statusKey] || statusStyles.pending;
-
+    if (status.toLowerCase() === "confirmed") {
+      return (
+        <Badge className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          Confirmed
+        </Badge>
+      );
+    }
+    if (status.toLowerCase() === "pending") {
+      return (
+        <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          Pending
+        </Badge>
+      );
+    }
+    if (status.toLowerCase() === "completed") {
+      return (
+        <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          Completed
+        </Badge>
+      );
+    }
+    if (status.toLowerCase() === "cancelled") {
+      return (
+        <Badge className="bg-gradient-to-r from-red-600 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          Cancelled
+        </Badge>
+      );
+    }
     return (
-      <span className={className}>
+      <Badge className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-medium">
         {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
-      </span>
+      </Badge>
     );
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="bg-slate-50 p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Your Bookings
-            </h3>
-            <p className="text-gray-600 font-medium">
-              Manage your travel bookings
-            </p>
-          </div>
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setBookingFilter("all")}
-              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                bookingFilter === "all"
-                  ? "bg-slate-700 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setBookingFilter("confirmed")}
-              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                bookingFilter === "confirmed"
-                  ? "bg-slate-700 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              Confirmed
-            </button>
-            <button
-              onClick={() => setBookingFilter("pending")}
-              className={`px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                bookingFilter === "pending"
-                  ? "bg-slate-700 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              Pending
-            </button>
-          </div>
+    <>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-1">
+            Your Bookings
+          </h3>
+          <p className="text-gray-600 font-medium">
+            Manage your travel bookings
+          </p>
+        </div>
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <button
+            onClick={() => setBookingFilter("all")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              bookingFilter === "all"
+                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setBookingFilter("confirmed")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              bookingFilter === "confirmed"
+                ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            Confirmed
+          </button>
+          <button
+            onClick={() => setBookingFilter("pending")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              bookingFilter === "pending"
+                ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            Pending
+          </button>
         </div>
       </div>
 
       <div className="overflow-x-auto">
         {filteredBookings.length > 0 ? (
           <Table>
-            <TableHeader className="bg-gray-50">
+            <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
               <TableRow>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Trip
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Destination
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Dates
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Price
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Participants
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Status
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
                   Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="bg-white divide-y divide-gray-200">
+            <TableBody className="bg-white divide-y divide-slate-200">
               {filteredBookings.map((booking) => (
                 <TableRow
                   key={booking.id}
-                  className="hover:bg-gray-50 transition-all duration-300"
+                  className="hover:bg-slate-50 transition-colors"
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="h-12 w-12 rounded-xl bg-slate-700 flex items-center justify-center text-white font-semibold text-lg mr-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
                         {booking.travelPlan.title.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-medium text-gray-900">
                         {booking.travelPlan.title}
                       </span>
                     </div>
@@ -157,7 +172,7 @@ export function BookingsTab({
                     {formatDateRange(booking.startDate, booking.endDate)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <div className="font-semibold text-white bg-slate-700 px-4 py-2 rounded-lg inline-block">
+                    <div className="font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 rounded-lg inline-block">
                       ${booking.totalPrice.toLocaleString()}
                     </div>
                   </TableCell>
@@ -172,7 +187,7 @@ export function BookingsTab({
                   <TableCell className="px-6 py-4">
                     <Button
                       onClick={() => router.push(`/bookings/${booking.id}`)}
-                      className="bg-slate-700 text-white hover:bg-slate-800 font-semibold shadow-sm"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold shadow-lg rounded-xl px-6 py-2"
                     >
                       View Details
                     </Button>
@@ -184,8 +199,8 @@ export function BookingsTab({
         ) : (
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
-              <div className="mx-auto h-24 w-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-6">
-                <Calendar className="h-12 w-12 text-slate-600" />
+              <div className="mx-auto h-24 w-24 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
+                <Calendar className="h-12 w-12 text-white" />
               </div>
               <p className="text-2xl font-bold text-gray-900 mb-4">
                 {bookings.length === 0
@@ -194,7 +209,7 @@ export function BookingsTab({
               </p>
               <div className="mt-8">
                 <Link href="/trips">
-                  <Button className="bg-slate-700 text-white hover:bg-slate-800 font-semibold px-8 py-3 shadow-sm">
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold px-8 py-3 shadow-lg rounded-xl">
                     Explore Trips
                   </Button>
                 </Link>
@@ -203,6 +218,6 @@ export function BookingsTab({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
