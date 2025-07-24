@@ -7,7 +7,13 @@ import { getUserChats } from "@/actions/chat/actions";
 import { TransformedChat } from "@/types/chats";
 import { MessageSquare } from "lucide-react";
 
-export const MessageSection = ({ userSession }: { userSession: string }) => {
+export const MessageSection = ({
+  userSession,
+  host
+}: {
+  userSession: string;
+  host?: boolean;
+}) => {
   const [initialChats, setInitialChats] = useState<TransformedChat[]>();
   const [userId, setUserId] = useState<string>("");
 
@@ -47,7 +53,7 @@ export const MessageSection = ({ userSession }: { userSession: string }) => {
       <div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Messages</h2>
         <p className="text-gray-600 font-medium">
-          Communicate with your guests and travelers
+          Communicate with your{host ? " guests and travelers" : " host"}
         </p>
       </div>
 

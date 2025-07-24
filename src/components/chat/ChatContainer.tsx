@@ -12,7 +12,6 @@ import type {
 import ChatWindow from "./ChatWindow";
 import { createOrGetChat } from "@/actions/chat/actions";
 import ChatList from "./ChatList";
-import { BackButton } from "../global/buttons";
 
 interface ChatContainerProps {
   currentUserId: string;
@@ -72,7 +71,6 @@ export default function ChatContainer({
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="w-80 flex-shrink-0 bg-slate-50/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg m-4 flex flex-col">
-        <BackButton isWhite={false} route="/" />
         {hostId && (
           <div className="p-6 border-b border-slate-200/60 bg-slate-100/60 rounded-t-2xl">
             <Button
