@@ -217,3 +217,9 @@
 :root {
   overflow-x: hidden;
 }
+.snap-container {
+  scroll-padding-top: 0;
+}
+.expandable-section {
+  padding-bottom: 2rem;
+}

@@ -17,7 +17,6 @@ import {
   getWaitingListCount
 } from "@/actions/common/waiting-list/action";
 
-// Base count to add to the actual database count
 const BASE_COUNT = 326;
 
 export default function ComingSoonPage() {
@@ -169,7 +168,6 @@ export default function ComingSoonPage() {
             {/* Yellow accent shape */}
             <div className="absolute -left-8 -top-8 w-32 h-32 bg-yellow-300 rounded-3xl -rotate-6 z-0"></div>
 
-            {/* Primary card */}
             <div
               ref={cardRef}
               className="content-card relative bg-white border-4 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0)] z-10 overflow-visible"

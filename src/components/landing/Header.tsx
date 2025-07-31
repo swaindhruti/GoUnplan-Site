@@ -2,19 +2,38 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Mountain, X, LogOut, User } from "lucide-react";
+import {
+  Menu,
+  Mountain,
+  X,
+  User,
+  Settings,
+  LogOut,
+  Calendar,
+  MapPin
+} from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   const navigationItems = [
     { name: "Home", href: "/", section: "#home" },
@@ -27,7 +46,7 @@ export default function Header() {
     const handleScrollEvent = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY <= 1) {
+      if (currentScrollY <= 0) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY) {
         setIsVisible(false);
@@ -70,10 +89,10 @@ export default function Header() {
     }
   };
 
-  // Don't render navbar on auth, dashboard, or booking pages
-  if (shouldHideNavbar()) {
-    return null;
-  }
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push("/");
+  };
 
   return (
     <>
@@ -122,35 +141,91 @@ export default function Header() {
             </nav>
 
             <div className="hidden lg:flex font-montserrat items-center space-x-3">
-              {status !== "unauthenticated" && (
-                <Button
-                  onClick={() => router.push(`/dashboard/host`)}
-                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-5 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm backdrop-blur-sm border border-purple-500/30"
-                >
-                  Host
-                </Button>
-              )}
-              <Button
-                onClick={() =>
-                  router.push(
-                    `${
-                      status === "unauthenticated"
-                        ? "/auth/signin"
-                        : "/dashboard/user"
-                    }`
-                  )
-                }
-                className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
-              >
-                {status === "unauthenticated" ? "Sign In" : "Profile"}
-              </Button>
-
-              <Button
+              {/*   <Button
                 onClick={() => router.push(`/trips`)}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-5 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm backdrop-blur-sm border border-purple-500/30"
               >
-                Trip
-              </Button>
+                Plan a Trip
+              </Button> */}
+
+              {status === "unauthenticated" ? (
+                <Button
+                  onClick={() => router.push("/auth/signin")}
+                  className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
+                >
+                  Sign In
+                </Button>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-2 py-2 rounded-lg font-medium text-sm backdrop-blur-sm">
+                      <Menu className="h-8 w-8" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-56 py-2 px-2 bg-black/90 backdrop-blur-md border-white/20 text-white"
+                    align="end"
+                  >
+                    <DropdownMenuLabel className="text-white font-roboto text-lg">
+                      {session?.user?.email || "My Account"}
+                    </DropdownMenuLabel>
+                    <DropdownMenuLabel className=" text-purple-300 font-roboto -mt-2">
+                      {session?.user?.name || "My Account"}
+                    </DropdownMenuLabel>
+
+                    <DropdownMenuSeparator className="bg-white/20" />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(
+                            getDashboardUrl(session?.user?.role || "USER")
+                          )
+                        }
+                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                        <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/trips")}
+                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        My Trips
+                        <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/profile/settings")}
+                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator className="bg-white/20" />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/")}
+                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Explore
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator className="bg-white/20" />
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
             <div className="hidden md:flex lg:hidden items-center space-x-4">
@@ -166,20 +241,84 @@ export default function Header() {
                 ))}
               </nav>
               <div className="flex items-center font-montserrat space-x-2">
-                {status === "unauthenticated" && (
+                {status === "unauthenticated" ? (
                   <Button
-                    onClick={() => router.push(`/auth/signin`)}
-                    className="text-white hover:text-purple-300 hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-3 py-1.5 rounded-lg font-medium text-sm"
+                    onClick={() => router.push("/auth/signin")}
+                    className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
                   >
                     Sign In
                   </Button>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-2 py-2 rounded-lg font-medium text-sm backdrop-blur-sm">
+                        <Menu className="h-8 w-8" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-56 py-2 px-2 bg-black/90 backdrop-blur-md border-white/20 text-white"
+                      align="end"
+                    >
+                      <DropdownMenuLabel className="text-white font-roboto text-lg">
+                        {session?.user?.email || "My Account"}
+                      </DropdownMenuLabel>
+                      <DropdownMenuLabel className=" text-purple-300 font-roboto -mt-2">
+                        {session?.user?.name || "My Account"}
+                      </DropdownMenuLabel>
+
+                      <DropdownMenuSeparator className="bg-white/20" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            router.push(
+                              getDashboardUrl(session?.user?.role || "USER")
+                            )
+                          }
+                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                          <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => router.push("/trips")}
+                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          My Trips
+                          <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => router.push("/profile/settings")}
+                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator className="bg-white/20" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() => router.push("/")}
+                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
+                        >
+                          <MapPin className="mr-2 h-4 w-4" />
+                          Explore
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator className="bg-white/20" />
+                      <DropdownMenuItem
+                        onClick={handleSignOut}
+                        className="text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Log out
+                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
-                <Button
-                  onClick={() => router.push(`/trips`)}
-                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-4 py-1.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                >
-                  Plan Trip
-                </Button>
               </div>
             </div>
 
@@ -243,11 +382,52 @@ export default function Header() {
                           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                         </div>
                       ))}
+
+                      {/* Mobile User Menu Items */}
+                      {status === "authenticated" && (
+                        <>
+                          <div className="border-t border-white/20 my-4"></div>
+                          <div
+                            onClick={() => {
+                              setIsOpen(false);
+                              router.push(
+                                getDashboardUrl(session?.user?.role || "USER")
+                              );
+                            }}
+                            className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
+                          >
+                            <span className="flex items-center justify-center text-xl relative z-10">
+                              <User className="mr-2 h-5 w-5" />
+                              Dashboard
+                              <span className="ml-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1">
+                                →
+                              </span>
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                          </div>
+                          <div
+                            onClick={() => {
+                              setIsOpen(false);
+                              router.push("/profile/settings");
+                            }}
+                            className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
+                          >
+                            <span className="flex items-center justify-center text-xl relative z-10">
+                              <Settings className="mr-2 h-5 w-5" />
+                              Settings
+                              <span className="ml-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1">
+                                →
+                              </span>
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                          </div>
+                        </>
+                      )}
                     </nav>
 
                     {/* Mobile CTA Buttons */}
                     <div className="flex flex-col space-y-4 p-6 border-t border-white/20 bg-black/50">
-                      {status === "unauthenticated" && (
+                      {status === "unauthenticated" ? (
                         <Button
                           onClick={() => {
                             setIsOpen(false);
@@ -256,6 +436,17 @@ export default function Header() {
                           className="text-white text-center hover:text-purple-300 hover:bg-white/10 transition-all duration-200 py-4 px-6 rounded-xl border border-white/40 hover:border-white/60 font-medium text-lg"
                         >
                           Sign In
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => {
+                            setIsOpen(false);
+                            handleSignOut();
+                          }}
+                          className="text-red-400 text-center hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 py-4 px-6 rounded-xl border border-red-500/40 hover:border-red-500/60 font-medium text-lg"
+                        >
+                          <LogOut className="mr-2 h-5 w-5" />
+                          Sign Out
                         </Button>
                       )}
                       <Link

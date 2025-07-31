@@ -10,7 +10,6 @@ import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { handleScroll } from "@/components/global/Handlescroll";
-import Header from "@/components/landing/Header";
 import { Button } from "@/components/ui/button";
 
 export const HeroSection = () => {
@@ -27,7 +26,7 @@ export const HeroSection = () => {
           your journey&apos;s{" "}
           <span className="highlight-wavy">love language</span>
         </>
-      ),
+      )
     },
     {
       image:
@@ -36,7 +35,7 @@ export const HeroSection = () => {
         <>
           <span className="highlight-circle">crafted</span> for explorers
         </>
-      ),
+      )
     },
     {
       image:
@@ -46,7 +45,7 @@ export const HeroSection = () => {
           slow travel is the new{" "}
           <span className="highlight-stroke">luxury</span>
         </>
-      ),
+      )
     },
     {
       image:
@@ -56,8 +55,8 @@ export const HeroSection = () => {
           powered by stories,{" "}
           <span className="highlight-oval">backed by locals</span>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   useEffect(() => {
@@ -104,7 +103,7 @@ export const HeroSection = () => {
         autoplay={{
           delay: 3000,
           disableOnInteraction: false,
-          pauseOnMouseEnter: false,
+          pauseOnMouseEnter: false
         }}
         speed={1000}
         effect="slide"
@@ -136,7 +135,7 @@ export const HeroSection = () => {
             handleScroll({
               location: "#filtertrip",
               duration: 1.5,
-              ease: "power3.inOut",
+              ease: "power3.inOut"
             })
           }
           className="group relative bg-black/50 font-montserrat backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
@@ -147,13 +146,13 @@ export const HeroSection = () => {
             <motion.div
               className="ml-3 flex flex-col items-center opacity-70 group-hover:opacity-100 transition-opacity duration-300"
               animate={{
-                y: [0, 4, 0],
+                y: [0, 4, 0]
               }}
               transition={{
                 duration: 0.8,
                 repeat: Infinity,
                 repeatType: "reverse",
-                ease: "easeInOut",
+                ease: "easeInOut"
               }}
             >
               <ChevronDown className="h-3 w-3" />
