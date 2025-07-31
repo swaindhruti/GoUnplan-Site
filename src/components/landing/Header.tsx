@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Mountain, X } from "lucide-react";
+import { Menu, Mountain, X, LogOut, User } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,10 +42,38 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScrollEvent);
   }, [lastScrollY]);
 
-  const handleNavClick = (section: string) => {
-    handleScroll({ location: section });
+  const handleNavClick = (item: {
+    name: string;
+    href: string;
+    section: string;
+  }) => {
+    if (item.name === "Home") {
+      router.push("/");
+    } else if (item.name === "Trips" || item.name === "Contact") {
+      router.push(item.href);
+    } else {
+      // For About, scroll to sections on landing page
+      handleScroll({ location: item.section });
+    }
     setIsOpen(false);
   };
+
+  const getDashboardUrl = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return "/dashboard/admin";
+      case "HOST":
+        return "/dashboard/host";
+      case "USER":
+      default:
+        return "/dashboard/user";
+    }
+  };
+
+  // Don't render navbar on auth, dashboard, or booking pages
+  if (shouldHideNavbar()) {
+    return null;
+  }
 
   return (
     <>
@@ -84,7 +112,7 @@ export default function Header() {
               {navigationItems.map((item) => (
                 <div
                   key={item.name}
-                  onClick={() => handleNavClick(item.section)}
+                  onClick={() => handleNavClick(item)}
                   className="text-white select-none font-montserrat hover:text-purple-300 transition-colors duration-200 font-medium cursor-pointer px-3 py-2 rounded-lg hover:bg-white/10 relative group"
                 >
                   {item.name}
@@ -130,7 +158,7 @@ export default function Header() {
                 {navigationItems.map((item) => (
                   <div
                     key={item.name}
-                    onClick={() => handleNavClick(item.section)}
+                    onClick={() => handleNavClick(item)}
                     className="text-white font-montserrat select-none hover:text-purple-300 transition-colors duration-200 font-medium cursor-pointer text-sm px-2 py-1 rounded hover:bg-white/10"
                   >
                     {item.name}
@@ -197,7 +225,7 @@ export default function Header() {
                       {navigationItems.map((item, index) => (
                         <div
                           key={item.name}
-                          onClick={() => handleNavClick(item.section)}
+                          onClick={() => handleNavClick(item)}
                           className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
                           style={{
                             animationDelay: `${index * 0.1}s`,
