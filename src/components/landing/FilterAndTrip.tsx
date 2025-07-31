@@ -9,7 +9,7 @@ import {
   Users,
   Search,
   ChevronDown,
-  Sparkles,
+  Sparkles
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -22,24 +22,24 @@ import {
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem,
+  SelectItem
 } from "@/components/ui/select";
 import {
   Popover,
   PopoverTrigger,
-  PopoverContent,
+  PopoverContent
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { PrimaryButton } from "./common";
 
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState("");
-  const [checkIn, setCheckIn] = useState<Date>();
-  const [checkOut, setCheckOut] = useState<Date>();
-  const [travelers, setTravelers] = useState("1");
+
+  const [travelerType, setTravelerType] = useState("solo");
   const [vibe, setVibe] = useState("");
-  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
-  const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date>();
+  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+
   const router = useRouter();
 
   const fieldClass =
@@ -51,33 +51,26 @@ export const FilterAndTrip = () => {
       label: "Destination",
       icon: <MapPin className="w-4 h-4 text-purple-300" />,
       type: "input",
-      placeholder: "Where to?",
+      placeholder: "Where to?"
     },
     {
-      id: "checkIn",
-      label: "Check-in",
+      id: "startDate",
+      label: "Start Date",
       icon: <Calendar className="w-4 h-4 text-purple-300" />,
-      type: "date",
+      type: "date"
     },
     {
-      id: "checkOut",
-      label: "Check-out",
-      icon: <Calendar className="w-4 h-4 text-purple-300" />,
-      type: "date",
-    },
-    {
-      id: "travelers",
-      label: "Travelers",
+      id: "travelerType",
+      label: "Who is Travelling?",
       icon: <Users className="w-4 h-4 text-purple-300" />,
       type: "select",
       options: [
-        { value: "1", label: "1 Traveler" },
-        { value: "2", label: "2 Travelers" },
-        { value: "3", label: "3 Travelers" },
-        { value: "4", label: "4 Travelers" },
-        { value: "5", label: "5+ Travelers" },
+        { value: "solo", label: "Solo" },
+        { value: "couple", label: "Couple" },
+        { value: "married", label: "Married" },
+        { value: "friends", label: "Friends" }
       ],
-      placeholder: "How many?",
+      placeholder: "Select type"
     },
     {
       id: "vibe",
@@ -90,28 +83,21 @@ export const FilterAndTrip = () => {
         { value: "Relaxation", label: "Relaxation" },
         { value: "Nature", label: "Nature" },
         { value: "Luxury", label: "Luxury" },
-        { value: "Budget", label: "Budget-Friendly" },
+        { value: "Budget", label: "Budget-Friendly" }
       ],
-      placeholder: "Your mood?",
-    },
+      placeholder: "Your mood?"
+    }
   ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (vibe) params.append("vibe", vibe);
-    if (travelers) params.append("travelers", travelers);
-    if (checkIn) params.append("checkIn", checkIn.toISOString());
-    if (checkOut) params.append("checkOut", checkOut.toISOString());
-    if (checkIn && checkOut) {
-      const days = Math.max(
-        1,
-        Math.ceil(
-          (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
-        )
-      );
-      params.append("days", days.toString());
-    }
+    if (travelerType) params.append("travelerType", travelerType);
+    if (startDate) params.append("startDate", startDate.toISOString());
+    console.log("Search params:", params.toString());
+    if (destination) params.append("destination", destination);
+
     router.push(`/trips?${params.toString()}`);
   };
 
@@ -135,39 +121,36 @@ export const FilterAndTrip = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-6">
-            {/* Left Sparkles with up-down motion */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: "easeInOut"
               }}
             >
               <Sparkles className="w-8 h-8 text-purple-400" />
             </motion.div>
 
-            {/* Main Heading */}
             <h1 className="text-4xl font-playfair md:text-6xl font-semibold text-white tracking-wide">
               Find Your Perfect
               <span className="block text-purple-400 mt-2">Journey</span>
             </h1>
 
-            {/* Right Sparkles with same up-down motion */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{
                 delay: 0.8,
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: "easeInOut"
               }}
             >
               <Sparkles className="w-8 h-8 text-purple-400" />
             </motion.div>
           </div>
 
-          <p className="text-lg text-white  font-roboto max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-lg text-white font-roboto max-w-2xl mx-auto font-normal leading-relaxed">
             Discover extraordinary destinations and create unforgettable
             memories
           </p>
@@ -176,7 +159,7 @@ export const FilterAndTrip = () => {
         {/* Form */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSearch} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="flex justify-center gap-6">
               {formFields.map((field) => {
                 const label = (
                   <Label
@@ -206,16 +189,12 @@ export const FilterAndTrip = () => {
                     );
 
                   case "date":
-                    const isCheckIn = field.id === "checkIn";
-                    const date = isCheckIn ? checkIn : checkOut;
-                    const setDate = isCheckIn ? setCheckIn : setCheckOut;
-                    const open = isCheckIn ? isCheckInOpen : isCheckOutOpen;
-                    const setOpen = isCheckIn
-                      ? setIsCheckInOpen
-                      : setIsCheckOutOpen;
-                    const disabledDate = isCheckIn
-                      ? (date: Date) => date < new Date()
-                      : (date: Date) => date < (checkIn || new Date());
+                    const isStart = field.id === "startDate";
+                    console.log("isStart", isStart);
+                    const date = startDate;
+                    const setDate = setStartDate;
+                    const open = isStartDateOpen;
+                    const setOpen = setIsStartDateOpen;
 
                     return (
                       <div key={field.id} className="space-y-3 font-playfair">
@@ -239,7 +218,7 @@ export const FilterAndTrip = () => {
                                 setOpen(false);
                               }}
                               initialFocus
-                              disabled={disabledDate}
+                              disabled={(date: Date) => date < new Date()}
                             />
                           </PopoverContent>
                         </Popover>
@@ -247,9 +226,15 @@ export const FilterAndTrip = () => {
                     );
 
                   case "select":
-                    const value = field.id === "vibe" ? vibe : travelers;
-                    const setValue =
-                      field.id === "vibe" ? setVibe : setTravelers;
+                    let value = "";
+                    let setValue: (v: string) => void = () => {};
+                    if (field.id === "vibe") {
+                      value = vibe;
+                      setValue = setVibe;
+                    } else if (field.id === "travelerType") {
+                      value = travelerType;
+                      setValue = setTravelerType;
+                    }
 
                     return (
                       <div key={field.id} className="space-y-3 font-playfair">
@@ -260,7 +245,7 @@ export const FilterAndTrip = () => {
                           </SelectTrigger>
                           <SelectContent className="bg-white rounded-xl shadow-xl border-0">
                             {field.options &&
-                              field?.options.map((option) => (
+                              field.options.map((option) => (
                                 <SelectItem
                                   key={option.value}
                                   value={option.value}

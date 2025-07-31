@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 
 export const WhyUsSection = () => {
   return (
-    <div className="relative py-20">
+    <div className="relative h-screen">
       {/* Background Image Section */}
-      <div className="h=full">
+      <div className="h-full">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{

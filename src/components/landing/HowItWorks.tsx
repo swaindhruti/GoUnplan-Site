@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 
 export const HowItWorksSection = () => {
   return (
-    <div className="relative py-20">
+    <div className="relative h-screen">
       <div className="h-full">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"

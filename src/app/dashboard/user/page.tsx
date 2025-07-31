@@ -6,7 +6,7 @@ import { getUserProfile, getUserBookings } from "@/actions/user/action";
 import {
   getPendingReviewBookings,
   getUserReviews,
-  submitReview,
+  submitReview
 } from "@/actions/reviews/action";
 import {
   UserProfile,
@@ -14,7 +14,7 @@ import {
   Review,
   PendingReview,
   ReviewFormState,
-  ReviewStats,
+  ReviewStats
 } from "@/types/dashboard";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { NavigationTabs } from "@/components/dashboard/NavigationTabs";
@@ -24,6 +24,7 @@ import { BookingsTab } from "@/components/dashboard/BookingsTab";
 import { ReviewsTab } from "@/components/dashboard/reviews/ReviewsTab";
 import { PlaceholderTab } from "@/components/dashboard/PlaceholderTab";
 import { LoadingAndErrorStates } from "@/components/dashboard/LoadingAndErrorStates";
+import { MessageSection } from "@/components/host/components/MessageSection";
 
 export default function UserDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -32,7 +33,7 @@ export default function UserDashboard() {
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats>({
     count: 0,
-    averageRating: 0,
+    averageRating: 0
   });
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({
     bookingId: "",
@@ -40,7 +41,7 @@ export default function UserDashboard() {
     comment: "",
     isSubmitting: false,
     success: null,
-    error: null,
+    error: null
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +100,7 @@ export default function UserDashboard() {
             setUserReviews(userReviewsRes.reviews || []);
             setReviewStats({
               count: userReviewsRes.count || 0,
-              averageRating: userReviewsRes.averageRating || 0,
+              averageRating: userReviewsRes.averageRating || 0
             });
           }
 
@@ -123,7 +124,7 @@ export default function UserDashboard() {
       ...prev,
       isSubmitting: true,
       error: null,
-      success: null,
+      success: null
     }));
     try {
       if (!profile?.id) throw new Error("User not found");
@@ -131,7 +132,7 @@ export default function UserDashboard() {
         userId: profile.id,
         bookingId: reviewForm.bookingId,
         rating: reviewForm.rating,
-        comment: reviewForm.comment,
+        comment: reviewForm.comment
       });
       if (res.success) {
         setReviewForm({
@@ -140,7 +141,7 @@ export default function UserDashboard() {
           comment: "",
           isSubmitting: false,
           success: "Review submitted successfully!",
-          error: null,
+          error: null
         });
         // Refresh reviews and pending reviews
         if (profile.id) {
@@ -149,7 +150,7 @@ export default function UserDashboard() {
             setUserReviews(userReviewsRes.reviews || []);
             setReviewStats({
               count: userReviewsRes.count || 0,
-              averageRating: userReviewsRes.averageRating || 0,
+              averageRating: userReviewsRes.averageRating || 0
             });
           }
           const pendingReviewsRes = await getPendingReviewBookings(profile.id);
@@ -161,7 +162,7 @@ export default function UserDashboard() {
         setReviewForm((prev) => ({
           ...prev,
           isSubmitting: false,
-          error: res.message || "Failed to submit review",
+          error: res.message || "Failed to submit review"
         }));
       }
     } catch (err: unknown) {
@@ -175,7 +176,7 @@ export default function UserDashboard() {
       setReviewForm((prev) => ({
         ...prev,
         isSubmitting: false,
-        error: errorMsg,
+        error: errorMsg
       }));
     }
   };
@@ -222,10 +223,12 @@ export default function UserDashboard() {
               handleSubmitReview={handleSubmitReview}
             />
           )}
-
-          {(activeTab === "explore" ||
-            activeTab === "messages" ||
-            activeTab === "settings") && <PlaceholderTab />}
+          {activeTab === "messages" && (
+            <MessageSection userSession={session?.user.id || ""} host={false} />
+          )}
+          {(activeTab === "explore" || activeTab === "settings") && (
+            <PlaceholderTab />
+          )}
         </div>
       </div>
     </div>

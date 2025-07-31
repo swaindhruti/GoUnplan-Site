@@ -5,8 +5,8 @@ import { PrimaryButton } from "./common";
 
 export const ReadyToStart = () => {
   return (
-    <div className="relative py-12 sm:py-16 md:py-20 lg:py-28 xl:py-36 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-white">
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-16 xl:gap-20 max-w-7xl mx-auto">
+    <div className="relative bg-white py-12 sm:py-16 md:py-20 lg:py-28 xl:py-36 px-4 sm:px-6">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-16 xl:gap-20 max-w-6xl mx-auto">
         {/* Left Text Section */}
         <div className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-playfair leading-tight sm:leading-snug lg:leading-tight mb-4 sm:mb-6 text-black">

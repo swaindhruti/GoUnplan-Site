@@ -9,15 +9,14 @@ import {
   Users,
   Plane,
   CheckCircle,
-  AlertCircle,
+  AlertCircle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   addEmailToWaitingList,
-  getWaitingListCount,
+  getWaitingListCount
 } from "@/actions/common/waiting-list/action";
 
-// Base count to add to the actual database count
 const BASE_COUNT = 326;
 
 export default function ComingSoonPage() {
@@ -89,7 +88,7 @@ export default function ComingSoonPage() {
         setSubmitted(true);
         setMessage({
           text: "Thanks for joining our waitlist! We'll notify you when we launch.",
-          type: "success",
+          type: "success"
         });
 
         // Update the count
@@ -114,7 +113,7 @@ export default function ComingSoonPage() {
           setMessage({
             text:
               result.message || "Failed to join waitlist. Please try again.",
-            type: "error",
+            type: "error"
           });
         }
       }
@@ -122,7 +121,7 @@ export default function ComingSoonPage() {
       console.error("Error submitting email:", error);
       setMessage({
         text: "Something went wrong. Please try again later.",
-        type: "error",
+        type: "error"
       });
     } finally {
       setIsLoading(false);
@@ -137,7 +136,7 @@ export default function ComingSoonPage() {
           isOverCard ? "opacity-0" : "opacity-100"
         }`}
         style={{
-          transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px) translate(-50%, -50%) rotate(-45deg)`,
+          transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px) translate(-50%, -50%) rotate(-45deg)`
         }}
       >
         <div className="relative">
@@ -169,7 +168,6 @@ export default function ComingSoonPage() {
             {/* Yellow accent shape */}
             <div className="absolute -left-8 -top-8 w-32 h-32 bg-yellow-300 rounded-3xl -rotate-6 z-0"></div>
 
-            {/* Primary card */}
             <div
               ref={cardRef}
               className="content-card relative bg-white border-4 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0)] z-10 overflow-visible"
