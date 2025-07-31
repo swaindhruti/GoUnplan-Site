@@ -12,8 +12,7 @@ import {
   ErrorDisplay
 } from "@/components/trips/LoadingStates";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { BackButton } from "@/components/global/buttons";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, Filter, Sparkles, X } from "lucide-react";
 
@@ -40,7 +39,6 @@ export default function TripsPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
-  // Handle authentication and mounting
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -233,6 +231,42 @@ export default function TripsPage() {
     [updateFilter]
   );
 
+  const handleTravellerChange = useCallback(
+    (selected: MultiValue<SelectOption>) => {
+      updateFilter(
+        "travellerFilter",
+        selected.map((opt) => opt.value)
+      );
+    },
+    [updateFilter]
+  );
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Map query params to filter keys
+    const travelerType = searchParams.get("travelerType");
+    const startDate = searchParams.get("startDate");
+    const destination = searchParams.get("destination");
+    const vibe = searchParams.get("vibe");
+    // Add more params as needed (e.g., language, priceRange, etc.)
+
+    if (travelerType) {
+      updateFilter("travellerFilter", [travelerType]);
+    }
+    if (vibe) {
+      updateFilter("vibeFilter", [vibe]);
+    }
+    if (destination) {
+      updateFilter("searchTerm", destination);
+    }
+    if (startDate) {
+      // If you want to filter by date, add a date filter to your FilterState and handle it here
+      // updateFilter("startDate", startDate);
+    }
+    // Add more param handling as needed
+  }, [searchParams, updateFilter]);
+
   // Handle trip card click - scroll to card
   const handleTripClick = useCallback((tripId: string) => {
     const element = document.getElementById(`trip-${tripId}`);
@@ -274,7 +308,7 @@ export default function TripsPage() {
       >
         {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-black/40" />
-        <BackButton isWhite={true} route="/" />
+        {/*         <BackButton isWhite={true} route="/" /> */}
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
@@ -294,7 +328,7 @@ export default function TripsPage() {
               >
                 <Sparkles className="w-8 h-8 text-purple-400" />
               </motion.div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
+              <h1 className="text-4xl md:text-5xl font-bold font-bricolage text-white mb-6 drop-shadow-lg">
                 Discover Your Perfect
                 <span className="block text-purple-300 mt-2">Adventure</span>
               </h1>
@@ -314,7 +348,7 @@ export default function TripsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md font-normal font-roboto leading-relaxed"
+              className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md font-normal font-instrument leading-relaxed"
             >
               Explore unique travel experiences tailored to your preferences.
               From hidden gems to popular destinations.
@@ -400,6 +434,7 @@ export default function TripsPage() {
                   handlePriceMaxChange={handlePriceMaxChange}
                   handleLanguageChange={handleLanguageChange}
                   handleVibeChange={handleVibeChange}
+                  handleTravellerChange={handleTravellerChange} // <-- add this
                 />
               </div>
             </motion.div>

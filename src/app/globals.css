@@ -156,6 +156,12 @@
 .font-montserrat {
   font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
 }
+.font-bricolage {
+  font-family: var(--font-bricolage), "Bricolage Grotesque", Arial, sans-serif;
+}
+.font-instrument {
+  font-family: var(--font-instrument), "Instrument Sans", Arial, sans-serif;
+}
 /* Sketch highlight effect */
 .highlight-wavy,
 .highlight-circle,

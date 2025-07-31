@@ -5,9 +5,13 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import ReactSelect, { StylesConfig, MultiValue } from "react-select";
+import ReactSelect, {
+  StylesConfig,
+  MultiValue,
+  CSSObjectWithLabel
+} from "react-select";
 import { FilterState, SelectOption, DURATION_OPTIONS } from "@/types/trips";
 import {
   DollarSign,
@@ -16,9 +20,48 @@ import {
   Globe,
   MessageCircle,
   Zap,
-  Filter,
+  Filter
 } from "lucide-react";
 import { useState } from "react";
+
+const INITIAL_LANGUAGES = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Mandarin",
+  "Hindi",
+  "Arabic",
+  "Portuguese",
+  "Russian"
+];
+
+const INITIAL_VIBES = [
+  "Adventure",
+  "Relaxation",
+  "Culture",
+  "Nature",
+  "Nightlife",
+  "Foodie",
+  "Luxury",
+  "Budget",
+  "Wellness",
+  "Family"
+];
+
+const INITIAL_TRAVELLERS = [
+  "Solo",
+  "Couple",
+  "With Baby",
+  "Friends",
+  "Family",
+  "Group",
+  "Pet Friendly",
+  "Senior",
+  "Business",
+  "Backpackers"
+];
 
 interface FilterPanelProps {
   filters: FilterState;
@@ -30,12 +73,14 @@ interface FilterPanelProps {
     countries: string[];
     languages: string[];
     vibes: string[];
+    travellers: string[];
   };
   selectStyles: StylesConfig<SelectOption, true>;
   handlePriceMinChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePriceMaxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleLanguageChange: (selected: MultiValue<SelectOption>) => void;
   handleVibeChange: (selected: MultiValue<SelectOption>) => void;
+  handleTravellerChange: (selected: MultiValue<SelectOption>) => void; // <-- Add this
 }
 
 export const FilterPanel = ({
@@ -46,22 +91,35 @@ export const FilterPanel = ({
   handlePriceMaxChange,
   handleLanguageChange,
   handleVibeChange,
-  selectStyles,
+  handleTravellerChange,
+  selectStyles
 }: FilterPanelProps) => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const languageOptions = filterOptions.languages.map((l) => ({
+  const languageOptions = INITIAL_LANGUAGES.map((l) => ({
     value: l,
-    label: l,
+    label: l
   }));
 
-  const vibeOptions = filterOptions.vibes.map((v) => ({
+  const vibeOptions = INITIAL_VIBES.map((v) => ({
     value: v,
-    label: v,
+    label: v
+  }));
+
+  const travellerOptions = INITIAL_TRAVELLERS.map((t) => ({
+    value: t,
+    label: t
   }));
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
+  };
+
+  const menuPortalStyles = {
+    menuPortal: (base: CSSObjectWithLabel): CSSObjectWithLabel => ({
+      ...base,
+      zIndex: 9999
+    })
   };
 
   return (
@@ -256,12 +314,15 @@ export const FilterPanel = ({
                 <ReactSelect
                   isMulti
                   instanceId="language-select-mobile"
-                  styles={selectStyles}
+                  styles={{ ...selectStyles, ...menuPortalStyles }}
+                  menuPortalTarget={
+                    typeof window !== "undefined" ? document.body : undefined
+                  }
                   placeholder="Select languages"
                   options={languageOptions}
                   value={filters.languageFilter.map((l) => ({
                     value: l,
-                    label: l,
+                    label: l
                   }))}
                   onChange={handleLanguageChange}
                   className="react-select-container"
@@ -279,14 +340,45 @@ export const FilterPanel = ({
                 <ReactSelect
                   isMulti
                   instanceId="vibe-select-mobile"
-                  styles={selectStyles}
+                  styles={{ ...selectStyles, ...menuPortalStyles }}
+                  menuPortalTarget={
+                    typeof window !== "undefined" ? document.body : undefined
+                  }
                   placeholder="Select vibes"
                   options={vibeOptions}
                   value={filters.vibeFilter.map((v) => ({
                     value: v,
-                    label: v,
+                    label: v
                   }))}
                   onChange={handleVibeChange}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  menuPlacement="auto"
+                />
+              </div>
+
+              {/* Travellers */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-purple-600" />
+                  Travellers
+                </Label>
+                <ReactSelect
+                  isMulti
+                  instanceId="traveller-select-mobile"
+                  styles={{ ...selectStyles, ...menuPortalStyles }}
+                  menuPortalTarget={
+                    typeof window !== "undefined" ? document.body : undefined
+                  }
+                  placeholder="Select travellers"
+                  options={travellerOptions}
+                  value={
+                    filters.travellerFilter?.map((t: string) => ({
+                      value: t,
+                      label: t
+                    })) || []
+                  }
+                  onChange={handleTravellerChange}
                   className="react-select-container"
                   classNamePrefix="react-select"
                   menuPlacement="auto"
@@ -425,6 +517,7 @@ export const FilterPanel = ({
           </div>
 
           <div className="space-y-4">
+            {/* Languages */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-purple-600" />
@@ -433,12 +526,15 @@ export const FilterPanel = ({
               <ReactSelect
                 isMulti
                 instanceId="language-select-desktop"
-                styles={selectStyles}
+                styles={{ ...selectStyles, ...menuPortalStyles }}
+                menuPortalTarget={
+                  typeof window !== "undefined" ? document.body : undefined
+                }
                 placeholder="Select languages"
                 options={languageOptions}
                 value={filters.languageFilter.map((l) => ({
                   value: l,
-                  label: l,
+                  label: l
                 }))}
                 onChange={handleLanguageChange}
                 className="react-select-container"
@@ -446,6 +542,7 @@ export const FilterPanel = ({
               />
             </div>
 
+            {/* Vibes */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <Zap className="h-4 w-4 text-purple-600" />
@@ -454,14 +551,44 @@ export const FilterPanel = ({
               <ReactSelect
                 isMulti
                 instanceId="vibe-select-desktop"
-                styles={selectStyles}
+                styles={{ ...selectStyles, ...menuPortalStyles }}
+                menuPortalTarget={
+                  typeof window !== "undefined" ? document.body : undefined
+                }
                 placeholder="Select vibes"
                 options={vibeOptions}
                 value={filters.vibeFilter.map((v) => ({
                   value: v,
-                  label: v,
+                  label: v
                 }))}
                 onChange={handleVibeChange}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+
+            {/* Travellers */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-purple-600" />
+                Travellers
+              </Label>
+              <ReactSelect
+                isMulti
+                instanceId="traveller-select-desktop"
+                styles={{ ...selectStyles, ...menuPortalStyles }}
+                menuPortalTarget={
+                  typeof window !== "undefined" ? document.body : undefined
+                }
+                placeholder="Select travellers"
+                options={travellerOptions}
+                value={
+                  filters.travellerFilter?.map((t: string) => ({
+                    value: t,
+                    label: t
+                  })) || []
+                }
+                onChange={handleTravellerChange}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />

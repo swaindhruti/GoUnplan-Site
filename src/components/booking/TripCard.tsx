@@ -21,7 +21,7 @@ export function TripCard({
   imageUrl,
   whatsIncluded,
   cancellationPolicy,
-  hostInfo,
+  hostInfo
 }: TripCardProps) {
   // Premium color palette
   const cardColors = useMemo(
@@ -37,7 +37,7 @@ export function TripCard({
       checkmark: "bg-gradient-to-r from-purple-600 to-pink-600",
       border: "border border-white/60",
       shadow: "shadow-xl hover:shadow-2xl",
-      innerShadow: "shadow-lg",
+      innerShadow: "shadow-lg"
     }),
     []
   );
@@ -72,7 +72,7 @@ export function TripCard({
       <div
         className={`p-6 border-b border-white/30 ${cardColors.header} text-gray-800`}
       >
-        <h3 className="text-2xl font-playfair font-bold tracking-tight">
+        <h3 className="text-2xl font-bricolage font-bold tracking-tight">
           {title}
         </h3>
       </div>

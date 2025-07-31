@@ -11,13 +11,13 @@ import { z } from "zod";
 const baseDateSelectionSchema = z.object({
   startDate: z.date({
     required_error: "Start date is required",
-    invalid_type_error: "Please select a valid date",
+    invalid_type_error: "Please select a valid date"
   }),
   endDate: z.date({
     required_error: "End date is required",
-    invalid_type_error: "Please select a valid date",
+    invalid_type_error: "Please select a valid date"
   }),
-  duration: z.number().min(1, "Duration must be at least 1 day"),
+  duration: z.number().min(1, "Duration must be at least 1 day")
 });
 
 // Enhanced schema with refinements for full validation
@@ -26,12 +26,12 @@ const dateSelectionSchema = baseDateSelectionSchema
     (data) => !isBefore(startOfDay(data.startDate), startOfDay(new Date())),
     {
       message: "Start date cannot be in the past",
-      path: ["startDate"],
+      path: ["startDate"]
     }
   )
   .refine((data) => isAfter(data.endDate, data.startDate), {
     message: "End date must be after start date",
-    path: ["endDate"],
+    path: ["endDate"]
   });
 
 interface DateSelectorProps {
@@ -43,7 +43,7 @@ interface DateSelectorProps {
 export function DateSelector({
   tripDuration,
   onDateChange,
-  selectedDate,
+  selectedDate
 }: DateSelectorProps) {
   const [date, setDate] = useState<Date | undefined>(selectedDate);
   const [availabilityFilter, setAvailabilityFilter] = useState<
@@ -59,7 +59,7 @@ export function DateSelector({
       const validation = dateSelectionSchema.safeParse({
         startDate: newDate,
         endDate: endDate,
-        duration: tripDuration,
+        duration: tripDuration
       });
 
       if (validation.success) {
@@ -76,7 +76,7 @@ export function DateSelector({
   const availabilityOptions = [
     { value: "weekend" as const, label: "Every weekend" },
     { value: "summer" as const, label: "Summer months" },
-    { value: "all" as const, label: "All year round" },
+    { value: "all" as const, label: "All year round" }
   ];
 
   // Helper function to check if date should be disabled based on filter
@@ -108,7 +108,7 @@ export function DateSelector({
           <div className="bg-purple-100 p-3 rounded-xl">
             <Clock className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Trip Duration: {tripDuration} days
           </h3>
         </div>
@@ -145,7 +145,7 @@ export function DateSelector({
 
       {/* Calendar Section */}
       <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <label className="block text-2xl font-playfair font-bold text-gray-800 mb-6">
+        <label className="block text-2xl font-bricolage font-bold text-gray-800 mb-6">
           Select Start Date
         </label>
         <div className="bg-white border border-purple-50 rounded-2xl p-6">
@@ -170,7 +170,7 @@ export function DateSelector({
                 "bg-white hover:bg-purple-50 border border-purple-100 rounded-xl",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
-              caption: "font-bold text-gray-800 text-lg",
+              caption: "font-bold text-gray-800 text-lg"
             }}
           />
         </div>
@@ -178,7 +178,7 @@ export function DateSelector({
 
       {/* Availability Filters */}
       <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
+        <h3 className="text-2xl font-bricolage font-bold text-gray-800 mb-6">
           Available Dates
         </h3>
         <div className="flex flex-wrap gap-4">
@@ -203,7 +203,7 @@ export function DateSelector({
 
       {/* Quick Date Selection */}
       <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-6">
+        <h3 className="text-2xl font-bricolage font-bold text-gray-800 mb-6">
           Quick Selection
         </h3>
         <div className="grid grid-cols-2 gap-4">

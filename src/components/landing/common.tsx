@@ -15,7 +15,7 @@ import { ArrowRight } from "lucide-react";
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
     <div
-      className={`font-montserrat inline-flex items-center px-8 py-2 ${
+      className={`font-instrument inline-flex items-center px-8 py-2 ${
         label === "About Us" ? "bg-white" : "bg-purple-100"
       }  rounded-full`}
     >
@@ -44,7 +44,7 @@ export const PrimaryButton = ({
 
   if (asContent) {
     return (
-      <div className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
+      <div className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
         {buttonContent}
       </div>
     );
@@ -53,7 +53,7 @@ export const PrimaryButton = ({
   return (
     <Button
       type={type}
-      className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-montserrat font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group"
+      className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group"
     >
       {buttonContent}
     </Button>
@@ -177,7 +177,7 @@ export const Carousels = ({
           <SectionLabel label={SectionTitle} />
         </div>
         <div className="mb-4 md:mb-20 text-center flex justify-center">
-          <h2 className="text-xl font-playfair sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
+          <h2 className="text-xl font-bricolage sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
             {Description}
           </h2>
         </div>
@@ -223,7 +223,7 @@ export const Carousels = ({
                       type === "destinations"
                         ? "-mt-[100px] size-40"
                         : "-mt-[60px] size-30"
-                    } z-30 rounded-full bg-purple-50 p-6 flex flex-col font-roboto items-center justify-center space-y-2 text-center`}
+                    } z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center`}
                   >
                     {type === "destinations" ? (
                       <>

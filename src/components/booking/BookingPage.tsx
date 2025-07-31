@@ -17,7 +17,7 @@ import {
   DollarSign,
   MessageCircle,
   Languages,
-  Star,
+  Star
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BackButton } from "@/components/global/buttons";
@@ -38,7 +38,7 @@ const EnhancedLoadingState = () => {
       "Preparing your booking...",
       "Checking availability...",
       "Securing your spot...",
-      "Almost ready...",
+      "Almost ready..."
     ];
     let messageIndex = 0;
     let progressValue = 0;
@@ -62,7 +62,7 @@ const EnhancedLoadingState = () => {
         <div className="mb-6 flex justify-center">
           <Loader2 className="h-12 w-12 text-purple-600 animate-spin" />
         </div>
-        <h2 className="text-2xl font-bold mb-4 text-gray-900 font-playfair">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900 font-bricolage">
           {loadingText}
         </h2>
         <div className="w-full bg-slate-100 rounded-full h-3 mb-6">
@@ -83,7 +83,7 @@ export function BookingPage({
   userId,
   tripData,
   existingBookingData,
-  Step,
+  Step
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -111,7 +111,7 @@ export function BookingPage({
       travelPlanId: tripData.travelPlanId,
       pricePerPerson: tripData.price,
       participants: tripData.maxParticipants,
-      ...existingBookingData,
+      ...existingBookingData
     });
   }, [
     existingBookingData,
@@ -119,7 +119,7 @@ export function BookingPage({
     tripData.travelPlanId,
     updateBookingData,
     userId,
-    tripData.maxParticipants,
+    tripData.maxParticipants
   ]);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export function BookingPage({
       setEndDate(newEndDate);
       await updateDateSelection({
         startDate: newStartDate,
-        endDate: newEndDate,
+        endDate: newEndDate
       });
     },
     [updateDateSelection]
@@ -151,7 +151,7 @@ export function BookingPage({
         pricePerPerson: tripData.price,
         participants: numberOfGuests,
         status: "PENDING" as const,
-        totalPrice: (tripData?.price || 0) * numberOfGuests,
+        totalPrice: (tripData?.price || 0) * numberOfGuests
       };
       const newBooking = await createNewBooking(initialBookingData);
       if (!newBooking) {
@@ -174,7 +174,7 @@ export function BookingPage({
     endDate,
     tripData.price,
     numberOfGuests,
-    createNewBooking,
+    createNewBooking
   ]);
 
   const handleBack = useCallback(() => {
@@ -193,7 +193,7 @@ export function BookingPage({
       const success = await updateGuestInfo({
         participants: guestCount,
         guests: guestData.guests,
-        specialRequirements: guestData.specialRequirements,
+        specialRequirements: guestData.specialRequirements
       });
       if (success) {
         handleContinue();
@@ -207,20 +207,20 @@ export function BookingPage({
     "Available year-round",
     `${tripData.noOfDays} days`,
     `Max ${tripData.maxParticipants} people`,
-    `₹${tripData.price} per person`,
+    `₹${tripData.price} per person`
   ];
   const hostInfo = {
     name: tripData.host?.user.name || "Host",
     image: tripData.host?.image || "https://via.placeholder.com/60",
     email: tripData.host?.hostEmail || "",
     description: tripData.host?.description || "",
-    createdYear,
+    createdYear
   };
   const tripStats = {
     price: tripData.price,
     noOfDays: tripData.noOfDays,
     maxParticipants: tripData.maxParticipants,
-    languages: tripData.languages?.join(", ") || "English",
+    languages: tripData.languages?.join(", ") || "English"
   };
 
   if (isLoading) {
@@ -233,7 +233,7 @@ export function BookingPage({
       <section
         className="relative py-24 overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`,
+          backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`
         }}
       >
         {/* Gradient overlay for better readability */}
@@ -241,7 +241,7 @@ export function BookingPage({
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           <BackButton isWhite={true} route="/trips" />
           <div className="text-center mt-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl font-playfair">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
               Book Your Adventure
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 font-roboto">
@@ -278,7 +278,7 @@ export function BookingPage({
                 {[
                   { icon: Calendar, label: "Select Date", step: 1 },
                   { icon: Users, label: "Guest Info", step: 2 },
-                  { icon: CheckCircle, label: "Confirmation", step: 3 },
+                  { icon: CheckCircle, label: "Confirmation", step: 3 }
                 ].map(({ icon: Icon, label, step }, index) => (
                   <div key={step} className="flex flex-col items-center">
                     <div
@@ -302,7 +302,7 @@ export function BookingPage({
 
               {currentStep === 1 && (
                 <>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-8 font-playfair">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-8 font-bricolage">
                     Select Your Travel Date
                   </h2>
                   <DateSelector
@@ -312,7 +312,7 @@ export function BookingPage({
                   />
 
                   <div className="mt-12">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-playfair">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-bricolage">
                       Trip Summary
                     </h3>
                     <TripSummary
@@ -350,7 +350,7 @@ export function BookingPage({
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
               <div className="flex items-center gap-4 mb-6">
                 <DollarSign className="h-8 w-8 text-purple-600" />
-                <span className="text-3xl font-bold text-gray-900 font-playfair">
+                <span className="text-3xl font-bold text-gray-900 font-bricolage">
                   ₹{tripStats.price}
                 </span>
                 <span className="text-base text-gray-600 font-roboto">
@@ -388,7 +388,7 @@ export function BookingPage({
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
               <div className="flex items-center gap-4 mb-6">
                 <MessageCircle className="h-6 w-6 text-purple-600" />
-                <span className="text-2xl font-bold text-gray-900 font-playfair">
+                <span className="text-2xl font-bold text-gray-900 font-bricolage">
                   About Your Host
                 </span>
               </div>
@@ -396,12 +396,12 @@ export function BookingPage({
               <div className="flex gap-4 items-center mb-6">
                 <Avatar className="h-16 w-16 border-2 border-purple-100">
                   <AvatarImage src={hostInfo.image} />
-                  <AvatarFallback className="bg-purple-200 text-purple-700 font-bold text-lg font-playfair">
+                  <AvatarFallback className="bg-purple-200 text-purple-700 font-bold text-lg font-bricolage">
                     {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-xl font-bold text-gray-900 font-playfair mb-1">
+                  <p className="text-xl font-bold text-gray-900 font-bricolage mb-1">
                     {hostInfo.name}
                   </p>
                   <div className="flex items-center gap-1 mb-2">

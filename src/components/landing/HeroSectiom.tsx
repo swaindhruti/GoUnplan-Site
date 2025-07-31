@@ -121,7 +121,7 @@ export const HeroSection = () => {
               className="object-cover transition-transform duration-1000 ease-in-out"
             />
             <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center">
-              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-playfair font-bold leading-tight drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
+              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-tight drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
                 {slide.text}
               </h2>
             </div>
@@ -138,7 +138,7 @@ export const HeroSection = () => {
               ease: "power3.inOut"
             })
           }
-          className="group relative bg-black/50 font-montserrat backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
+          className="group relative bg-black/50 font-instrument backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
           size="lg"
         >
           <span className="relative z-10 flex items-center">

@@ -30,7 +30,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
               strokeWidth={2.5}
             />
           </div>
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Booking Progress
           </h3>
         </div>

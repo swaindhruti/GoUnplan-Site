@@ -3,16 +3,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Menu,
   Mountain,
@@ -21,18 +27,27 @@ import {
   Settings,
   LogOut,
   Calendar,
-  MapPin
+  Home,
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Determine text color based on route
+  const isBlackText = pathname === "/chat" || pathname === "/contactus";
+  const textColorClass = isBlackText ? "text-black" : "text-white";
+
   const { data: session, status } = useSession();
 
   const navigationItems = [
@@ -48,7 +63,7 @@ export default function Header() {
 
       if (currentScrollY <= 0) {
         setIsVisible(true);
-      } else if (currentScrollY > lastScrollY) {
+      } else if (currentScrollY > lastScrollY && currentScrollY > 10) {
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY) {
         setIsVisible(true);
@@ -71,7 +86,6 @@ export default function Header() {
     } else if (item.name === "Trips" || item.name === "Contact") {
       router.push(item.href);
     } else {
-      // For About, scroll to sections on landing page
       handleScroll({ location: item.section });
     }
     setIsOpen(false);
@@ -94,10 +108,530 @@ export default function Header() {
     router.push("/");
   };
 
+  // Generate breadcrumb items based on current path
+  const generateBreadcrumbs = () => {
+    const pathSegments = pathname
+      .split("/")
+      .filter((segment) => segment !== "");
+    const breadcrumbs = [];
+
+    // Always start with Home
+    breadcrumbs.push({
+      label: "Home",
+      href: "/",
+      isActive: pathname === "/"
+    });
+
+    // Add path segments
+    let currentPath = "";
+    pathSegments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      const isLast = index === pathSegments.length - 1;
+
+      // Capitalize and clean up segment names
+      let label = segment.charAt(0).toUpperCase() + segment.slice(1);
+      if (label === "Dashboard") {
+        label =
+          session?.user?.role === "ADMIN"
+            ? "Admin Dashboard"
+            : session?.user?.role === "HOST"
+            ? "Host Dashboard"
+            : "Dashboard";
+      }
+
+      breadcrumbs.push({
+        label,
+        href: currentPath,
+        isActive: isLast
+      });
+    });
+
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = generateBreadcrumbs();
+  const isHomePage = pathname === "/";
+
+  // Simple header styling - consistent for home page
+  const homeHeaderClasses = `
+    fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+    bg-white backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-black/5
+    ${isVisible ? "translate-y-0" : "-translate-y-full"}
+  `;
+
+  // Transparent header for other routes
+  const otherRoutesHeaderClasses = `
+    fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+    bg-transparent backdrop-blur-sm
+    ${isVisible ? "translate-y-0" : "-translate-y-full"}
+  `;
+
+  // If not home page, render transparent header with breadcrumbs
+  if (!isHomePage) {
+    return (
+      <div className={otherRoutesHeaderClasses}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-18">
+            {/* Breadcrumb Navigation - Left Side */}
+            <div className="flex-1 flex justify-start max-w-2xl">
+              <Breadcrumb>
+                <BreadcrumbList
+                  className={`flex items-center ${textColorClass}`}
+                >
+                  {breadcrumbs.map((crumb, index) => (
+                    <div key={crumb.href} className="flex items-center">
+                      <BreadcrumbItem>
+                        {crumb.isActive ? (
+                          <BreadcrumbPage
+                            className={`font-semibold transition-colors duration-300 ${textColorClass}`}
+                          >
+                            {crumb.label}
+                          </BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink
+                            href={crumb.href}
+                            className={`font-medium transition-all duration-300 hover:scale-105 ${textColorClass} ${
+                              isBlackText
+                                ? "hover:text-black"
+                                : "hover:text-white"
+                            }`}
+                          >
+                            <span className="flex items-center">
+                              {index === 0 && <Home className="h-4 w-4 mr-2" />}
+                              {crumb.label}
+                            </span>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbs.length - 1 && (
+                        <BreadcrumbSeparator
+                          className={`mx-3 text-black/50 transition-colors duration-300 ${textColorClass}`}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </BreadcrumbSeparator>
+                      )}
+                    </div>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+
+            {/* Menu Button - Right Side */}
+            <div className="flex items-center">
+              {status === "authenticated" ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm">
+                      <Menu className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Menu</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
+                    align="end"
+                  >
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">
+                            {session?.user?.name || "User"}
+                          </p>
+                          <p className="text-gray-500 text-xs">
+                            {session?.user?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <DropdownMenuGroup className="p-2">
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(
+                            getDashboardUrl(session?.user?.role || "USER")
+                          )
+                        }
+                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900">
+                          Dashboard
+                        </span>
+                        <DropdownMenuShortcut className="text-gray-400">
+                          ⌘D
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/trips")}
+                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900">
+                          My Trips
+                        </span>
+                        <DropdownMenuShortcut className="text-gray-400">
+                          ⌘T
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/profile/settings")}
+                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900">
+                          Settings
+                        </span>
+                        <DropdownMenuShortcut className="text-gray-400">
+                          ⌘S
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+
+                    <div className="border-t border-gray-100 p-2">
+                      <DropdownMenuItem
+                        onClick={handleSignOut}
+                        className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
+                        <span className="font-medium text-gray-900 group-hover:text-red-600">
+                          Sign Out
+                        </span>
+                        <DropdownMenuShortcut className="text-gray-400">
+                          ⇧⌘Q
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  onClick={() => router.push("/auth/signin")}
+                  className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Full header for home page - consistent styling, no color changes
   return (
-    <>
+    <header className={homeHeaderClasses}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center group flex-shrink-0">
+            <div className="relative">
+              <Image
+                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1753997807/Screenshot_2025-08-01_030302_wghn3r.png"
+                alt="UNPLan Logo"
+                width={84}
+                height={84}
+                className="lg:h-[114px] lg:w-[114px] transition-all duration-300 scale-110 object-contain"
+              />
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+            {navigationItems.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleNavClick(item)}
+                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+              >
+                {item.name}
+                <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {status === "unauthenticated" ? (
+              <Button
+                onClick={() => router.push("/auth/signin")}
+                className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-200"
+              >
+                Sign In
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/[0.55] hover:bg-gray-50 text-gray-900 border-gray-200 shadow-md ">
+                    <Menu className="h-4 w-4 mr-2" />
+                    Menu
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
+                  align="end"
+                >
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 text-sm">
+                          {session?.user?.name || "User"}
+                        </p>
+                        <p className="text-gray-500 text-xs">
+                          {session?.user?.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <DropdownMenuGroup className="p-2">
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(
+                          getDashboardUrl(session?.user?.role || "USER")
+                        )
+                      }
+                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                      <span className="font-medium text-gray-900">
+                        Dashboard
+                      </span>
+                      <DropdownMenuShortcut className="text-gray-400">
+                        ⌘D
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/trips")}
+                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                      <span className="font-medium text-gray-900">
+                        My Trips
+                      </span>
+                      <DropdownMenuShortcut className="text-gray-400">
+                        ⌘T
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/profile/settings")}
+                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                      <span className="font-medium text-gray-900">
+                        Settings
+                      </span>
+                      <DropdownMenuShortcut className="text-gray-400">
+                        ⌘S
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+
+                  <div className="border-t border-gray-100 p-2">
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
+                      <span className="font-medium text-gray-900 group-hover:text-red-600">
+                        Sign Out
+                      </span>
+                      <DropdownMenuShortcut className="text-gray-400">
+                        ⇧⌘Q
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+
+          {/* Tablet Navigation */}
+          <div className="hidden md:flex lg:hidden items-center space-x-6">
+            <nav className="flex items-center space-x-4">
+              {navigationItems.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => handleNavClick(item)}
+                  className="px-3 py-2 font-semibold transition-all duration-300 rounded-lg hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+                >
+                  {item.name}
+                </button>
+              ))}
+            </nav>
+            <div className="flex items-center space-x-3">
+              {status === "unauthenticated" ? (
+                <Button
+                  onClick={() => router.push("/auth/signin")}
+                  className="transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+                >
+                  Sign In
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSignOut}
+                  className="bg-red-500/10 hover:bg-red-500/20 text-red-600 border-red-300 hover:border-red-400 transition-all duration-300 hover:scale-105"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="transition-all duration-300 hover:scale-110 text-gray-900 hover:bg-gray-100 border-gray-200 border"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="w-full h-full bg-gradient-to-br from-white via-purple-50/30 to-blue-50/30 backdrop-blur-xl border-none p-0"
+              >
+                <div className="flex flex-col h-full">
+                  {/* Mobile Header */}
+                  <div className="flex items-center justify-between p-6 border-b border-gray-200/60 bg-white/60 backdrop-blur-sm">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <Mountain className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-xl font-bold text-gray-900 tracking-tight">
+                        UNPLan
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsOpen(false)}
+                      className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 hover:scale-110"
+                    >
+                      <X className="h-5 w-5" />
+                      <span className="sr-only">Close menu</span>
+                    </Button>
+                  </div>
+
+                  {/* Mobile Navigation */}
+                  <nav className="flex-1 flex flex-col justify-center px-6 py-8 space-y-2">
+                    {navigationItems.map((item, index) => (
+                      <button
+                        key={item.name}
+                        onClick={() => handleNavClick(item)}
+                        className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        style={{
+                          animationDelay: `${index * 100}ms`,
+                          animation: isOpen
+                            ? "slideInRight 0.6s ease-out forwards"
+                            : "none"
+                        }}
+                      >
+                        <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                          {item.name}
+                          <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                      </button>
+                    ))}
+
+                    {/* User Menu Items */}
+                    {status === "authenticated" && (
+                      <>
+                        <div className="border-t border-gray-200/60 my-6"></div>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push(
+                              getDashboardUrl(session?.user?.role || "USER")
+                            );
+                          }}
+                          className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <User className="mr-3 h-5 w-5 text-purple-600" />
+                              Dashboard
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/profile/settings");
+                          }}
+                          className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <Settings className="mr-3 h-5 w-5 text-purple-600" />
+                              Settings
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                        </button>
+                      </>
+                    )}
+                  </nav>
+
+                  {/* Mobile CTA */}
+                  <div className="flex flex-col space-y-4 p-6 border-t border-gray-200/60 bg-white/60 backdrop-blur-sm">
+                    {status === "unauthenticated" ? (
+                      <Button
+                        onClick={() => {
+                          setIsOpen(false);
+                          router.push("/auth/signin");
+                        }}
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                      >
+                        <Sparkles className="mr-2 h-5 w-5" />
+                        Sign In to Continue
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          setIsOpen(false);
+                          handleSignOut();
+                        }}
+                        className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-semibold py-4 rounded-2xl transition-all duration-300 hover:scale-105"
+                      >
+                        <LogOut className="mr-2 h-5 w-5" />
+                        Sign Out
+                      </Button>
+                    )}
+                    <Link
+                      href="/trips"
+                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center block"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Calendar className="inline mr-2 h-5 w-5" />
+                      Plan Your Trip
+                    </Link>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+
       <style jsx>{`
-        @keyframes slideInFromRight {
+        @keyframes slideInRight {
           from {
             opacity: 0;
             transform: translateX(30px);
@@ -108,365 +642,6 @@ export default function Header() {
           }
         }
       `}</style>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md transition-transform duration-500 ease-in-out ${
-          isVisible ? "transform translate-y-0" : "transform -translate-y-full"
-        }`}
-        style={{
-          transform: isVisible ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 0.3s ease-in-out"
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <Mountain className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-              <span className="text-white text-lg sm:text-xl font-bold tracking-wide">
-                UNPLan
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-              {navigationItems.map((item) => (
-                <div
-                  key={item.name}
-                  onClick={() => handleNavClick(item)}
-                  className="text-white select-none font-montserrat hover:text-purple-300 transition-colors duration-200 font-medium cursor-pointer px-3 py-2 rounded-lg hover:bg-white/10 relative group"
-                >
-                  {item.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-300 transition-all duration-200 group-hover:w-full"></span>
-                </div>
-              ))}
-            </nav>
-
-            <div className="hidden lg:flex font-montserrat items-center space-x-3">
-              {/*   <Button
-                onClick={() => router.push(`/trips`)}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-5 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm backdrop-blur-sm border border-purple-500/30"
-              >
-                Plan a Trip
-              </Button> */}
-
-              {status === "unauthenticated" ? (
-                <Button
-                  onClick={() => router.push("/auth/signin")}
-                  className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
-                >
-                  Sign In
-                </Button>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-2 py-2 rounded-lg font-medium text-sm backdrop-blur-sm">
-                      <Menu className="h-8 w-8" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56 py-2 px-2 bg-black/90 backdrop-blur-md border-white/20 text-white"
-                    align="end"
-                  >
-                    <DropdownMenuLabel className="text-white font-roboto text-lg">
-                      {session?.user?.email || "My Account"}
-                    </DropdownMenuLabel>
-                    <DropdownMenuLabel className=" text-purple-300 font-roboto -mt-2">
-                      {session?.user?.name || "My Account"}
-                    </DropdownMenuLabel>
-
-                    <DropdownMenuSeparator className="bg-white/20" />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          router.push(
-                            getDashboardUrl(session?.user?.role || "USER")
-                          )
-                        }
-                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                        <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push("/trips")}
-                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        My Trips
-                        <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push("/profile/settings")}
-                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator className="bg-white/20" />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        onClick={() => router.push("/")}
-                        className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                      >
-                        <MapPin className="mr-2 h-4 w-4" />
-                        Explore
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator className="bg-white/20" />
-                    <DropdownMenuItem
-                      onClick={handleSignOut}
-                      className="text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log out
-                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-
-            <div className="hidden md:flex lg:hidden items-center space-x-4">
-              <nav className="flex items-center space-x-4">
-                {navigationItems.map((item) => (
-                  <div
-                    key={item.name}
-                    onClick={() => handleNavClick(item)}
-                    className="text-white font-montserrat select-none hover:text-purple-300 transition-colors duration-200 font-medium cursor-pointer text-sm px-2 py-1 rounded hover:bg-white/10"
-                  >
-                    {item.name}
-                  </div>
-                ))}
-              </nav>
-              <div className="flex items-center font-montserrat space-x-2">
-                {status === "unauthenticated" ? (
-                  <Button
-                    onClick={() => router.push("/auth/signin")}
-                    className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
-                  >
-                    Sign In
-                  </Button>
-                ) : (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-2 py-2 rounded-lg font-medium text-sm backdrop-blur-sm">
-                        <Menu className="h-8 w-8" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-56 py-2 px-2 bg-black/90 backdrop-blur-md border-white/20 text-white"
-                      align="end"
-                    >
-                      <DropdownMenuLabel className="text-white font-roboto text-lg">
-                        {session?.user?.email || "My Account"}
-                      </DropdownMenuLabel>
-                      <DropdownMenuLabel className=" text-purple-300 font-roboto -mt-2">
-                        {session?.user?.name || "My Account"}
-                      </DropdownMenuLabel>
-
-                      <DropdownMenuSeparator className="bg-white/20" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            router.push(
-                              getDashboardUrl(session?.user?.role || "USER")
-                            )
-                          }
-                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                        >
-                          <User className="mr-2 h-4 w-4" />
-                          Dashboard
-                          <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => router.push("/trips")}
-                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                        >
-                          <Calendar className="mr-2 h-4 w-4" />
-                          My Trips
-                          <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => router.push("/profile/settings")}
-                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                        >
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator className="bg-white/20" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={() => router.push("/")}
-                          className="text-white hover:bg-white/10 hover:text-purple-300 cursor-pointer"
-                        >
-                          <MapPin className="mr-2 h-4 w-4" />
-                          Explore
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator className="bg-white/20" />
-                      <DropdownMenuItem
-                        onClick={handleSignOut}
-                        className="text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Log out
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </div>
-
-            {/* Mobile Menu */}
-            <div className="md:hidden font-montserrat">
-              <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-none border border-white/40 hover:border-white/60 transition-all duration-200 h-10 w-10"
-                  >
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent
-                  side="right"
-                  className="w-full h-full bg-black/95 backdrop-blur-md border-none p-0"
-                >
-                  <div className="flex flex-col h-full">
-                    {/* Mobile Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-white/20">
-                      <div className="flex items-center space-x-2">
-                        <Mountain className="h-6 w-6 text-white" />
-                        <span className="text-white text-lg font-bold tracking-wide">
-                          UNPLan
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsOpen(false)}
-                        className="text-white border border-white/40 hover:border-white/60 transition-all duration-200 h-10 w-10"
-                      >
-                        <X className="h-5 w-5" />
-                        <span className="sr-only">Close menu</span>
-                      </Button>
-                    </div>
-
-                    {/* Mobile Navigation */}
-                    <nav className="flex-1 flex flex-col justify-center px-6 space-y-4">
-                      {navigationItems.map((item, index) => (
-                        <div
-                          key={item.name}
-                          onClick={() => handleNavClick(item)}
-                          className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
-                          style={{
-                            animationDelay: `${index * 0.1}s`,
-                            animation: isOpen
-                              ? "slideInFromRight 0.5s ease-out forwards"
-                              : "none"
-                          }}
-                        >
-                          <span className="flex items-center justify-center text-xl relative z-10">
-                            {item.name}
-                            <span className="ml-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1">
-                              →
-                            </span>
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                        </div>
-                      ))}
-
-                      {/* Mobile User Menu Items */}
-                      {status === "authenticated" && (
-                        <>
-                          <div className="border-t border-white/20 my-4"></div>
-                          <div
-                            onClick={() => {
-                              setIsOpen(false);
-                              router.push(
-                                getDashboardUrl(session?.user?.role || "USER")
-                              );
-                            }}
-                            className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
-                          >
-                            <span className="flex items-center justify-center text-xl relative z-10">
-                              <User className="mr-2 h-5 w-5" />
-                              Dashboard
-                              <span className="ml-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1">
-                                →
-                              </span>
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                          </div>
-                          <div
-                            onClick={() => {
-                              setIsOpen(false);
-                              router.push("/profile/settings");
-                            }}
-                            className="text-white select-none hover:text-purple-300 transition-all duration-300 font-medium py-4 px-6 rounded-xl hover:bg-white/10 cursor-pointer group text-center relative overflow-hidden"
-                          >
-                            <span className="flex items-center justify-center text-xl relative z-10">
-                              <Settings className="mr-2 h-5 w-5" />
-                              Settings
-                              <span className="ml-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-1">
-                                →
-                              </span>
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-700/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                          </div>
-                        </>
-                      )}
-                    </nav>
-
-                    {/* Mobile CTA Buttons */}
-                    <div className="flex flex-col space-y-4 p-6 border-t border-white/20 bg-black/50">
-                      {status === "unauthenticated" ? (
-                        <Button
-                          onClick={() => {
-                            setIsOpen(false);
-                            router.push(`/auth/signin`);
-                          }}
-                          className="text-white text-center hover:text-purple-300 hover:bg-white/10 transition-all duration-200 py-4 px-6 rounded-xl border border-white/40 hover:border-white/60 font-medium text-lg"
-                        >
-                          Sign In
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            setIsOpen(false);
-                            handleSignOut();
-                          }}
-                          className="text-red-400 text-center hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 py-4 px-6 rounded-xl border border-red-500/40 hover:border-red-500/60 font-medium text-lg"
-                        >
-                          <LogOut className="mr-2 h-5 w-5" />
-                          Sign Out
-                        </Button>
-                      )}
-                      <Link
-                        href="/trips"
-                        className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-center transform hover:-translate-y-0.5 text-lg"
-                        onClick={() => {
-                          router.push(`/trips`);
-                          setIsOpen(false);
-                        }}
-                      >
-                        Plan Your Trip
-                      </Link>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </div>
-      </header>
-    </>
+    </header>
   );
 }

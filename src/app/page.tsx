@@ -13,49 +13,18 @@ import { TopHosts } from "@/components/landing/TopHosts";
 
 export default function Home() {
   return (
-    <main className="h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth">
-      <section
-        id="home"
-        className="min-h-screen snap-start snap-always flex flex-col"
-      >
-        <HeroSection />
-      </section>
-      <section
-        id="vibes"
-        className="min-h-screen snap-start snap-always flex flex-col"
-      >
-        <FilterAndTrip />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <FindMyVibe />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <TopDestinations />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <WhyUsSection />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <HowItWorksSection />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <ReviewSection />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <TopHosts />
-      </section>
-      <section
-        id="about"
-        className="min-h-screen snap-start snap-always flex flex-col"
-      >
-        <AboutUs />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <ReadyToStart />
-      </section>
-      <section className="min-h-screen snap-start snap-always flex flex-col">
-        <FAQSection />
-      </section>
+    <main className="h-screen ">
+      <HeroSection />
+      <FilterAndTrip />
+      <FindMyVibe />
+      <TopDestinations />
+      <WhyUsSection />
+      <HowItWorksSection />
+      <ReviewSection />
+      <TopHosts />
+      <AboutUs />
+      <ReadyToStart />
+      <FAQSection />
     </main>
   );
 }
