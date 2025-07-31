@@ -19,7 +19,7 @@ const testimonials = [
     rating: 5,
     image:
       "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Maldives Paradise",
+    destination: "Maldives Paradise"
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const testimonials = [
     rating: 5,
     image:
       "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Swiss Alps Adventure",
+    destination: "Swiss Alps Adventure"
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ const testimonials = [
     rating: 5,
     image:
       "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Japanese Cultural Tour",
+    destination: "Japanese Cultural Tour"
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ const testimonials = [
     rating: 5,
     image:
       "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Santorini Sunset",
+    destination: "Santorini Sunset"
   },
   {
     id: 5,
@@ -59,8 +59,8 @@ const testimonials = [
     rating: 5,
     image:
       "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Costa Rica Wildlife",
-  },
+    destination: "Costa Rica Wildlife"
+  }
 ];
 
 export default function ReviewSection() {
@@ -68,7 +68,7 @@ export default function ReviewSection() {
     () =>
       testimonials.map((testimonial) => (
         <SwiperSlide key={testimonial.id}>
-          <div className="flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col  items-center justify-center px-4 sm:px-6 lg:px-8">
             {/* Quote Icon */}
             <div className="mb-6 sm:mb-8">
               <div className="relative">
@@ -158,13 +158,13 @@ export default function ReviewSection() {
             autoplay={{
               delay: 4000,
               disableOnInteraction: false,
-              pauseOnMouseEnter: true,
+              pauseOnMouseEnter: true
             }}
             speed={1000}
             allowTouchMove={true}
             pagination={{
               clickable: true,
-              dynamicBullets: true,
+              dynamicBullets: true
             }}
             className="w-full max-w-4xl mx-auto"
           >

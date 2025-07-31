@@ -183,7 +183,7 @@
   content: "";
   position: absolute;
   left: -10%;
-  bottom: -10%;
+  bottom: -30%;
   width: 120%;
   height: 140%;
   background: url("/circle-sketch.svg") no-repeat center/contain;
@@ -206,10 +206,10 @@
 .highlight-oval::after {
   content: "";
   position: absolute;
-  left: -5%;
-  bottom: -5%;
-  width: 110%;
-  height: 130%;
+  left: -70%;
+  bottom: -90%;
+  width: 230%;
+  height: 250%;
   background: url("/oval-sketch.svg") no-repeat center/contain;
   z-index: -1;
 }

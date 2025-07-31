@@ -8,7 +8,7 @@ const vibeDescriptions: Record<string, string> = {
     "Immerse yourself in local traditions, art, and history for a truly authentic experience.",
   Adventure: "Thrilling activities and wild landscapes for adrenaline seekers.",
   Relaxation: "Unwind in serene destinations designed for peace and comfort.",
-  Nature: "Explore breathtaking natural wonders and scenic escapes.",
+  Nature: "Explore breathtaking natural wonders and scenic escapes."
 };
 
 export const FindMyVibe = () => {
@@ -17,20 +17,20 @@ export const FindMyVibe = () => {
   const vibes = [
     {
       label: "Cultural",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791020/pexels-emre-simsek-27565013-33041565_uqwqch.jpg",
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791020/pexels-emre-simsek-27565013-33041565_uqwqch.jpg"
     },
     {
       label: "Adventure",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791121/pexels-marius-mann-772581-33021041_fvxvqj.jpg",
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791121/pexels-marius-mann-772581-33021041_fvxvqj.jpg"
     },
     {
       label: "Relaxation",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791236/pexels-kubra-ercan-2154019843-33019785_qdfrky.jpg",
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791236/pexels-kubra-ercan-2154019843-33019785_qdfrky.jpg"
     },
     {
       label: "Nature",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791316/pexels-ishahidsultan-33048368_vwox3l.jpg",
-    },
+      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791316/pexels-ishahidsultan-33048368_vwox3l.jpg"
+    }
   ];
 
   const handleVibeClick = (vibeLabel: string) => {
@@ -46,10 +46,10 @@ export const FindMyVibe = () => {
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-playfair font-bold text-gray-900 leading-tight">
+          <h1 className="text-3xl flex sm:text-4xl lg:text-5xl font-playfair font-bold text-gray-900 leading-tight">
             Popular
             <br />
-            <span className="text-gray-800">Vibes</span>
+            <span className="text-gray-800 ml-3">Vibes</span>
           </h1>
 
           <p className="text-[15px] sm:text-[16px] mb-8 font-roboto text-gray-600">
@@ -63,7 +63,7 @@ export const FindMyVibe = () => {
         </div>
         <div
           onClick={() => handleVibeClick("Adventure")}
-          className="w-full h-[300px] cursor-pointer sm:h-[350px] md:h-[400px] relative group"
+          className="w-full h-[270px] cursor-pointer sm:h-[320px] md:h-[370px] relative group"
         >
           <Image
             src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
@@ -86,7 +86,7 @@ export const FindMyVibe = () => {
           <div
             key={index}
             onClick={() => handleVibeClick(vibe.label)}
-            className="relative h-[250px] sm:h-[300px] md:h-[350px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
+            className="relative h-[220px] sm:h-[270px] md:h-[320px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
           >
             <Image
               src={vibe.src}

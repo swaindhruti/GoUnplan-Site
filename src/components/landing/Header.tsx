@@ -7,26 +7,29 @@ import { Menu, Mountain, X } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
+  const { status } = useSession();
 
   const navigationItems = [
     { name: "Home", href: "/", section: "#home" },
+    { name: "Vibes", href: "/vibes", section: "#vibes" },
     { name: "About", href: "/about", section: "#about" },
-    { name: "vibes", href: "/vibes", section: "#vibes" },
     { name: "Contact", href: "/contact", section: "#contact" }
   ];
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScrollEvent = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY < 10) {
+
+      if (currentScrollY <= 1) {
         setIsVisible(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      } else if (currentScrollY > lastScrollY) {
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY) {
         setIsVisible(true);
@@ -35,9 +38,8 @@ export default function Header() {
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScrollEvent, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollEvent);
   }, [lastScrollY]);
 
   const handleNavClick = (section: string) => {
@@ -60,9 +62,13 @@ export default function Header() {
         }
       `}</style>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md transition-transform duration-300 ease-in-out ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
+        className={`fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md transition-transform duration-500 ease-in-out ${
+          isVisible ? "transform translate-y-0" : "transform -translate-y-full"
         }`}
+        style={{
+          transform: isVisible ? "translateY(0)" : "translateY(-100%)",
+          transition: "transform 0.3s ease-in-out"
+        }}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
@@ -87,23 +93,38 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Desktop CTA Buttons */}
-            <div className="hidden lg:flex  font-montserrat items-center space-x-3">
+            <div className="hidden lg:flex font-montserrat items-center space-x-3">
+              {status !== "unauthenticated" && (
+                <Button
+                  onClick={() => router.push(`/dashboard/host`)}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-5 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm backdrop-blur-sm border border-purple-500/30"
+                >
+                  Host
+                </Button>
+              )}
               <Button
-                onClick={() => router.push(`/auth/signin`)}
+                onClick={() =>
+                  router.push(
+                    `${
+                      status === "unauthenticated"
+                        ? "/auth/signin"
+                        : "/dashboard/user"
+                    }`
+                  )
+                }
                 className="text-white hover:text-purple-300 bg-transparent hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-4 py-2 rounded-lg font-medium text-sm backdrop-blur-sm"
               >
-                Sign In
+                {status === "unauthenticated" ? "Sign In" : "Profile"}
               </Button>
+
               <Button
                 onClick={() => router.push(`/trips`)}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-5 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm backdrop-blur-sm border border-purple-500/30"
               >
-                Plan Your Trip
+                Trip
               </Button>
             </div>
 
-            {/* Tablet Navigation (hidden on mobile and desktop) */}
             <div className="hidden md:flex lg:hidden items-center space-x-4">
               <nav className="flex items-center space-x-4">
                 {navigationItems.map((item) => (
@@ -117,12 +138,14 @@ export default function Header() {
                 ))}
               </nav>
               <div className="flex items-center font-montserrat space-x-2">
-                <Button
-                  onClick={() => router.push(`/auth/signin`)}
-                  className="text-white hover:text-purple-300 hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-3 py-1.5 rounded-lg font-medium text-sm"
-                >
-                  Sign In
-                </Button>
+                {status === "unauthenticated" && (
+                  <Button
+                    onClick={() => router.push(`/auth/signin`)}
+                    className="text-white hover:text-purple-300 hover:bg-white/10 transition-all duration-200 border border-white/40 hover:border-white/60 px-3 py-1.5 rounded-lg font-medium text-sm"
+                  >
+                    Sign In
+                  </Button>
+                )}
                 <Button
                   onClick={() => router.push(`/trips`)}
                   className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-4 py-1.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
@@ -150,7 +173,7 @@ export default function Header() {
                   className="w-full h-full bg-black/95 backdrop-blur-md border-none p-0"
                 >
                   <div className="flex flex-col h-full">
-                    {/* Mobile Header with Close Button */}
+                    {/* Mobile Header */}
                     <div className="flex items-center justify-between p-6 border-b border-white/20">
                       <div className="flex items-center space-x-2">
                         <Mountain className="h-6 w-6 text-white" />
@@ -162,7 +185,7 @@ export default function Header() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsOpen(false)}
-                        className="text-white  border border-white/40 hover:border-white/60 transition-all duration-200 h-10 w-10"
+                        className="text-white border border-white/40 hover:border-white/60 transition-all duration-200 h-10 w-10"
                       >
                         <X className="h-5 w-5" />
                         <span className="sr-only">Close menu</span>
@@ -196,15 +219,17 @@ export default function Header() {
 
                     {/* Mobile CTA Buttons */}
                     <div className="flex flex-col space-y-4 p-6 border-t border-white/20 bg-black/50">
-                      <Button
-                        onClick={() => {
-                          setIsOpen(false);
-                          router.push(`/auth/signin`);
-                        }}
-                        className="text-white text-center hover:text-purple-300 hover:bg-white/10 transition-all duration-200 py-4 px-6 rounded-xl border border-white/40 hover:border-white/60 font-medium text-lg"
-                      >
-                        Sign In
-                      </Button>
+                      {status === "unauthenticated" && (
+                        <Button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push(`/auth/signin`);
+                          }}
+                          className="text-white text-center hover:text-purple-300 hover:bg-white/10 transition-all duration-200 py-4 px-6 rounded-xl border border-white/40 hover:border-white/60 font-medium text-lg"
+                        >
+                          Sign In
+                        </Button>
+                      )}
                       <Link
                         href="/trips"
                         className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-center transform hover:-translate-y-0.5 text-lg"

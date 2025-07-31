@@ -1,18 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-/* import { Swiper, SwiperSlide } from "swiper/modules"; */
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import { Button } from "../ui/button";
-import { handleScroll } from "../global/Handlescroll";
+
 import { ChevronDown } from "lucide-react";
-import Header from "./Header";
+
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { handleScroll } from "@/components/global/Handlescroll";
+import Header from "@/components/landing/Header";
+import { Button } from "@/components/ui/button";
 
 export const HeroSection = () => {
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const lastScrollTop = useRef(0);
+  const scrollThreshold = 10;
+
   const slides = [
     {
       image:
@@ -54,6 +59,41 @@ export const HeroSection = () => {
       )
     }
   ];
+
+  useEffect(() => {
+    const handleScrollEvent = () => {
+      const currentScrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const scrollDirection =
+        currentScrollTop > lastScrollTop.current ? "down" : "up";
+
+      if (
+        scrollDirection === "down" &&
+        !hasScrolled &&
+        currentScrollTop >= scrollThreshold
+      ) {
+        setHasScrolled(true);
+
+        /*  handleScroll({
+          location: "#filtertrip",
+          duration: 1.5,
+          ease: "power3.inOut"
+        });
+ */
+        setTimeout(() => {
+          setHasScrolled(false);
+        }, 2000);
+      }
+
+      lastScrollTop.current = currentScrollTop <= 0 ? 0 : currentScrollTop;
+    };
+
+    window.addEventListener("scroll", handleScrollEvent, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollEvent);
+    };
+  }, [hasScrolled]);
 
   return (
     <div className="relative w-full h-screen min-h-[600px]">
@@ -121,7 +161,6 @@ export const HeroSection = () => {
             </motion.div>
           </span>
 
-          {/* Elegant hover effect overlay */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/0 via-purple-400/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </Button>
       </div>
