@@ -29,11 +29,11 @@ export default function AboutUs() {
 
         {/* Right Side Text */}
         <div className="w-full lg:w-1/2 text-center lg:text-left">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-extrabold text-gray-800 leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage font-extrabold text-gray-800 leading-tight">
             Your Journey, <span className="text-purple-600">Our Passion</span>
           </h2>
 
-          <p className="text-base md:text-lg font-roboto text-gray-700 leading-relaxed mt-6">
+          <p className="text-base md:text-lg font-instrument text-gray-700 leading-relaxed mt-6">
             GoUnplan isn’t just a travel company — it’s a movement to make
             travel more personal, inspiring, and meaningful. We help turn your
             travel dreams into reality by blending expert planning with the

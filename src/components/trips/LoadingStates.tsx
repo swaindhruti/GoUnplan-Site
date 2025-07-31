@@ -70,7 +70,7 @@ export const EmptyState = ({ onClearFilters }: EmptyStateProps) => (
 
       {/* Header */}
       <div className="mb-8 space-y-4">
-        <h3 className="text-3xl font-playfair font-bold text-gray-800">
+        <h3 className="text-3xl font-bricolage font-bold text-gray-800">
           No Adventures Found
         </h3>
         <p className="text-lg text-gray-600 leading-relaxed">
@@ -104,7 +104,7 @@ export const ErrorDisplay = ({ error }: ErrorDisplayProps) => (
 
       {/* Header */}
       <div className="mb-8 space-y-4">
-        <h3 className="text-3xl font-playfair font-bold text-gray-800">
+        <h3 className="text-3xl font-bricolage font-bold text-gray-800">
           Oops! Something went wrong
         </h3>
         <p className="text-lg text-gray-600 leading-relaxed">{error}</p>

@@ -35,7 +35,7 @@ import { PrimaryButton } from "./common";
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState("");
 
-  const [travelerType, setTravelerType] = useState("solo");
+  const [travelerType, setTravelerType] = useState("Solo");
   const [vibe, setVibe] = useState("");
   const [startDate, setStartDate] = useState<Date>();
   const [isStartDateOpen, setIsStartDateOpen] = useState(false);
@@ -43,7 +43,7 @@ export const FilterAndTrip = () => {
   const router = useRouter();
 
   const fieldClass =
-    "h-12 w-full bg-white/90 border border-white/30 text-gray-800 placeholder:font-roboto placeholder:text-gray-500 rounded-lg px-4 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium";
+    "h-12 w-full bg-white/90 border border-white/30 text-gray-800 placeholder:font-instrument placeholder:text-gray-500 rounded-lg px-4 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium";
 
   const formFields = [
     {
@@ -65,10 +65,16 @@ export const FilterAndTrip = () => {
       icon: <Users className="w-4 h-4 text-purple-300" />,
       type: "select",
       options: [
-        { value: "solo", label: "Solo" },
-        { value: "couple", label: "Couple" },
-        { value: "married", label: "Married" },
-        { value: "friends", label: "Friends" }
+        { value: "Solo", label: "Solo" },
+        { value: "Couple", label: "Couple" },
+        { value: "With Baby", label: "With Baby" },
+        { value: "Friends", label: "Friends" },
+        { value: "Family", label: "Family" },
+        { value: "Group", label: "Group" },
+        { value: "Pet Friendly", label: "Pet Friendly" },
+        { value: "Senior", label: "Senior" },
+        { value: "Business", label: "Business" },
+        { value: "Backpackers", label: "Backpackers" }
       ],
       placeholder: "Select type"
     },
@@ -78,12 +84,16 @@ export const FilterAndTrip = () => {
       icon: <Sparkles className="w-4 h-4 text-purple-300" />,
       type: "select",
       options: [
-        { value: "Cultural", label: "Cultural" },
+        { value: "Culture", label: "Culture" },
         { value: "Adventure", label: "Adventure" },
         { value: "Relaxation", label: "Relaxation" },
         { value: "Nature", label: "Nature" },
+        { value: "Nightlife", label: "Nightlife" },
+        { value: "Foodie", label: "Foodie" },
         { value: "Luxury", label: "Luxury" },
-        { value: "Budget", label: "Budget-Friendly" }
+        { value: "Budget", label: "Budget" },
+        { value: "Wellness", label: "Wellness" },
+        { value: "Family", label: "Family" }
       ],
       placeholder: "Your mood?"
     }
@@ -132,7 +142,7 @@ export const FilterAndTrip = () => {
               <Sparkles className="w-8 h-8 text-purple-400" />
             </motion.div>
 
-            <h1 className="text-4xl font-playfair md:text-6xl font-semibold text-white tracking-wide">
+            <h1 className="text-4xl font-bricolage md:text-6xl font-semibold text-white tracking-wide">
               Find Your Perfect
               <span className="block text-purple-400 mt-2">Journey</span>
             </h1>
@@ -150,7 +160,7 @@ export const FilterAndTrip = () => {
             </motion.div>
           </div>
 
-          <p className="text-lg text-white font-roboto max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-lg text-white font-instrument max-w-2xl mx-auto font-normal leading-relaxed">
             Discover extraordinary destinations and create unforgettable
             memories
           </p>
@@ -174,7 +184,7 @@ export const FilterAndTrip = () => {
                 switch (field.type) {
                   case "input":
                     return (
-                      <div key={field.id} className="space-y-3 font-playfair">
+                      <div key={field.id} className="space-y-3 font-bricolage">
                         {label}
                         <div className="relative">
                           <Input
@@ -197,7 +207,7 @@ export const FilterAndTrip = () => {
                     const setOpen = setIsStartDateOpen;
 
                     return (
-                      <div key={field.id} className="space-y-3 font-playfair">
+                      <div key={field.id} className="space-y-3 font-bricolage">
                         {label}
                         <Popover open={open} onOpenChange={setOpen}>
                           <PopoverTrigger asChild>
@@ -237,7 +247,7 @@ export const FilterAndTrip = () => {
                     }
 
                     return (
-                      <div key={field.id} className="space-y-3 font-playfair">
+                      <div key={field.id} className="space-y-3 font-bricolage">
                         {label}
                         <Select value={value} onValueChange={setValue}>
                           <SelectTrigger className={fieldClass}>
@@ -270,10 +280,10 @@ export const FilterAndTrip = () => {
           </form>
 
           <div className="text-center mt-8 pt-6 border-t border-white/20">
-            <p className="text-white/80 text-sm">
+            <p className="text-white/80 text-sm font-instrument">
               Need inspiration?{" "}
-              <button className="text-purple-300 hover:text-purple-200 font-medium underline transition-colors duration-200">
-                Browse by destination
+              <button className="text-purple-300 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
+                Browse by vibe
               </button>
             </p>
           </div>

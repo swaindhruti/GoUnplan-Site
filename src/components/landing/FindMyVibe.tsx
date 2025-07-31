@@ -46,13 +46,13 @@ export const FindMyVibe = () => {
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
-          <h1 className="text-3xl flex sm:text-4xl lg:text-5xl font-playfair font-bold text-gray-900 leading-tight">
+          <h1 className="text-3xl flex sm:text-4xl lg:text-5xl font-bricolage font-bold text-gray-900 leading-tight">
             Popular
             <br />
             <span className="text-gray-800 ml-3">Vibes</span>
           </h1>
 
-          <p className="text-[15px] sm:text-[16px] mb-8 font-roboto text-gray-600">
+          <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
             Join us as we explore the wonders of the globe, one incredible
             journey at a time.
           </p>
@@ -72,10 +72,10 @@ export const FindMyVibe = () => {
             className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"
           />
           <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-playfair font-semibold text-white mb-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage font-semibold text-white mb-2">
               Adventure
             </div>
-            <div className="text-base sm:text-lg text-white/90 font-roboto text-center">
+            <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
               {vibeDescriptions["Adventure"]}
             </div>
           </div>
@@ -95,10 +95,10 @@ export const FindMyVibe = () => {
               className="object-cover"
             />
             <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-playfair font-semibold text-white mb-2">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage font-semibold text-white mb-2">
                 {vibe.label}
               </div>
-              <div className="text-base sm:text-lg text-white/90 font-roboto text-center">
+              <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
                 {vibeDescriptions[vibe.label]}
               </div>
             </div>

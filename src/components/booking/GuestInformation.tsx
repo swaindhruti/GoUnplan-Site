@@ -13,7 +13,7 @@ import {
   FileText,
   BriefcaseMedical,
   ArrowLeft,
-  ArrowRight,
+  ArrowRight
 } from "lucide-react";
 import { z, ZodError } from "zod";
 import { BookingFormData } from "@/types/booking";
@@ -48,7 +48,7 @@ const baseGuestInfoSchema = z.object({
     .regex(/^[+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .min(10, "Phone number must be at least 10 digits")
     .max(20, "Phone number must be less than 20 characters"),
-  isteamLead: z.boolean().default(false),
+  isteamLead: z.boolean().default(false)
 });
 
 const baseGuestInformationFormSchema = z.object({
@@ -63,13 +63,13 @@ const baseGuestInformationFormSchema = z.object({
   specialRequirements: z
     .string()
     .max(500, "Special requirements must be less than 500 characters")
-    .optional(),
+    .optional()
 });
 
 const guestInformationFormSchema = baseGuestInformationFormSchema
   .refine((data) => data.guests.length === data.participants, {
     message: "Number of guest forms must match selected number of guests",
-    path: ["guests"],
+    path: ["guests"]
   })
   .refine(
     (data) => {
@@ -79,7 +79,7 @@ const guestInformationFormSchema = baseGuestInformationFormSchema
     },
     {
       message: "Exactly one guest must be designated as the team lead",
-      path: ["guests"],
+      path: ["guests"]
     }
   );
 
@@ -95,7 +95,7 @@ interface GuestInformationFormProps {
 export function GuestInformationForm({
   onBack,
   onContinue,
-  maxGuests = 8,
+  maxGuests = 8
 }: GuestInformationFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
@@ -104,8 +104,8 @@ export function GuestInformationForm({
       lastName: "",
       memberEmail: "",
       phone: "",
-      isteamLead: true,
-    },
+      isteamLead: true
+    }
   ]);
   const [specialRequirements, setSpecialRequirements] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -166,7 +166,7 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false,
+          isteamLead: false
         });
       }
     } else if (num < currentForms.length) {
@@ -187,8 +187,8 @@ export function GuestInformationForm({
           lastName: "",
           memberEmail: "",
           phone: "",
-          isteamLead: false,
-        },
+          isteamLead: false
+        }
       ]);
     }
   };
@@ -253,7 +253,7 @@ export function GuestInformationForm({
     const formData: BookingFormData = {
       guests: guestForms,
       specialRequirements: specialRequirements || undefined,
-      participants: numberOfGuests,
+      participants: numberOfGuests
     };
 
     const validation = guestInformationFormSchema.safeParse(formData);
@@ -291,7 +291,7 @@ export function GuestInformationForm({
         <div className="bg-purple-100 p-4 rounded-2xl">
           <Users className="h-8 w-8 text-purple-600" strokeWidth={2.5} />
         </div>
-        <h2 className="text-3xl font-playfair font-bold text-gray-800">
+        <h2 className="text-3xl font-bricolage font-bold text-gray-800">
           Guest Information
         </h2>
       </div>
@@ -302,7 +302,7 @@ export function GuestInformationForm({
           <div className="bg-purple-100 p-3 rounded-xl">
             <Users className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Number of Guests
           </h3>
         </div>
@@ -342,7 +342,7 @@ export function GuestInformationForm({
 
       <div className="space-y-6">
         <div className="flex items-center justify-between mb-6 border-b border-purple-100 pb-4">
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Guest Details
           </h3>
           <div className="bg-purple-100 border border-purple-200 rounded-xl px-6 py-3 font-bold text-lg">
@@ -559,7 +559,7 @@ export function GuestInformationForm({
               strokeWidth={2.5}
             />
           </div>
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Special Requirements (Optional)
           </h3>
         </div>
@@ -601,7 +601,7 @@ export function GuestInformationForm({
           <div className="bg-purple-100 p-3 rounded-xl">
             <FileText className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
           </div>
-          <h3 className="text-2xl font-playfair font-bold text-gray-800">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
             Booking Summary
           </h3>
         </div>

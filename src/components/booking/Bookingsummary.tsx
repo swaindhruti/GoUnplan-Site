@@ -154,7 +154,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-16 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-10 shadow-xl text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 font-playfair">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 font-bricolage">
                 Booking Not Found
               </h2>
               <p className="text-gray-600 font-roboto text-lg">
@@ -179,7 +179,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                   <CheckCircle className="h-12 w-12 text-white" />
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-playfair">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
                 {step === 1
                   ? "Booking Summary"
                   : step === 2 && !paymentCompleted
@@ -225,7 +225,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <MapPin className="w-8 h-8 text-purple-600" />
                       </div>
                       <div>
-                        <h2 className="text-3xl font-bold text-gray-900 font-playfair mb-2">
+                        <h2 className="text-3xl font-bold text-gray-900 font-bricolage mb-2">
                           {travelPlan?.title || "Travel Package"}
                         </h2>
                         <p className="text-xl text-purple-600 font-semibold font-roboto">
@@ -248,7 +248,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <Calendar className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Trip Details
                         </h3>
                       </div>
@@ -306,7 +306,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <DollarSign className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Pricing
                         </h3>
                       </div>
@@ -346,7 +346,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <Users className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Team Members ({booking.guests.length})
                         </h3>
                       </div>
@@ -387,7 +387,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <FileText className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Special Requirements
                         </h3>
                       </div>
@@ -443,7 +443,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                   ) : (
                     <div className="space-y-6">
                       <div className="text-center">
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                           Confirm Payment
                         </h3>
                         <p className="text-gray-600 font-roboto text-lg mb-6">
@@ -484,7 +484,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                 ) : (
                   <div className="space-y-6">
                     <div className="text-center">
-                      <h3 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                      <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                         Payment Successful
                       </h3>
                       <p className="text-gray-600 font-roboto text-lg mb-6">
@@ -530,7 +530,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
             <div className="space-y-8">
               {/* Booking Info Card */}
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 font-playfair mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-6">
                   Booking Information
                 </h3>
                 <div className="space-y-4">
@@ -566,7 +566,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
               {/* Quick Summary Card */}
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-3xl shadow-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 font-playfair mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-6">
                   Quick Summary
                 </h3>
                 <div className="space-y-4">

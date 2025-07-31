@@ -11,38 +11,38 @@ const faqs = [
     id: 1,
     question: "What services do you offer?",
     answer:
-      "We offer comprehensive travel planning services including destination research, accommodation booking, flight arrangements, activity planning, and 24/7 customer support throughout your journey.",
+      "We offer comprehensive travel planning services including destination research, accommodation booking, flight arrangements, activity planning, and 24/7 customer support throughout your journey."
   },
   {
     id: 2,
     question: "How far in advance should I book my trip?",
     answer:
-      "We recommend booking at least 2-3 months in advance for domestic trips and 4-6 months for international destinations. This ensures better availability and pricing for flights and accommodations.",
+      "We recommend booking at least 2-3 months in advance for domestic trips and 4-6 months for international destinations. This ensures better availability and pricing for flights and accommodations."
   },
   {
     id: 3,
     question: "Do you offer travel insurance?",
     answer:
-      "Yes, we partner with leading insurance providers to offer comprehensive travel insurance options. We can help you choose the right coverage based on your destination, trip duration, and activities planned.",
+      "Yes, we partner with leading insurance providers to offer comprehensive travel insurance options. We can help you choose the right coverage based on your destination, trip duration, and activities planned."
   },
   {
     id: 4,
     question: "What happens if I need to cancel or modify my booking?",
     answer:
-      "Our flexible booking policies allow for modifications and cancellations with varying terms depending on the service provider. We'll work with you to minimize any fees and find the best solution for your situation.",
+      "Our flexible booking policies allow for modifications and cancellations with varying terms depending on the service provider. We'll work with you to minimize any fees and find the best solution for your situation."
   },
   {
     id: 5,
     question: "Do you provide 24/7 customer support during travel?",
     answer:
-      "We provide round-the-clock support during your trip. Our emergency hotline is available 24/7 to assist with any issues, changes, or emergencies that may arise during your travels.",
+      "We provide round-the-clock support during your trip. Our emergency hotline is available 24/7 to assist with any issues, changes, or emergencies that may arise during your travels."
   },
   {
     id: 6,
     question: "Can you help with visa and passport requirements?",
     answer:
-      "Yes, we provide guidance on visa requirements, passport validity, and necessary documentation for your destination. We can also assist with visa application processes and connect you with relevant services.",
-  },
+      "Yes, we provide guidance on visa requirements, passport validity, and necessary documentation for your destination. We can also assist with visa application processes and connect you with relevant services."
+  }
 ];
 
 export default function FAQSection() {
@@ -73,10 +73,10 @@ export default function FAQSection() {
       <div className="max-w-4xl w-full">
         {/* Title */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-extrabold text-gray-800 leading-tight mb-6">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage font-extrabold text-gray-800 leading-tight mb-6">
             Frequently Asked <span className="text-purple-600">Questions</span>
           </h2>
-          <p className="text-base md:text-lg font-roboto text-gray-700 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base md:text-lg font-instrument text-gray-700 leading-relaxed max-w-2xl mx-auto">
             Find answers to common questions about our services and booking
             process. Can&apos;t find what you&apos;re looking for? We&apos;re
             here to help!
@@ -104,7 +104,7 @@ export default function FAQSection() {
                       strokeWidth={2}
                     />
                   </div>
-                  <h3 className="text-lg font-playfair md:text-xl font-semibold text-gray-900 leading-tight pr-4">
+                  <h3 className="text-lg font-bricolage md:text-xl font-semibold text-gray-900 leading-tight pr-4">
                     {faq.question}
                   </h3>
                 </div>
@@ -131,7 +131,7 @@ export default function FAQSection() {
                   >
                     <div className="px-6 pb-6 pt-2">
                       <div className="bg-purple-50 border border-purple-100 rounded-xl p-6">
-                        <p className="text-base font-roboto text-gray-700 leading-relaxed">
+                        <p className="text-base font-instrument text-gray-700 leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>
@@ -151,10 +151,10 @@ export default function FAQSection() {
           className="text-center mt-12"
         >
           <div className="bg-white border border-purple-100 rounded-2xl p-8 shadow-sm">
-            <h3 className="text-2xl font-playfair font-bold text-gray-800 mb-4">
+            <h3 className="text-2xl font-bricolage font-bold text-gray-800 mb-4">
               Still have questions?
             </h3>
-            <p className="text-base font-roboto text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-base font-instrument text-gray-600 mb-6 max-w-md mx-auto">
               We&apos;re here to help! Our travel experts are ready to answer
               any questions and help you plan your perfect trip.
             </p>

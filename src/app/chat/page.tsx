@@ -15,7 +15,7 @@ export default async function ChatPage() {
   const initialChats = chatsResult.success ? chatsResult.chats : [];
 
   return (
-    <div className="h-screen">
+    <div className="h-screen mt-10">
       <ChatContainer
         currentUserId={UserSession.user.id || ""}
         initialChats={initialChats}

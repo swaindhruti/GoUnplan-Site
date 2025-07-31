@@ -79,7 +79,7 @@ export default function ReviewSection() {
             </div>
 
             {/* Testimonial Text */}
-            <blockquote className="text-base sm:text-lg lg:text-xl xl:text-2xl font-roboto text-gray-700 mb-6 sm:mb-8 lg:mb-10 max-w-4xl leading-relaxed text-center italic">
+            <blockquote className="text-base sm:text-lg lg:text-xl xl:text-2xl font-instrument text-gray-700 mb-6 sm:mb-8 lg:mb-10 max-w-4xl leading-relaxed text-center italic">
               &quot;{testimonial.text}&quot;
             </blockquote>
 
@@ -117,10 +117,10 @@ export default function ReviewSection() {
                 </div>
               </div>
               <div className="text-center">
-                <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold font-playfair text-gray-900 mb-1">
+                <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold font-bricolage text-gray-900 mb-1">
                   {testimonial.name}
                 </h4>
-                <p className="text-sm sm:text-base text-purple-600 font-medium font-roboto">
+                <p className="text-sm sm:text-base text-purple-600 font-medium font-instrument">
                   {testimonial.role}
                 </p>
               </div>
@@ -139,11 +139,11 @@ export default function ReviewSection() {
           <div className="flex justify-center mb-6 sm:mb-8">
             <SectionLabel label="Customer Testimonials" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-playfair text-gray-900 mb-4 sm:mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage text-gray-900 mb-4 sm:mb-6 leading-tight">
             What Our Travelers
             <span className="block text-gray-800">Say About Us</span>
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-roboto max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-instrument max-w-3xl mx-auto leading-relaxed">
             Discover authentic experiences from real travelers who have embarked
             on unforgettable journeys with us
           </p>

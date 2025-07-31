@@ -9,13 +9,13 @@ export const ReadyToStart = () => {
       <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-16 xl:gap-20 max-w-6xl mx-auto">
         {/* Left Text Section */}
         <div className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-playfair leading-tight sm:leading-snug lg:leading-tight mb-4 sm:mb-6 text-black">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage leading-tight sm:leading-snug lg:leading-tight mb-4 sm:mb-6 text-black">
             Get started
             <br />
             with us
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 mb-6 sm:mb-8 font-roboto leading-relaxed max-w-lg lg:max-w-none mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 mb-6 sm:mb-8 font-instrument leading-relaxed max-w-lg lg:max-w-none mx-auto lg:mx-0">
             Let us help you create the perfect journey. Our travel experts are
             ready to craft your dream vacation.
           </p>

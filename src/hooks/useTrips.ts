@@ -63,6 +63,18 @@ export const useFilters = (trips: Trip[]) => {
       countries: Array.from(new Set(trips.map((t) => t.country))).sort(),
       languages: Array.from(new Set(trips.flatMap((t) => t.languages))).sort(),
       vibes: Array.from(new Set(trips.flatMap((t) => t.vibes))).sort(),
+      travellers: [
+        "Solo",
+        "Couple",
+        "With Baby",
+        "Friends",
+        "Family",
+        "Group",
+        "Pet Friendly",
+        "Senior",
+        "Business",
+        "Backpackers"
+      ]
     }),
     [trips]
   );
@@ -78,7 +90,7 @@ export const useFilters = (trips: Trip[]) => {
           trip.description,
           trip.city,
           trip.state,
-          trip.country,
+          trip.country
         ]
           .join(" ")
           .toLowerCase();
@@ -138,6 +150,6 @@ export const useFilters = (trips: Trip[]) => {
     clearAllFilters,
     filteredTrips,
     activeFiltersCount,
-    filterOptions,
+    filterOptions
   };
 };

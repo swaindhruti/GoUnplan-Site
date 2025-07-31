@@ -57,7 +57,7 @@ export const TripCard = ({
         {/* Top: Title, Price, Description */}
         <div className="space-y-3">
           <div className="flex justify-between items-start">
-            <h3 className="text-lg font-playfair font-semibold text-gray-800 leading-snug pr-2 line-clamp-2">
+            <h3 className="text-lg font-bricolage font-semibold text-gray-800 leading-snug pr-2 line-clamp-2">
               {trip.title}
             </h3>
             <Badge className="text-base font-semibold px-3 py-1 bg-purple-100 text-purple-700 rounded-md whitespace-nowrap">

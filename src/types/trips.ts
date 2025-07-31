@@ -41,6 +41,7 @@ export type FilterState = {
   countryFilter: string;
   languageFilter: string[];
   vibeFilter: string[];
+  travellerFilter: string[];
 };
 
 export const INITIAL_FILTERS: FilterState = {
@@ -50,11 +51,12 @@ export const INITIAL_FILTERS: FilterState = {
   countryFilter: "all",
   languageFilter: [],
   vibeFilter: [],
+  travellerFilter: []
 };
 
 export const DURATION_OPTIONS = [
   { value: "all", label: "All Durations" },
   { value: "1-3", label: "Short Trip (1–3 Days)" },
   { value: "4-7", label: "Medium Trip (4–7 Days)" },
-  { value: "8", label: "Extended Trip (8+ Days)" },
+  { value: "8", label: "Extended Trip (8+ Days)" }
 ];

@@ -15,7 +15,7 @@ import {
   Users,
   X,
   AlertCircle,
-  CheckCircle2,
+  CheckCircle2
 } from "lucide-react";
 import { BackButton } from "@/components/global/buttons";
 import { completePaymentAction } from "@/actions/booking/actions";
@@ -126,7 +126,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                 <CreditCard className="h-12 w-12 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-playfair">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
               Payment Details
             </h1>
             <p className="text-xl text-white/90 mb-8 font-roboto max-w-3xl mx-auto">
@@ -164,7 +164,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                     <MapPin className="w-8 h-8 text-purple-600" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-gray-900 font-playfair mb-2">
+                    <h2 className="text-3xl font-bold text-gray-900 font-bricolage mb-2">
                       {tripData.title || "Trip Summary"}
                     </h2>
                     <p className="text-purple-600 font-semibold font-roboto">
@@ -193,7 +193,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <Calendar className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Trip Details
                         </h3>
                       </div>
@@ -224,7 +224,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                         <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
                           <DollarSign className="w-6 h-6 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                           Pricing
                         </h3>
                       </div>
@@ -261,7 +261,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
 
                   {/* Total Amount */}
                   <div className="flex justify-between items-center bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 p-8 rounded-2xl">
-                    <span className="text-2xl font-bold text-gray-900 font-playfair">
+                    <span className="text-2xl font-bold text-gray-900 font-bricolage">
                       Total Amount
                     </span>
                     <span className="text-3xl font-bold text-purple-600 font-roboto">
@@ -313,7 +313,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                 <div className="bg-gradient-to-r from-green-100 to-green-200 p-3 rounded-xl">
                   <Shield className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                   Security
                 </h3>
               </div>
@@ -348,7 +348,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
 
             {/* Quick Summary Card */}
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-3xl shadow-xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 font-playfair mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-6">
                 Payment Summary
               </h3>
               <div className="space-y-4">
@@ -387,7 +387,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                 <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-xl">
                   <Users className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 font-playfair">
+                <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                   Contact Information
                 </h3>
               </div>
@@ -482,7 +482,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                   <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded-2xl mb-6">
                     <CreditCard className="w-12 h-12 text-purple-600 mx-auto" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                     Confirm Payment
                   </h2>
                   <p className="text-gray-600 font-roboto mb-6">
@@ -514,7 +514,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                   <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded-2xl mb-6">
                     <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                     Processing Payment
                   </h2>
                   <p className="text-gray-600 font-roboto">
@@ -528,7 +528,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                   <div className="bg-gradient-to-r from-green-100 to-green-200 p-4 rounded-2xl mb-6">
                     <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                     Payment Successful!
                   </h2>
                   <p className="text-gray-600 font-roboto mb-4">
@@ -551,7 +551,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                   <div className="bg-gradient-to-r from-red-100 to-red-200 p-4 rounded-2xl mb-6">
                     <AlertCircle className="w-12 h-12 text-red-600 mx-auto" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 font-playfair mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
                     Payment Failed
                   </h2>
                   <p className="text-gray-600 font-roboto mb-6">
