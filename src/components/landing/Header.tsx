@@ -155,7 +155,7 @@ export default function Header() {
   // Simple header styling - consistent for home page
   const homeHeaderClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
-    bg-white backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-black/5
+    bg-white/[0.5] backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-black/5
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 

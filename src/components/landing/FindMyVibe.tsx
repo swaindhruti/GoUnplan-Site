@@ -46,7 +46,7 @@ export const FindMyVibe = () => {
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
-          <h1 className="text-3xl flex sm:text-4xl lg:text-5xl font-bricolage font-bold text-gray-900 leading-tight">
+          <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage font-bold text-gray-900 leading-tight">
             Popular
             <br />
             <span className="text-gray-800 ml-3">Vibes</span>

@@ -24,7 +24,9 @@ export const HeroSection = () => {
       text: (
         <>
           your journey&apos;s{" "}
-          <span className="highlight-wavy">love language</span>
+          <span className="highlight-wavy text-black md:text-white">
+            love language
+          </span>
         </>
       )
     },
