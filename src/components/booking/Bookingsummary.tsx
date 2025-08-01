@@ -169,38 +169,43 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
         {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden bg-gradient-to-br from-purple-600 to-purple-800">
+        <section className="relative py-16 md:py-20 overflow-hidden bg-gradient-to-br from-purple-600 to-purple-800">
           <div className="absolute inset-0 bg-black/20" />
-          <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
             <BackButton isWhite={true} route="/trips" />
             <div className="text-center mt-8">
               <div className="flex justify-center mb-6">
                 <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl p-4">
-                  <CheckCircle className="h-12 w-12 text-white" />
+                  <CheckCircle
+                    className="h-12 w-12 text-white"
+                    aria-label="Booking Status"
+                  />
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
                 {step === 1
                   ? "Booking Summary"
                   : step === 2 && !paymentCompleted
                   ? "Confirm Payment"
                   : "Payment Successful"}
               </h1>
-              <p className="text-xl text-white/90 mb-8 font-roboto max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-white/90 mb-8 font-roboto max-w-2xl mx-auto">
                 {step === 1
                   ? "Please review your booking details before proceeding to payment"
                   : step === 2 && !paymentCompleted
                   ? "Confirm your payment details"
                   : `Redirecting to trips in ${timer} seconds...`}
               </p>
-              <div className="flex justify-center gap-4">
-                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-semibold">
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 sm:px-6 sm:py-3 text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    <span>Booking ID: {booking.id?.slice(0, 8)}...</span>
+                    <span className="truncate">
+                      Booking ID: {booking.id?.slice(0, 8)}...
+                    </span>
                   </div>
                 </div>
-                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-semibold">
+                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 sm:px-6 sm:py-3 text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5" />
                     <span>{formatCurrency(booking.totalPrice)}</span>
@@ -212,8 +217,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         </section>
 
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <div className="grid lg:grid-cols-3 gap-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {step === 1 && (
@@ -527,32 +532,32 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-8">
+            <aside className="space-y-8">
               {/* Booking Info Card */}
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-6">
+              <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-6 md:p-8">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 font-bricolage mb-4 md:mb-6">
                   Booking Information
                 </h3>
                 <div className="space-y-4">
-                  <div className="bg-slate-50/60 p-4 rounded-2xl border border-slate-200/60">
-                    <span className="text-sm text-gray-600 font-roboto">
+                  <div className="bg-slate-50/60 p-3 md:p-4 rounded-2xl border border-slate-200/60">
+                    <span className="text-xs md:text-sm text-gray-600 font-roboto">
                       Booking ID:{" "}
                     </span>
-                    <span className="font-mono font-bold text-gray-900 text-lg">
+                    <span className="font-mono font-bold text-gray-900 text-base md:text-lg break-all">
                       {booking.id}
                     </span>
                   </div>
-                  <div className="bg-slate-50/60 p-4 rounded-2xl border border-slate-200/60">
-                    <span className="text-sm text-gray-600 font-roboto">
+                  <div className="bg-slate-50/60 p-3 md:p-4 rounded-2xl border border-slate-200/60">
+                    <span className="text-xs md:text-sm text-gray-600 font-roboto">
                       Booked on:{" "}
                     </span>
-                    <span className="font-bold text-gray-900 font-roboto text-lg">
+                    <span className="font-bold text-gray-900 font-roboto text-base md:text-lg">
                       {formatDate(booking.createdAt)}
                     </span>
                     {booking.updatedAt &&
                       booking.updatedAt !== booking.createdAt && (
                         <div className="mt-2">
-                          <span className="text-sm text-gray-600 font-roboto">
+                          <span className="text-xs md:text-sm text-gray-600 font-roboto">
                             Last updated:{" "}
                           </span>
                           <span className="font-bold text-gray-900 font-roboto">
@@ -565,8 +570,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
               </div>
 
               {/* Quick Summary Card */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-3xl shadow-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-6">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-3xl shadow-xl p-6 md:p-8">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 font-bricolage mb-4 md:mb-6">
                   Quick Summary
                 </h3>
                 <div className="space-y-4">
@@ -590,13 +595,13 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     <span className="text-gray-600 font-medium font-roboto">
                       Total:
                     </span>
-                    <span className="font-bold text-purple-600 font-roboto text-xl">
+                    <span className="font-bold text-purple-600 font-roboto text-lg md:text-xl">
                       {formatCurrency(booking.totalPrice)}
                     </span>
                   </div>
                 </div>
               </div>
-            </div>
+            </aside>
           </div>
         </div>
       </div>
