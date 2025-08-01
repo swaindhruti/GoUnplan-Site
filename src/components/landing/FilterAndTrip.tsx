@@ -260,13 +260,16 @@ export const FilterAndTrip = () => {
                     }
 
                     return (
-                      <div key={field.id} className="space-y-2 font-bricolage">
+                      <div
+                        key={field.id}
+                        className="space-y-2 z-50 font-bricolage"
+                      >
                         {label}
                         <Select value={value} onValueChange={setValue}>
                           <SelectTrigger className={fieldClass}>
                             <SelectValue placeholder={field.placeholder} />
                           </SelectTrigger>
-                          <SelectContent className="bg-white rounded-xl shadow-xl border-0 max-h-60 overflow-y-auto">
+                          <SelectContent className="bg-white z-59 rounded-xl shadow-xl border-0 max-h-60 overflow-y-auto ">
                             {field.options &&
                               field.options.map((option) => (
                                 <SelectItem

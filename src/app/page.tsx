@@ -13,7 +13,7 @@ import { TopHosts } from "@/components/landing/TopHosts";
 
 export default function Home() {
   return (
-    <main className="h-screen ">
+    <main className="min-h-screen ">
       <HeroSection />
       <FilterAndTrip />
       <FindMyVibe />
