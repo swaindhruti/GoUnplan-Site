@@ -21,15 +21,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Menu,
-  Mountain,
-  X,
   User,
   Settings,
   LogOut,
   Calendar,
   Home,
   ChevronRight,
-  Sparkles
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  Crown,
+  Shield,
+  UserCog
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -41,6 +44,11 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  // State for dashboard menu toggle (desktop)
+  const [isDashboardMenuOpen, setIsDashboardMenuOpen] = useState(false);
+  // State for mobile dashboard menu toggle
+  const [isMobileDashboardOpen, setIsMobileDashboardOpen] = useState(false);
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -91,7 +99,7 @@ export default function Header() {
     setIsOpen(false);
   };
 
-  const getDashboardUrl = (role: string) => {
+  /*   const getDashboardUrl = (role: string) => {
     switch (role) {
       case "ADMIN":
         return "/dashboard/admin";
@@ -101,11 +109,70 @@ export default function Header() {
       default:
         return "/dashboard/user";
     }
-  };
+  }; */
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.push("/");
+  };
+
+  // Handle dashboard navigation based on user role
+  const handleDashboardClick = () => {
+    const userRole = session?.user?.role || "USER";
+
+    // If user role, go directly to user dashboard
+    if (userRole === "USER") {
+      router.push("/dashboard/user");
+      setIsDashboardMenuOpen(false);
+      return;
+    }
+
+    // For HOST and ADMIN, toggle the menu
+    setIsDashboardMenuOpen(!isDashboardMenuOpen);
+  };
+
+  // Handle mobile dashboard click
+  const handleMobileDashboardClick = () => {
+    const userRole = session?.user?.role || "USER";
+
+    // If user role, go directly to user dashboard
+    if (userRole === "USER") {
+      router.push("/dashboard/user");
+      setIsOpen(false);
+      return;
+    }
+
+    // For HOST and ADMIN, toggle the mobile menu
+    setIsMobileDashboardOpen(!isMobileDashboardOpen);
+  };
+
+  // Get dashboard menu items based on user role
+  const getDashboardMenuItems = () => {
+    const userRole = session?.user?.role || "USER";
+    const items = [];
+
+    if (userRole === "HOST" || userRole === "ADMIN") {
+      items.push({
+        label: "User Dashboard",
+        href: "/dashboard/user",
+        icon: User
+      });
+      items.push({
+        label: "Host Dashboard",
+        href: "/dashboard/host",
+        icon: Crown
+      });
+    }
+
+    if (userRole === "ADMIN") {
+      items.push({
+        label: "Admin Dashboard",
+        href: "/dashboard/admin",
+        icon: Shield
+      });
+    }
+
+    return items;
   };
 
   // Generate breadcrumb items based on current path
@@ -166,6 +233,12 @@ export default function Header() {
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 
+  // Check if user should see "Want to be Host" button
+  const shouldShowHostButton =
+    status === "authenticated" &&
+    session?.user?.role !== "HOST" &&
+    session?.user?.role !== "ADMIN";
+
   // If not home page, render transparent header with breadcrumbs
   if (!isHomePage) {
     return (
@@ -221,7 +294,10 @@ export default function Header() {
             {/* Menu Button - Right Side */}
             <div className="flex items-center">
               {status === "authenticated" ? (
-                <DropdownMenu>
+                <DropdownMenu
+                  open={isDashboardMenuOpen}
+                  onOpenChange={setIsDashboardMenuOpen}
+                >
                   <DropdownMenuTrigger asChild>
                     <Button className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm">
                       <Menu className="h-4 w-4 mr-2" />
@@ -250,22 +326,65 @@ export default function Header() {
                     </div>
 
                     <DropdownMenuGroup className="p-2">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          router.push(
-                            getDashboardUrl(session?.user?.role || "USER")
-                          )
-                        }
-                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900">
-                          Dashboard
-                        </span>
-                        <DropdownMenuShortcut className="text-gray-400">
-                          ⌘D
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
+                      {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
+                      <div className="relative">
+                        <DropdownMenuItem
+                          onClick={handleDashboardClick}
+                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                          aria-expanded={
+                            isDashboardMenuOpen &&
+                            (session?.user?.role === "HOST" ||
+                              session?.user?.role === "ADMIN")
+                          }
+                          aria-haspopup={session?.user?.role !== "USER"}
+                        >
+                          <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900 flex-1">
+                            Dashboard
+                          </span>
+                          {/* Show toggle icon for HOST/ADMIN roles */}
+                          {(session?.user?.role === "HOST" ||
+                            session?.user?.role === "ADMIN") && (
+                            <>
+                              {isDashboardMenuOpen ? (
+                                <ChevronUp className="h-4 w-4 text-gray-400" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-gray-400" />
+                              )}
+                            </>
+                          )}
+                          {/* Show shortcut only for USER role */}
+                          {session?.user?.role === "USER" && (
+                            <DropdownMenuShortcut className="text-gray-400">
+                              ⌘D
+                            </DropdownMenuShortcut>
+                          )}
+                        </DropdownMenuItem>
+
+                        {/* Nested Dashboard Options */}
+                        {isDashboardMenuOpen &&
+                          (session?.user?.role === "HOST" ||
+                            session?.user?.role === "ADMIN") && (
+                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                              {getDashboardMenuItems().map((item) => (
+                                <DropdownMenuItem
+                                  key={item.href}
+                                  onClick={() => {
+                                    router.push(item.href);
+                                    setIsDashboardMenuOpen(false);
+                                  }}
+                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                                >
+                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                  <span className="font-medium text-gray-800">
+                                    {item.label}
+                                  </span>
+                                </DropdownMenuItem>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+
                       <DropdownMenuItem
                         onClick={() => router.push("/trips")}
                         className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
@@ -278,6 +397,20 @@ export default function Header() {
                           ⌘T
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
+
+                      {/* Want to be Host button - conditionally shown */}
+                      {shouldShowHostButton && (
+                        <DropdownMenuItem
+                          onClick={() => router.push("/become-host")}
+                          className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
+                          <span className="font-medium text-gray-900 group-hover:text-amber-600">
+                            Want to be Host
+                          </span>
+                        </DropdownMenuItem>
+                      )}
+
                       <DropdownMenuItem
                         onClick={() => router.push("/profile/settings")}
                         className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
@@ -367,7 +500,10 @@ export default function Header() {
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             ) : (
-              <DropdownMenu>
+              <DropdownMenu
+                open={isDashboardMenuOpen}
+                onOpenChange={setIsDashboardMenuOpen}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/[0.55] hover:bg-gray-50 text-gray-900 border-gray-200 shadow-md ">
                     <Menu className="h-4 w-4 mr-2" />
@@ -396,22 +532,65 @@ export default function Header() {
                   </div>
 
                   <DropdownMenuGroup className="p-2">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        router.push(
-                          getDashboardUrl(session?.user?.role || "USER")
-                        )
-                      }
-                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900">
-                        Dashboard
-                      </span>
-                      <DropdownMenuShortcut className="text-gray-400">
-                        ⌘D
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
+                    <div className="relative">
+                      <DropdownMenuItem
+                        onClick={handleDashboardClick}
+                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                        aria-expanded={
+                          isDashboardMenuOpen &&
+                          (session?.user?.role === "HOST" ||
+                            session?.user?.role === "ADMIN")
+                        }
+                        aria-haspopup={session?.user?.role !== "USER"}
+                      >
+                        <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900 flex-1">
+                          Dashboard
+                        </span>
+                        {/* Show toggle icon for HOST/ADMIN roles */}
+                        {(session?.user?.role === "HOST" ||
+                          session?.user?.role === "ADMIN") && (
+                          <>
+                            {isDashboardMenuOpen ? (
+                              <ChevronUp className="h-4 w-4 text-gray-400" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-gray-400" />
+                            )}
+                          </>
+                        )}
+                        {/* Show shortcut only for USER role */}
+                        {session?.user?.role === "USER" && (
+                          <DropdownMenuShortcut className="text-gray-400">
+                            ⌘D
+                          </DropdownMenuShortcut>
+                        )}
+                      </DropdownMenuItem>
+
+                      {/* Nested Dashboard Options */}
+                      {isDashboardMenuOpen &&
+                        (session?.user?.role === "HOST" ||
+                          session?.user?.role === "ADMIN") && (
+                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                            {getDashboardMenuItems().map((item) => (
+                              <DropdownMenuItem
+                                key={item.href}
+                                onClick={() => {
+                                  router.push(item.href);
+                                  setIsDashboardMenuOpen(false);
+                                }}
+                                className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                              >
+                                <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                <span className="font-medium text-gray-800">
+                                  {item.label}
+                                </span>
+                              </DropdownMenuItem>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+
                     <DropdownMenuItem
                       onClick={() => router.push("/trips")}
                       className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
@@ -424,6 +603,20 @@ export default function Header() {
                         ⌘T
                       </DropdownMenuShortcut>
                     </DropdownMenuItem>
+
+                    {/* Want to be Host button - conditionally shown */}
+                    {shouldShowHostButton && (
+                      <DropdownMenuItem
+                        onClick={() => router.push("/become-host")}
+                        className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
+                        <span className="font-medium text-gray-900 group-hover:text-amber-600">
+                          Want to be Host
+                        </span>
+                      </DropdownMenuItem>
+                    )}
+
                     <DropdownMenuItem
                       onClick={() => router.push("/profile/settings")}
                       className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
@@ -498,9 +691,9 @@ export default function Header() {
                   variant="ghost"
                   size="icon"
                   className="transition-all duration-300 hover:scale-110 text-gray-900 hover:bg-gray-100 border-gray-200 border"
+                  aria-label="Open mobile menu"
                 >
                   <Menu className="h-5 w-5" />
-                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent
@@ -508,34 +701,16 @@ export default function Header() {
                 className="w-full h-full bg-gradient-to-br from-white via-purple-50/30 to-blue-50/30 backdrop-blur-xl border-none p-0"
               >
                 <div className="flex flex-col h-full">
-                  {/* Mobile Header */}
-                  <div className="flex items-center justify-between p-6 border-b border-gray-200/60 bg-white/60 backdrop-blur-sm">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <Mountain className="h-5 w-5 text-white" />
-                      </div>
-                      <span className="text-xl font-bold text-gray-900 tracking-tight">
-                        UNPLan
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsOpen(false)}
-                      className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 hover:scale-110"
-                    >
-                      <X className="h-5 w-5" />
-                      <span className="sr-only">Close menu</span>
-                    </Button>
-                  </div>
+                  {/* Mobile Header - Fixed close button issue */}
 
                   {/* Mobile Navigation */}
-                  <nav className="flex-1 flex flex-col justify-center px-6 py-8 space-y-2">
+                  <nav className="flex-1 flex flex-col justify-start px-6 py-8 space-y-2 overflow-y-auto">
+                    {/* Navigation Items */}
                     {navigationItems.map((item, index) => (
                       <button
                         key={item.name}
                         onClick={() => handleNavClick(item)}
-                        className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        className="group relative  p-4 rounded-2xl  hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         style={{
                           animationDelay: `${index * 100}ms`,
                           animation: isOpen
@@ -547,37 +722,127 @@ export default function Header() {
                           {item.name}
                           <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                         </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                       </button>
                     ))}
 
-                    {/* User Menu Items */}
+                    {/* Authenticated User Menu Items */}
                     {status === "authenticated" && (
                       <>
-                        <div className="border-t border-gray-200/60 my-6"></div>
+                        <div className="border-t overflow-auto border-gray-200/60 my-6"></div>
+
+                        {/* Mobile Dashboard Menu - Toggleable */}
+                        <div className="space-y-2">
+                          <button
+                            onClick={handleMobileDashboardClick}
+                            className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg w-full"
+                            aria-expanded={
+                              isMobileDashboardOpen &&
+                              (session?.user?.role === "HOST" ||
+                                session?.user?.role === "ADMIN")
+                            }
+                            aria-haspopup={session?.user?.role !== "USER"}
+                          >
+                            <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                              <div className="flex items-center">
+                                <UserCog className="mr-3 h-5 w-5 text-purple-600" />
+                                Dashboard
+                              </div>
+                              {/* Show toggle icon for HOST/ADMIN, navigation arrow for USER */}
+                              {session?.user?.role === "USER" ? (
+                                <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                              ) : (
+                                <>
+                                  {isMobileDashboardOpen ? (
+                                    <ChevronUp className="h-5 w-5 text-purple-600 transition-transform duration-300" />
+                                  ) : (
+                                    <ChevronDown className="h-5 w-5 text-purple-600 transition-transform duration-300" />
+                                  )}
+                                </>
+                              )}
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                          </button>
+
+                          {/* Mobile Nested Dashboard Options */}
+                          {isMobileDashboardOpen &&
+                            (session?.user?.role === "HOST" ||
+                              session?.user?.role === "ADMIN") && (
+                              <div className="ml-4 space-y-2 border-l-2 border-purple-200 pl-4">
+                                {getDashboardMenuItems().map((item, index) => (
+                                  <button
+                                    key={item.href}
+                                    onClick={() => {
+                                      router.push(item.href);
+                                      setIsOpen(false);
+                                      setIsMobileDashboardOpen(false);
+                                    }}
+                                    className="group relative overflow-hidden p-3 rounded-xl transition-all duration-300 hover:scale-105 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-gray-200/40 hover:border-purple-300/40 hover:shadow-md w-full"
+                                    style={{
+                                      animationDelay: `${(index + 1) * 100}ms`,
+                                      animation: isMobileDashboardOpen
+                                        ? "slideInRight 0.4s ease-out forwards"
+                                        : "none"
+                                    }}
+                                  >
+                                    <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
+                                      <div className="flex items-center">
+                                        <item.icon className="mr-3 h-4 w-4 text-purple-600" />
+                                        {item.label}
+                                      </div>
+                                      <ChevronRight className="h-4 w-4 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                                    </span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 to-blue-600/5 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-xl"></div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                        </div>
+
+                        {/* My Trips */}
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push(
-                              getDashboardUrl(session?.user?.role || "USER")
-                            );
+                            router.push("/trips");
                           }}
-                          className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                          className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
-                              <User className="mr-3 h-5 w-5 text-purple-600" />
-                              Dashboard
+                              <Calendar className="mr-3 h-5 w-5 text-purple-600" />
+                              My Trips
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
+
+                        {/* Want to be Host - conditionally shown */}
+                        {shouldShowHostButton && (
+                          <button
+                            onClick={() => {
+                              setIsOpen(false);
+                              router.push("/become-host");
+                            }}
+                            className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-amber-300/60 hover:shadow-lg"
+                          >
+                            <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                              <div className="flex items-center">
+                                <Crown className="mr-3 h-5 w-5 text-amber-600" />
+                                Want to be Host
+                              </div>
+                              <ChevronRight className="h-5 w-5 text-amber-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-orange-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                          </button>
+                        )}
+
+                        {/* Settings */}
                         <button
                           onClick={() => {
                             setIsOpen(false);
                             router.push("/profile/settings");
                           }}
-                          className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                          className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
@@ -586,6 +851,7 @@ export default function Header() {
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
                       </>
                     )}
@@ -599,7 +865,7 @@ export default function Header() {
                           setIsOpen(false);
                           router.push("/auth/signin");
                         }}
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                        className="w-full bg-purple-600  hover:bg-purple-700  text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
                       >
                         <Sparkles className="mr-2 h-5 w-5" />
                         Sign In to Continue
@@ -610,20 +876,22 @@ export default function Header() {
                           setIsOpen(false);
                           handleSignOut();
                         }}
-                        className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-semibold py-4 rounded-2xl transition-all duration-300 hover:scale-105"
+                        className="w-full bg-red-50 py-6 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
                       >
                         <LogOut className="mr-2 h-5 w-5" />
                         Sign Out
                       </Button>
                     )}
-                    <Link
-                      href="/trips"
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center block"
-                      onClick={() => setIsOpen(false)}
+                    <Button
+                      className="w-full bg-purple-600  hover:bg-purple-700 flex justify-center items-center text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center "
+                      onClick={() => {
+                        setIsOpen(false);
+                        router.push("/trips");
+                      }}
                     >
                       <Calendar className="inline mr-2 h-5 w-5" />
                       Plan Your Trip
-                    </Link>
+                    </Button>
                   </div>
                 </div>
               </SheetContent>
