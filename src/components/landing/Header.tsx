@@ -173,28 +173,30 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-18">
             {/* Breadcrumb Navigation - Left Side */}
-            <div className="flex-1 flex justify-start max-w-2xl">
+            <div className="flex-1 flex justify-start min-w-0 max-w-full overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2 sm:pr-0">
               <Breadcrumb>
                 <BreadcrumbList
-                  className={`flex items-center ${textColorClass}`}
+                  className={`flex items-center gap-1 sm:gap-2 ${textColorClass} min-w-fit`}
                 >
                   {breadcrumbs.map((crumb, index) => (
-                    <div key={crumb.href} className="flex items-center">
+                    <div key={crumb.href} className="flex items-center min-w-0">
                       <BreadcrumbItem>
                         {crumb.isActive ? (
                           <BreadcrumbPage
-                            className={`font-semibold transition-colors duration-300 ${textColorClass}`}
+                            className={`font-semibold truncate transition-colors duration-300 ${textColorClass}`}
+                            style={{ maxWidth: 120 }}
                           >
                             {crumb.label}
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink
                             href={crumb.href}
-                            className={`font-medium transition-all duration-300 hover:scale-105 ${textColorClass} ${
+                            className={`font-medium truncate transition-all duration-300 hover:scale-105 ${textColorClass} ${
                               isBlackText
                                 ? "hover:text-black"
                                 : "hover:text-white"
                             }`}
+                            style={{ maxWidth: 120 }}
                           >
                             <span className="flex items-center">
                               {index === 0 && <Home className="h-4 w-4 mr-2" />}
@@ -205,7 +207,7 @@ export default function Header() {
                       </BreadcrumbItem>
                       {index < breadcrumbs.length - 1 && (
                         <BreadcrumbSeparator
-                          className={`mx-3 text-black/50 transition-colors duration-300 ${textColorClass}`}
+                          className={`mx-2 text-black/50 transition-colors duration-300 ${textColorClass}`}
                         >
                           <ChevronRight className="h-4 w-4" />
                         </BreadcrumbSeparator>
@@ -341,12 +343,12 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+          <nav className="hidden lg:flex items-center gap-x-2 xl:gap-x-4">
             {navigationItems.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item)}
-                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-300"
               >
                 {item.name}
                 <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>

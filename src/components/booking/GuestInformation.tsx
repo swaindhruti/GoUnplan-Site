@@ -656,11 +656,11 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      <div className="flex justify-between pt-8 border-t border-purple-100">
+      <div className="flex flex-col sm:flex-row justify-between pt-8 border-t border-purple-100 gap-4">
         <Button
           onClick={onBack}
           disabled={isSubmitting}
-          className="bg-white border border-purple-100 text-purple-700 hover:bg-purple-50 font-semibold text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
+          className="bg-white border border-purple-100 text-purple-700 hover:bg-purple-50 font-semibold text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3 w-full sm:w-auto"
         >
           <ArrowLeft className="w-6 h-6" />
           Back to Dates
@@ -668,7 +668,7 @@ export function GuestInformationForm({
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3"
+          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3 w-full sm:w-auto"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
           <ArrowRight className="w-6 h-6" />

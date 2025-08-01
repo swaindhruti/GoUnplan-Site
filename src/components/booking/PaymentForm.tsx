@@ -151,12 +151,12 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-8 md:py-12 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Trip Summary Card */}
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl overflow-hidden">
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl md:rounded-3xl shadow-xl p-4 sm:p-6 md:p-8">
               {/* Trip Header */}
               <div className="bg-gradient-to-r from-purple-50 to-purple-100 border-b border-purple-200 p-8">
                 <div className="flex items-center gap-6 mb-6">
@@ -283,7 +283,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
                            hover:bg-slate-50 hover:border-slate-400
                            transition-all duration-300 shadow-lg hover:shadow-xl
                            disabled:opacity-50 disabled:cursor-not-allowed
-                           flex items-center justify-center gap-3 font-montserrat"
+                           flex-1 flex items-center justify-center gap-3 font-montserrat"
                 >
                   <ArrowLeft className="w-6 h-6" />
                   Back to Booking
@@ -465,7 +465,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
       {/* Payment Confirmation Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 relative">
             {/* Close Button */}
             <button
               onClick={handleCloseModal}

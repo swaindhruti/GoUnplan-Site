@@ -231,27 +231,26 @@ export function BookingPage({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       {/* Hero Section */}
       <section
-        className="relative py-24 overflow-hidden bg-cover bg-center bg-no-repeat"
+        className="relative py-16 sm:py-20 md:py-24 overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778285/1432000_1_byxulb.jpg')`
         }}
       >
-        {/* Gradient overlay for better readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/70" />
-        <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <BackButton isWhite={true} route="/trips" />
-          <div className="text-center mt-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
+          <div className="text-center mt-6 sm:mt-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 drop-shadow-2xl font-bricolage">
               Book Your Adventure
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8 font-roboto">
+            <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-4 sm:mb-8 font-roboto">
               {tripData.title} - {tripData.destination}
             </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4 sm:mt-8">
               {heroTags.map((tag, i) => (
                 <span
                   key={i}
-                  className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-semibold text-base font-roboto shadow-lg"
+                  className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-white font-semibold text-sm sm:text-base font-roboto shadow-lg"
                 >
                   {tag}
                 </span>
@@ -262,12 +261,12 @@ export function BookingPage({
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-8 md:py-12 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Main Booking Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             <div
-              className={`bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-10 transition-all duration-500 ${
+              className={`bg-white/90 backdrop-blur-sm border border-slate-200/60 rounded-2xl md:rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 lg:p-10 transition-all duration-500 ${
                 isTransitioning
                   ? "opacity-50 scale-95"
                   : "opacity-100 scale-100"
@@ -327,7 +326,7 @@ export function BookingPage({
                     <Button
                       onClick={handleContinue}
                       disabled={isTransitioning}
-                      className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-4 text-lg rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-montserrat"
+                      className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-montserrat"
                     >
                       Continue to Guest Details
                     </Button>
@@ -343,9 +342,8 @@ export function BookingPage({
               )}
             </div>
           </div>
-
           {/* Sidebar */}
-          <div className="flex flex-col space-y-8">
+          <div className="flex flex-col space-y-6 order-1 lg:order-2">
             {/* Trip Card */}
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
               <div className="flex items-center gap-4 mb-6">
