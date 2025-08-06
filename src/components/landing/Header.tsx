@@ -32,7 +32,8 @@ import {
   Sparkles,
   Crown,
   Shield,
-  UserCog
+  UserCog,
+  FileText
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -423,6 +424,40 @@ export default function Header() {
                           ⌘S
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={() =>
+                          window.open("/terms-and-conditions.pdf", "_blank")
+                        }
+                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                          Terms and Conditions
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          window.open("/privacy-policy.pdf", "_blank")
+                        }
+                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                          Privacy Policy
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          window.open("/cancellation-policy.pdf", "_blank")
+                        }
+                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                      >
+                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                          Cancellation Policy
+                        </span>
+                      </DropdownMenuItem>
                     </DropdownMenuGroup>
 
                     <div className="border-t border-gray-100 p-2">
@@ -628,6 +663,40 @@ export default function Header() {
                       <DropdownMenuShortcut className="text-gray-400">
                         ⌘S
                       </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={() =>
+                        window.open("/terms-and-conditions.pdf", "_blank")
+                      }
+                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        Terms and Conditions
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        window.open("/privacy-policy.pdf", "_blank")
+                      }
+                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        Privacy Policy
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        window.open("/cancellation-policy.pdf", "_blank")
+                      }
+                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                    >
+                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        Cancellation Policy
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
 
