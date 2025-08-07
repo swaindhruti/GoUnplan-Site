@@ -1,97 +1,72 @@
-import { Plane, Mountain, Armchair } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Search, Calendar, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export const WhyUsSection = () => {
   return (
-    <div className="relative h-screen">
-      {/* Background Image Section */}
-      <div className="h-full">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg)`
-          }}
-        >
-          <div className="absolute inset-0 bg-black/30" />
+    <div className="relative min-h-screen flex items-stretch bg-gradient-to-l from-purple-100 via-purple-200 to-purple-300">
+      <div className="grid grid-cols-1 lg:grid-cols-2 w-full h-screen">
+        {/* Left: Image with overlay */}
+        <div className="relative hidden lg:block">
+          <Image
+            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841633/derek-thomson-TWoL-QCZubY-unsplash_2_lpbmix.jpg"
+            alt="Why us background"
+            fill
+            className="object-cover object-center"
+            priority
+          />
         </div>
-
-        {/* Content */}
-        <div className="relative z-10 h-full flex items-center justify-center">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-28 items-center max-w-6xl mx-auto">
-              {/* Left Content Card */}
-              <Card className="p-4 sm:p-6 lg:p-12 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl order-2 lg:order-1 max-w-lg mx-auto lg:mx-0">
-                <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-                  {/* Customized Packages */}
-                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
-                        <Plane className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
-                      </div>
-                      <h3 className="text-base font-bricolage sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
-                        Customized Packages
-                      </h3>
-                    </div>
-                    <p className="text-xs sm:text-sm lg:text-base font-instrument text-white/90 leading-relaxed font-normal drop-shadow-md">
-                      Tailor-made itineraries to suit your preferences and
-                      interests, ensuring a unique travel experience every time.
-                    </p>
-                  </div>
-
-                  {/* Divider Line */}
-                  <div className="border-t border-white/30"></div>
-
-                  {/* Adventure Tours */}
-                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
-                        <Mountain className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
-                      </div>
-                      <h3 className="text-base font-bricolage sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
-                        Adventure Tours
-                      </h3>
-                    </div>
-                    <p className="text-xs sm:text-sm lg:text-base font-instrument text-white/90 leading-relaxed font-normal drop-shadow-md">
-                      Explore thrilling destinations and activities, from
-                      mountain trekking to scuba diving, for the adrenaline
-                      seekers.
-                    </p>
-                  </div>
-
-                  {/* Divider Line */}
-                  <div className="border-t border-white/30"></div>
-
-                  {/* Luxury Vacations */}
-                  <div className="space-y-2 sm:space-y-3 lg:space-y-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-white/30">
-                        <Armchair className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
-                      </div>
-                      <h3 className="text-base font-bricolage sm:text-lg lg:text-xl font-bold text-white drop-shadow-lg">
-                        Luxury Vacations
-                      </h3>
-                    </div>
-                    <p className="text-xs sm:text-sm lg:text-base font-instrument text-white/90 leading-relaxed font-normal drop-shadow-md">
-                      Indulge in opulent accommodations and exclusive
-                      experiences, designed for those seeking a lavish escape.
-                    </p>
-                  </div>
+        {/* Right: Solid color with text */}
+        <div className="flex items-center justify-center bg-purple-500 px-6 py-16 lg:py-0">
+          <div className="max-w-lg w-full text-center lg:text-left">
+            <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white/30 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm font-bold mb-6 border border-white/40 drop-shadow-lg">
+              WHY US
+            </span>
+            <h1 className="text-2xl font-bricolage sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-medium text-white leading-tight tracking-tight drop-shadow-2xl mb-8">
+              Crafting Unforgettable
+              <br />
+              Journeys
+            </h1>
+            <div className="space-y-8">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
+                  <Search className="w-5 h-5 text-white" />
                 </div>
-              </Card>
-
-              {/* Right Content */}
-              <div className="text-center lg:text-left order-1 lg:order-2 px-4">
                 <div>
-                  <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white/30 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-white/40 drop-shadow-lg">
-                    WHY US
-                  </span>
-                  <h1 className="text-2xl font-bricolage sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white leading-tight tracking-tight drop-shadow-2xl">
-                    Crafting
-                    <br />
-                    Unforgettable
-                    <br />
-                    Journeys
-                  </h1>
+                  <h3 className="text-lg font-bricolage font-normal text-white mb-1">
+                    Customized Packages
+                  </h3>
+                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
+                    Tailor-made itineraries to suit your preferences and
+                    interests, ensuring a unique travel experience every time.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bricolage font-normal text-white mb-1">
+                    Adventure Tours
+                  </h3>
+                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
+                    Explore thrilling destinations and activities, from mountain
+                    trekking to scuba diving, for the adrenaline seekers.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
+                  <MapPin className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bricolage font-normal text-white mb-1">
+                    Luxury Vacations
+                  </h3>
+                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
+                    Indulge in opulent accommodations and exclusive experiences,
+                    designed for those seeking a lavish escape.
+                  </p>
                 </div>
               </div>
             </div>
