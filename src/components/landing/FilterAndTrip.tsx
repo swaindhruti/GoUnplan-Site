@@ -42,7 +42,7 @@ export const FilterAndTrip = () => {
   const router = useRouter();
 
   const fieldClass =
-    "h-12 w-full bg-white/90 border border-white/30 text-gray-800 placeholder:font-instrument placeholder:text-gray-500 rounded-lg px-4 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium";
+    "h-9 w-full bg-white/90 border border-white/30 text-gray-800 placeholder:font-instrument placeholder:text-gray-500 rounded-md px-3 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 transition-all duration-200 shadow-sm hover:shadow-md text-xs font-medium";
 
   const formFields = [
     {
@@ -113,7 +113,7 @@ export const FilterAndTrip = () => {
   return (
     <div
       id="filtertrip"
-      className="min-h-screen relative flex items-center justify-center px-4 sm:px-6"
+      className="min-h-screen relative flex items-center justify-center px-2 sm:px-4"
     >
       <div className="absolute inset-0">
         <Image
@@ -126,10 +126,10 @@ export const FilterAndTrip = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-800/50 to-slate-900/70" />
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto py-8 sm:py-12">
+      <div className="relative z-10 w-full max-w-3xl mx-auto py-6 sm:py-10">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{
@@ -139,14 +139,14 @@ export const FilterAndTrip = () => {
               }}
               className="hidden sm:block"
             >
-              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
             </motion.div>
 
             <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bricolage font-semibold text-white tracking-wide leading-tight">
-                Find Your Perfect
-                <span className="block text-purple-400 mt-1 sm:mt-2">
-                  Journey
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bricolage font-semibold text-white tracking-wide leading-tight lowercase">
+                find your perfect
+                <span className="block text-purple-400 mt-1 sm:mt-2 lowercase">
+                  journey
                 </span>
               </h1>
             </div>
@@ -161,26 +161,26 @@ export const FilterAndTrip = () => {
               }}
               className="hidden sm:block"
             >
-              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
             </motion.div>
           </div>
 
-          <p className="text-base sm:text-lg text-white font-instrument max-w-2xl mx-auto font-normal leading-relaxed px-4">
+          <p className="text-sm sm:text-base text-white font-instrument max-w-2xl mx-auto font-normal leading-relaxed px-2">
             Discover extraordinary destinations and create unforgettable
             memories
           </p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl mx-2 sm:mx-0">
-          <form onSubmit={handleSearch} className="space-y-6 sm:space-y-8">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-3 sm:p-4 lg:p-6 shadow-2xl mx-1 sm:mx-0">
+          <form onSubmit={handleSearch} className="space-y-4 sm:space-y-6">
             {/* Mobile: Stack vertically, Desktop: Grid layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {formFields.map((field) => {
                 const label = (
                   <Label
                     key={`${field.id}-label`}
-                    className="text-white/90 font-medium text-sm flex items-center gap-2 mb-2"
+                    className="text-white/90 font-medium text-xs flex items-center gap-2 mb-2 font-instrument"
                   >
                     {field.icon}
                     {field.label}
@@ -190,36 +190,41 @@ export const FilterAndTrip = () => {
                 switch (field.type) {
                   case "input":
                     return (
-                      <div key={field.id} className="space-y-2 font-bricolage">
+                      <div
+                        key={field.id}
+                        className="space-y-2 font-bricolage font-instrument"
+                      >
                         {label}
                         <div className="relative">
                           <Input
                             placeholder={field.placeholder}
                             value={destination}
                             onChange={(e) => setDestination(e.target.value)}
-                            className={fieldClass}
+                            className={fieldClass + " font-instrument"}
                           />
-                          <Search className="absolute right-3 top-3 w-4 h-4 text-gray-500" />
+                          <Search className="absolute right-2 top-2 w-4 h-4 text-gray-500" />
                         </div>
                       </div>
                     );
 
                   case "date":
-                    const isStart = field.id === "startDate";
-                    console.log("isStart", isStart);
+                    /*  const isStart = field.id === "startDate"; */
                     const date = startDate;
                     const setDate = setStartDate;
                     const open = isStartDateOpen;
                     const setOpen = setIsStartDateOpen;
 
                     return (
-                      <div key={field.id} className="space-y-2 font-bricolage">
+                      <div
+                        key={field.id}
+                        className="space-y-2 font-bricolage font-instrument"
+                      >
                         {label}
                         <Popover open={open} onOpenChange={setOpen}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className={`${fieldClass} justify-start`}
+                              className={`${fieldClass} justify-start font-instrument`}
                             >
                               <span className="truncate">
                                 {date ? format(date, "MMM dd") : "Select date"}
@@ -262,11 +267,13 @@ export const FilterAndTrip = () => {
                     return (
                       <div
                         key={field.id}
-                        className="space-y-2 z-50 font-bricolage"
+                        className="space-y-2 z-50 font-bricolage font-instrument"
                       >
                         {label}
                         <Select value={value} onValueChange={setValue}>
-                          <SelectTrigger className={fieldClass}>
+                          <SelectTrigger
+                            className={fieldClass + " font-instrument"}
+                          >
                             <SelectValue placeholder={field.placeholder} />
                           </SelectTrigger>
                           <SelectContent className="bg-white z-59 rounded-xl shadow-xl border-0 max-h-60 overflow-y-auto ">
@@ -275,7 +282,7 @@ export const FilterAndTrip = () => {
                                 <SelectItem
                                   key={option.value}
                                   value={option.value}
-                                  className="cursor-pointer"
+                                  className="cursor-pointer font-instrument"
                                 >
                                   {option.label}
                                 </SelectItem>
@@ -291,15 +298,15 @@ export const FilterAndTrip = () => {
               })}
             </div>
 
-            <div className="flex justify-center pt-2 sm:pt-4">
+            <div className="flex justify-center pt-1 sm:pt-2">
               <div className="w-full flex justify-center sm:w-auto">
-                <PrimaryButton label="Search Trips" type="submit" />
+                <PrimaryButton label="search trips" type="submit" />
               </div>
             </div>
           </form>
 
-          <div className="text-center mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/20">
-            <p className="text-white/80 text-sm font-instrument px-2">
+          <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
+            <p className="text-white/80 text-xs font-instrument px-2">
               Need inspiration?{" "}
               <button className="text-purple-300 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
                 Browse by vibe

@@ -11,6 +11,10 @@ import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/autoplay";
 
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
@@ -44,7 +48,7 @@ export const PrimaryButton = ({
 
   if (asContent) {
     return (
-      <div className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group">
+      <div className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-lg hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-1 group">
         {buttonContent}
       </div>
     );
@@ -53,7 +57,7 @@ export const PrimaryButton = ({
   return (
     <Button
       type={type}
-      className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-xl hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2 sm:gap-3 group"
+      className="bg-purple-600 font-poppins text-white px-6 py-4 sm:px-12 sm:py-6 rounded-[90px] font-instrument font-semibold text-base sm:text-lg md:text-lg hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-1 group"
     >
       {buttonContent}
     </Button>
@@ -182,33 +186,29 @@ export const Carousels = ({
           </h2>
         </div>
 
-        <Carousel
-          opts={{ align: "start", loop: true }}
-          className="w-full pb-20"
-        >
-          <CarouselContent className="-mx-6">
+        {type === "hosts" ? (
+          <Swiper
+            modules={[Autoplay]}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            loop
+            spaceBetween={32}
+            slidesPerView={1}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 4 }
+            }}
+            className="w-full pb-20"
+          >
             {data.map((item) => (
-              <CarouselItem
-                key={item.id}
-                className={`px-6 basis-full sm:basis-1/2 ${
-                  type === "hosts" ? "lg:basis-1/4" : "lg:basis-1/3"
-                }`}
-              >
+              <SwiperSlide key={item.id}>
                 <div className="flex flex-col items-center">
-                  <Card
-                    className={`rounded-[90px] ${
-                      type === "destinations"
-                        ? "h-[50vh] w-full"
-                        : "h-[40vh] w-full"
-                    } relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer`}
-                  >
+                  <Card className="rounded-[90px] h-[40vh] w-full relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer">
                     <Image
                       src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
-                      alt={type === "destinations" ? "Destination" : "Host"}
+                      alt="Host"
                       fill
                       className="object-cover rounded-[90px] transition-transform duration-300 group-hover:scale-105"
                     />
-
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-[90px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
                       <div className="text-white text-center">
                         <p className="text-sm md:text-base leading-relaxed">
@@ -217,46 +217,67 @@ export const Carousels = ({
                       </div>
                     </div>
                   </Card>
-
-                  <div
-                    className={`${
-                      type === "destinations"
-                        ? "-mt-[100px] size-40"
-                        : "-mt-[60px] size-30"
-                    } z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center`}
-                  >
-                    {type === "destinations" ? (
-                      <>
-                        <div className="flex items-center justify-center mt-2">
-                          <Image
-                            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752009257/Group_1_gbuwbu.svg"
-                            alt="Rating Stars"
-                            width={40}
-                            height={20}
-                          />
-                        </div>
-                        <SectionLabel label={(item as Destination).country} />
-                        <h3 className="text-lg 2xl:text-xl font-semibold text-black">
-                          {(item as Destination).name}
-                        </h3>
-                        <p className="text-gray-600 -mt-2 text-[14px] ">
-                          ${(item as Destination).price}
-                        </p>
-                      </>
-                    ) : (
-                      <h3 className="text-lg font-normal text-black">
-                        {(item as Host).name}
-                      </h3>
-                    )}
+                  <div className="-mt-[60px] size-30 z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center">
+                    <h3 className="text-lg font-normal text-black">
+                      {(item as Host).name}
+                    </h3>
                   </div>
                 </div>
-              </CarouselItem>
+              </SwiperSlide>
             ))}
-          </CarouselContent>
-
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
-        </Carousel>
+          </Swiper>
+        ) : (
+          <Carousel
+            opts={{ align: "start", loop: true }}
+            className="w-full pb-20"
+          >
+            <CarouselContent className="-mx-6">
+              {data.map((item) => (
+                <CarouselItem
+                  key={item.id}
+                  className="px-6 basis-full sm:basis-1/2 lg:basis-1/3"
+                >
+                  <div className="flex flex-col items-center">
+                    <Card className="rounded-[90px] h-[50vh] w-full relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer">
+                      <Image
+                        src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+                        alt="Destination"
+                        fill
+                        className="object-cover rounded-[90px] transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-[90px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
+                        <div className="text-white text-center">
+                          <p className="text-sm md:text-base leading-relaxed">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                    <div className="-mt-[100px] size-40 z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center">
+                      <div className="flex items-center justify-center mt-2">
+                        <Image
+                          src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752009257/Group_1_gbuwbu.svg"
+                          alt="Rating Stars"
+                          width={40}
+                          height={20}
+                        />
+                      </div>
+                      <SectionLabel label={(item as Destination).country} />
+                      <h3 className="text-lg 2xl:text-xl font-semibold text-black">
+                        {(item as Destination).name}
+                      </h3>
+                      <p className="text-gray-600 -mt-2 text-[14px] ">
+                        ${(item as Destination).price}
+                      </p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        )}
       </div>
     </div>
   );
