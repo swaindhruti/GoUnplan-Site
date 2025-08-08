@@ -10,11 +10,12 @@ import {
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/autoplay";
+import Marquee from "react-fast-marquee";
 
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
@@ -175,57 +176,70 @@ export const Carousels = ({
       : (hosts as Host[]);
 
   return (
-    <div className="h-auto md:min-h-screen flex justify-center items-center px-4 py-10 md:px-10">
+    <div className="h-auto md:min-h-screen flex justify-center items-center px-6 md:px-20  py-10 ">
       <div className="w-full max-w-6xl">
         <div className="mb-4 flex justify-center">
           <SectionLabel label={SectionTitle} />
         </div>
         <div className="mb-4 md:mb-20 text-center flex justify-center">
-          <h2 className="text-xl font-bricolage sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
+          <h2 className="text-xl font-bricolage leading-[1.05] tracking-tighter   sm:text-2xl w-[70%] md:text-5xl font-semibold text-gray-700 text-center">
             {Description}
           </h2>
         </div>
 
         {type === "hosts" ? (
-          <Swiper
-            modules={[Autoplay]}
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
-            loop
-            spaceBetween={32}
-            slidesPerView={1}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 }
-            }}
-            className="w-full pb-20"
-          >
-            {data.map((item) => (
-              <SwiperSlide key={item.id}>
-                <div className="flex flex-col items-center">
-                  <Card className="rounded-[90px] h-[40vh] w-full relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer">
-                    <Image
-                      src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
-                      alt="Host"
-                      fill
-                      className="object-cover rounded-[90px] transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-[90px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
-                      <div className="text-white text-center">
-                        <p className="text-sm md:text-base leading-relaxed">
-                          {item.description}
-                        </p>
+          <div className="relative">
+            <Swiper
+              modules={[Autoplay, Navigation]}
+              autoplay={{ delay: 2000, disableOnInteraction: false }}
+              loop
+              spaceBetween={32}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 4 }
+              }}
+              navigation={{
+                nextEl: ".host-swiper-button-next",
+                prevEl: ".host-swiper-button-prev"
+              }}
+              className="w-full pb-20"
+            >
+              {data.map((item) => (
+                <SwiperSlide key={item.id}>
+                  <div className="flex flex-col items-center">
+                    <Card className="rounded-[90px] h-[40vh] w-full relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer">
+                      <Image
+                        src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+                        alt="Host"
+                        fill
+                        className="object-cover rounded-[90px] transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-[90px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
+                        <div className="text-white text-center">
+                          <p className="text-sm md:text-base leading-relaxed">
+                            {item.description}
+                          </p>
+                        </div>
                       </div>
+                    </Card>
+                    <div className="-mt-[60px] size-30 z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center">
+                      <h3 className="text-lg font-normal text-black">
+                        {(item as Host).name}
+                      </h3>
                     </div>
-                  </Card>
-                  <div className="-mt-[60px] size-30 z-30 rounded-full bg-purple-50 p-6 flex flex-col font-instrument items-center justify-center space-y-2 text-center">
-                    <h3 className="text-lg font-normal text-black">
-                      {(item as Host).name}
-                    </h3>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            <button className="host-swiper-button-prev absolute -left-16 top-1/2 z-50 -translate-y-1/2 bg-white rounded-full shadow p-2">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button className="host-swiper-button-next absolute -right-16 top-1/2 z-50 -translate-y-1/2 bg-white rounded-full shadow p-2">
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
         ) : (
           <Carousel
             opts={{ align: "start", loop: true }}
@@ -280,5 +294,60 @@ export const Carousels = ({
         )}
       </div>
     </div>
+  );
+};
+
+export const SectionJoinerMarquee = () => {
+  const marqueeContent = [
+    {
+      imageurl:
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611737/travel-luggage_cwevzh.png",
+      label: "Adventure approved"
+    },
+    {
+      imageurl:
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/travel_v9i3za.png",
+      label: "Memory enriched"
+    },
+    {
+      imageurl:
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/destination_e5puwk.png",
+      label: "Culture infused"
+    },
+    {
+      imageurl:
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/world_wj01uz.png",
+      label: "Stress-free travel"
+    },
+    {
+      imageurl:
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611796/landscape_t31pnd.png",
+      label: "Wanderlust certified"
+    }
+  ];
+
+  return (
+    <Marquee className="py-6 md:py-10" gradient={false} speed={50}>
+      {marqueeContent.map((item, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-3 md:gap-6 px-4 md:px-8"
+        >
+          <div className="relative w-10 h-10 md:w-16 md:h-16 flex-shrink-0">
+            <Image
+              src={item.imageurl}
+              alt={item.label}
+              fill
+              priority
+              className="rounded-full object-cover "
+              sizes="(max-width: 768px) 40px, 64px"
+            />
+          </div>
+          <p className="font-bricolage leading-[1.05] tracking-tighter  text-xl md:text-3xl font-semibold text-gray-800 whitespace-nowrap">
+            {item.label}
+          </p>
+        </div>
+      ))}
+    </Marquee>
   );
 };

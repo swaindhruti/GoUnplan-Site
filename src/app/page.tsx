@@ -10,6 +10,8 @@ import { HowItWorksSection } from "@/components/landing/HowItWorks";
 import ReviewSection from "@/components/landing/ReviewSection";
 import FAQSection from "@/components/landing/Faqs";
 import { TopHosts } from "@/components/landing/TopHosts";
+import { SectionJoinerMarquee } from "@/components/landing/common";
+import { Footer } from "@/components/landing/Footer";
 
 export default function Home() {
   return (
@@ -19,12 +21,14 @@ export default function Home() {
       <FindMyVibe />
       <TopDestinations />
       <WhyUsSection />
+      <SectionJoinerMarquee />
       <HowItWorksSection />
       <ReviewSection />
       <TopHosts />
       <AboutUs />
       <ReadyToStart />
       <FAQSection />
+      <Footer />
     </main>
   );
 }

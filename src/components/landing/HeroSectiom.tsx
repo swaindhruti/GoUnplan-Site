@@ -20,19 +20,17 @@ export const HeroSection = () => {
   const slides = [
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752778417/1192092_zgldao.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610583/pexels-esan-2085998_bcqaqq.jpg",
       text: (
         <>
           your journey&apos;s{" "}
-          <span className="highlight-wavy text-black md:text-white">
-            love language
-          </span>
+          <span className="highlight-wavy ">love language</span>
         </>
       )
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787155/1510615_zvcpjw.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610582/pexels-pixabay-163872_osxe5v.jpg",
       text: (
         <>
           <span className="highlight-circle">crafted</span> for explorers
@@ -41,7 +39,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752788073/pexels-cristian-s-575448225-18041997_fnpdvo.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610574/pexels-pixabay-262325_barmtl.jpg",
       text: (
         <>
           slow travel is the new{" "}
@@ -51,7 +49,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787550/pexels-faruktokluoglu-12823547_jui5dt.jpg",
+        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610586/sergey-pesterev-_VqyrvQi6do-unsplash_1_k2ygzi.jpg",
       text: (
         <>
           powered by stories,{" "}
@@ -97,7 +95,7 @@ export const HeroSection = () => {
   }, [hasScrolled]);
 
   return (
-    <div className="relative w-full h-screen min-h-[600px]">
+    <div className="relative w-full h-screen  min-h-[600px]">
       <Swiper
         modules={[Autoplay]}
         slidesPerView={1}
@@ -110,7 +108,7 @@ export const HeroSection = () => {
         speed={1000}
         effect="slide"
         centeredSlides
-        className="h-full w-full [&_.swiper-slide-active]:scale-100 [&_.swiper-slide]:transition-transform [&_.swiper-slide]:duration-1000"
+        className="h-full w-full [&_.swiper-slide-active]:scale-100 [&_.swiper-slide]:transition-transform [&_.swiper-slide]:duration-1000 px-6 md:px-20 "
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index} className="relative overflow-hidden">
@@ -123,7 +121,7 @@ export const HeroSection = () => {
               className="object-cover transition-transform duration-1000 ease-in-out"
             />
             <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center">
-              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-tight drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
+              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-[1.05] tracking-tighter drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
                 {slide.text}
               </h2>
             </div>

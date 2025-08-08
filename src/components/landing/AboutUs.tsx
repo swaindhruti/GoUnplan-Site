@@ -7,7 +7,7 @@ export default function AboutUs() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden bg-purple-100 min-h-screen flex flex-col items-center px-6 py-16"
+      className="relative overflow-hidden bg-purple-100 min-h-screen flex flex-col items-center px-6 md:px-20 py-16"
     >
       {/* Section Header */}
       <div className="w-full text-center mb-12">
@@ -29,7 +29,7 @@ export default function AboutUs() {
 
         {/* Right Side Text */}
         <div className="w-full lg:w-1/2 text-center lg:text-left">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage font-extrabold text-gray-800 leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage leading-[1.05] tracking-tighter font-extrabold text-gray-800">
             Your Journey, <span className="text-purple-600">Our Passion</span>
           </h2>
 
@@ -41,14 +41,14 @@ export default function AboutUs() {
             seeking romance, or a family in search of adventure, we’re here to
             craft journeys that resonate with your unique style.
             <br className="hidden sm:block" />
-            <span className="block mt-4">
+            {/*  <span className="block mt-4">
               From spontaneous weekend getaways to immersive cultural
               expeditions, we believe travel should go beyond checklists. Our
               team brings years of experience, insider access, and local
               knowledge to design every itinerary with care. We don’t just book
               trips — we design experiences that leave you with stories worth
               telling.
-            </span>
+            </span> */}
           </p>
 
           <div className="pt-8 max-md:flex max-md:justify-center">

@@ -431,8 +431,8 @@ export default function Header() {
                         }
                         className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                       >
-                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
-                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900 ">
                           Terms and Conditions
                         </span>
                       </DropdownMenuItem>
@@ -442,8 +442,8 @@ export default function Header() {
                         }
                         className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                       >
-                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
-                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900 ">
                           Privacy Policy
                         </span>
                       </DropdownMenuItem>
@@ -453,8 +453,8 @@ export default function Header() {
                         }
                         className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                       >
-                        <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
-                        <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                        <span className="font-medium text-gray-900 ">
                           Cancellation Policy
                         </span>
                       </DropdownMenuItem>
@@ -499,13 +499,16 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center group flex-shrink-0">
-            <div className="relative">
+            <div className="relative bg-white rounded-full shadow-lg">
               <Image
-                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1753997807/Screenshot_2025-08-01_030302_wghn3r.png"
-                alt="UNPLan Logo"
-                width={84}
-                height={84}
-                className="lg:h-[114px] lg:w-[114px] transition-all duration-300 scale-110 object-contain"
+                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
+                alt="GoUnplan Logo"
+                width={80}
+                height={80}
+                className="rounded-full object-cover
+        w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20
+        transition-all duration-300"
+                priority
               />
             </div>
           </Link>
@@ -671,8 +674,8 @@ export default function Header() {
                       }
                       className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                     >
-                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
-                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
+                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                      <span className="font-medium text-gray-900 ">
                         Terms and Conditions
                       </span>
                     </DropdownMenuItem>
@@ -682,7 +685,7 @@ export default function Header() {
                       }
                       className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                     >
-                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
                       <span className="font-medium text-gray-900 group-hover:text-blue-800">
                         Privacy Policy
                       </span>
@@ -693,7 +696,7 @@ export default function Header() {
                       }
                       className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
                     >
-                      <FileText className="mr-3 h-4 w-4 text-blue-600 group-hover:text-blue-800" />
+                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
                       <span className="font-medium text-gray-900 group-hover:text-blue-800">
                         Cancellation Policy
                       </span>

@@ -40,13 +40,13 @@ export const FindMyVibe = () => {
   return (
     <div
       id="vibes"
-      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-16"
+      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6   py-10 md:py-20 flex flex-col lg:flex-row items-center gap-16"
     >
       <div className="w-full lg:w-1/4 flex flex-col items-center gap-y-16">
         <div className="space-y-4 max-w-md text-center lg:text-left">
           <SectionLabel label="Choose Your Vibe!" />
 
-          <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage font-bold text-gray-900 leading-tight">
+          <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-900 ">
             Popular
             <br />
             <span className="text-gray-800 ml-3">Vibes</span>
@@ -63,7 +63,7 @@ export const FindMyVibe = () => {
         </div>
         <div
           onClick={() => handleVibeClick("Adventure")}
-          className="w-full h-[270px] cursor-pointer sm:h-[320px] md:h-[370px] relative group"
+          className="w-full h-[190px] cursor-pointer sm:h-[240px] md:h-[290px] relative group"
         >
           <Image
             src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
@@ -72,7 +72,7 @@ export const FindMyVibe = () => {
             className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"
           />
           <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage font-semibold text-white mb-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
               Adventure
             </div>
             <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
@@ -86,7 +86,7 @@ export const FindMyVibe = () => {
           <div
             key={index}
             onClick={() => handleVibeClick(vibe.label)}
-            className="relative h-[220px] sm:h-[270px] md:h-[320px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
+            className="relative h-[140px] sm:h-[190px] md:h-[240px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
           >
             <Image
               src={vibe.src}
@@ -95,7 +95,7 @@ export const FindMyVibe = () => {
               className="object-cover"
             />
             <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage font-semibold text-white mb-2">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter  font-semibold text-white mb-2">
                 {vibe.label}
               </div>
               <div className="text-base sm:text-lg text-white/90 font-instrument text-center">

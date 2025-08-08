@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -48,20 +47,20 @@ export const FilterAndTrip = () => {
     {
       id: "destination",
       label: "Destination",
-      icon: <MapPin className="w-4 h-4 text-purple-300" />,
+      icon: <MapPin className="w-4 h-4 text-purple-600" />,
       type: "input",
       placeholder: "Where to?"
     },
     {
       id: "startDate",
       label: "Start Date",
-      icon: <Calendar className="w-4 h-4 text-purple-300" />,
+      icon: <Calendar className="w-4 h-4 text-purple-600" />,
       type: "date"
     },
     {
       id: "travelerType",
       label: "Who is Travelling?",
-      icon: <Users className="w-4 h-4 text-purple-300" />,
+      icon: <Users className="w-4 h-4 text-purple-600" />,
       type: "select",
       options: [
         { value: "Solo", label: "Solo" },
@@ -80,7 +79,7 @@ export const FilterAndTrip = () => {
     {
       id: "vibe",
       label: "Vibe",
-      icon: <Sparkles className="w-4 h-4 text-purple-300" />,
+      icon: <Sparkles className="w-4 h-4 text-purple-600" />,
       type: "select",
       options: [
         { value: "Culture", label: "Culture" },
@@ -113,9 +112,9 @@ export const FilterAndTrip = () => {
   return (
     <div
       id="filtertrip"
-      className="min-h-screen relative flex items-center justify-center px-2 sm:px-4"
+      className="min-h-screen relative flex items-center justify-center px-6 md:px-20 bg-purple-100"
     >
-      <div className="absolute inset-0">
+      {/*    <div className="absolute inset-0">
         <Image
           src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752787684/1534646_x5pzis.jpg"
           alt="Travel destination"
@@ -124,7 +123,7 @@ export const FilterAndTrip = () => {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-800/50 to-slate-900/70" />
-      </div>
+      </div> */}
 
       <div className="relative z-10 w-full max-w-3xl mx-auto py-6 sm:py-10">
         {/* Header */}
@@ -139,13 +138,13 @@ export const FilterAndTrip = () => {
               }}
               className="hidden sm:block"
             >
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-700" />
             </motion.div>
 
             <div className="text-center">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bricolage font-semibold text-white tracking-wide leading-tight lowercase">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bricolage  font-semibold text-black leading-[1.05] tracking-tighter lowercase">
                 find your perfect
-                <span className="block text-purple-400 mt-1 sm:mt-2 lowercase">
+                <span className="block text-purple-700 mt-1 sm:mt-2 lowercase">
                   journey
                 </span>
               </h1>
@@ -161,11 +160,11 @@ export const FilterAndTrip = () => {
               }}
               className="hidden sm:block"
             >
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-700" />
             </motion.div>
           </div>
 
-          <p className="text-sm sm:text-base text-white font-instrument max-w-2xl mx-auto font-normal leading-relaxed px-2">
+          <p className="text-sm sm:text-base text-black font-instrument max-w-xl mx-auto font-normal leading-relaxed px-2">
             Discover extraordinary destinations and create unforgettable
             memories
           </p>
@@ -180,7 +179,7 @@ export const FilterAndTrip = () => {
                 const label = (
                   <Label
                     key={`${field.id}-label`}
-                    className="text-white/90 font-medium text-xs flex items-center gap-2 mb-2 font-instrument"
+                    className="text-black/90 font-medium text-xs flex items-center gap-2 mb-2 font-instrument"
                   >
                     {field.icon}
                     {field.label}
@@ -306,7 +305,7 @@ export const FilterAndTrip = () => {
           </form>
 
           <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
-            <p className="text-white/80 text-xs font-instrument px-2">
+            <p className="text-black/80 text-xs font-instrument px-2">
               Need inspiration?{" "}
               <button className="text-purple-300 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
                 Browse by vibe
