@@ -117,7 +117,7 @@ export default function ReviewSection() {
                 </div>
               </div>
               <div className="text-center">
-                <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold font-bricolage text-gray-900 mb-1">
+                <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold font-bricolage leading-[1.05] tracking-tighter text-gray-900 mb-1">
                   {testimonial.name}
                 </h4>
                 <p className="text-sm sm:text-base text-purple-600 font-medium font-instrument">
@@ -132,14 +132,14 @@ export default function ReviewSection() {
   );
 
   return (
-    <section className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-10 py-10 md:py-20 flex flex-col items-center">
+    <section className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6 md:px-20  py-10 md:py-20 flex flex-col items-center">
       <div className="w-full max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
           <div className="flex justify-center mb-6 sm:mb-8">
             <SectionLabel label="Customer Testimonials" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage text-gray-900 mb-4 sm:mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage leading-[1.05] tracking-tighter text-gray-900 mb-4 sm:mb-6 ">
             What Our Travelers
             <span className="block text-gray-800">Say About Us</span>
           </h2>

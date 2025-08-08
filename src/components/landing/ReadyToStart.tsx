@@ -5,11 +5,10 @@ import { PrimaryButton } from "./common";
 
 export const ReadyToStart = () => {
   return (
-    <div className="relative bg-white py-12 sm:py-16 md:py-20 lg:py-28 xl:py-36 px-4 sm:px-6">
+    <div className="relative max-w-6xl bg-white py-12 sm:py-16 md:py-20 lg:py-28 xl:py-36 px-6 md:px-20 mx-auto text-center">
       <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-16 xl:gap-20 max-w-6xl mx-auto">
-        {/* Left Text Section */}
         <div className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage leading-tight sm:leading-snug lg:leading-tight mb-4 sm:mb-6 text-black">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bricolage leading-[1.05] tracking-tighter  sm:leading-snug lg:leading-tight mb-4 sm:mb-6 text-black">
             Get started
             <br />
             with us

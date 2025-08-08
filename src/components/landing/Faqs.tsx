@@ -62,7 +62,7 @@ export default function FAQSection() {
   return (
     <section
       id="faq"
-      className="relative overflow-hidden bg-purple-100 min-h-screen flex flex-col items-center px-6 py-16"
+      className="relative overflow-hidden bg-purple-100 min-h-screen flex flex-col items-center px-6 md:px-20  py-16"
     >
       {/* Section Header */}
       <div className="w-full text-center mb-12">
@@ -73,7 +73,7 @@ export default function FAQSection() {
       <div className="max-w-4xl w-full">
         {/* Title */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage font-extrabold text-gray-800 leading-tight mb-6">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage leading-[1.05] tracking-tighter font-extrabold text-gray-800  mb-6">
             Frequently Asked <span className="text-purple-600">Questions</span>
           </h2>
           <p className="text-base md:text-lg font-instrument text-gray-700 leading-relaxed max-w-2xl mx-auto">
@@ -104,7 +104,7 @@ export default function FAQSection() {
                       strokeWidth={2}
                     />
                   </div>
-                  <h3 className="text-lg font-bricolage md:text-xl font-semibold text-gray-900 leading-tight pr-4">
+                  <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter md:text-xl font-semibold text-gray-900 pr-4">
                     {faq.question}
                   </h3>
                 </div>
@@ -151,7 +151,7 @@ export default function FAQSection() {
           className="text-center mt-12"
         >
           <div className="bg-white border border-purple-100 rounded-2xl p-8 shadow-sm">
-            <h3 className="text-2xl font-bricolage font-bold text-gray-800 mb-4">
+            <h3 className="text-2xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-800 mb-4">
               Still have questions?
             </h3>
             <p className="text-base font-instrument text-gray-600 mb-6 max-w-md mx-auto">

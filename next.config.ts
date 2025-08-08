@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
       "images.unsplash.com",
       "avatar.iran.liara.run",
       "images.pexels.com",
-      "oq7nempxaa.ufs.sh"
+      "oq7nempxaa.ufs.sh",
+      "drive.google.com"
     ]
   }
 };
