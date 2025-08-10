@@ -378,7 +378,6 @@ export async function markMessagesAsRead(chatId: string, userId: string) {
   }
 }
 
-// Get unread message count for user
 export async function getUnreadCount(userId: string) {
   try {
     const unreadCount = await prisma.message.count({

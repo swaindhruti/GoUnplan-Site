@@ -58,7 +58,7 @@ export default function Header() {
 
   // Determine text color based on route
   const isBlackText = pathname === "/chat" || pathname === "/contactus";
-  const textColorClass = isBlackText ? "text-black" : "text-white";
+  const textColorClass = "text-white";
 
   const { data: session, status } = useSession();
 

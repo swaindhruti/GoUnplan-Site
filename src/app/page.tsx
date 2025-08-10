@@ -12,10 +12,12 @@ import FAQSection from "@/components/landing/Faqs";
 import { TopHosts } from "@/components/landing/TopHosts";
 import { SectionJoinerMarquee } from "@/components/landing/common";
 import { Footer } from "@/components/landing/Footer";
+import { MessageComponent } from "@/components/landing/messageComponent";
 
 export default function Home() {
   return (
     <main className="min-h-screen ">
+      <MessageComponent />
       <HeroSection />
       <FilterAndTrip />
       <FindMyVibe />
