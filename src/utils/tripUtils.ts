@@ -60,6 +60,14 @@ export const normalizeTrip = (trip: RawTrip): Trip => {
     languages: Array.isArray(trip.languages) ? trip.languages : [],
     filters: safeFilters,
     vibes: generateVibes(),
+    // Ensure rating fields are properly handled with defaults
+    averageRating: trip.averageRating || 0,
+    reviewCount: trip.reviewCount || 0,
+    // Add missing required properties with defaults
+    tripImage: trip.tripImage || "",
+    maxParticipants: trip.maxParticipants,
+    seatsLeft: trip.seatsLeft,
+    bookedSeats: trip.bookedSeats,
   };
 };
 

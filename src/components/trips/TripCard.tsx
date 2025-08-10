@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Compass, Calendar, Languages, ArrowRight, Users } from "lucide-react";
+import { Compass, Calendar, Languages, ArrowRight, Users, Star } from "lucide-react";
 import { Trip } from "@/types/trips";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +64,28 @@ export const TripCard = ({
           <p className="text-sm font-roboto text-gray-600 line-clamp-2">
             {trip.description}
           </p>
+
+          {/* Star Rating */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${
+                    i < Math.round(trip.averageRating)
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-sm text-gray-600 font-medium">
+              {trip.averageRating > 0 
+                ? trip.averageRating.toFixed(1) 
+                : "0.0"
+              } ({trip.reviewCount} {trip.reviewCount === 1 ? "review" : "reviews"})
+            </span>
+          </div>
         </div>
 
         {/* Trip Details */}

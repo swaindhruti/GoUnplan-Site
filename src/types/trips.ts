@@ -11,6 +11,12 @@ export type RawTrip = {
   createdAt: string | Date;
   languages?: string[];
   filters?: string[];
+  averageRating?: number;
+  reviewCount?: number;
+  tripImage?: string;
+  maxParticipants?: number;
+  seatsLeft?: number;
+  bookedSeats?: number;
 };
 
 export type Trip = {
@@ -31,6 +37,8 @@ export type Trip = {
   maxParticipants?: number;
   seatsLeft?: number;
   bookedSeats?: number;
+  averageRating: number;
+  reviewCount: number;
 };
 
 export type SelectOption = {
@@ -55,12 +63,12 @@ export const INITIAL_FILTERS: FilterState = {
   countryFilter: "all",
   languageFilter: [],
   vibeFilter: [],
-  travellerFilter: []
+  travellerFilter: [],
 };
 
 export const DURATION_OPTIONS = [
   { value: "all", label: "All Durations" },
   { value: "1-3", label: "Short Trip (1–3 Days)" },
   { value: "4-7", label: "Medium Trip (4–7 Days)" },
-  { value: "8", label: "Extended Trip (8+ Days)" }
+  { value: "8", label: "Extended Trip (8+ Days)" },
 ];
