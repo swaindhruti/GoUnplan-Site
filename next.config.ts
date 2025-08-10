@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
       "avatar.iran.liara.run",
       "images.pexels.com",
       "oq7nempxaa.ufs.sh",
-      "drive.google.com"
+      "drive.google.com",
+      "i.pravatar.cc"
     ]
   }
 };
