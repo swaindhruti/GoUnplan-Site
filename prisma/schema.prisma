@@ -42,6 +42,12 @@ model HostProfile {
   averageRating Float    @default(0)
   reviews       Review[]
 
+  // Social Media Fields
+  instagramUrl  String?
+  twitterUrl    String?
+  linkedinUrl   String?
+  websiteUrl    String?
+
   user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   travelPlans TravelPlans[]
 

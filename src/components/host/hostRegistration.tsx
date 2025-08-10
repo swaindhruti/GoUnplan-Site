@@ -10,6 +10,10 @@ import {
   Phone,
   Mail,
   Clock,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Globe,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { applyForHost, hasAppliedForHost } from "@/actions/user/action";
@@ -30,6 +34,10 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
     description: "",
     hostEmail: userEmail,
     hostMobile: "",
+    instagramUrl: "",
+    twitterUrl: "",
+    linkedinUrl: "",
+    websiteUrl: "",
   });
 
   const [state, setState] = useState({
@@ -383,6 +391,82 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                       placeholder="Enter your contact phone number"
                       className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="instagramUrl"
+                      className="flex items-center text-sm font-medium text-gray-700"
+                    >
+                      <Instagram className="h-4 w-4 text-gray-500 mr-2" />
+                      Instagram URL
+                    </label>
+                    <Input
+                      type="url"
+                      id="instagramUrl"
+                      name="instagramUrl"
+                      value={formData.instagramUrl}
+                      onChange={handleInputChange}
+                      placeholder="Enter your Instagram profile URL"
+                      className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="twitterUrl"
+                      className="flex items-center text-sm font-medium text-gray-700"
+                    >
+                      <Twitter className="h-4 w-4 text-gray-500 mr-2" />
+                      Twitter URL
+                    </label>
+                    <Input
+                      type="url"
+                      id="twitterUrl"
+                      name="twitterUrl"
+                      value={formData.twitterUrl}
+                      onChange={handleInputChange}
+                      placeholder="Enter your Twitter profile URL"
+                      className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="linkedinUrl"
+                      className="flex items-center text-sm font-medium text-gray-700"
+                    >
+                      <Linkedin className="h-4 w-4 text-gray-500 mr-2" />
+                      LinkedIn URL
+                    </label>
+                    <Input
+                      type="url"
+                      id="linkedinUrl"
+                      name="linkedinUrl"
+                      value={formData.linkedinUrl}
+                      onChange={handleInputChange}
+                      placeholder="Enter your LinkedIn profile URL"
+                      className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="websiteUrl"
+                      className="flex items-center text-sm font-medium text-gray-700"
+                    >
+                      <Globe className="h-4 w-4 text-gray-500 mr-2" />
+                      Website URL
+                    </label>
+                    <Input
+                      type="url"
+                      id="websiteUrl"
+                      name="websiteUrl"
+                      value={formData.websiteUrl}
+                      onChange={handleInputChange}
+                      placeholder="Enter your personal website or blog URL"
+                      className="focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
 

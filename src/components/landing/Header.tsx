@@ -40,6 +40,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import { Switch } from "@/components/ui/switch";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,6 +50,8 @@ export default function Header() {
   const [isDashboardMenuOpen, setIsDashboardMenuOpen] = useState(false);
   // State for mobile dashboard menu toggle
   const [isMobileDashboardOpen, setIsMobileDashboardOpen] = useState(false);
+  // State for host mode toggle
+  const [isHostMode, setIsHostMode] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -238,6 +241,25 @@ export default function Header() {
     session?.user?.role !== "HOST" &&
     session?.user?.role !== "ADMIN";
 
+  // Determine if current user is a host
+  const isUserHost = session?.user?.role === "HOST" || session?.user?.role === "ADMIN";
+
+  // Handle host mode toggle
+  const handleHostModeToggle = (checked: boolean) => {
+    setIsHostMode(checked);
+    if (checked) {
+      router.push("/dashboard/host");
+    } else {
+      router.push("/dashboard/user");
+    }
+    setIsDashboardMenuOpen(false);
+  };
+
+  // Update host mode state based on current route
+  useEffect(() => {
+    setIsHostMode(pathname.startsWith("/dashboard/host"));
+  }, [pathname]);
+
   if (!isHomePage) {
     return (
       <div className={otherRoutesHeaderClasses}>
@@ -292,15 +314,291 @@ export default function Header() {
             {/* Menu Button - Right Side */}
             <div className="flex items-center">
               {status === "authenticated" ? (
+                <div className="flex items-center space-x-4">
+                  {/* Host Mode Toggle - Show outside dropdown for hosts */}
+                  {isUserHost && (
+                    <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                      <Crown className="h-4 w-4 text-white" />
+                      <span className="font-medium text-white text-sm">
+                        Host Mode
+                      </span>
+                      <Switch
+                        checked={isHostMode}
+                        onCheckedChange={handleHostModeToggle}
+                        className="data-[state=checked]:bg-purple-600"
+                      />
+                    </div>
+                  )}
+
+                  <DropdownMenu
+                    open={isDashboardMenuOpen}
+                    onOpenChange={setIsDashboardMenuOpen}
+                  >
+                    <DropdownMenuTrigger asChild>
+                      <Button className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm">
+                        <Menu className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Menu</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
+                      align="end"
+                    >
+                      <div className="p-4 border-b border-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <User className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">
+                              {session?.user?.name || "User"}
+                            </p>
+                            <p className="text-gray-500 text-xs">
+                              {session?.user?.email}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <DropdownMenuGroup className="p-2">
+                        {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
+                        <div className="relative">
+                          <DropdownMenuItem
+                            onClick={handleDashboardClick}
+                            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                            aria-expanded={
+                              isDashboardMenuOpen &&
+                              (session?.user?.role === "HOST" ||
+                                session?.user?.role === "ADMIN")
+                            }
+                            aria-haspopup={session?.user?.role !== "USER"}
+                          >
+                            <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                            <span className="font-medium text-gray-900 flex-1">
+                              Dashboard
+                            </span>
+                            {/* Show toggle icon for HOST/ADMIN roles */}
+                            {(session?.user?.role === "HOST" ||
+                              session?.user?.role === "ADMIN") && (
+                              <>
+                                {isDashboardMenuOpen ? (
+                                  <ChevronUp className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4 text-gray-400" />
+                                )}
+                              </>
+                            )}
+                            {/* Show shortcut only for USER role */}
+                            {session?.user?.role === "USER" && (
+                              <DropdownMenuShortcut className="text-gray-400">
+                                ⌘D
+                              </DropdownMenuShortcut>
+                            )}
+                          </DropdownMenuItem>
+
+                          {/* Nested Dashboard Options */}
+                          {isDashboardMenuOpen &&
+                            (session?.user?.role === "HOST" ||
+                              session?.user?.role === "ADMIN") && (
+                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                              {getDashboardMenuItems().map((item) => (
+                                <DropdownMenuItem
+                                  key={item.href}
+                                  onClick={() => {
+                                    router.push(item.href);
+                                    setIsDashboardMenuOpen(false);
+                                  }}
+                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                                >
+                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                  <span className="font-medium text-gray-800">
+                                    {item.label}
+                                  </span>
+                                </DropdownMenuItem>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/trips")}
+                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900">
+                            My Trips
+                          </span>
+                          <DropdownMenuShortcut className="text-gray-400">
+                            ⌘T
+                          </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+
+                        {/* Apply for Host button - only show for non-hosts */}
+                        {shouldShowHostButton && (
+                          <DropdownMenuItem
+                            onClick={() => router.push("/dashboard/host")}
+                            className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
+                          >
+                            <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
+                            <span className="font-medium text-gray-900 group-hover:text-amber-600">
+                              Apply for Host
+                            </span>
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/profile/settings")}
+                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900">
+                            Settings
+                          </span>
+                          <DropdownMenuShortcut className="text-gray-400">
+                            ⌘S
+                          </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() =>
+                            window.open("/terms-and-conditions.pdf", "_blank")
+                          }
+                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900 ">
+                            Terms and Conditions
+                          </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            window.open("/privacy-policy.pdf", "_blank")
+                          }
+                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900 ">
+                            Privacy Policy
+                          </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            window.open("/cancellation-policy.pdf", "_blank")
+                          }
+                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+                          <span className="font-medium text-gray-900 ">
+                            Cancellation Policy
+                          </span>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+
+                      <div className="border-t border-gray-100 p-2">
+                        <DropdownMenuItem
+                          onClick={handleSignOut}
+                          className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
+                        >
+                          <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
+                          <span className="font-medium text-gray-900 group-hover:text-red-600">
+                            Sign Out
+                          </span>
+                          <DropdownMenuShortcut className="text-gray-400">
+                            ⇧⌘Q
+                          </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => router.push("/auth/signin")}
+                  className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Full header for home page - consistent styling, no color changes
+  return (
+    <header className={homeHeaderClasses}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center group flex-shrink-0">
+            <div className="relative bg-white rounded-full shadow-lg">
+              <Image
+                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
+                alt="GoUnplan Logo"
+                width={80}
+                height={80}
+                className="rounded-full object-cover
+        w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20
+        transition-all duration-300"
+                priority
+              />
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-x-2 xl:gap-x-4">
+            {navigationItems.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleNavClick(item)}
+                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-300"
+              >
+                {item.name}
+                <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {status === "unauthenticated" ? (
+              <Button
+                onClick={() => router.push("/auth/signin")}
+                className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-200"
+              >
+                Sign In
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Button>
+            ) : (
+              <div className="flex items-center space-x-4">
+                {/* Host Mode Toggle - Show outside dropdown for hosts */}
+                {isUserHost && (
+                  <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                    <Crown className="h-4 w-4 text-purple-600" />
+                    <span className="font-medium text-gray-800 text-sm">
+                      Host Mode
+                    </span>
+                    <Switch
+                      checked={isHostMode}
+                      onCheckedChange={handleHostModeToggle}
+                      className="data-[state=checked]:bg-purple-600"
+                    />
+                  </div>
+                )}
+
                 <DropdownMenu
                   open={isDashboardMenuOpen}
                   onOpenChange={setIsDashboardMenuOpen}
                 >
                   <DropdownMenuTrigger asChild>
-                    <Button className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm">
+                    <Button className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/[0.55] hover:bg-gray-50 text-gray-900 border-gray-200 shadow-md ">
                       <Menu className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Menu</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      Menu
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -363,24 +661,24 @@ export default function Header() {
                         {isDashboardMenuOpen &&
                           (session?.user?.role === "HOST" ||
                             session?.user?.role === "ADMIN") && (
-                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                              {getDashboardMenuItems().map((item) => (
-                                <DropdownMenuItem
-                                  key={item.href}
-                                  onClick={() => {
-                                    router.push(item.href);
-                                    setIsDashboardMenuOpen(false);
-                                  }}
-                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                                >
-                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                  <span className="font-medium text-gray-800">
-                                    {item.label}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                            </div>
-                          )}
+                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                            {getDashboardMenuItems().map((item) => (
+                              <DropdownMenuItem
+                                key={item.href}
+                                onClick={() => {
+                                  router.push(item.href);
+                                  setIsDashboardMenuOpen(false);
+                                }}
+                                className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                              >
+                                <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                <span className="font-medium text-gray-800">
+                                  {item.label}
+                                </span>
+                              </DropdownMenuItem>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <DropdownMenuItem
@@ -396,7 +694,7 @@ export default function Header() {
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
 
-                      {/* Want to be Host button - conditionally shown */}
+                      {/* Apply for Host button - only show for non-hosts */}
                       {shouldShowHostButton && (
                         <DropdownMenuItem
                           onClick={() => router.push("/dashboard/host")}
@@ -404,7 +702,7 @@ export default function Header() {
                         >
                           <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
                           <span className="font-medium text-gray-900 group-hover:text-amber-600">
-                            Want to be Host
+                            Apply for Host
                           </span>
                         </DropdownMenuItem>
                       )}
@@ -473,249 +771,7 @@ export default function Header() {
                     </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <Button
-                  onClick={() => router.push("/auth/signin")}
-                  className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Full header for home page - consistent styling, no color changes
-  return (
-    <header className={homeHeaderClasses}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center group flex-shrink-0">
-            <div className="relative bg-white rounded-full shadow-lg">
-              <Image
-                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
-                alt="GoUnplan Logo"
-                width={80}
-                height={80}
-                className="rounded-full object-cover
-        w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20
-        transition-all duration-300"
-                priority
-              />
-            </div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-x-2 xl:gap-x-4">
-            {navigationItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => handleNavClick(item)}
-                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-300"
-              >
-                {item.name}
-                <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {status === "unauthenticated" ? (
-              <Button
-                onClick={() => router.push("/auth/signin")}
-                className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-200"
-              >
-                Sign In
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </Button>
-            ) : (
-              <DropdownMenu
-                open={isDashboardMenuOpen}
-                onOpenChange={setIsDashboardMenuOpen}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/[0.55] hover:bg-gray-50 text-gray-900 border-gray-200 shadow-md ">
-                    <Menu className="h-4 w-4 mr-2" />
-                    Menu
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
-                  align="end"
-                >
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 text-sm">
-                          {session?.user?.name || "User"}
-                        </p>
-                        <p className="text-gray-500 text-xs">
-                          {session?.user?.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <DropdownMenuGroup className="p-2">
-                    {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
-                    <div className="relative">
-                      <DropdownMenuItem
-                        onClick={handleDashboardClick}
-                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                        aria-expanded={
-                          isDashboardMenuOpen &&
-                          (session?.user?.role === "HOST" ||
-                            session?.user?.role === "ADMIN")
-                        }
-                        aria-haspopup={session?.user?.role !== "USER"}
-                      >
-                        <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900 flex-1">
-                          Dashboard
-                        </span>
-                        {/* Show toggle icon for HOST/ADMIN roles */}
-                        {(session?.user?.role === "HOST" ||
-                          session?.user?.role === "ADMIN") && (
-                          <>
-                            {isDashboardMenuOpen ? (
-                              <ChevronUp className="h-4 w-4 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4 text-gray-400" />
-                            )}
-                          </>
-                        )}
-                        {/* Show shortcut only for USER role */}
-                        {session?.user?.role === "USER" && (
-                          <DropdownMenuShortcut className="text-gray-400">
-                            ⌘D
-                          </DropdownMenuShortcut>
-                        )}
-                      </DropdownMenuItem>
-
-                      {/* Nested Dashboard Options */}
-                      {isDashboardMenuOpen &&
-                        (session?.user?.role === "HOST" ||
-                          session?.user?.role === "ADMIN") && (
-                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                            {getDashboardMenuItems().map((item) => (
-                              <DropdownMenuItem
-                                key={item.href}
-                                onClick={() => {
-                                  router.push(item.href);
-                                  setIsDashboardMenuOpen(false);
-                                }}
-                                className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                              >
-                                <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                <span className="font-medium text-gray-800">
-                                  {item.label}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-
-                    <DropdownMenuItem
-                      onClick={() => router.push("/trips")}
-                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900">
-                        My Trips
-                      </span>
-                      <DropdownMenuShortcut className="text-gray-400">
-                        ⌘T
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-
-                    {/* Want to be Host button - conditionally shown */}
-                    {shouldShowHostButton && (
-                      <DropdownMenuItem
-                        onClick={() => router.push("/dashboard/host")}
-                        className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
-                        <span className="font-medium text-gray-900 group-hover:text-amber-600">
-                          Want to be Host
-                        </span>
-                      </DropdownMenuItem>
-                    )}
-
-                    <DropdownMenuItem
-                      onClick={() => router.push("/profile/settings")}
-                      className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900">
-                        Settings
-                      </span>
-                      <DropdownMenuShortcut className="text-gray-400">
-                        ⌘S
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      onClick={() =>
-                        window.open("/terms-and-conditions.pdf", "_blank")
-                      }
-                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900 ">
-                        Terms and Conditions
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        window.open("/privacy-policy.pdf", "_blank")
-                      }
-                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
-                        Privacy Policy
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        window.open("/cancellation-policy.pdf", "_blank")
-                      }
-                      className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                      <span className="font-medium text-gray-900 group-hover:text-blue-800">
-                        Cancellation Policy
-                      </span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-
-                  <div className="border-t border-gray-100 p-2">
-                    <DropdownMenuItem
-                      onClick={handleSignOut}
-                      className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
-                    >
-                      <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
-                      <span className="font-medium text-gray-900 group-hover:text-red-600">
-                        Sign Out
-                      </span>
-                      <DropdownMenuShortcut className="text-gray-400">
-                        ⇧⌘Q
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              </div>
             )}
           </div>
 

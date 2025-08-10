@@ -1,13 +1,45 @@
 // hooks/useRecommendations.ts
 import { useMemo } from "react";
 
+// Define proper types
+export interface Trip {
+  id: string;
+  destination?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  continent?: string;
+  vibe?: string;
+  activities?: string[];
+  tags?: string[];
+  travellerType?: string;
+  recommendedFor?: string;
+  groupSize?: string;
+  price?: number;
+  language?: string;
+  spokenLanguages?: string[];
+  duration?: string;
+  bestTime?: string;
+  [key: string]: unknown; // For additional properties
+}
+
+export interface Filters {
+  vibeFilter?: string[];
+  travellerFilter?: string[];
+  priceRange?: [number, number];
+  searchTerm?: string;
+  languageFilter?: string[];
+  duration?: string;
+  travelSeason?: string;
+}
+
 export interface RecommendationMatch {
-  trip: any;
+  trip: Trip;
   score: number;
   reasons: string[];
 }
 
-export const useRecommendations = (filters: any, allTrips: any[]) => {
+export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
   const recommendations = useMemo(() => {
     if (!allTrips || allTrips.length === 0) return [];
 
@@ -76,7 +108,7 @@ export const useRecommendations = (filters: any, allTrips: any[]) => {
       if (filters.searchTerm && filters.searchTerm.trim()) {
         const searchTerms = filters.searchTerm.toLowerCase().split(" ");
 
-        searchTerms.forEach((term) => {
+        searchTerms.forEach((term: string) => {
           if (term.length > 2) {
             // Ignore very short terms
             const locationMatch =
@@ -135,7 +167,7 @@ export const useRecommendations = (filters: any, allTrips: any[]) => {
       return {
         ...trip,
         recommendationScore: score,
-        matchReasons: reasons
+        matchReasons: reasons,
       };
     });
 
@@ -150,7 +182,7 @@ export const useRecommendations = (filters: any, allTrips: any[]) => {
     return recommendations.slice(0, n).map((trip) => ({
       trip,
       score: trip.recommendationScore,
-      reasons: trip.matchReasons
+      reasons: trip.matchReasons,
     }));
   };
 
@@ -160,31 +192,34 @@ export const useRecommendations = (filters: any, allTrips: any[]) => {
       vibeMatches: recommendations
         .filter((trip) =>
           trip.matchReasons.some(
-            (reason) => reason.includes("lovers") || reason.includes("vibe")
+            (reason: string) =>
+              reason.includes("lovers") || reason.includes("vibe")
           )
         )
         .slice(0, 2),
 
       groupMatches: recommendations
         .filter((trip) =>
-          trip.matchReasons.some((reason) => reason.includes("Great for"))
+          trip.matchReasons.some((reason: string) =>
+            reason.includes("Great for")
+          )
         )
         .slice(0, 2),
 
       budgetMatches: recommendations
         .filter((trip) =>
-          trip.matchReasons.some((reason) => reason.includes("budget"))
+          trip.matchReasons.some((reason: string) => reason.includes("budget"))
         )
         .slice(0, 2),
 
       locationMatches: recommendations
         .filter((trip) =>
           trip.matchReasons.some(
-            (reason) =>
+            (reason: string) =>
               reason.includes("destination") || reason.includes("Similar")
           )
         )
-        .slice(0, 2)
+        .slice(0, 2),
     };
 
     return categories;
@@ -207,6 +242,6 @@ export const useRecommendations = (filters: any, allTrips: any[]) => {
     getTopRecommendations,
     getRecommendationsByCategory,
     hasMatchablePreferences: hasMatchablePreferences(),
-    totalRecommendations: recommendations.length
+    totalRecommendations: recommendations.length,
   };
 };
