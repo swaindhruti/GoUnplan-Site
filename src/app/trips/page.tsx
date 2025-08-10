@@ -51,6 +51,7 @@ export default function TripsPage() {
   }, [mounted, status, router]);
 
   const { trips, isLoading, error } = useTripsData();
+
   const {
     filters,
     updateFilter,

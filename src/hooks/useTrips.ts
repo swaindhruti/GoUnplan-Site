@@ -14,6 +14,7 @@ export const useTripsData = () => {
     const loadTrips = async () => {
       try {
         const result = await getAllActiveTrips();
+        console.log(result);
 
         if (!isMounted) return;
 
@@ -40,7 +41,7 @@ export const useTripsData = () => {
       isMounted = false;
     };
   }, []);
-
+  console.log(trips);
   return { trips, isLoading, error };
 };
 

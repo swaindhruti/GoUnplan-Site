@@ -124,6 +124,7 @@
 :root {
   /* overflow: hidden; */
   overscroll-behavior: none;
+  overflow-x: hidden;
 }
 .neo-input {
   background: #f3f4f6;

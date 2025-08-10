@@ -17,8 +17,11 @@ export const CreateDestinationSchema = z.object({
   languages: z.array(z.string()).optional().default([]),
   includedActivities: z.array(z.string()).optional().default([]),
   restrictions: z.array(z.string()).optional().default([]),
+  tripImage: z
+    .string()
+    .min(1, "Trip cover image is required")
+    .url("Must be a valid image URL"),
 
-  // Properly define the dayWiseData schema
   dayWiseData: z
     .array(
       z.object({
@@ -28,7 +31,11 @@ export const CreateDestinationSchema = z.object({
         activities: z.array(z.string()).optional().default([]),
         meals: z.string().optional().default(""),
         accommodation: z.string().optional().default(""),
+        dayWiseImage: z
+          .string()
+          .min(1, "Day image is required")
+          .url("Must be a valid image URL")
       })
     )
-    .nonempty("At least one day must be added"),
+    .nonempty("At least one day must be added")
 });
