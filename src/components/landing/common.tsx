@@ -10,7 +10,7 @@ import {
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MessageCircle } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
@@ -349,5 +349,22 @@ export const SectionJoinerMarquee = () => {
         </div>
       ))}
     </Marquee>
+  );
+};
+
+export const UnreadcountMessageBox = ({
+  unreadCount
+}: {
+  unreadCount: number;
+}) => {
+  return (
+    <div className="relative">
+      <MessageCircle size={32} className="text-purple-600" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center min-w-[24px]">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </div>
   );
 };
