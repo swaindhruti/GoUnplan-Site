@@ -20,7 +20,6 @@ export const TripCard = ({
       className={`group w-full relative rounded-xl bg-white border border-gray-200 shadow-sm transition-transform h-auto duration-300 ease-in-out cursor-pointer flex flex-col`}
       onClick={onClick}
     >
-      {/* Image Section */}
       <div className="relative h-72 rounded-t-xl overflow-hidden flex-shrink-0">
         <Image
           src={trip.tripImage || ""}
@@ -46,11 +45,8 @@ export const TripCard = ({
           </div>
         )}
       </div>
-
-      {/* Content */}
       <div className="flex flex-col justify-between p-4 flex-grow">
         <div className="space-y-3">
-          {/* Title & Price */}
           <div className="flex justify-between items-start">
             <h3 className="text-lg font-bricolage font-semibold text-gray-800 leading-snug pr-2 line-clamp-2">
               {trip.title}
@@ -60,7 +56,6 @@ export const TripCard = ({
             </Badge>
           </div>
 
-          {/* Description */}
           <p className="text-sm font-roboto text-gray-600 line-clamp-2">
             {trip.description}
           </p>
@@ -88,7 +83,6 @@ export const TripCard = ({
           </div>
         </div>
 
-        {/* Trip Details */}
         <div className="space-y-3 mt-4">
           <div className="flex flex-col gap-1 text-sm text-gray-700">
             <div className="flex items-center gap-2">
@@ -110,8 +104,6 @@ export const TripCard = ({
               </div>
             )}
           </div>
-
-          {/* Tags */}
           <div className="flex flex-wrap gap-2 text-xs">
             {trip.languages.length > 0 && (
               <div className="flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
@@ -133,8 +125,6 @@ export const TripCard = ({
               </span>
             )}
           </div>
-
-          {/* CTA Button */}
           <Link href={`/trips/${trip.travelPlanId}`}>
             <button className="w-full text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors">
               View Details <ArrowRight className="w-4 h-4" />
