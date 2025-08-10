@@ -27,6 +27,10 @@ export type Trip = {
   languages: string[];
   filters: string[];
   vibes: string[];
+  tripImage: string;
+  maxParticipants?: number;
+  seatsLeft?: number;
+  bookedSeats?: number;
 };
 
 export type SelectOption = {

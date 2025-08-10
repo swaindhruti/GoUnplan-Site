@@ -57,6 +57,7 @@ model DayWiseItinerary {
   meals         String?
   accommodation String?
   travelPlanId  String
+  dayWiseImage  String?     @default("https://avatar.iran.liara.run/public")
   travelPlan    TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

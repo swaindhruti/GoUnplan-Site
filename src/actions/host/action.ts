@@ -121,6 +121,7 @@ export const createTravelPlan = async (data: {
     activities: string[];
     meals: string;
     accommodation: string;
+    dayWiseImage: string;
   }>;
 }) => {
   const session = await requireHost();
@@ -181,19 +182,16 @@ export const createTravelPlan = async (data: {
 
     console.log("Travel plan created successfully:", travelPlan);
 
-    // Create day-wise itineraries if provided
     if (data.dayWiseData && data.dayWiseData.length > 0) {
       console.log(`Processing ${data.dayWiseData.length} day entries...`);
 
       try {
-        // Create day-wise itineraries one by one
         for (const dayData of data.dayWiseData) {
           console.log(
             `Creating day ${dayData.dayNumber}:`,
             JSON.stringify(dayData, null, 2)
           );
 
-          // Create day-wise itinerary using standard Prisma client
           const createdDay = await prisma.dayWiseItinerary.create({
             data: {
               travelPlanId: travelPlan.travelPlanId,
@@ -204,7 +202,9 @@ export const createTravelPlan = async (data: {
                 ? dayData.activities
                 : [],
               meals: dayData.meals || "",
-              accommodation: dayData.accommodation || ""
+              accommodation: dayData.accommodation || "",
+              dayWiseImage:
+                dayData.dayWiseImage || "https://avatar.iran.liara.run/public"
             }
           });
 

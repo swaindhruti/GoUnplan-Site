@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { PrimaryButton, SectionLabel } from "./common";
+import { useState } from "react";
 
 const vibeDescriptions: Record<string, string> = {
   Cultural:
@@ -13,6 +14,7 @@ const vibeDescriptions: Record<string, string> = {
 
 export const FindMyVibe = () => {
   const router = useRouter();
+  const [myVibes, setMyVibes] = useState(false);
 
   const vibes = [
     {
@@ -37,73 +39,104 @@ export const FindMyVibe = () => {
     router.push(`/trips?vibe=${encodeURIComponent(vibeLabel)}`);
   };
 
+  const handleVibeButtonClick = () => {
+    setMyVibes(true);
+  };
+
   return (
-    <div
-      id="vibes"
-      className="min-h-screen bg-purple-500/[0.05] justify-center px-4 sm:px-6   py-10 md:py-20 flex flex-col lg:flex-row items-center gap-16"
-    >
-      <div className="w-full lg:w-1/4 flex flex-col items-center gap-y-16">
-        <div className="space-y-4 max-w-md text-center lg:text-left">
+    <div className="bg-purple-500/[0.05] min-h-screen w-full ">
+      {myVibes && (
+        <div className="w-screen flex justify-center -mt-3 lg:-mt-6 pt-6 lg:pt-12">
           <SectionLabel label="Choose Your Vibe!" />
-
-          <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-900 ">
-            Popular
-            <br />
-            <span className="text-gray-800 ml-3">Vibes</span>
-          </h1>
-
-          <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
-            Join us as we explore the wonders of the globe, one incredible
-            journey at a time.
-          </p>
-
-          <div className="flex justify-center lg:justify-start">
-            <PrimaryButton label="Find Packages" />
-          </div>
         </div>
+      )}
+      <div
+        id="vibes"
+        className=" justify-center px-4 sm:px-6 py-10 md:py-20 flex flex-col lg:flex-row items-center gap-16 relative"
+      >
         <div
-          onClick={() => handleVibeClick("Adventure")}
-          className="w-full h-[190px] cursor-pointer sm:h-[240px] md:h-[290px] relative group"
+          className={`relative w-full lg:w-1/4 flex flex-col items-center ${
+            myVibes ? "h-full justify-center" : "gap-y-16"
+          }`}
         >
-          <Image
-            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
-            alt="Adventure"
-            fill
-            className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"
-          />
-          <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
-              Adventure
+          {" "}
+          {!myVibes && (
+            <div className="space-y-4 max-w-md text-center lg:text-left mt-16">
+              <SectionLabel label="Choose Your Vibe!" />
+              <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-900 ">
+                Popular
+                <br />
+                <span className="text-gray-800 ml-3">Vibes</span>
+              </h1>
+              <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
+                Join us as we explore the wonders of the globe, one incredible
+                journey at a time.
+              </p>
+              <div
+                onClick={handleVibeButtonClick}
+                className="flex justify-center lg:justify-start"
+              >
+                <PrimaryButton label="Find your Vibe" />
+              </div>
             </div>
-            <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
-              {vibeDescriptions["Adventure"]}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-16">
-        {vibes.map((vibe, index) => (
+          )}
           <div
-            key={index}
-            onClick={() => handleVibeClick(vibe.label)}
-            className="relative h-[140px] sm:h-[190px] md:h-[240px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
+            onClick={() => handleVibeClick("Adventure")}
+            className={`w-full cursor-pointer ${
+              myVibes
+                ? "flex-1 min-h-[400px]"
+                : "h-[190px] sm:h-[240px] md:h-[290px]"
+            } relative group`}
           >
             <Image
-              src={vibe.src}
-              alt={vibe.label}
+              src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+              alt="Adventure"
               fill
-              className="object-cover"
+              className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"
             />
-            <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center px-6">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter  font-semibold text-white mb-2">
-                {vibe.label}
+
+            <div
+              className={`absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md ${
+                myVibes ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              } transition-opacity flex flex-col justify-center items-center px-6`}
+            >
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
+                Adventure
               </div>
               <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
-                {vibeDescriptions[vibe.label]}
+                {vibeDescriptions["Adventure"]}
               </div>
             </div>
           </div>
-        ))}
+        </div>
+        <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-16">
+          {vibes.map((vibe, index) => (
+            <div
+              key={index}
+              onClick={() => handleVibeClick(vibe.label)}
+              className="relative h-[140px] sm:h-[190px] md:h-[240px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
+            >
+              <Image
+                src={vibe.src}
+                alt={vibe.label}
+                fill
+                className="object-cover"
+              />
+              <div
+                className={`absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md ${
+                  myVibes ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                } transition-opacity flex flex-col justify-center items-center px-6`}
+              >
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
+                  {vibe.label}
+                </div>
+                <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
+                  {vibeDescriptions[vibe.label]}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

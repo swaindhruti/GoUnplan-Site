@@ -60,7 +60,21 @@ export type FormDataShape = {
     ? Date
     : K extends "filters" | "languages" | "includedActivities" | "restrictions"
     ? string[]
+    : K extends "tripImage"
+    ? string // tripImage is now required
     : string;
+} & {
+  // Make tripImage required in the shape
+  tripImage: string;
+  dayWiseData: Array<{
+    dayNumber: number;
+    title: string;
+    description: string;
+    activities: string[];
+    meals: string;
+    accommodation: string;
+    dayWiseImage: string; // Make day-wise images required
+  }>;
 };
 
 export type FormInputShape = {
@@ -70,7 +84,20 @@ export type FormInputShape = {
     ? string | Date
     : K extends "filters" | "languages" | "includedActivities" | "restrictions"
     ? string[]
+    : K extends "tripImage"
+    ? string
     : string;
+} & {
+  tripImage: string;
+  dayWiseData: Array<{
+    dayNumber: number;
+    title: string;
+    description: string;
+    activities: string[];
+    meals: string;
+    accommodation: string;
+    dayWiseImage: string;
+  }>;
 };
 
 export type FormSchemaType = z.ZodType<

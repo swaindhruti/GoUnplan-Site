@@ -1,4 +1,8 @@
 "use client";
+import {
+  CldUploadWidget,
+  CloudinaryUploadWidgetResults
+} from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,7 +25,7 @@ import ReactSelect, { StylesConfig, MultiValue } from "react-select";
 import { Plus, Minus, Map, Calendar, FileText, Camera, X } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type SelectOption = {
   value: string;
@@ -34,7 +38,7 @@ const getSelectOptions = (options?: string[]) => {
 
 export const CreateDestinationForm = ({
   FormData,
-  FormSchema,
+  FormSchema
 }: FormComponentProps) => {
   const schema = FormSchema;
   const router = useRouter();
@@ -52,11 +56,10 @@ export const CreateDestinationForm = ({
             ? ""
             : field.type === "multi-select"
             ? []
-            : "",
+            : ""
       }),
       {}
     ),
-    // Always include a properly structured dayWiseData with at least one day
     dayWiseData: [
       {
         dayNumber: 1,
@@ -65,37 +68,50 @@ export const CreateDestinationForm = ({
         activities: [],
         meals: "",
         accommodation: "",
-      },
+        dayWiseImage: ""
+      }
     ],
     // Add tripImage field
-    tripImage: "",
+    tripImage: ""
   };
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData",
+    name: "dayWiseData"
   });
 
-  // Update the addDay function to ensure each day has required fields
+  const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
+    {}
+  );
+
+  console.log(dayWiseImages);
+
   const addDay = () => {
     const nextDayNumber = fields.length + 1;
     append({
       dayNumber: nextDayNumber,
-      title: `Day ${nextDayNumber}`, // Give a default title
+      title: `Day ${nextDayNumber}`,
       description: "",
       activities: [],
       meals: "",
       accommodation: "",
+      dayWiseImage: ""
     });
   };
 
   const removeDay = (index: number) => {
     if (fields.length > 1) {
       remove(index);
+      // Clean up day-wise image state
+      setDayWiseImages((prev) => {
+        const newImages = { ...prev };
+        delete newImages[index];
+        return newImages;
+      });
       fields.forEach((_, i) => {
         if (i > index) {
           form.setValue(`dayWiseData.${i - 1}.dayNumber`, i);
@@ -104,22 +120,71 @@ export const CreateDestinationForm = ({
     }
   };
 
-  // Handle image upload
-
   // Remove uploaded image
   const removeImage = () => {
     form.setValue("tripImage", "");
   };
 
-  // Watch for uploaded file changes
+  // Remove day-wise image
+  const removeDayWiseImage = (dayIndex: number) => {
+    form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, "");
+  };
+
+  // Watch for uploaded file changes (main trip image)
   useEffect(() => {
     const handleImageUpload = (imageUrl: string) => {
       form.setValue("tripImage", imageUrl);
     };
     if (uploadedFile?.secure_url) {
+      console.log("tt:", uploadedFile);
       handleImageUpload(uploadedFile.secure_url);
     }
   }, [uploadedFile, form]);
+
+  // Handle day-wise image upload success
+  const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
+    setDayWiseImages((prev) => ({
+      ...prev,
+      [dayIndex]: imageUrl
+    }));
+    form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, imageUrl);
+  };
+
+  const createDayWiseUploadButton = (dayIndex: number, label: string) => (
+    <CldUploadWidget
+      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!}
+      onSuccess={(results: CloudinaryUploadWidgetResults) => {
+        const resultsInfo = results.info;
+        if (
+          resultsInfo &&
+          typeof resultsInfo === "object" &&
+          typeof resultsInfo.secure_url === "string"
+        ) {
+          handleDayWiseImageUpload(dayIndex, resultsInfo.secure_url);
+        }
+      }}
+      onError={(error) => {
+        console.error("Cloudinary upload error:", error);
+      }}
+    >
+      {({ open }: { open?: () => void }) => (
+        <button
+          type="button"
+          className="bg-white text-purple-700 border-2 border-black rounded-xl px-4 py-2 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-purple-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => {
+            if (open) {
+              open();
+            } else {
+              console.error("Cloudinary widget not initialized properly");
+            }
+          }}
+          disabled={!open}
+        >
+          {label}
+        </button>
+      )}
+    </CldUploadWidget>
+  );
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     // Log the raw form data to check what we're working with
@@ -146,18 +211,20 @@ export const CreateDestinationForm = ({
             activities?: string[];
             meals?: string;
             accommodation?: string;
+            dayWiseImage?: string;
           },
           index: number
         ) => ({
-          dayNumber: index + 1, // Ensure correct day numbering
+          dayNumber: index + 1,
           title: day.title || `Day ${index + 1}`,
           description: day.description || "",
           activities: Array.isArray(day.activities) ? day.activities : [],
           meals: day.meals || "",
           accommodation: day.accommodation || "",
+          dayWiseImage: day.dayWiseImage || ""
         })
       );
-
+      console.log("whole travel plan: ", data);
       console.log("Submitting day-wise data:", processedDayWiseData);
 
       const result = await createTravelPlan({
@@ -176,8 +243,8 @@ export const CreateDestinationForm = ({
         city: data.city,
         languages: data.languages || [],
         filters: data.filters || [],
-        dayWiseData: processedDayWiseData, // Use the processed data
-        tripImage: data.tripImage || "", // Add trip image
+        dayWiseData: processedDayWiseData,
+        tripImage: data.tripImage || ""
       });
 
       if (result?.error) {
@@ -201,7 +268,7 @@ export const CreateDestinationForm = ({
       ...base,
       backgroundColor: "white",
       borderColor: "#e2e8f0",
-      color: "#333",
+      color: "#333"
     }),
     menu: (base) => ({ ...base, backgroundColor: "white" }),
     option: (base, state) => ({
@@ -211,17 +278,17 @@ export const CreateDestinationForm = ({
         : state.isFocused
         ? "#f3f4f6"
         : "white",
-      color: "#333",
+      color: "#333"
     }),
     multiValue: (base) => ({ ...base, backgroundColor: "#f3f4f6" }),
     multiValueLabel: (base) => ({ ...base, color: "#333" }),
     multiValueRemove: (base) => ({
       ...base,
       color: "#333",
-      ":hover": { backgroundColor: "#e2e8f0" },
+      ":hover": { backgroundColor: "#e2e8f0" }
     }),
     placeholder: (base) => ({ ...base, color: "#94a3b8" }),
-    input: (base) => ({ ...base, color: "#333" }),
+    input: (base) => ({ ...base, color: "#333" })
   };
 
   return (
@@ -424,7 +491,7 @@ export const CreateDestinationForm = ({
                                   value={(field.value as string[])?.map(
                                     (val) => ({
                                       value: val,
-                                      label: val,
+                                      label: val
                                     })
                                   )}
                                   onChange={(
@@ -442,12 +509,12 @@ export const CreateDestinationForm = ({
                                       border: "2px solid #000",
                                       borderRadius: "0.75rem",
                                       boxShadow: "4px 4px 0 0 #000",
-                                      fontWeight: "bold",
+                                      fontWeight: "bold"
                                     }),
                                     multiValue: (base) => ({
                                       ...base,
                                       backgroundColor: "#e9d5ff",
-                                      color: "#6d28d9",
+                                      color: "#6d28d9"
                                     }),
                                     option: (base, state) => ({
                                       ...base,
@@ -457,8 +524,8 @@ export const CreateDestinationForm = ({
                                         ? "#fde68a"
                                         : "#fff",
                                       color: "#333",
-                                      fontWeight: "bold",
-                                    }),
+                                      fontWeight: "bold"
+                                    })
                                   }}
                                   placeholder={data.placeholder}
                                 />
@@ -550,170 +617,244 @@ export const CreateDestinationForm = ({
                     </h3>
                   </div>
 
-                  {fields.map((field, index) => (
-                    <div
-                      key={field.id}
-                      className="p-6 bg-yellow-50 rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-extrabold text-gray-800">
-                          Day {index + 1}
-                        </h3>
-                        {fields.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeDay(index)}
-                            className="bg-red-50 border-2 border-black text-red-600 hover:bg-red-100 shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                        )}
+                  {fields.map((field, index) => {
+                    return (
+                      <div
+                        key={field.id}
+                        className="p-6 bg-yellow-50 rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-extrabold text-gray-800">
+                            Day {index + 1}
+                          </h3>
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeDay(index)}
+                              className="bg-red-50 border-2 border-black text-red-600 hover:bg-red-100 shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4 mb-6">
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.title`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Day Title
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="e.g., Arrival & Welcome Ride"
+                                    className="neo-input"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.accommodation`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Accommodation
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="e.g., Alpine Lodge in Verbier"
+                                    className="neo-input"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.description`}
+                            render={({ field }) => (
+                              <FormItem className="col-span-2">
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Day Description
+                                </FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Describe the day's activities and schedule..."
+                                    className="neo-input min-h-[100px]"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.meals`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Meals Included
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="e.g., Breakfast, lunch, and dinner included"
+                                    className="neo-input"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.activities`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Activities
+                                </FormLabel>
+                                <FormControl>
+                                  <ReactSelect
+                                    isMulti
+                                    placeholder="Add activities..."
+                                    options={[]} // You can add predefined options here
+                                    value={
+                                      field.value?.map((act: string) => ({
+                                        value: act,
+                                        label: act
+                                      })) || []
+                                    }
+                                    onChange={(
+                                      selected: MultiValue<SelectOption>
+                                    ) =>
+                                      field.onChange(
+                                        selected.map((opt) => opt.value)
+                                      )
+                                    }
+                                    styles={{
+                                      ...selectStyles,
+                                      control: (base) => ({
+                                        ...base,
+                                        backgroundColor: "#f3f4f6",
+                                        border: "2px solid #000",
+                                        borderRadius: "0.75rem",
+                                        boxShadow: "4px 4px 0 0 #000",
+                                        fontWeight: "bold"
+                                      }),
+                                      multiValue: (base) => ({
+                                        ...base,
+                                        backgroundColor: "#e9d5ff",
+                                        color: "#6d28d9"
+                                      }),
+                                      option: (base, state) => ({
+                                        ...base,
+                                        backgroundColor: state.isSelected
+                                          ? "#facc15"
+                                          : state.isFocused
+                                          ? "#fde68a"
+                                          : "#fff",
+                                        color: "#333",
+                                        fontWeight: "bold"
+                                      })
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Day-wise Image Upload Section */}
+                        <div className="space-y-4">
+                          <div className="border-b border-gray-300 pb-2">
+                            <h4 className="text-md font-bold text-gray-700 flex items-center">
+                              <Camera className="h-4 w-4 text-gray-500 mr-2" />
+                              Day {index + 1} Image
+                            </h4>
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name={`dayWiseData.${index}.dayWiseImage`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                  Upload Day Image
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="space-y-4">
+                                    {!field.value ? (
+                                      <div className="flex flex-col items-center justify-center p-6 border border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
+                                        <Camera className="h-8 w-8 text-gray-400 mb-2" />
+                                        <p className="text-xs text-gray-500 mb-3 text-center">
+                                          Add an image for this day&apos;s
+                                          activities
+                                        </p>
+                                        {createDayWiseUploadButton(
+                                          index,
+                                          "Choose Image"
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div className="relative group">
+                                        <Image
+                                          width={400}
+                                          height={300}
+                                          src={field.value}
+                                          alt={`Day ${index + 1} image`}
+                                          className="w-full h-32 object-cover rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+                                        />
+                                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                          <div className="flex gap-2">
+                                            {createDayWiseUploadButton(
+                                              index,
+                                              "Change Image"
+                                            )}
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                removeDayWiseImage(index)
+                                              }
+                                              className="bg-red-500 text-white border-2 border-black rounded-lg px-3 py-1 font-bold shadow-[1px_1px_0_0_rgba(0,0,0,1)] hover:bg-red-600 transition-all flex items-center gap-1 text-sm"
+                                            >
+                                              <X className="h-3 w-3" />
+                                              Remove
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Upload an image that represents this
+                                  day&apos;s activities or destination.
+                                </p>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`dayWiseData.${index}.title`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-sm font-bold text-gray-800 mb-1">
-                                Day Title
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g., Arrival & Welcome Ride"
-                                  className="neo-input"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`dayWiseData.${index}.accommodation`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-sm font-bold text-gray-800 mb-1">
-                                Accommodation
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g., Alpine Lodge in Verbier"
-                                  className="neo-input"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`dayWiseData.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem className="col-span-2">
-                              <FormLabel className="text-sm font-bold text-gray-800 mb-1">
-                                Day Description
-                              </FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  placeholder="Describe the day's activities and schedule..."
-                                  className="neo-input min-h-[100px]"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`dayWiseData.${index}.meals`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-sm font-bold text-gray-800 mb-1">
-                                Meals Included
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g., Breakfast, lunch, and dinner included"
-                                  className="neo-input"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`dayWiseData.${index}.activities`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-sm font-bold text-gray-800 mb-1">
-                                Activities
-                              </FormLabel>
-                              <FormControl>
-                                <ReactSelect
-                                  isMulti
-                                  placeholder="Add activities..."
-                                  options={[]} // You can add predefined options here
-                                  value={
-                                    field.value?.map((act: string) => ({
-                                      value: act,
-                                      label: act,
-                                    })) || []
-                                  }
-                                  onChange={(
-                                    selected: MultiValue<SelectOption>
-                                  ) =>
-                                    field.onChange(
-                                      selected.map((opt) => opt.value)
-                                    )
-                                  }
-                                  styles={{
-                                    ...selectStyles,
-                                    control: (base) => ({
-                                      ...base,
-                                      backgroundColor: "#f3f4f6",
-                                      border: "2px solid #000",
-                                      borderRadius: "0.75rem",
-                                      boxShadow: "4px 4px 0 0 #000",
-                                      fontWeight: "bold",
-                                    }),
-                                    multiValue: (base) => ({
-                                      ...base,
-                                      backgroundColor: "#e9d5ff",
-                                      color: "#6d28d9",
-                                    }),
-                                    option: (base, state) => ({
-                                      ...base,
-                                      backgroundColor: state.isSelected
-                                        ? "#facc15"
-                                        : state.isFocused
-                                        ? "#fde68a"
-                                        : "#fff",
-                                      color: "#333",
-                                      fontWeight: "bold",
-                                    }),
-                                  }}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   <div className="flex justify-center">
                     <Button
@@ -744,6 +885,10 @@ export const CreateDestinationForm = ({
                     <li className="flex items-start">
                       <span className="mr-2">✔️</span>
                       <span>Upload a compelling trip cover image</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔️</span>
+                      <span>Add day-wise images to enhance your itinerary</span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2">✔️</span>
@@ -800,8 +945,3 @@ export const CreateDestinationForm = ({
     </div>
   );
 };
-
-// Add this to your global CSS or module CSS for neo-brut styling:
-/* 
-
-*/

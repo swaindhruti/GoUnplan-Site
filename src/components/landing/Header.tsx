@@ -227,20 +227,17 @@ export default function Header() {
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 
-  // Transparent header for other routes
   const otherRoutesHeaderClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
     bg-transparent backdrop-blur-sm
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 
-  // Check if user should see "Want to be Host" button
   const shouldShowHostButton =
     status === "authenticated" &&
     session?.user?.role !== "HOST" &&
     session?.user?.role !== "ADMIN";
 
-  // If not home page, render transparent header with breadcrumbs
   if (!isHomePage) {
     return (
       <div className={otherRoutesHeaderClasses}>
@@ -402,7 +399,7 @@ export default function Header() {
                       {/* Want to be Host button - conditionally shown */}
                       {shouldShowHostButton && (
                         <DropdownMenuItem
-                          onClick={() => router.push("/become-host")}
+                          onClick={() => router.push("/dashboard/host")}
                           className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
                         >
                           <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
@@ -645,7 +642,7 @@ export default function Header() {
                     {/* Want to be Host button - conditionally shown */}
                     {shouldShowHostButton && (
                       <DropdownMenuItem
-                        onClick={() => router.push("/become-host")}
+                        onClick={() => router.push("/dashboard/host")}
                         className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
                       >
                         <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
@@ -893,7 +890,7 @@ export default function Header() {
                           <button
                             onClick={() => {
                               setIsOpen(false);
-                              router.push("/become-host");
+                              router.push("/dashboard/host");
                             }}
                             className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-amber-300/60 hover:shadow-lg"
                           >

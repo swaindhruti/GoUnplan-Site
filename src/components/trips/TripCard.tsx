@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Compass, Calendar, Languages, ArrowRight } from "lucide-react";
+import { Compass, Calendar, Languages, ArrowRight, Users } from "lucide-react";
 import { Trip } from "@/types/trips";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -17,18 +17,13 @@ export const TripCard = ({
 }: TripCardProps) => {
   return (
     <div
-      className={`group relative rounded-xl bg-white border border-gray-200 shadow-sm transition-transform duration-300 ease-in-out cursor-pointer flex flex-col `}
-      style={{
-        minHeight: "540px",
-        maxHeight: "540px",
-        width: "100%"
-      }}
+      className={`group w-full relative rounded-xl bg-white border border-gray-200 shadow-sm transition-transform h-auto duration-300 ease-in-out cursor-pointer flex flex-col`}
       onClick={onClick}
     >
       {/* Image Section */}
       <div className="relative h-72 rounded-t-xl overflow-hidden flex-shrink-0">
         <Image
-          src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+          src={trip.tripImage || ""}
           alt={trip.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -53,26 +48,26 @@ export const TripCard = ({
       </div>
 
       {/* Content */}
-      <div className="flex flex-col justify-between p-4 flex-grow overflow-hidden">
-        {/* Top: Title, Price, Description */}
+      <div className="flex flex-col justify-between p-4 flex-grow">
         <div className="space-y-3">
+          {/* Title & Price */}
           <div className="flex justify-between items-start">
             <h3 className="text-lg font-bricolage font-semibold text-gray-800 leading-snug pr-2 line-clamp-2">
               {trip.title}
             </h3>
-            <Badge className="text-base font-semibold px-3 py-1 bg-purple-100 text-purple-700 rounded-md whitespace-nowrap">
+            <Badge className="text-sm font-semibold px-3 py-1 bg-purple-100 text-purple-700 rounded-md whitespace-nowrap">
               ${trip.price.toLocaleString()}
             </Badge>
           </div>
 
+          {/* Description */}
           <p className="text-sm font-roboto text-gray-600 line-clamp-2">
             {trip.description}
           </p>
         </div>
 
-        {/* Bottom: Details, Tags, Button */}
+        {/* Trip Details */}
         <div className="space-y-3 mt-4">
-          {/* Trip Info */}
           <div className="flex flex-col gap-1 text-sm text-gray-700">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-purple-500" />
@@ -86,6 +81,12 @@ export const TripCard = ({
                 {trip.city}, {trip.state}, {trip.country}
               </span>
             </div>
+            {trip.maxParticipants && (
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-purple-500" />
+                <span className="text-sm">{trip.seatsLeft} Seats Left</span>
+              </div>
+            )}
           </div>
 
           {/* Tags */}
