@@ -45,7 +45,7 @@ export default function TripItinerary({
   const getCurrentImageIndex = (itemId: string) => imageIndexes[itemId] || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 overflow-x-hidden to-blue-50 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-12">
       {/* Header */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">

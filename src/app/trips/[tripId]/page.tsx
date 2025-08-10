@@ -16,13 +16,13 @@ import TripItinerary from "@/components/trips/Itenary";
 import Image from "next/image";
 
 type Props = {
-  params: {
+  params: Promise<{
     tripId: string;
-  };
+  }>;
 };
 
 export default async function TripDetailsPage({ params }: Props) {
-  const { tripId } = params;
+  const tripId = (await params).tripId;
   const trip = await getTripById(tripId);
   const UserSession = await requireUser();
 

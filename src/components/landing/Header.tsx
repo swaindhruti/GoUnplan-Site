@@ -242,7 +242,8 @@ export default function Header() {
     session?.user?.role !== "ADMIN";
 
   // Determine if current user is a host
-  const isUserHost = session?.user?.role === "HOST" || session?.user?.role === "ADMIN";
+  const isUserHost =
+    session?.user?.role === "HOST" || session?.user?.role === "ADMIN";
 
   // Handle host mode toggle
   const handleHostModeToggle = (checked: boolean) => {
@@ -250,7 +251,7 @@ export default function Header() {
     if (checked) {
       router.push("/dashboard/host");
     } else {
-      router.push("/dashboard/user");
+      router.push("/");
     }
     setIsDashboardMenuOpen(false);
   };
@@ -401,24 +402,24 @@ export default function Header() {
                           {isDashboardMenuOpen &&
                             (session?.user?.role === "HOST" ||
                               session?.user?.role === "ADMIN") && (
-                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                              {getDashboardMenuItems().map((item) => (
-                                <DropdownMenuItem
-                                  key={item.href}
-                                  onClick={() => {
-                                    router.push(item.href);
-                                    setIsDashboardMenuOpen(false);
-                                  }}
-                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                                >
-                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                  <span className="font-medium text-gray-800">
-                                    {item.label}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                            </div>
-                          )}
+                              <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                                {getDashboardMenuItems().map((item) => (
+                                  <DropdownMenuItem
+                                    key={item.href}
+                                    onClick={() => {
+                                      router.push(item.href);
+                                      setIsDashboardMenuOpen(false);
+                                    }}
+                                    className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                                  >
+                                    <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                    <span className="font-medium text-gray-800">
+                                      {item.label}
+                                    </span>
+                                  </DropdownMenuItem>
+                                ))}
+                              </div>
+                            )}
                         </div>
 
                         <DropdownMenuItem
@@ -661,24 +662,24 @@ export default function Header() {
                         {isDashboardMenuOpen &&
                           (session?.user?.role === "HOST" ||
                             session?.user?.role === "ADMIN") && (
-                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                            {getDashboardMenuItems().map((item) => (
-                              <DropdownMenuItem
-                                key={item.href}
-                                onClick={() => {
-                                  router.push(item.href);
-                                  setIsDashboardMenuOpen(false);
-                                }}
-                                className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                              >
-                                <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                <span className="font-medium text-gray-800">
-                                  {item.label}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
-                          </div>
-                        )}
+                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                              {getDashboardMenuItems().map((item) => (
+                                <DropdownMenuItem
+                                  key={item.href}
+                                  onClick={() => {
+                                    router.push(item.href);
+                                    setIsDashboardMenuOpen(false);
+                                  }}
+                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                                >
+                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                                  <span className="font-medium text-gray-800">
+                                    {item.label}
+                                  </span>
+                                </DropdownMenuItem>
+                              ))}
+                            </div>
+                          )}
                       </div>
 
                       <DropdownMenuItem
