@@ -68,7 +68,7 @@ export default async function TripDetailsPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50  font-instrument">
       {/* Hero Section */}
       <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
         <Image
@@ -82,7 +82,7 @@ export default async function TripDetailsPage({ params }: Props) {
 
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
+          <h1 className="text-3xl font-bricolage sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
             {trip.title}
           </h1>
           <div className="flex items-center">
@@ -94,7 +94,7 @@ export default async function TripDetailsPage({ params }: Props) {
               className="rounded-full mr-3"
             />
             <div>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold font-instrument text-gray-800">
                 Hosted by {trip.host.user.name}
               </p>
 
@@ -112,7 +112,7 @@ export default async function TripDetailsPage({ params }: Props) {
         </div>
 
         {/* Trip Info */}
-        <div className="flex flex-wrap gap-6 text-gray-700">
+        <div className="flex flex-wrap gap-6  font-instrument text-gray-700">
           <div className="flex items-center gap-2">
             <span>⏳</span> {tripStats.noOfDays} days
           </div>
@@ -129,14 +129,14 @@ export default async function TripDetailsPage({ params }: Props) {
 
         {/* Highlights */}
         <div className="bg-purple-600 text-white rounded-lg p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid font-instrument grid-cols-1 sm:grid-cols-2 gap-4">
             {highlights.flat().map((item, idx) => (
               <div key={idx}>⚡ {item}</div>
             ))}
           </div>
         </div>
 
-        <p className="text-lg text-gray-700 leading-relaxed">
+        <p className="text-lg text-gray-700  font-instrument leading-relaxed">
           {trip.description}
         </p>
 
