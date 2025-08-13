@@ -12,7 +12,8 @@ export const getTripById = async (tripId: string) => {
 
         bookings: {
           where: {
-            travelPlanId: tripId
+            travelPlanId: tripId,
+            status: { in: ["CONFIRMED", "PENDING"] }
           },
           select: {
             id: true,
