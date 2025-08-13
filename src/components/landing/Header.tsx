@@ -120,37 +120,30 @@ export default function Header() {
     router.push("/");
   };
 
-  // Handle dashboard navigation based on user role
   const handleDashboardClick = () => {
     const userRole = session?.user?.role || "USER";
 
-    // If user role, go directly to user dashboard
     if (userRole === "USER") {
       router.push("/dashboard/user");
       setIsDashboardMenuOpen(false);
       return;
     }
 
-    // For HOST and ADMIN, toggle the menu
     setIsDashboardMenuOpen(!isDashboardMenuOpen);
   };
 
-  // Handle mobile dashboard click
   const handleMobileDashboardClick = () => {
     const userRole = session?.user?.role || "USER";
 
-    // If user role, go directly to user dashboard
     if (userRole === "USER") {
       router.push("/dashboard/user");
       setIsOpen(false);
       return;
     }
 
-    // For HOST and ADMIN, toggle the mobile menu
     setIsMobileDashboardOpen(!isMobileDashboardOpen);
   };
 
-  // Get dashboard menu items based on user role
   const getDashboardMenuItems = () => {
     const userRole = session?.user?.role || "USER";
     const items = [];
@@ -186,14 +179,12 @@ export default function Header() {
       .filter((segment) => segment !== "");
     const breadcrumbs = [];
 
-    // Always start with Home
     breadcrumbs.push({
       label: "Home",
       href: "/",
       isActive: pathname === "/"
     });
 
-    // Add path segments
     let currentPath = "";
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;

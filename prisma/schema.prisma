@@ -76,6 +76,7 @@ model TravelPlans {
   title              String
   description        String
   includedActivities String[]
+  notIncludedActivities String[]
   restrictions       String[]
   noOfDays           Int
   hostId             String

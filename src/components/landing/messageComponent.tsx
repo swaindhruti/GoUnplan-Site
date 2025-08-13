@@ -53,13 +53,13 @@ export const MessageComponent = () => {
       {!isShrinked ? (
         <button
           title="Open messages"
-          className="fixed right-10 font-instrument hover:scale-105 hover:-rotate-12 duration-300  bg-white bottom-5 z-50 p-3  text-black rounded-xl shadow-md  transition-all"
+          className="fixed right-10 bottom-20 font-instrument hover:scale-105 hover:-rotate-12 duration-300  bg-white  z-50 p-3  text-black rounded-xl shadow-md  transition-all"
           onClick={changeShrinkState}
         >
           <UnreadcountMessageBox unreadCount={unreadCount} />
         </button>
       ) : (
-        <div className="p-6 font-instrument bg-white rounded-lg fixed right-10 bottom-5 z-50 shadow-md max-w-md mx-auto">
+        <div className="p-6 font-instrument bg-white rounded-lg fixed right-10 bottom-20 z-50 shadow-md max-w-md mx-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bricolage tracking-tight font-bold text-gray-800">
               Messages
