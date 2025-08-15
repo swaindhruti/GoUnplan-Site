@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const LoadingSkeleton = () => (
-  <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {Array.from({ length: 6 }).map((_, i) => (
-      <div
-        key={i}
-        className="w-full h-[540px] flex flex-col justify-between rounded-3xl border border-white/40 bg-white/60  p-4"
-      >
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full h-[540px] flex flex-col justify-between rounded-2xl border border-gray-200 bg-white shadow-sm p-4"
+        >
         {/* Image */}
-        <div className="relative h-64 w-full overflow-hidden rounded-2xl">
+        <div className="relative h-64 w-full overflow-hidden rounded-t-2xl">
           <Skeleton className="absolute inset-0 w-full h-full" />
         </div>
 
@@ -50,9 +51,10 @@ export const LoadingSkeleton = () => (
         </div>
 
         {/* Button */}
-        <Skeleton className="w-full h-12 rounded-2xl mt-2" />
-      </div>
-    ))}
+        <Skeleton className="w-full h-12 rounded-full mt-2" />
+        </div>
+      ))}
+    </div>
   </div>
 );
 
@@ -61,31 +63,33 @@ interface EmptyStateProps {
 }
 
 export const EmptyState = ({ onClearFilters }: EmptyStateProps) => (
-  <div className="text-center py-16">
-    <div className="max-w-md mx-auto">
-      {/* Icon container */}
-      <div className="inline-block p-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl mb-8 shadow-lg">
-        <Search className="h-16 w-16 text-purple-600" />
-      </div>
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="text-center py-16">
+      <div className="max-w-md mx-auto">
+        {/* Icon container */}
+        <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Search className="h-10 w-10 text-purple-600" />
+        </div>
 
-      {/* Header */}
-      <div className="mb-8 space-y-4">
-        <h3 className="text-3xl font-bricolage font-bold text-gray-800">
-          No Adventures Found
-        </h3>
-        <p className="text-lg text-gray-600 leading-relaxed">
-          We couldn&apos;t find any trips matching your current preferences. Try
-          adjusting your filters or explore our other amazing destinations!
-        </p>
-      </div>
+        {/* Header */}
+        <div className="mb-8 space-y-4">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-900">
+            No Adventures Found
+          </h3>
+          <p className="text-gray-600 font-instrument leading-relaxed">
+            We couldn&apos;t find any trips matching your current preferences. Try
+            adjusting your filters or explore our other amazing destinations!
+          </p>
+        </div>
 
-      {/* Button */}
-      <Button
-        onClick={onClearFilters}
-        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-      >
-        Clear All Filters
-      </Button>
+        {/* Button */}
+        <Button
+          onClick={onClearFilters}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold px-8 py-3 rounded-full transition-colors duration-200"
+        >
+          Clear All Filters
+        </Button>
+      </div>
     </div>
   </div>
 );
@@ -95,28 +99,30 @@ interface ErrorDisplayProps {
 }
 
 export const ErrorDisplay = ({ error }: ErrorDisplayProps) => (
-  <div className="text-center py-16">
-    <div className="max-w-md mx-auto">
-      {/* Icon container */}
-      <div className="inline-block p-6 bg-gradient-to-r from-red-100 to-orange-100 rounded-3xl mb-8 shadow-lg">
-        <AlertCircle className="h-16 w-16 text-red-600" />
-      </div>
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="text-center py-16">
+      <div className="max-w-md mx-auto">
+        {/* Icon container */}
+        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertCircle className="h-10 w-10 text-red-600" />
+        </div>
 
-      {/* Header */}
-      <div className="mb-8 space-y-4">
-        <h3 className="text-3xl font-bricolage font-bold text-gray-800">
-          Oops! Something went wrong
-        </h3>
-        <p className="text-lg text-gray-600 leading-relaxed">{error}</p>
-      </div>
+        {/* Header */}
+        <div className="mb-8 space-y-4">
+          <h3 className="text-2xl font-bricolage font-bold text-gray-900">
+            Oops! Something went wrong
+          </h3>
+          <p className="text-gray-600 font-instrument leading-relaxed">{error}</p>
+        </div>
 
-      {/* Button */}
-      <Button
-        onClick={() => window.location.reload()}
-        className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-      >
-        Try Again
-      </Button>
+        {/* Button */}
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-red-600 hover:bg-red-700 text-white font-instrument font-semibold px-8 py-3 rounded-full transition-colors duration-200"
+        >
+          Try Again
+        </Button>
+      </div>
     </div>
   </div>
 );

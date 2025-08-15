@@ -1,9 +1,7 @@
 import {
   User,
   Calendar,
-  BookOpen,
   MessageSquare,
-  Settings,
   Star,
 } from "lucide-react";
 
@@ -16,95 +14,68 @@ export function NavigationTabs({
   activeTab,
   setActiveTab,
 }: NavigationTabsProps) {
-  // Define tabs with sophisticated styling and descriptions
+  // Define tabs with clean, simple styling
   const tabs = [
     {
       id: "profile",
-      label: "PROFILE",
-      icon: <User className="w-5 h-5" />,
-      description: "Personal Settings",
+      label: "Profile",
+      icon: <User className="w-4 h-4" />,
     },
     {
       id: "bookings",
-      label: "BOOKINGS",
-      icon: <Calendar className="w-5 h-5" />,
-      description: "Travel History",
-    },
-    {
-      id: "explore",
-      label: "EXPLORE",
-      icon: <BookOpen className="w-5 h-5" />,
-      description: "Discover Trips",
+      label: "Bookings",
+      icon: <Calendar className="w-4 h-4" />,
     },
     {
       id: "messages",
-      label: "MESSAGES",
-      icon: <MessageSquare className="w-5 h-5" />,
-      description: "Communication",
+      label: "Messages",
+      icon: <MessageSquare className="w-4 h-4" />,
     },
     {
       id: "reviews",
-      label: "REVIEWS",
-      icon: <Star className="w-5 h-5" />,
-      description: "Your Feedback",
-    },
-    {
-      id: "settings",
-      label: "SETTINGS",
-      icon: <Settings className="w-5 h-5" />,
-      description: "Preferences",
+      label: "Reviews",
+      icon: <Star className="w-4 h-4" />,
     },
   ];
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm border-b border-slate-200/50 py-4">
+    <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center space-x-3 overflow-x-auto overflow-y-hidden scrollbar-hide py-5">
+        <div className="flex items-center justify-center gap-x-2 py-4 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                relative group px-8 py-6 font-semibold text-sm uppercase tracking-wider
-                rounded-xl transition-all duration-300 flex flex-col items-center gap-3 min-w-[140px] flex-shrink-0
+                relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group
                 ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25 scale-105"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-102"
+                    ? "text-purple-600 bg-purple-50"
+                    : "text-gray-700 hover:text-purple-600 hover:bg-purple-50"
                 }
+                focus:outline-none focus:ring-2 focus:ring-purple-300
               `}
             >
-              <div
-                className={`
-                p-3 rounded-lg transition-all duration-300 flex-shrink-0
-                ${
-                  activeTab === tab.id
-                    ? "bg-white/20"
-                    : "bg-slate-100 group-hover:bg-slate-200"
-                }
-              `}
-              >
+              <div className="flex items-center gap-2 font-instrument">
                 {tab.icon}
+                <span>{tab.label}</span>
               </div>
-              <div className="text-center space-y-1 flex-shrink-0">
-                <div className="font-semibold text-sm whitespace-nowrap">
-                  {tab.label}
-                </div>
-                <div
-                  className={`text-xs font-medium whitespace-nowrap ${
-                    activeTab === tab.id ? "text-white/80" : "text-slate-500"
-                  }`}
-                >
-                  {tab.description}
-                </div>
-              </div>
-              {activeTab === tab.id && (
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-10 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full" />
-              )}
+              <span 
+                className={`
+                  absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 
+                  bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 
+                  rounded-full
+                  ${
+                    activeTab === tab.id 
+                      ? "w-3/4" 
+                      : "group-hover:w-3/4"
+                  }
+                `}
+              />
             </button>
           ))}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

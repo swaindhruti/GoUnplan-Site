@@ -21,11 +21,18 @@ import { z } from "zod";
 import { FormComponentProps } from "@/types/form";
 import { createTravelPlan } from "@/actions/host/action";
 import { useRouter } from "next/navigation";
-import ReactSelect, { StylesConfig, MultiValue } from "react-select";
+import { MultiValue } from "react-select";
 import { Plus, Minus, Map, Calendar, FileText, Camera, X } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import ReactSelect to prevent hydration issues
+const ReactSelect = dynamic(() => import("react-select"), {
+  ssr: false,
+  loading: () => <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
+});
 
 type SelectOption = {
   value: string;
@@ -170,7 +177,7 @@ export const CreateDestinationForm = ({
       {({ open }: { open?: () => void }) => (
         <button
           type="button"
-          className="bg-white text-purple-700 border-2 border-black rounded-xl px-4 py-2 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-purple-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors font-instrument disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => {
             if (open) {
               open();
@@ -180,6 +187,7 @@ export const CreateDestinationForm = ({
           }}
           disabled={!open}
         >
+          <Camera className="h-4 w-4 mr-2" />
           {label}
         </button>
       )}
@@ -263,89 +271,65 @@ export const CreateDestinationForm = ({
     return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
   };
 
-  const selectStyles: StylesConfig<SelectOption, true> = {
-    control: (base) => ({
-      ...base,
-      backgroundColor: "white",
-      borderColor: "#e2e8f0",
-      color: "#333"
-    }),
-    menu: (base) => ({ ...base, backgroundColor: "white" }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isSelected
-        ? "#f3f4f6"
-        : state.isFocused
-        ? "#f3f4f6"
-        : "white",
-      color: "#333"
-    }),
-    multiValue: (base) => ({ ...base, backgroundColor: "#f3f4f6" }),
-    multiValueLabel: (base) => ({ ...base, color: "#333" }),
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "#333",
-      ":hover": { backgroundColor: "#e2e8f0" }
-    }),
-    placeholder: (base) => ({ ...base, color: "#94a3b8" }),
-    input: (base) => ({ ...base, color: "#333" })
-  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-yellow-50">
-      <header className="bg-purple-100 border-b-4 border-black shadow-[0_6px_0_0_rgba(0,0,0,1)] relative z-10">
-        <div className="max-w-7xl mx-auto flex items-center h-20 px-6 justify-between">
-          <div className="text-3xl md:text-4xl font-extrabold tracking-tight text-purple-700 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] select-none">
-            Unplan
-          </div>
-          <div className="flex gap-4">
-            <button
-              onClick={() => {
-                router.push("/dashboard/host");
-              }}
-              className="bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_0_rgba(0,0,0,1)] font-bold text-purple-700 px-5 py-2 hover:bg-purple-50 transition-all duration-150"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => {
-                router.push("/dashboard/trips");
-              }}
-              className="bg-white border-2 border-black rounded-xl shadow-[2px_2px_0_0_rgba(0,0,0,1)] font-bold text-yellow-600 px-5 py-2 hover:bg-yellow-50 transition-all duration-150"
-            >
-              Trips
-            </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="inline-flex items-center px-4 py-1.5 bg-purple-100 rounded-full mb-2">
+                <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase font-instrument">
+                  Create Experience
+                </span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 font-bricolage leading-tight">
+                Create New Travel Experience
+              </h1>
+              <p className="text-lg text-gray-600 font-instrument">
+                Plan and organize your perfect destination experience
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push("/dashboard/host")}
+                className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors font-instrument font-medium"
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="max-w-4xl w-full bg-white rounded-xl border-4 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] overflow-hidden">
-          <div className="border-b-4 border-black bg-yellow-100 px-6 py-4">
-            <div className="flex items-center justify-center">
-              <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 border-4 border-black flex items-center justify-center mb-2 shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
-                <Map className="h-8 w-8 text-purple-600" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Map className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 font-bricolage">
+                  Trip Details
+                </h2>
+                <p className="text-sm text-gray-600 font-instrument">
+                  Fill in the details for your travel experience
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-2 leading-tight drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
-                Create Your <span className="text-purple-700">Dream Trip</span>
-              </h1>
-              <p className="text-lg text-gray-700 font-semibold">
-                Plan and organize your perfect destination experience
-              </p>
-            </div>
+          <div className="p-6">
 
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
+                className="space-y-6"
               >
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {FormData.map((data) => {
                     if (
                       ["text", "email", "tel", "number"].includes(data.type)
@@ -357,25 +341,14 @@ export const CreateDestinationForm = ({
                           name={data.id}
                           render={({ field }) => (
                             <FormItem className={data.className}>
-                              <FormLabel className="flex items-center text-sm font-bold text-gray-800 mb-1">
-                                {data.id === "tripName" && (
-                                  <FileText className="h-4 w-4 text-gray-500 mr-2" />
-                                )}
-                                {data.id === "price" && (
-                                  <span className="h-4 w-4 text-gray-500 mr-2">
-                                    $
-                                  </span>
-                                )}
-                                {data.id === "destination" && (
-                                  <Map className="h-4 w-4 text-gray-500 mr-2" />
-                                )}
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                 {data.label}
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   type={data.type}
                                   placeholder={data.placeholder}
-                                  className="neo-input"
+                                  className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                   {...field}
                                   value={field.value?.toString() ?? ""}
                                 />
@@ -395,14 +368,13 @@ export const CreateDestinationForm = ({
                           name={data.id}
                           render={({ field }) => (
                             <FormItem className={data.className}>
-                              <FormLabel className="flex items-center text-sm font-bold text-gray-800 mb-1">
-                                <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                 {data.label}
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   type="date"
-                                  className="neo-input"
+                                  className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                   {...field}
                                   value={formatDateForInput(field.value)}
                                   onChange={(e) =>
@@ -431,21 +403,20 @@ export const CreateDestinationForm = ({
                             <FormItem
                               className={`${data.className} md:col-span-2`}
                             >
-                              <FormLabel className="flex items-center text-sm font-bold text-gray-800 mb-1">
-                                <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                 {data.label}
                               </FormLabel>
                               <FormControl>
                                 <Textarea
                                   placeholder={data.placeholder}
-                                  className="neo-input min-h-[100px] resize-none"
+                                  className="min-h-[100px] resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                   {...field}
                                   value={field.value?.toString() ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
-                              <p className="text-xs text-gray-500 mt-1">
-                                Provide a detailed description of your trip.
+                              <p className="text-xs text-gray-500 mt-1 font-instrument">
+                                Provide a detailed description of your trip experience.
                               </p>
                             </FormItem>
                           )}
@@ -457,13 +428,15 @@ export const CreateDestinationForm = ({
                       return (
                         <div
                           key={data.id}
-                          className={`${data.className} md:col-span-2 mt-8 mb-4`}
+                          className={`${data.className} md:col-span-2 mt-8 mb-6`}
                         >
-                          <div className="w-full text-gray-800 text-xl font-extrabold flex items-center border-b-2 border-black pb-2">
-                            <span className="bg-purple-100 p-1 rounded-md mr-2 border-2 border-black">
+                          <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                               <FileText className="h-4 w-4 text-purple-600" />
-                            </span>
-                            {data.label}
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                              {data.label}
+                            </h3>
                           </div>
                         </div>
                       );
@@ -481,7 +454,7 @@ export const CreateDestinationForm = ({
                           name={data.id}
                           render={({ field }) => (
                             <FormItem className={data.className}>
-                              <FormLabel className="flex items-center text-sm font-bold text-gray-800 mb-1">
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                 {data.label}
                               </FormLabel>
                               <FormControl>
@@ -494,40 +467,62 @@ export const CreateDestinationForm = ({
                                       label: val
                                     })
                                   )}
-                                  onChange={(
-                                    selected: MultiValue<SelectOption>
-                                  ) =>
+                                  onChange={(newValue) => {
+                                    const selected = newValue as MultiValue<SelectOption>;
                                     field.onChange(
-                                      selected.map((opt) => opt.value)
-                                    )
-                                  }
+                                      selected?.map((opt) => opt.value) || []
+                                    );
+                                  }}
                                   styles={{
-                                    ...selectStyles,
                                     control: (base) => ({
                                       ...base,
-                                      backgroundColor: "#f3f4f6",
-                                      border: "2px solid #000",
-                                      borderRadius: "0.75rem",
-                                      boxShadow: "4px 4px 0 0 #000",
-                                      fontWeight: "bold"
+                                      minHeight: '44px',
+                                      backgroundColor: 'white',
+                                      border: '1px solid #e5e7eb',
+                                      borderRadius: '0.375rem',
+                                      boxShadow: 'none',
+                                      '&:hover': {
+                                        borderColor: '#a855f7'
+                                      },
+                                      '&:focus-within': {
+                                        borderColor: '#a855f7',
+                                        boxShadow: '0 0 0 3px rgba(168, 85, 247, 0.1)'
+                                      }
                                     }),
                                     multiValue: (base) => ({
                                       ...base,
-                                      backgroundColor: "#e9d5ff",
-                                      color: "#6d28d9"
+                                      backgroundColor: '#f3e8ff',
+                                      borderRadius: '0.25rem'
+                                    }),
+                                    multiValueLabel: (base) => ({
+                                      ...base,
+                                      color: '#7c3aed',
+                                      fontWeight: '500'
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      color: '#7c3aed',
+                                      '&:hover': {
+                                        backgroundColor: '#e9d5ff',
+                                        color: '#6d28d9'
+                                      }
                                     }),
                                     option: (base, state) => ({
                                       ...base,
                                       backgroundColor: state.isSelected
-                                        ? "#facc15"
+                                        ? '#a855f7'
                                         : state.isFocused
-                                        ? "#fde68a"
-                                        : "#fff",
-                                      color: "#333",
-                                      fontWeight: "bold"
+                                        ? '#f3e8ff'
+                                        : 'white',
+                                      color: state.isSelected ? 'white' : '#374151'
+                                    }),
+                                    placeholder: (base) => ({
+                                      ...base,
+                                      color: '#9ca3af'
                                     })
                                   }}
                                   placeholder={data.placeholder}
+                                  className="font-instrument"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -542,12 +537,12 @@ export const CreateDestinationForm = ({
                 </div>
 
                 {/* Trip Image Upload Section */}
-                <div className="space-y-4">
-                  <div className="border-b-2 border-black pb-2">
-                    <h3 className="text-lg font-extrabold text-gray-800 flex items-center">
-                      <span className="bg-purple-100 p-1 rounded-md mr-2 border-2 border-black">
-                        <Camera className="h-4 w-4 text-purple-600" />
-                      </span>
+                <div className="space-y-4 mt-8">
+                  <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Camera className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
                       Trip Image
                     </h3>
                   </div>
@@ -557,7 +552,7 @@ export const CreateDestinationForm = ({
                     name="tripImage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                        <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                           Upload Trip Cover Image
                         </FormLabel>
                         <FormControl>
@@ -578,7 +573,7 @@ export const CreateDestinationForm = ({
                                   height={500}
                                   src={field.value}
                                   alt="Trip cover"
-                                  className="w-full h-48 object-cover rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                                  className="w-full h-48 object-cover rounded-xl border border-gray-200 shadow-sm"
                                 />
                                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                                   <div className="flex gap-2">
@@ -586,9 +581,9 @@ export const CreateDestinationForm = ({
                                     <button
                                       type="button"
                                       onClick={removeImage}
-                                      className="bg-red-500 text-white border-2 border-black rounded-xl px-4 py-2 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-red-600 transition-all flex items-center gap-2"
+                                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
                                     >
-                                      <X className="h-4 w-4" />
+                                      <X className="h-4 w-4 mr-2" />
                                       Remove
                                     </button>
                                   </div>
@@ -607,12 +602,12 @@ export const CreateDestinationForm = ({
                   />
                 </div>
 
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-extrabold text-gray-900 flex items-center drop-shadow-[1px_1px_0_rgba(0,0,0,1)]">
-                      <span className="bg-purple-100 p-1 rounded-md mr-2 border-2 border-black">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                      </span>
+                <div className="space-y-6 mt-8">
+                  <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
                       Day-by-Day Itinerary
                     </h3>
                   </div>
@@ -621,21 +616,27 @@ export const CreateDestinationForm = ({
                     return (
                       <div
                         key={field.id}
-                        className="p-6 bg-yellow-50 rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                        className="p-6 bg-white rounded-lg border border-gray-200 shadow-sm"
                       >
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-extrabold text-gray-800">
-                            Day {index + 1}
-                          </h3>
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                              Day {index + 1}
+                            </h3>
+                          </div>
                           {fields.length > 1 && (
                             <Button
                               type="button"
                               variant="outline"
                               size="sm"
                               onClick={() => removeDay(index)}
-                              className="bg-red-50 border-2 border-black text-red-600 hover:bg-red-100 shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+                              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 font-instrument"
                             >
                               <Minus className="h-4 w-4" />
+                              Remove Day
                             </Button>
                           )}
                         </div>
@@ -646,13 +647,13 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.title`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Day Title
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="e.g., Arrival & Welcome Ride"
-                                    className="neo-input"
+                                    className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                     {...field}
                                   />
                                 </FormControl>
@@ -666,13 +667,13 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.accommodation`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Accommodation
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="e.g., Alpine Lodge in Verbier"
-                                    className="neo-input"
+                                    className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                     {...field}
                                   />
                                 </FormControl>
@@ -686,13 +687,13 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.description`}
                             render={({ field }) => (
                               <FormItem className="col-span-2">
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Day Description
                                 </FormLabel>
                                 <FormControl>
                                   <Textarea
                                     placeholder="Describe the day's activities and schedule..."
-                                    className="neo-input min-h-[100px]"
+                                    className="min-h-[100px] resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                     {...field}
                                   />
                                 </FormControl>
@@ -706,13 +707,13 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.meals`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Meals Included
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="e.g., Breakfast, lunch, and dinner included"
-                                    className="neo-input"
+                                    className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                     {...field}
                                   />
                                 </FormControl>
@@ -726,7 +727,7 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.activities`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Activities
                                 </FormLabel>
                                 <FormControl>
@@ -740,37 +741,58 @@ export const CreateDestinationForm = ({
                                         label: act
                                       })) || []
                                     }
-                                    onChange={(
-                                      selected: MultiValue<SelectOption>
-                                    ) =>
+                                    onChange={(newValue) => {
+                                      const selected = newValue as MultiValue<SelectOption>;
                                       field.onChange(
-                                        selected.map((opt) => opt.value)
-                                      )
-                                    }
+                                        selected?.map((opt) => opt.value) || []
+                                      );
+                                    }}
                                     styles={{
-                                      ...selectStyles,
                                       control: (base) => ({
                                         ...base,
-                                        backgroundColor: "#f3f4f6",
-                                        border: "2px solid #000",
-                                        borderRadius: "0.75rem",
-                                        boxShadow: "4px 4px 0 0 #000",
-                                        fontWeight: "bold"
+                                        minHeight: '44px',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '0.375rem',
+                                        boxShadow: 'none',
+                                        '&:hover': {
+                                          borderColor: '#a855f7'
+                                        },
+                                        '&:focus-within': {
+                                          borderColor: '#a855f7',
+                                          boxShadow: '0 0 0 3px rgba(168, 85, 247, 0.1)'
+                                        }
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
-                                        backgroundColor: "#e9d5ff",
-                                        color: "#6d28d9"
+                                        backgroundColor: '#f3e8ff',
+                                        borderRadius: '0.25rem'
+                                      }),
+                                      multiValueLabel: (base) => ({
+                                        ...base,
+                                        color: '#7c3aed',
+                                        fontWeight: '500'
+                                      }),
+                                      multiValueRemove: (base) => ({
+                                        ...base,
+                                        color: '#7c3aed',
+                                        '&:hover': {
+                                          backgroundColor: '#e9d5ff',
+                                          color: '#6d28d9'
+                                        }
                                       }),
                                       option: (base, state) => ({
                                         ...base,
                                         backgroundColor: state.isSelected
-                                          ? "#facc15"
+                                          ? '#a855f7'
                                           : state.isFocused
-                                          ? "#fde68a"
-                                          : "#fff",
-                                        color: "#333",
-                                        fontWeight: "bold"
+                                          ? '#f3e8ff'
+                                          : 'white',
+                                        color: state.isSelected ? 'white' : '#374151'
+                                      }),
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: '#9ca3af'
                                       })
                                     }}
                                   />
@@ -782,10 +804,12 @@ export const CreateDestinationForm = ({
                         </div>
 
                         {/* Day-wise Image Upload Section */}
-                        <div className="space-y-4">
-                          <div className="border-b border-gray-300 pb-2">
-                            <h4 className="text-md font-bold text-gray-700 flex items-center">
-                              <Camera className="h-4 w-4 text-gray-500 mr-2" />
+                        <div className="space-y-4 mt-6">
+                          <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+                            <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center">
+                              <Camera className="h-3 w-3 text-purple-600" />
+                            </div>
+                            <h4 className="text-sm font-semibold text-gray-700 font-instrument">
                               Day {index + 1} Image
                             </h4>
                           </div>
@@ -795,17 +819,16 @@ export const CreateDestinationForm = ({
                             name={`dayWiseData.${index}.dayWiseImage`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm font-bold text-gray-800 mb-1">
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   Upload Day Image
                                 </FormLabel>
                                 <FormControl>
                                   <div className="space-y-4">
                                     {!field.value ? (
-                                      <div className="flex flex-col items-center justify-center p-6 border border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
+                                      <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
                                         <Camera className="h-8 w-8 text-gray-400 mb-2" />
-                                        <p className="text-xs text-gray-500 mb-3 text-center">
-                                          Add an image for this day&apos;s
-                                          activities
+                                        <p className="text-xs text-gray-500 mb-3 text-center font-instrument">
+                                          Add an image for this day&apos;s activities
                                         </p>
                                         {createDayWiseUploadButton(
                                           index,
@@ -819,7 +842,7 @@ export const CreateDestinationForm = ({
                                           height={300}
                                           src={field.value}
                                           alt={`Day ${index + 1} image`}
-                                          className="w-full h-32 object-cover rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+                                          className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
                                         />
                                         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                                           <div className="flex gap-2">
@@ -832,9 +855,9 @@ export const CreateDestinationForm = ({
                                               onClick={() =>
                                                 removeDayWiseImage(index)
                                               }
-                                              className="bg-red-500 text-white border-2 border-black rounded-lg px-3 py-1 font-bold shadow-[1px_1px_0_0_rgba(0,0,0,1)] hover:bg-red-600 transition-all flex items-center gap-1 text-sm"
+                                              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
                                             >
-                                              <X className="h-3 w-3" />
+                                              <X className="h-3 w-3 mr-1" />
                                               Remove
                                             </button>
                                           </div>
@@ -844,9 +867,8 @@ export const CreateDestinationForm = ({
                                   </div>
                                 </FormControl>
                                 <FormMessage />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Upload an image that represents this
-                                  day&apos;s activities or destination.
+                                <p className="text-xs text-gray-500 mt-1 font-instrument">
+                                  Upload an image that represents this day&apos;s activities or destination.
                                 </p>
                               </FormItem>
                             )}
@@ -861,7 +883,7 @@ export const CreateDestinationForm = ({
                       type="button"
                       variant="outline"
                       onClick={addDay}
-                      className="border-2 border-purple-700 text-purple-700 bg-yellow-50 hover:bg-yellow-100 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all"
+                      className="text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300 font-instrument"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Another Day
@@ -869,79 +891,68 @@ export const CreateDestinationForm = ({
                   </div>
                 </div>
 
-                <div className="bg-yellow-50 p-4 rounded-lg border-2 border-black mb-4 shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
-                  <h4 className="font-bold text-gray-800 mb-2">
-                    Before you submit:
-                  </h4>
-                  <ul className="text-sm text-gray-700 space-y-1 font-semibold">
+                <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <FileText className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 font-bricolage">
+                      Before you submit:
+                    </h4>
+                  </div>
+                  <ul className="text-sm text-gray-700 space-y-2 font-instrument">
                     <li className="flex items-start">
-                      <span className="mr-2">✔️</span>
+                      <span className="mr-3 text-green-500">✓</span>
                       <span>Review all trip details for accuracy</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">✔️</span>
+                      <span className="mr-3 text-green-500">✓</span>
                       <span>Ensure dates and pricing are correct</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">✔️</span>
+                      <span className="mr-3 text-green-500">✓</span>
                       <span>Upload a compelling trip cover image</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">✔️</span>
+                      <span className="mr-3 text-green-500">✓</span>
                       <span>Add day-wise images to enhance your itinerary</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">✔️</span>
+                      <span className="mr-3 text-green-500">✓</span>
                       <span>Your trip will be live after submission</span>
                     </li>
                   </ul>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full bg-purple-700 hover:bg-purple-800 text-white px-8 py-4 h-auto rounded-lg text-lg font-extrabold border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center gap-2 transition-all duration-300"
-                >
-                  Create Trip Destination
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-5 h-5"
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
                   >
-                    <path d="m5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </Button>
+                    Create Travel Experience
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4"
+                    >
+                      <path d="m5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </Button>
+                </div>
               </form>
             </Form>
           </div>
 
-          <div className="border-t-4 border-black bg-yellow-100 px-6 py-4">
-            <div className="flex justify-center items-center gap-2 text-gray-700 font-bold">
-              <div className="w-12 h-px bg-gray-400" />
-              <span className="text-sm">
-                Create your perfect travel experience
-              </span>
-              <div className="w-12 h-px bg-gray-400" />
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t-4 border-black py-6 shadow-[0_-4px_0_0_rgba(0,0,0,1)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-600 font-bold">
-            <p>© 2024 Unplan. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

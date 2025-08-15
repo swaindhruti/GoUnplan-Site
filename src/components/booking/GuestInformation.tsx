@@ -283,106 +283,102 @@ export function GuestInformationForm({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4 border-b border-purple-100 pb-6 mb-8">
-        <div className="bg-purple-100 p-4 rounded-2xl">
-          <Users className="h-8 w-8 text-purple-600" strokeWidth={2.5} />
-        </div>
-        <h2 className="text-3xl font-bricolage font-bold text-gray-800">
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-2">
           Guest Information
         </h2>
+        <p className="text-gray-600 font-instrument">
+          Please provide details for all travelers
+        </p>
       </div>
 
       {/* Number of Guests */}
-      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
-          <div className="bg-purple-100 p-3 rounded-xl">
-            <Users className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
+      <div className="bg-gray-50 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-purple-100 p-2 rounded-lg">
+            <Users className="w-5 h-5 text-purple-600" />
           </div>
-          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
-            Number of Guests
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+            Number of Travelers
           </h3>
         </div>
 
         <div className="space-y-4">
-          <Label
-            htmlFor="guests"
-            className="font-semibold text-gray-700 text-lg"
-          >
-            Select number of guests
+          <Label htmlFor="guests" className="text-gray-700 font-instrument">
+            Select how many people will be joining this trip
           </Label>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-3">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
             {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
               <Button
                 key={num}
                 onClick={() => handleNumberOfGuestsChange(num.toString())}
-                className={`font-bold text-lg py-3 px-4 rounded-xl transition-all duration-300 font-montserrat border border-purple-100 ${
+                className={`h-12 w-12 rounded-lg font-semibold transition-all duration-200 font-instrument ${
                   numberOfGuests === num
-                    ? "bg-purple-600 text-white"
-                    : "bg-white text-purple-700 hover:bg-purple-50"
+                    ? "bg-purple-600 text-white shadow-sm"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 }`}
               >
                 {num}
               </Button>
             ))}
           </div>
-          <p className="bg-white border border-purple-50 p-4 rounded-xl mt-4 font-semibold text-gray-700">
-            Maximum {maxGuests} people per booking
+          <p className="text-sm text-gray-600 font-instrument">
+            Maximum {maxGuests} travelers per booking
           </p>
           {getFieldError("participants") && (
-            <p className="bg-red-50 border border-red-200 p-4 rounded-xl font-semibold text-red-700">
+            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg font-instrument">
               {getFieldError("participants")}
             </p>
           )}
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between mb-6 border-b border-purple-100 pb-4">
-          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
-            Guest Details
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+            Traveler Details
           </h3>
-          <div className="bg-purple-100 border border-purple-200 rounded-xl px-6 py-3 font-bold text-lg">
-            {guestForms.length} of {numberOfGuests} guest
-            {numberOfGuests > 1 ? "s" : ""}
+          <div className="bg-purple-50 text-purple-700 rounded-lg px-4 py-2 text-sm font-semibold font-instrument">
+            {guestForms.length} of {numberOfGuests} completed
           </div>
         </div>
 
         {guestForms.map((guest, index) => (
           <div
             key={index}
-            className="bg-white border border-purple-100 rounded-2xl overflow-hidden shadow-sm"
+            className="bg-white border border-gray-200 rounded-xl shadow-sm"
           >
-            <div className="bg-white border-b border-purple-100 flex items-center justify-between p-6">
-              <div className="flex items-center gap-4">
-                <div className="bg-purple-100 p-3 rounded-xl">
-                  <User className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
+            <div className="bg-gray-50 border-b border-gray-200 flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-2 rounded-lg">
+                  <User className="w-4 h-4 text-purple-600" />
                 </div>
-                <h3 className="font-bold text-xl text-gray-800">
-                  Guest {index + 1}
+                <h4 className="font-semibold text-gray-900 font-instrument">
+                  Traveler {index + 1}
                   {guest.isteamLead && (
-                    <span className="ml-3 bg-purple-600 text-white px-4 py-1 text-sm rounded-xl uppercase font-semibold">
-                      Team Lead
+                    <span className="ml-2 bg-purple-600 text-white px-2 py-1 text-xs rounded-md uppercase font-semibold">
+                      Primary Contact
                     </span>
                   )}
-                </h3>
+                </h4>
               </div>
               {guestForms.length > 1 && (
                 <Button
                   onClick={() => removeGuestForm(index)}
-                  className="bg-white border border-purple-100 text-red-600 hover:bg-red-50 font-semibold p-3 rounded-xl"
+                  className="bg-white border border-gray-300 text-red-600 hover:bg-red-50 p-2 rounded-lg"
                 >
-                  <Trash2 className="w-5 h-5" strokeWidth={2.5} />
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               )}
             </div>
 
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
+            <div className="p-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label
                     htmlFor={`firstName-${index}`}
-                    className="font-semibold text-gray-700 text-lg"
+                    className="text-sm font-medium text-gray-700 font-instrument"
                   >
                     First Name <span className="text-red-500">*</span>
                   </Label>
@@ -393,23 +389,23 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "firstName", e.target.value)
                     }
-                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
+                    className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
                       getFieldError("firstName", index)
                         ? "border-red-400"
-                        : "hover:border-purple-400"
+                        : ""
                     }`}
                   />
                   {getFieldError("firstName", index) && (
-                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
+                    <p className="text-sm text-red-600 font-instrument">
                       {getFieldError("firstName", index)}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Label
                     htmlFor={`lastName-${index}`}
-                    className="font-semibold text-gray-700 text-lg"
+                    className="text-sm font-medium text-gray-700 font-instrument"
                   >
                     Last Name <span className="text-red-500">*</span>
                   </Label>
@@ -420,25 +416,25 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "lastName", e.target.value)
                     }
-                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
+                    className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
                       getFieldError("lastName", index)
                         ? "border-red-400"
-                        : "hover:border-purple-400"
+                        : ""
                     }`}
                   />
                   {getFieldError("lastName", index) && (
-                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
+                    <p className="text-sm text-red-600 font-instrument">
                       {getFieldError("lastName", index)}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label
                     htmlFor={`memberEmail-${index}`}
-                    className="font-semibold text-gray-700 text-lg"
+                    className="text-sm font-medium text-gray-700 font-instrument"
                   >
                     Email Address <span className="text-red-500">*</span>
                   </Label>
@@ -450,23 +446,23 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "memberEmail", e.target.value)
                     }
-                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
+                    className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
                       getFieldError("memberEmail", index)
                         ? "border-red-400"
-                        : "hover:border-purple-400"
+                        : ""
                     }`}
                   />
                   {getFieldError("memberEmail", index) && (
-                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
+                    <p className="text-sm text-red-600 font-instrument">
                       {getFieldError("memberEmail", index)}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Label
                     htmlFor={`phone-${index}`}
-                    className="font-semibold text-gray-700 text-lg"
+                    className="text-sm font-medium text-gray-700 font-instrument"
                   >
                     Phone Number <span className="text-red-500">*</span>
                   </Label>
@@ -478,14 +474,14 @@ export function GuestInformationForm({
                     onChange={(e) =>
                       updateGuestForm(index, "phone", e.target.value)
                     }
-                    className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
+                    className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
                       getFieldError("phone", index)
                         ? "border-red-400"
-                        : "hover:border-purple-400"
+                        : ""
                     }`}
                   />
                   {getFieldError("phone", index) && (
-                    <p className="bg-red-50 border border-red-200 p-3 rounded-xl font-medium text-red-700">
+                    <p className="text-sm text-red-600 font-instrument">
                       {getFieldError("phone", index)}
                     </p>
                   )}
@@ -493,8 +489,8 @@ export function GuestInformationForm({
               </div>
 
               {numberOfGuests > 1 && (
-                <div className="pt-6 border-t border-purple-100">
-                  <div className="flex items-center space-x-4">
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center space-x-3">
                     <input
                       type="checkbox"
                       id={`teamLead-${index}`}
@@ -502,23 +498,22 @@ export function GuestInformationForm({
                       onChange={(e) =>
                         updateGuestForm(index, "isteamLead", e.target.checked)
                       }
-                      className="w-6 h-6 border-2 border-purple-400 rounded-lg accent-purple-600"
+                      className="w-4 h-4 border-2 border-gray-300 rounded accent-purple-600"
                     />
                     <Label
                       htmlFor={`teamLead-${index}`}
-                      className="font-semibold text-gray-700 text-lg"
+                      className="text-sm text-gray-700 font-instrument"
                     >
-                      Make this person the primary contact (Team Lead)
+                      Make this person the primary contact
                     </Label>
                   </div>
                 </div>
               )}
 
               {(numberOfGuests === 1 || guest.isteamLead) && (
-                <div className="pt-6 border-t border-purple-100">
-                  <p className="bg-white border border-purple-50 p-4 rounded-xl font-medium text-gray-700">
-                    <strong>Note:</strong> This person will be the primary
-                    contact for the booking.
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm text-blue-800 font-instrument">
+                    <strong>Primary Contact:</strong> This person will receive all booking confirmations and updates.
                   </p>
                 </div>
               )}
@@ -529,63 +524,59 @@ export function GuestInformationForm({
         {canAddMoreForms && (
           <Button
             onClick={addGuestForm}
-            className="w-full bg-white border border-purple-100 text-purple-700 font-semibold text-lg font-montserrat hover:bg-purple-50 transition-all duration-300 py-6 rounded-2xl"
+            className="w-full bg-gray-100 border border-gray-300 text-gray-700 font-semibold hover:bg-gray-200 transition-all duration-200 py-3 rounded-lg font-instrument"
           >
-            <Plus className="w-6 h-6 mr-3" strokeWidth={2.5} />
-            Add Guest ({guestForms.length}/{numberOfGuests})
+            <Plus className="w-4 h-4 mr-2" />
+            Add Traveler ({guestForms.length}/{numberOfGuests})
           </Button>
         )}
 
         {/* Show message if max guests reached */}
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
-          <div className="bg-white border border-purple-100 rounded-2xl p-6">
-            <p className="font-semibold text-lg text-gray-700">
-              All guest forms added. You can increase the number of guests above
-              to add more.
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800 font-instrument">
+              All traveler forms completed. You can increase the number of travelers above to add more.
             </p>
           </div>
         )}
       </div>
 
       {/* Special Requirements */}
-      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
-          <div className="bg-purple-100 p-3 rounded-xl">
-            <BriefcaseMedical
-              className="w-7 h-7 text-purple-600"
-              strokeWidth={2.5}
-            />
+      <div className="bg-gray-50 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-blue-100 p-2 rounded-lg">
+            <BriefcaseMedical className="w-5 h-5 text-blue-600" />
           </div>
-          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
-            Special Requirements (Optional)
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+            Special Requirements
           </h3>
+          <span className="text-sm text-gray-500 font-instrument">(Optional)</span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Label
             htmlFor="requirements"
-            className="font-semibold text-gray-700 text-lg"
+            className="text-gray-700 font-instrument"
           >
-            Any dietary restrictions, accessibility needs, medical conditions,
-            or other special requests
+            Any dietary restrictions, accessibility needs, medical conditions, or other special requests
           </Label>
           <Textarea
             id="requirements"
-            placeholder="Please describe any special requirements, dietary restrictions, accessibility needs, or other requests we should know about..."
+            placeholder="Please describe any special requirements we should know about..."
             value={specialRequirements}
             onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
-            rows={4}
-            className={`bg-white border border-purple-100 text-lg rounded-xl transition-all duration-300 ${
+            rows={3}
+            className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
               getFieldError("specialRequirements")
                 ? "border-red-400"
-                : "hover:border-purple-400"
+                : ""
             }`}
           />
-          <p className="bg-white border border-purple-50 p-4 rounded-xl mt-3 font-semibold text-gray-700">
-            Maximum 500 characters ({specialRequirements.length}/500)
+          <p className="text-xs text-gray-500 font-instrument">
+            {specialRequirements.length}/500 characters
           </p>
           {getFieldError("specialRequirements") && (
-            <p className="bg-red-50 border border-red-200 p-4 rounded-xl font-medium text-red-700">
+            <p className="text-sm text-red-600 font-instrument">
               {getFieldError("specialRequirements")}
             </p>
           )}
@@ -593,30 +584,30 @@ export function GuestInformationForm({
       </div>
 
       {/* Booking Summary */}
-      <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-6 border-b border-purple-100 pb-4">
-          <div className="bg-purple-100 p-3 rounded-xl">
-            <FileText className="w-7 h-7 text-purple-600" strokeWidth={2.5} />
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-green-100 p-2 rounded-lg">
+            <FileText className="w-5 h-5 text-green-600" />
           </div>
-          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
-            Booking Summary
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+            Summary
           </h3>
         </div>
 
-        <div className="space-y-4 bg-white border border-purple-50 p-6 rounded-2xl">
-          <div className="flex justify-between border-b border-purple-100 pb-4">
-            <span className="font-semibold text-lg text-gray-700">
-              Number of Guests:
+        <div className="space-y-3">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-gray-700 font-instrument">
+              Number of Travelers:
             </span>
-            <span className="font-bold text-lg text-gray-800">
+            <span className="font-semibold text-gray-900 font-instrument">
               {numberOfGuests}
             </span>
           </div>
-          <div className="flex justify-between border-b border-purple-100 pb-4">
-            <span className="font-semibold text-lg text-gray-700">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-gray-700 font-instrument">
               Forms Completed:
             </span>
-            <span className="font-bold text-lg text-gray-800">
+            <span className="font-semibold text-gray-900 font-instrument">
               {
                 guestForms.filter(
                   (guest) =>
@@ -625,27 +616,25 @@ export function GuestInformationForm({
                     guest.memberEmail &&
                     guest.phone
                 ).length
-              }{" "}
-              of {numberOfGuests}
+              } of {numberOfGuests}
             </span>
           </div>
           {numberOfGuests > 1 && (
-            <div className="flex justify-between border-b border-purple-100 pb-4">
-              <span className="font-semibold text-lg text-gray-700">
-                Team Lead:
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-700 font-instrument">
+                Primary Contact:
               </span>
-              <span className="font-bold text-lg text-gray-800">
-                {guestForms.find((g) => g.isteamLead)?.firstName ||
-                  "Not selected"}
+              <span className="font-semibold text-gray-900 font-instrument">
+                {guestForms.find((g) => g.isteamLead)?.firstName || "Not selected"}
               </span>
             </div>
           )}
           {specialRequirements && (
-            <div className="pt-4 border-t border-purple-100">
-              <span className="font-semibold block mb-3 text-lg text-gray-700">
+            <div className="pt-3 border-t border-gray-200">
+              <span className="text-gray-700 font-instrument block mb-2">
                 Special Requirements:
               </span>
-              <p className="bg-gray-50 p-4 border border-gray-200 rounded-xl text-lg text-gray-700">
+              <p className="bg-gray-50 p-3 border border-gray-200 rounded-lg text-sm text-gray-700 font-instrument">
                 {specialRequirements}
               </p>
             </div>
@@ -653,14 +642,14 @@ export function GuestInformationForm({
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between pt-8 border-t border-purple-100 gap-4">
+      <div className="pt-6 border-t border-gray-200">
         <Button
           onClick={handleContinueClick}
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
-          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 text-xl font-montserrat transition-all duration-300 py-6 px-8 rounded-2xl flex items-center gap-3 w-full sm:w-auto"
+          className="w-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-all duration-200 py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-instrument"
         >
           {isSubmitting ? "Validating..." : "Continue to Payment"}
-          <ArrowRight className="w-6 h-6" />
+          <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
     </div>

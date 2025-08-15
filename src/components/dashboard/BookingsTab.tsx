@@ -37,34 +37,34 @@ export function BookingsTab({
   const getStatusBadge = (status: string) => {
     if (status.toLowerCase() === "confirmed") {
       return (
-        <Badge className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+        <Badge className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument">
           Confirmed
         </Badge>
       );
     }
     if (status.toLowerCase() === "pending") {
       return (
-        <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+        <Badge className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium font-instrument">
           Pending
         </Badge>
       );
     }
     if (status.toLowerCase() === "completed") {
       return (
-        <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+        <Badge className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium font-instrument">
           Completed
         </Badge>
       );
     }
     if (status.toLowerCase() === "cancelled") {
       return (
-        <Badge className="bg-gradient-to-r from-red-600 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+        <Badge className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium font-instrument">
           Cancelled
         </Badge>
       );
     }
     return (
-      <Badge className="bg-gradient-to-r from-slate-600 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+      <Badge className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument">
         {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
       </Badge>
     );
@@ -74,40 +74,40 @@ export function BookingsTab({
     <>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-1">
+          <h3 className="text-2xl font-bold text-gray-900 mb-1 font-bricolage">
             Your Bookings
           </h3>
-          <p className="text-gray-600 font-medium">
+          <p className="text-gray-600 font-instrument mt-1">
             Manage your travel bookings
           </p>
         </div>
         <div className="flex gap-2 mt-2 md:mt-0">
           <button
             onClick={() => setBookingFilter("all")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
               bookingFilter === "all"
-                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             All
           </button>
           <button
             onClick={() => setBookingFilter("confirmed")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
               bookingFilter === "confirmed"
-                ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             Confirmed
           </button>
           <button
             onClick={() => setBookingFilter("pending")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
               bookingFilter === "pending"
-                ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             Pending
@@ -118,48 +118,48 @@ export function BookingsTab({
       <div className="overflow-x-auto">
         {filteredBookings.length > 0 ? (
           <Table>
-            <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+            <TableHeader className="bg-gray-50 border-b border-gray-200">
               <TableRow>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Trip
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Destination
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Dates
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Price
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Participants
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Status
                 </TableHead>
-                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="bg-white divide-y divide-slate-200">
+            <TableBody className="bg-white divide-y divide-gray-200">
               {filteredBookings.map((booking) => (
                 <TableRow
                   key={booking.id}
-                  className="hover:bg-slate-50 transition-colors"
+                  className="hover:bg-gray-50 transition-colors"
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                      <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm mr-3">
                         {booking.travelPlan.title.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-gray-900 font-instrument">
                         {booking.travelPlan.title}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-700 font-medium">
+                  <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                     {[
                       booking.travelPlan.city,
                       booking.travelPlan.state,
@@ -168,16 +168,16 @@ export function BookingsTab({
                       .filter(Boolean)
                       .join(", ")}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-700 font-medium">
+                  <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                     {formatDateRange(booking.startDate, booking.endDate)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <div className="font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 rounded-lg inline-block">
+                    <div className="font-semibold text-gray-900 font-bricolage">
                       ${booking.totalPrice.toLocaleString()}
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <span className="bg-slate-100 font-semibold text-slate-700 rounded-full w-10 h-10 flex items-center justify-center">
+                    <span className="bg-gray-100 font-semibold text-gray-700 rounded-full w-10 h-10 flex items-center justify-center font-instrument">
                       {booking.participants}
                     </span>
                   </TableCell>
@@ -187,7 +187,7 @@ export function BookingsTab({
                   <TableCell className="px-6 py-4">
                     <Button
                       onClick={() => router.push(`/bookings/${booking.id}`)}
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold shadow-lg rounded-xl px-6 py-2"
+                      className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                     >
                       View Details
                     </Button>
@@ -199,21 +199,24 @@ export function BookingsTab({
         ) : (
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
-              <div className="mx-auto h-24 w-24 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-                <Calendar className="h-12 w-12 text-white" />
+              <div className="mx-auto h-20 w-20 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                <Calendar className="h-10 w-10 text-purple-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 font-bricolage">
                 {bookings.length === 0
-                  ? "No bookings found. Start by booking your first trip!"
-                  : `No ${bookingFilter} bookings found.`}
+                  ? "No bookings found"
+                  : `No ${bookingFilter} bookings found`}
+              </h3>
+              <p className="text-gray-600 font-instrument mb-8">
+                {bookings.length === 0
+                  ? "Start by booking your first trip!"
+                  : `Try adjusting your filter or book a new trip.`}
               </p>
-              <div className="mt-8">
-                <Link href="/trips">
-                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold px-8 py-3 shadow-lg rounded-xl">
-                    Explore Trips
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/trips">
+                <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold px-8 py-3 rounded-full transition-colors duration-200">
+                  Explore Trips
+                </Button>
+              </Link>
             </div>
           </div>
         )}

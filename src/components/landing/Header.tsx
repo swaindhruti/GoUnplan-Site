@@ -57,8 +57,6 @@ export default function Header() {
   const pathname = usePathname();
 
   // Determine text color based on route
-  const isBlackText = pathname === "/chat" || pathname === "/contactus";
-  const textColorClass = "text-white";
 
   const { data: session, status } = useSession();
 
@@ -214,16 +212,10 @@ export default function Header() {
   const breadcrumbs = generateBreadcrumbs();
   const isHomePage = pathname === "/";
 
-  // Simple header styling - consistent for home page
-  const homeHeaderClasses = `
+  // Unified header styling for all pages
+  const headerClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all overflow-x-hidden duration-500 ease-out
-    bg-white/[0.5] backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-black/5
-    ${isVisible ? "translate-y-0" : "-translate-y-full"}
-  `;
-
-  const otherRoutesHeaderClasses = `
-    fixed top-0 left-0 right-0 z-100 overflow-x-hidden transition-all duration-500 ease-out
-    bg-black/[0.6] backdrop-blur-lg backdrop-blur-sm
+    bg-white backdrop-blur-xl border-b border-gray-200 shadow-sm
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 
@@ -254,53 +246,53 @@ export default function Header() {
 
   if (!isHomePage) {
     return (
-      <div className={otherRoutesHeaderClasses}>
+      <div className={headerClasses}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-18">
-            {/* Breadcrumb Navigation - Left Side */}
-            <div className="flex-1 flex justify-start min-w-0 max-w-full overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2 sm:pr-0">
-              <Breadcrumb>
-                <BreadcrumbList
-                  className={`flex items-center gap-1 sm:gap-2 ${textColorClass} min-w-fit`}
-                >
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo and Breadcrumb - Left Side */}
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center group flex-shrink-0">
+                <div className="relative bg-white rounded-full">
+                  <Image
+                    src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
+                    alt="GoUnplan Logo"
+                    width={50}
+                    height={50}
+                    className="rounded-full object-cover transition-all duration-300 hover:scale-105"
+                    priority
+                  />
+                </div>
+              </Link>
+              
+              <div className="hidden md:flex items-center">
+                <Breadcrumb>
+                  <BreadcrumbList className="flex items-center gap-2 text-gray-600">
                   {breadcrumbs.map((crumb, index) => (
                     <div key={crumb.href} className="flex items-center min-w-0">
                       <BreadcrumbItem>
                         {crumb.isActive ? (
-                          <BreadcrumbPage
-                            className={`font-semibold truncate transition-colors duration-300 ${textColorClass}`}
-                            style={{ maxWidth: 120 }}
-                          >
+                          <BreadcrumbPage className="font-semibold text-purple-600 font-instrument">
                             {crumb.label}
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink
                             href={crumb.href}
-                            className={`font-medium truncate transition-all duration-300 hover:scale-105 ${textColorClass} ${
-                              isBlackText
-                                ? "hover:text-black"
-                                : "hover:text-white"
-                            }`}
-                            style={{ maxWidth: 120 }}
+                            className="font-medium text-gray-600 hover:text-purple-600 transition-colors duration-200 font-instrument"
                           >
-                            <span className="flex items-center">
-                              {index === 0 && <Home className="h-4 w-4 mr-2" />}
-                              {crumb.label}
-                            </span>
+                            {index === 0 ? <Home className="h-4 w-4" /> : crumb.label}
                           </BreadcrumbLink>
                         )}
                       </BreadcrumbItem>
                       {index < breadcrumbs.length - 1 && (
-                        <BreadcrumbSeparator
-                          className={`mx-2 text-black/50 transition-colors duration-300 ${textColorClass}`}
-                        >
-                          <ChevronRight className="h-4 w-4" />
+                        <BreadcrumbSeparator className="mx-2 text-gray-400">
+                          <ChevronRight className="h-3 w-3" />
                         </BreadcrumbSeparator>
                       )}
                     </div>
                   ))}
-                </BreadcrumbList>
-              </Breadcrumb>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
             </div>
 
             {/* Menu Button - Right Side */}
@@ -309,9 +301,9 @@ export default function Header() {
                 <div className="flex items-center space-x-4">
                   {/* Host Mode Toggle - Show outside dropdown for hosts */}
                   {isUserHost && (
-                    <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
-                      <Crown className="h-4 w-4 text-white" />
-                      <span className="font-medium text-white text-sm">
+                    <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
+                      <Crown className="h-4 w-4 text-purple-600" />
+                      <span className="font-medium text-gray-700 text-sm font-instrument">
                         Host Mode
                       </span>
                       <Switch
@@ -327,10 +319,9 @@ export default function Header() {
                     onOpenChange={setIsDashboardMenuOpen}
                   >
                     <DropdownMenuTrigger asChild>
-                      <Button className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm">
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
                         <Menu className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Menu</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -414,7 +405,7 @@ export default function Header() {
                         </div>
 
                         <DropdownMenuItem
-                          onClick={() => router.push("/trips")}
+                          onClick={() => router.push("/my-trips")}
                           className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
                         >
                           <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
@@ -507,7 +498,7 @@ export default function Header() {
               ) : (
                 <Button
                   onClick={() => router.push("/auth/signin")}
-                  className="relative group transition-all duration-300 hover:shadow-lg bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 backdrop-blur-sm"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Sign In
@@ -520,22 +511,20 @@ export default function Header() {
     );
   }
 
-  // Full header for home page - consistent styling, no color changes
+  // Full header for home page - consistent styling
   return (
-    <header className={homeHeaderClasses}>
+    <header className={headerClasses}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center group flex-shrink-0">
-            <div className="relative bg-white rounded-full shadow-lg">
+            <div className="relative bg-white rounded-full">
               <Image
                 src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
                 alt="GoUnplan Logo"
-                width={80}
-                height={80}
-                className="rounded-full object-cover
-        w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20
-        transition-all duration-300"
+                width={60}
+                height={60}
+                className="rounded-full object-cover transition-all duration-300 hover:scale-105"
                 priority
               />
             </div>
@@ -547,7 +536,7 @@ export default function Header() {
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item)}
-                className="relative px-4 py-2 font-semibold transition-all duration-300 rounded-lg group hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                className="relative px-4 py-2 font-instrument font-semibold transition-all duration-300 rounded-lg group text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-300"
               >
                 {item.name}
                 <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300 group-hover:w-3/4 rounded-full"></span>
@@ -560,18 +549,17 @@ export default function Header() {
             {status === "unauthenticated" ? (
               <Button
                 onClick={() => router.push("/auth/signin")}
-                className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-200"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
               >
                 Sign In
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             ) : (
               <div className="flex items-center space-x-4">
                 {/* Host Mode Toggle - Show outside dropdown for hosts */}
                 {isUserHost && (
-                  <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                  <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                     <Crown className="h-4 w-4 text-purple-600" />
-                    <span className="font-medium text-gray-800 text-sm">
+                    <span className="font-medium text-gray-700 text-sm font-instrument">
                       Host Mode
                     </span>
                     <Switch
@@ -587,10 +575,9 @@ export default function Header() {
                   onOpenChange={setIsDashboardMenuOpen}
                 >
                   <DropdownMenuTrigger asChild>
-                    <Button className="relative group transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/[0.55] hover:bg-gray-50 text-gray-900 border-gray-200 shadow-md ">
+                    <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
                       <Menu className="h-4 w-4 mr-2" />
                       Menu
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -774,7 +761,7 @@ export default function Header() {
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item)}
-                  className="px-3 py-2 font-semibold transition-all duration-300 rounded-lg hover:scale-105 text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+                  className="px-3 py-2 font-instrument font-semibold transition-all duration-300 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50"
                 >
                   {item.name}
                 </button>
@@ -784,14 +771,14 @@ export default function Header() {
               {status === "unauthenticated" ? (
                 <Button
                   onClick={() => router.push("/auth/signin")}
-                  className="transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                 >
                   Sign In
                 </Button>
               ) : (
                 <Button
                   onClick={handleSignOut}
-                  className="bg-red-500/10 hover:bg-red-500/20 text-red-600 border-red-300 hover:border-red-400 transition-all duration-300 hover:scale-105"
+                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
@@ -807,7 +794,7 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="transition-all duration-300 hover:scale-110 text-gray-900 hover:bg-gray-100 border-gray-200 border"
+                  className="text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200"
                   aria-label="Open mobile menu"
                 >
                   <Menu className="h-5 w-5" />

@@ -15,13 +15,13 @@ export function ReviewForm({
   handleSubmitReview,
 }: ReviewFormProps) {
   return (
-    <div className="bg-white border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-black text-black">Write Your Review</h3>
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-bold text-gray-900 font-bricolage">Write Your Review</h3>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="font-bold bg-gray-200 border-2 border-black text-black hover:bg-gray-300"
+          className="font-instrument font-semibold border-gray-300 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-full"
           onClick={() => setReviewForm((prev) => ({ ...prev, bookingId: "" }))}
         >
           Cancel
@@ -29,25 +29,25 @@ export function ReviewForm({
       </div>
 
       {reviewForm.success && (
-        <div className="bg-green-500 text-black p-3 rounded-md flex items-center mb-4 border-2 border-black font-extrabold">
-          <ThumbsUp className="h-5 w-5 mr-2" />
+        <div className="bg-green-50 text-green-600 p-4 rounded-lg flex items-center mb-4 border border-green-200 font-instrument">
+          <ThumbsUp className="h-4 w-4 mr-2" />
           <span>{reviewForm.success}</span>
         </div>
       )}
 
       {reviewForm.error && (
-        <div className="bg-red-400 text-black p-3 rounded-md flex items-center mb-4 border-2 border-black font-extrabold">
-          <AlertCircle className="h-5 w-5 mr-2" />
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-center mb-4 border border-red-200 font-instrument">
+          <AlertCircle className="h-4 w-4 mr-2" />
           <span>{reviewForm.error}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmitReview}>
-        <div className="mb-4">
-          <label className="block text-sm font-extrabold text-black mb-1 uppercase">
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-gray-700 mb-2 font-instrument">
             Rating
           </label>
-          <div className="flex space-x-2">
+          <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -58,13 +58,13 @@ export function ReviewForm({
                     rating: star,
                   }))
                 }
-                className="focus:outline-none"
+                className="focus:outline-none transition-colors duration-200 hover:scale-110"
               >
                 <Star
                   className={`h-8 w-8 ${
                     star <= reviewForm.rating
-                      ? "text-yellow-300 fill-yellow-300 stroke-black"
-                      : "text-gray-300"
+                      ? "text-yellow-500 fill-yellow-500"
+                      : "text-gray-300 hover:text-yellow-400"
                   }`}
                 />
               </button>
@@ -72,10 +72,10 @@ export function ReviewForm({
           </div>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-6">
           <label
             htmlFor="comment"
-            className="block text-sm font-extrabold text-black mb-1 uppercase"
+            className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
           >
             Your Review
           </label>
@@ -91,13 +91,13 @@ export function ReviewForm({
               }))
             }
             required
-            className="w-full border-3 border-black rounded-md shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-gray-100"
+            className="w-full font-instrument"
           />
         </div>
 
         <Button
           type="submit"
-          className="bg-green-500 text-black hover:bg-green-400 w-full border-3 border-black font-extrabold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+          className="bg-purple-600 hover:bg-purple-700 text-white w-full font-instrument font-semibold py-3 rounded-full transition-colors duration-200"
           disabled={reviewForm.isSubmitting}
         >
           {reviewForm.isSubmitting ? "Submitting..." : "Submit Review"}

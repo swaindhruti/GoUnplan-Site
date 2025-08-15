@@ -49,132 +49,136 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   }, [trips]);
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-8">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="h-1 w-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full" />
-            <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase">
-              Experience Management
-            </span>
-          </div>
-          <h2 className="text-3xl font-bold text-slate-900">
-            Your Travel Experiences
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-gray-900 font-bricolage">
+            Travel Experiences
           </h2>
-          <p className="text-slate-600 font-medium">
-            Create and manage your curated travel experiences with precision
+          <p className="text-gray-600 font-instrument">
+            Create and manage your curated travel experiences
           </p>
         </div>
         <Link
           href="/dashboard/host/create-new-task"
-          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-105"
+          className="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors font-instrument"
         >
-          <Plus className="w-5 h-5 mr-2" />
-          Create New Experience
+          <Plus className="w-4 h-4 mr-2" />
+          Create New
         </Link>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-purple-600" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-600 font-instrument">Total Experiences</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">
+                {stats.totalTrips}
+              </p>
             </div>
-            <span className="text-3xl font-bold text-purple-600">
-              {stats.totalTrips}
-            </span>
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-purple-600" />
+            </div>
           </div>
-          <h3 className="text-slate-700 font-semibold text-lg mb-1">
-            Total Experiences
-          </h3>
-          <p className="text-slate-500 text-base">All your created trips</p>
+          <div className="mt-4 flex items-center">
+            <span className="text-xs text-gray-500 font-instrument">All your created trips</span>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-              <Users className="h-6 w-6 text-emerald-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-600 font-instrument">Active</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">
+                {stats.activeTrips}
+              </p>
             </div>
-            <span className="text-3xl font-bold text-emerald-600">
-              {stats.activeTrips}
-            </span>
+            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-emerald-600" />
+            </div>
           </div>
-          <h3 className="text-slate-700 font-semibold text-lg mb-1">
-            Active Experiences
-          </h3>
-          <p className="text-slate-500 text-base">Currently available</p>
+          <div className="mt-4 flex items-center">
+            <span className="text-xs text-gray-500 font-instrument">Currently available</span>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <DollarSign className="h-6 w-6 text-blue-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-600 font-instrument">Total Value</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">
+                ₹{stats.totalRevenue.toLocaleString()}
+              </p>
             </div>
-            <span className="text-3xl font-bold text-blue-600">
-              ₹{stats.totalRevenue.toLocaleString()}
-            </span>
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-blue-600" />
+            </div>
           </div>
-          <h3 className="text-slate-700 font-semibold text-lg mb-1">
-            Total Value
-          </h3>
-          <p className="text-slate-500 text-base">Combined trip value</p>
+          <div className="mt-4 flex items-center">
+            <span className="text-xs text-gray-500 font-instrument">Combined trip value</span>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
-              <Star className="h-6 w-6 text-orange-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-600 font-instrument">Drafts</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">
+                {stats.draftTrips}
+              </p>
             </div>
-            <span className="text-3xl font-bold text-orange-600">
-              {stats.draftTrips}
-            </span>
+            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+              <Star className="w-6 h-6 text-orange-600" />
+            </div>
           </div>
-          <h3 className="text-slate-700 font-semibold text-lg mb-1">
-            Draft Experiences
-          </h3>
-          <p className="text-slate-500 text-base">In development</p>
+          <div className="mt-4 flex items-center">
+            <span className="text-xs text-gray-500 font-instrument">In development</span>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-slate-50 to-purple-50 p-6 border-b border-slate-200">
+      {/* Trips Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">
-                Experience Overview
+              <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                All Experiences
               </h3>
-              <p className="text-slate-600 font-medium text-base">
-                Manage all your trips and their performance metrics
+              <p className="text-sm text-gray-600 font-instrument">
+                Manage your travel experiences
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-2">
               <button
                 onClick={() => setStatusFilter("all")}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
+                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors font-instrument ${
                   statusFilter === "all"
-                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-purple-600 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 All
               </button>
               <button
                 onClick={() => setStatusFilter("active")}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
+                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors font-instrument ${
                   statusFilter === "active"
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-emerald-600 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 Active
               </button>
               <button
                 onClick={() => setStatusFilter("draft")}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
+                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors font-instrument ${
                   statusFilter === "draft"
-                    ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/25"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-orange-600 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 Draft
@@ -314,6 +318,6 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };

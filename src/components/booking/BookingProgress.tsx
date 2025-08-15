@@ -20,53 +20,41 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
   };
 
   return (
-    <div className="border border-purple-100 rounded-2xl overflow-hidden shadow-sm bg-white">
-      {/* Header */}
-      <div className="bg-white border-b border-purple-100 p-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-purple-100 p-3 rounded-xl">
-            <CheckCircle
-              className="h-7 w-7 text-purple-600"
-              strokeWidth={2.5}
-            />
-          </div>
-          <h3 className="text-2xl font-bricolage font-bold text-gray-800">
-            Booking Progress
-          </h3>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6 space-y-4">
+    <div className="space-y-4">
+      <h4 className="text-sm font-semibold text-gray-900 font-instrument">
+        Booking Details
+      </h4>
+      
+      <div className="space-y-3">
         {/* Booking ID */}
         {bookingData.id ? (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 rounded-xl p-4 bg-white border border-purple-50 shadow-sm">
-            <div className="flex items-center gap-3 font-semibold text-lg text-gray-700">
-              <Tag className="h-5 w-5 text-purple-600" strokeWidth={2.5} />
-              <span>Booking ID:</span>
+          <div className="flex justify-between items-center py-2">
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-gray-500" />
+              <span className="text-sm text-gray-700 font-instrument">Booking ID:</span>
             </div>
-            <span className="bg-purple-100 px-4 py-2 border border-purple-200 rounded-xl font-bold text-sm flex-shrink-0 text-purple-700">
-              {bookingData.id.slice(-8)}
+            <span className="text-sm font-semibold text-gray-900 font-instrument">
+              #{bookingData.id.slice(-8)}
             </span>
           </div>
         ) : (
-          <div className="py-3 px-4 border border-purple-50 rounded-xl bg-white shadow-sm">
-            <p className="text-lg font-semibold flex items-center gap-3 text-gray-700">
-              <span className="animate-pulse">⏳</span> Creating new booking...
-            </p>
+          <div className="flex items-center gap-2 py-2">
+            <span className="text-sm text-gray-600 font-instrument animate-pulse">
+              Creating booking...
+            </span>
           </div>
         )}
 
         {/* Status */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 rounded-xl p-4 bg-white border border-purple-50 shadow-sm">
-          <div className="flex items-center gap-3 font-semibold text-lg text-gray-700">
-            <Clock className="h-5 w-5 text-purple-600" strokeWidth={2.5} />
-            <span>Status:</span>
+        <div className="flex justify-between items-center py-2">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-sm text-gray-700 font-instrument">Status:</span>
           </div>
           <span
-            className={`px-4 py-2 border border-purple-100 rounded-xl ${getStatusStyle(
+            className={`text-sm px-2 py-1 rounded-md font-semibold font-instrument ${getStatusStyle(
               bookingData.status
-            )} flex-shrink-0`}
+            )}`}
           >
             {bookingData.status || "DRAFT"}
           </span>
@@ -74,27 +62,26 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
 
         {/* Dates */}
         {bookingData.startDate && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 rounded-xl p-4 bg-white border border-purple-50 shadow-sm">
-            <div className="flex items-center gap-3 font-semibold text-lg text-gray-700">
-              <Calendar className="h-5 w-5 text-purple-600" strokeWidth={2.5} />
-              <span>Dates:</span>
+          <div className="flex justify-between items-center py-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <span className="text-sm text-gray-700 font-instrument">Dates:</span>
             </div>
-            <span className="bg-purple-100 px-4 py-2 border border-purple-200 rounded-xl font-bold text-sm flex-shrink-0 text-purple-700">
-              {format(bookingData.startDate, "MMM dd")} -{" "}
-              {format(bookingData.endDate!, "MMM dd")}
+            <span className="text-sm font-semibold text-gray-900 font-instrument">
+              {format(bookingData.startDate, "MMM dd")} - {format(bookingData.endDate!, "MMM dd")}
             </span>
           </div>
         )}
 
         {/* Guests */}
         {bookingData.participants && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 rounded-xl p-4 bg-white border border-purple-50 shadow-sm">
-            <div className="flex items-center gap-3 font-semibold text-lg text-gray-700">
-              <Users className="h-5 w-5 text-purple-600" strokeWidth={2.5} />
-              <span>Guests:</span>
+          <div className="flex justify-between items-center py-2">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-gray-500" />
+              <span className="text-sm text-gray-700 font-instrument">Travelers:</span>
             </div>
-            <span className="bg-purple-100 px-4 py-2 border border-purple-200 rounded-xl font-bold text-sm flex-shrink-0 text-purple-700">
-              {bookingData.participants}
+            <span className="text-sm font-semibold text-gray-900 font-instrument">
+              {bookingData.participants} {bookingData.participants === 1 ? 'person' : 'people'}
             </span>
           </div>
         )}

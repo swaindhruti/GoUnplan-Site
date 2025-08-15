@@ -22,12 +22,15 @@ import { StatsCards } from "@/components/dashboard/StatsCards";
 import { ProfileTab } from "@/components/dashboard/ProfileTab";
 import { BookingsTab } from "@/components/dashboard/BookingsTab";
 import { ReviewsTab } from "@/components/dashboard/reviews/ReviewsTab";
-import { PlaceholderTab } from "@/components/dashboard/PlaceholderTab";
+import { MessagesTab } from "@/components/dashboard/MessagesTab";
 import { LoadingAndErrorStates } from "@/components/dashboard/LoadingAndErrorStates";
-import { MessageSection } from "@/components/host/components/MessageSection";
 
 export default function UserDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  
+  const handleProfileUpdate = (updatedProfile: UserProfile) => {
+    setProfile(updatedProfile);
+  };
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
@@ -187,7 +190,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <DashboardHeader profile={profile} />
 
@@ -200,9 +203,12 @@ export default function UserDashboard() {
         <StatsCards profile={profile} bookings={bookings} />
 
         {/* Tabbed Content */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           {activeTab === "profile" && (
-            <ProfileTab profile={profile} setActiveTab={setActiveTab} />
+            <ProfileTab 
+              profile={profile}
+              onProfileUpdate={handleProfileUpdate}
+            />
           )}
 
           {activeTab === "bookings" && (
@@ -223,11 +229,8 @@ export default function UserDashboard() {
               handleSubmitReview={handleSubmitReview}
             />
           )}
-          {activeTab === "messages" && (
-            <MessageSection userSession={session?.user.id || ""} host={false} />
-          )}
-          {(activeTab === "explore" || activeTab === "settings") && (
-            <PlaceholderTab />
+          {activeTab === "messages" && profile && (
+            <MessagesTab userId={profile.id} />
           )}
         </div>
       </div>

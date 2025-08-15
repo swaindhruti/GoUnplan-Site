@@ -14,7 +14,8 @@ import {
   CreditCard
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
-import { editBookingAction } from "@/actions/booking/actions";
+import { editBookingAction, updateBookingStatus } from "@/actions/booking/actions";
+import { BookingStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/global/buttons";
 
@@ -99,18 +100,45 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       setStep(2);
     }, []);
 
-    const handleConfirmPayment = useCallback((confirmed: boolean) => {
+    const handleConfirmPayment = useCallback(async (confirmed: boolean) => {
       if (confirmed) {
+        if (!booking?.id) {
+          console.error("No booking ID available");
+          return;
+        }
+
         setIsProcessing(true);
-        setTimeout(() => {
+        
+        try {
+          // Update booking status to CONFIRMED
+          const response = await updateBookingStatus(booking.id, BookingStatus.CONFIRMED);
+          
+          if (response.success) {
+            // Update local state to reflect the new status
+            setTimeout(() => {
+              setIsProcessing(false);
+              setPaymentCompleted(true);
+              
+              // Update the booking object with new status
+              if (booking) {
+                booking.status = "CONFIRMED";
+                booking.updatedAt = new Date();
+              }
+            }, 2000); // Reduced time for better UX
+          } else {
+            setIsProcessing(false);
+            console.error("Failed to update booking status:", response.error);
+            alert("Payment failed. Please try again.");
+          }
+        } catch (error) {
           setIsProcessing(false);
-          setPaymentCompleted(true);
-          alert("Payment Completed!");
-        }, 5000);
+          console.error("Error processing payment:", error);
+          alert("Payment failed. Please try again.");
+        }
       } else {
         setStep(1);
       }
-    }, []);
+    }, [booking]);
 
     const handleGoToTrips = useCallback(() => {
       router.push("/trips");
@@ -130,16 +158,16 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     // Loading state
     if (loading) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-16 px-6">
+        <div className="min-h-screen bg-gray-50 py-16 px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-10 shadow-xl">
+            <div className="bg-white border border-gray-200 rounded-2xl p-10 shadow-sm">
               <div className="animate-pulse space-y-8">
-                <div className="h-10 bg-slate-200 rounded w-1/3 mx-auto"></div>
-                <div className="h-6 bg-slate-200 rounded w-1/2 mx-auto"></div>
+                <div className="h-10 bg-gray-200 rounded w-1/3 mx-auto"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto"></div>
                 <div className="space-y-8 mt-12">
-                  <div className="h-48 bg-slate-200 rounded-2xl"></div>
-                  <div className="h-40 bg-slate-200 rounded-2xl"></div>
-                  <div className="h-64 bg-slate-200 rounded-2xl"></div>
+                  <div className="h-48 bg-gray-200 rounded-xl"></div>
+                  <div className="h-40 bg-gray-200 rounded-xl"></div>
+                  <div className="h-64 bg-gray-200 rounded-xl"></div>
                 </div>
               </div>
             </div>
@@ -151,13 +179,13 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     // Error state
     if (!booking) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-16 px-6">
+        <div className="min-h-screen bg-gray-50 py-16 px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-10 shadow-xl text-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-10 shadow-sm text-center">
               <h2 className="text-3xl font-bold text-gray-900 mb-6 font-bricolage">
                 Booking Not Found
               </h2>
-              <p className="text-gray-600 font-roboto text-lg">
+              <p className="text-gray-600 font-instrument text-lg">
                 Unable to load booking details.
               </p>
             </div>
@@ -167,135 +195,147 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="min-h-screen bg-gray-50 font-instrument">
         {/* Hero Section */}
-        <section className="relative py-16 md:py-20 overflow-hidden bg-gradient-to-br from-purple-600 to-purple-800">
-          <div className="absolute inset-0 bg-black/20" />
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+        <div
+          className="relative bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${travelPlan?.tripImage || 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'}')`
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
             <BackButton isWhite={true} route="/trips" />
-            <div className="text-center mt-8">
-              <div className="flex justify-center mb-6">
-                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl p-4">
-                  <CheckCircle
-                    className="h-12 w-12 text-white"
-                    aria-label="Booking Status"
-                  />
+            
+            <div className="flex items-center justify-between mt-12">
+              <div className="space-y-4">
+                <div className="inline-flex items-center px-6 py-2 bg-purple-600/80 backdrop-blur-sm rounded-full mb-4">
+                  <span className="text-white text-sm font-semibold tracking-wide uppercase font-instrument">
+                    {step === 1
+                      ? "Booking Summary"
+                      : step === 2 && !paymentCompleted
+                      ? "Payment Confirmation"
+                      : "Payment Complete"}
+                  </span>
+                </div>
+                <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
+                  {step === 1
+                    ? "Review Your Booking"
+                    : step === 2 && !paymentCompleted
+                    ? "Complete Payment"
+                    : "Booking Confirmed"}
+                  <span className="block text-purple-300 mt-2">{travelPlan?.title}</span>
+                </h1>
+                <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
+                  {step === 1
+                    ? "Verify your trip details and proceed to secure payment"
+                    : step === 2 && !paymentCompleted
+                    ? "Confirm your payment to finalize your booking"
+                    : `Redirecting to your trips in ${timer} seconds`}
+                </p>
+                
+                <div className="flex flex-wrap gap-3 mt-6">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    ID: {booking.id?.slice(-8)}
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    {formatCurrency(booking.totalPrice)}
+                  </div>
                 </div>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl font-bricolage">
-                {step === 1
-                  ? "Booking Summary"
-                  : step === 2 && !paymentCompleted
-                  ? "Confirm Payment"
-                  : "Payment Successful"}
-              </h1>
-              <p className="text-lg sm:text-xl text-white/90 mb-8 font-roboto max-w-2xl mx-auto">
-                {step === 1
-                  ? "Please review your booking details before proceeding to payment"
-                  : step === 2 && !paymentCompleted
-                  ? "Confirm your payment details"
-                  : `Redirecting to trips in ${timer} seconds...`}
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 sm:px-6 sm:py-3 text-white font-semibold">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    <span className="truncate">
-                      Booking ID: {booking.id?.slice(0, 8)}...
-                    </span>
-                  </div>
-                </div>
-                <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2 sm:px-6 sm:py-3 text-white font-semibold">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" />
-                    <span>{formatCurrency(booking.totalPrice)}</span>
-                  </div>
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+                  <CheckCircle className="h-8 w-8 text-white" />
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
+        {/* Booking Details Section */}
+        <div className="relative -mt-16 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <div className="backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 space-y-8">
               {step === 1 && (
                 <>
-                  {/* Trip Header Card */}
-                  <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                    <div className="flex items-center gap-6 mb-6">
-                      <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded-2xl">
-                        <MapPin className="w-8 h-8 text-purple-600" />
+                  {/* Trip Header */}
+                  <div className="text-center mb-8">
+                    <div className="flex items-center gap-3 justify-center mb-4">
+                      <div className="bg-purple-100 p-2 rounded-lg">
+                        <MapPin className="w-5 h-5 text-purple-600" />
                       </div>
-                      <div>
-                        <h2 className="text-3xl font-bold text-gray-900 font-bricolage mb-2">
-                          {travelPlan?.title || "Travel Package"}
-                        </h2>
-                        <p className="text-xl text-purple-600 font-semibold font-roboto">
-                          {travelPlan?.destination || "Destination"}
-                        </p>
-                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900 font-bricolage">
+                        Trip Details
+                      </h2>
                     </div>
+                    <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-2">
+                      {travelPlan?.title || "Travel Package"}
+                    </h3>
+                    <p className="text-purple-600 font-semibold font-instrument">
+                      {travelPlan?.destination || "Destination"}
+                    </p>
                     {travelPlan?.description && (
-                      <p className="text-gray-700 font-roboto leading-relaxed text-lg">
+                      <p className="text-gray-600 font-instrument mt-4 leading-relaxed">
                         {travelPlan.description}
                       </p>
                     )}
                   </div>
 
                   {/* Trip Details & Pricing Grid */}
-                  <div className="grid md:grid-cols-2 gap-8">
+                  <div className="grid md:grid-cols-2 gap-6">
                     {/* Trip Details Card */}
-                    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
-                          <Calendar className="w-6 h-6 text-purple-600" />
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="bg-purple-100 p-2 rounded-lg">
+                          <Calendar className="w-5 h-5 text-purple-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-                          Trip Details
-                        </h3>
+                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
+                          Travel Schedule
+                        </h4>
                       </div>
-                      <div className="space-y-6">
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
                             Check-in:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {formatDate(booking.startDate)}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
                             Check-out:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {formatDate(booking.endDate)}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
                             Duration:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {getDuration()} days
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
-                            Participants:
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
+                            Travelers:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {booking.participants || 0}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-4">
-                          <span className="text-gray-600 font-medium font-roboto">
+                        <div className="flex justify-between items-center py-2">
+                          <span className="text-gray-700 font-instrument">
                             Status:
                           </span>
                           <span
-                            className={`px-4 py-2 text-sm rounded-full border font-bold ${getStatusColor(
+                            className={`px-3 py-1 text-sm rounded-md font-semibold ${getStatusColor(
                               booking.status
                             )}`}
                           >
@@ -306,77 +346,79 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     </div>
 
                     {/* Pricing Card */}
-                    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
-                          <DollarSign className="w-6 h-6 text-purple-600" />
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="bg-green-100 p-2 rounded-lg">
+                          <DollarSign className="w-5 h-5 text-green-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-                          Pricing
-                        </h3>
+                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
+                          Cost Breakdown
+                        </h4>
                       </div>
-                      <div className="space-y-6">
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
                             Price per person:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {formatCurrency(booking.pricePerPerson)}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-slate-200">
-                          <span className="text-gray-600 font-medium font-roboto">
-                            Total participants:
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <span className="text-gray-700 font-instrument">
+                            Total travelers:
                           </span>
-                          <span className="font-bold text-gray-900 font-roboto text-lg">
+                          <span className="font-semibold text-gray-900 font-instrument">
                             {booking.participants || 0}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl px-6">
-                          <span className="text-gray-900 font-bold font-roboto text-lg">
-                            Total amount:
-                          </span>
-                          <span className="text-2xl font-bold text-purple-600 font-roboto">
-                            {formatCurrency(booking.totalPrice)}
-                          </span>
+                        <div className="bg-purple-50 rounded-lg p-4 mt-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-900 font-bold font-instrument">
+                              Total Amount:
+                            </span>
+                            <span className="text-xl font-bold text-purple-600 font-instrument">
+                              {formatCurrency(booking.totalPrice)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Team Members Card */}
+                  {/* Travelers Card */}
                   {booking.guests && booking.guests.length > 0 && (
-                    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
-                          <Users className="w-6 h-6 text-purple-600" />
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="bg-blue-100 p-2 rounded-lg">
+                          <Users className="w-5 h-5 text-blue-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-                          Team Members ({booking.guests.length})
-                        </h3>
+                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
+                          Travelers ({booking.guests.length})
+                        </h4>
                       </div>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {booking.guests.map((member, index) => (
                           <div
                             key={member.memberEmail + index}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-slate-50/60 rounded-2xl border border-slate-200/60"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
                           >
-                            <div className="flex items-center gap-4 mb-3 sm:mb-0">
-                              <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
-                                <User className="w-5 h-5 text-purple-600" />
+                            <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                              <div className="bg-purple-100 p-2 rounded-lg">
+                                <User className="w-4 h-4 text-purple-600" />
                               </div>
                               <div>
-                                <p className="font-bold text-gray-900 font-roboto text-lg">
+                                <p className="font-semibold text-gray-900 font-instrument">
                                   {member.firstName} {member.lastName}
                                 </p>
-                                <p className="text-gray-600 font-roboto">
+                                <p className="text-gray-600 font-instrument text-sm">
                                   {member.memberEmail}
                                 </p>
                               </div>
                             </div>
                             {member.isteamLead && (
-                              <span className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 px-4 py-2 rounded-full text-sm font-bold border border-purple-300">
-                                Team Lead
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-md text-xs font-semibold">
+                                Primary Contact
                               </span>
                             )}
                           </div>
@@ -387,222 +429,229 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
                   {/* Special Requirements */}
                   {booking.specialRequirements && (
-                    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-3 rounded-xl">
-                          <FileText className="w-6 h-6 text-purple-600" />
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-orange-100 p-2 rounded-lg">
+                          <FileText className="w-5 h-5 text-orange-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
                           Special Requirements
-                        </h3>
+                        </h4>
                       </div>
-                      <p className="text-gray-700 font-roboto leading-relaxed bg-slate-50/60 p-6 rounded-2xl border border-slate-200/60 text-lg">
-                        {booking.specialRequirements}
-                      </p>
+                      <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <p className="text-gray-700 font-instrument leading-relaxed">
+                          {booking.specialRequirements}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </>
               )}
 
-              {/* Action Buttons */}
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 {step === 1 ? (
-                  <div className="flex flex-col sm:flex-row gap-6">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={handleEditDetails}
-                      className="flex-1 bg-white text-gray-700 font-bold text-lg
-                               border border-slate-300 rounded-2xl py-4 px-8
-                               hover:bg-slate-50 hover:border-slate-400
-                               transition-all duration-300 shadow-lg hover:shadow-xl
-                              
-
- disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-3 font-montserrat"
+                      className="flex-1 bg-gray-100 text-gray-700 font-semibold
+                               border border-gray-300 rounded-xl py-3 px-6
+                               hover:bg-gray-200 hover:border-gray-400
+                               transition-all duration-200
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               flex items-center justify-center gap-2 font-instrument"
                       disabled={loading}
                       type="button"
                     >
-                      <Edit2 className="w-6 h-6" />
+                      <Edit2 className="w-4 h-4" />
                       Edit Details
                     </button>
 
                     <button
                       onClick={handleContinueToPayment}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-lg
-                               border border-purple-600 rounded-2xl py-4 px-8
-                               hover:from-purple-700 hover:to-purple-800 hover:border-purple-700
-                               transition-all duration-300 shadow-lg hover:shadow-xl
+                      className="flex-1 bg-purple-600 text-white font-semibold
+                               border border-purple-600 rounded-xl py-3 px-6
+                               hover:bg-purple-700 hover:border-purple-700
+                               transition-all duration-200
                                disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-3 font-montserrat"
+                               flex items-center justify-center gap-2 font-instrument"
                       disabled={loading}
                       type="button"
                     >
                       Continue to Payment
-                      <ArrowRight className="w-6 h-6" />
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 ) : step === 2 && !paymentCompleted ? (
                   isProcessing ? (
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+                    <div className="flex justify-center items-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-4">
+                        Confirm Payment
+                      </h3>
+                      <p className="text-gray-600 font-instrument mb-6">
+                        Would you like to confirm the payment of {formatCurrency(booking.totalPrice)}?
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <button
+                          onClick={() => handleConfirmPayment(true)}
+                          className="flex-1 bg-purple-600 text-white font-semibold
+                                   border border-purple-600 rounded-xl py-3 px-6
+                                   hover:bg-purple-700 hover:border-purple-700
+                                   transition-all duration-200
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   flex items-center justify-center gap-2 font-instrument"
+                          disabled={loading}
+                          type="button"
+                        >
                           Confirm Payment
-                        </h3>
-                        <p className="text-gray-600 font-roboto text-lg mb-6">
-                          Would you like to confirm the payment of{" "}
-                          {formatCurrency(booking.totalPrice)}?
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-6">
-                          <button
-                            onClick={() => handleConfirmPayment(true)}
-                            className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-lg
-                                     border border-purple-600 rounded-2xl py-4 px-8
-                                     hover:from-purple-700 hover:to-purple-800 hover:border-purple-700
-                                     transition-all duration-300 shadow-lg hover:shadow-xl
-                                     disabled:opacity-50 disabled:cursor-not-allowed
-                                     flex items-center justify-center gap-3 font-montserrat"
-                            disabled={loading}
-                            type="button"
-                          >
-                            Yes
-                          </button>
-                          <button
-                            onClick={() => handleConfirmPayment(false)}
-                            className="flex-1 bg-white text-gray-700 font-bold text-lg
-                                     border border-slate-300 rounded-2xl py-4 px-8
-                                     hover:bg-slate-50 hover:border-slate-400
-                                     transition-all duration-300 shadow-lg hover:shadow-xl
-                                     disabled:opacity-50 disabled:cursor-not-allowed
-                                     flex items-center justify-center gap-3 font-montserrat"
-                            disabled={loading}
-                            type="button"
-                          >
-                            No
-                          </button>
-                        </div>
+                        </button>
+                        <button
+                          onClick={() => handleConfirmPayment(false)}
+                          className="flex-1 bg-gray-100 text-gray-700 font-semibold
+                                   border border-gray-300 rounded-xl py-3 px-6
+                                   hover:bg-gray-200 hover:border-gray-400
+                                   transition-all duration-200
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   flex items-center justify-center gap-2 font-instrument"
+                          disabled={loading}
+                          type="button"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )
                 ) : (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
-                        Payment Successful
-                      </h3>
-                      <p className="text-gray-600 font-roboto text-lg mb-6">
-                        Your payment has been processed successfully.
-                        Redirecting in {timer} seconds...
-                      </p>
-                      <div className="flex justify-center">
-                        <button
-                          onClick={handleGoToTrips}
-                          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-lg
-                                   border border-purple-600 rounded-2xl py-4 px-8
-                                   hover:from-purple-700 hover:to-purple-800 hover:border-purple-700
-                                   transition-all duration-300 shadow-lg hover:shadow-xl
-                                   disabled:opacity-50 disabled:cursor-not-allowed
-                                   flex items-center justify-center gap-3 font-montserrat"
-                          disabled={loading}
-                          type="button"
-                        >
-                          Go to Trips
-                          <ArrowRight className="w-6 h-6" />
-                        </button>
-                      </div>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="h-8 w-8 text-green-600" />
                     </div>
+                    <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-2">
+                      Payment Successful!
+                    </h3>
+                    <p className="text-gray-600 font-instrument mb-6">
+                      Your booking is confirmed. Redirecting in {timer} seconds...
+                    </p>
+                    <button
+                      onClick={handleGoToTrips}
+                      className="bg-purple-600 text-white font-semibold
+                               border border-purple-600 rounded-xl py-3 px-6
+                               hover:bg-purple-700 hover:border-purple-700
+                               transition-all duration-200
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               flex items-center justify-center gap-2 font-instrument mx-auto"
+                      disabled={loading}
+                      type="button"
+                    >
+                      View My Trips
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
 
-                {/* Terms and Conditions */}
-                <div className="text-center mt-8 pt-8 border-t border-slate-200">
-                  <p className="text-gray-600 font-roboto text-lg">
-                    By proceeding, you agree to our{" "}
-                    <a
-                      href="#"
-                      className="text-purple-600 hover:text-purple-700 underline font-bold transition-colors"
-                    >
-                      Terms & Conditions
-                    </a>
-                  </p>
+                  {/* Terms and Conditions */}
+                  <div className="text-center mt-6 pt-6 border-t border-gray-200">
+                    <p className="text-gray-600 font-instrument text-sm">
+                      By proceeding, you agree to our{" "}
+                      <a
+                        href="#"
+                        className="text-purple-600 hover:text-purple-700 underline font-semibold transition-colors"
+                      >
+                        Terms & Conditions
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6 lg:sticky lg:top-24">
+                {/* Booking Info Card */}
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-purple-100 p-2 rounded-lg">
+                      <FileText className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+                      Booking Details
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <span className="text-sm text-gray-600 font-instrument">
+                        Booking ID
+                      </span>
+                      <p className="font-mono font-semibold text-gray-900 text-sm break-all mt-1">
+                        {booking.id}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <span className="text-sm text-gray-600 font-instrument">
+                        Booking Date
+                      </span>
+                      <p className="font-semibold text-gray-900 font-instrument text-sm mt-1">
+                        {formatDate(booking.createdAt)}
+                      </p>
+                      {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                          <span className="text-xs text-gray-600 font-instrument">
+                            Last Updated
+                          </span>
+                          <p className="font-semibold text-gray-900 font-instrument text-xs mt-1">
+                            {formatDate(booking.updatedAt)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Summary Card */}
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-gray-900 font-bricolage mb-4">
+                    Summary
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-purple-200">
+                      <span className="text-gray-700 font-instrument">
+                        Duration:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-instrument">
+                        {getDuration()} days
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-purple-200">
+                      <span className="text-gray-700 font-instrument">
+                        Travelers:
+                      </span>
+                      <span className="font-semibold text-gray-900 font-instrument">
+                        {booking.participants || 0}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-700 font-instrument">
+                        Total:
+                      </span>
+                      <span className="font-bold text-purple-600 font-instrument text-lg">
+                        {formatCurrency(booking.totalPrice)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Sidebar */}
-            <aside className="space-y-8">
-              {/* Booking Info Card */}
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-6 md:p-8">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 font-bricolage mb-4 md:mb-6">
-                  Booking Information
-                </h3>
-                <div className="space-y-4">
-                  <div className="bg-slate-50/60 p-3 md:p-4 rounded-2xl border border-slate-200/60">
-                    <span className="text-xs md:text-sm text-gray-600 font-roboto">
-                      Booking ID:{" "}
-                    </span>
-                    <span className="font-mono font-bold text-gray-900 text-base md:text-lg break-all">
-                      {booking.id}
-                    </span>
-                  </div>
-                  <div className="bg-slate-50/60 p-3 md:p-4 rounded-2xl border border-slate-200/60">
-                    <span className="text-xs md:text-sm text-gray-600 font-roboto">
-                      Booked on:{" "}
-                    </span>
-                    <span className="font-bold text-gray-900 font-roboto text-base md:text-lg">
-                      {formatDate(booking.createdAt)}
-                    </span>
-                    {booking.updatedAt &&
-                      booking.updatedAt !== booking.createdAt && (
-                        <div className="mt-2">
-                          <span className="text-xs md:text-sm text-gray-600 font-roboto">
-                            Last updated:{" "}
-                          </span>
-                          <span className="font-bold text-gray-900 font-roboto">
-                            {formatDate(booking.updatedAt)}
-                          </span>
-                        </div>
-                      )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Summary Card */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-3xl shadow-xl p-6 md:p-8">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 font-bricolage mb-4 md:mb-6">
-                  Quick Summary
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600 font-medium font-roboto">
-                      Duration:
-                    </span>
-                    <span className="font-bold text-gray-900 font-roboto">
-                      {getDuration()} days
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600 font-medium font-roboto">
-                      Guests:
-                    </span>
-                    <span className="font-bold text-gray-900 font-roboto">
-                      {booking.participants || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600 font-medium font-roboto">
-                      Total:
-                    </span>
-                    <span className="font-bold text-purple-600 font-roboto text-lg md:text-xl">
-                      {formatCurrency(booking.totalPrice)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </aside>
           </div>
+        </div>
+
+        {/* Additional content sections can be added here */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Footer content if needed */}
         </div>
       </div>
     );

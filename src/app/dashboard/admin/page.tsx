@@ -22,8 +22,6 @@ import {
   User,
   BarChart3,
   MessageSquare,
-  Crown,
-  TrendingUp,
   Shield,
   Filter,
 } from "lucide-react";
@@ -353,10 +351,10 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <span className="text-gray-600 font-medium">
+          <span className="text-gray-600 font-instrument">
             Loading admin dashboard...
           </span>
         </div>
@@ -366,77 +364,39 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="h-8 w-8 text-red-600" />
           </div>
-          <p className="text-red-600 font-medium text-lg">Error: {error}</p>
+          <p className="text-red-600 font-instrument">Error: {error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-16 overflow-hidden">
-        {/* Premium background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/20" />
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.15),transparent_50%)]" />
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.15),transparent_50%)]" />
-
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-              backgroundSize: "20px 20px",
-            }}
-          />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse" />
-                <span className="text-purple-300 text-sm font-medium tracking-wide uppercase">
+            <div className="space-y-2">
+              <div className="inline-flex items-center px-6 py-2 bg-purple-100 rounded-full mb-4">
+                <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase font-instrument">
                   Admin Dashboard
                 </span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-bricolage leading-[1.05] tracking-tighter">
                 Platform Management
-                <span className="block bg-gradient-to-r from-purple-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
-                  Control Center
-                </span>
               </h1>
-              <p className="text-xl text-slate-300 font-medium max-w-2xl leading-relaxed">
-                Manage users, hosts, monitor revenue, and oversee platform
-                operations with precision and authority.
+              <p className="text-lg text-gray-600 font-instrument mt-2">
+                Oversee users, hosts, and platform operations
               </p>
             </div>
-
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-1 rounded-2xl">
-                  <div className="bg-slate-800 p-4 rounded-xl">
-                    <Shield size={32} className="text-purple-300" />
-                  </div>
-                </div>
-                <div className="absolute -top-2 -right-2 bg-emerald-500 rounded-full p-1">
-                  <Crown size={12} className="text-white" />
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-2xl">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  <span className="text-2xl font-bold text-white">Admin</span>
-                </div>
-                <p className="text-slate-300 text-sm font-medium">
-                  System Administrator
-                </p>
+            <div className="flex items-center gap-4">
+              <div className="bg-purple-50 p-4 rounded-full">
+                <Shield className="h-8 w-8 text-purple-600" />
               </div>
             </div>
           </div>
@@ -444,50 +404,26 @@ export default function AdminDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-slate-200/50 py-4">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-3 overflow-x-auto overflow-y-hidden scrollbar-hide py-5">
+          <div className="flex justify-center space-x-2 overflow-x-auto py-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  relative group px-8 py-6 font-semibold text-sm uppercase tracking-wider
-                  rounded-xl transition-all duration-300 flex flex-col items-center gap-3 min-w-[140px] flex-shrink-0
+                  px-6 py-3 rounded-full font-instrument font-semibold text-sm transition-all duration-200
                   ${
                     activeTab === tab.id
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25 scale-105"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-102"
+                      ? "bg-purple-600 text-white"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }
                 `}
               >
-                <div
-                  className={`
-                  p-3 rounded-lg transition-all duration-300 flex-shrink-0
-                  ${
-                    activeTab === tab.id
-                      ? "bg-white/20"
-                      : "bg-slate-100 group-hover:bg-slate-200"
-                  }
-                `}
-                >
+                <div className="flex items-center gap-2">
                   {tab.icon}
+                  <span>{tab.label}</span>
                 </div>
-                <div className="text-center space-y-1 flex-shrink-0">
-                  <div className="font-semibold text-sm whitespace-nowrap">
-                    {tab.label}
-                  </div>
-                  <div
-                    className={`text-xs font-medium whitespace-nowrap ${
-                      activeTab === tab.id ? "text-white/80" : "text-slate-500"
-                    }`}
-                  >
-                    {tab.description}
-                  </div>
-                </div>
-                {activeTab === tab.id && (
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-10 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full" />
-                )}
               </button>
             ))}
           </div>
@@ -495,148 +431,113 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-12">
           {/* Total Users Card */}
-          <div className="relative group bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-lg border border-blue-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wide">
-                  Total Users
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-50 rounded-full">
+                <Users className="h-5 w-5 text-purple-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {statsData.totalUsers.toLocaleString()}
-              </div>
-              <p className="text-blue-600 font-medium text-sm">
-                Registered users
-              </p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              {statsData.totalUsers.toLocaleString()}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Total Users
+            </p>
           </div>
 
           {/* Total Hosts Card */}
-          <div className="relative group bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl p-6 shadow-lg border border-emerald-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-green-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
-                  Total Hosts
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <UserCheck className="h-6 w-6 text-white" />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-50 rounded-full">
+                <UserCheck className="h-5 w-5 text-green-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {statsData.totalHosts}
-              </div>
-              <p className="text-emerald-600 font-medium text-sm">
-                Active hosts
-              </p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              {statsData.totalHosts}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Total Hosts
+            </p>
           </div>
 
-          {/* Host Applicants Card */}
-          <div className="relative group bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-6 shadow-lg border border-amber-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-amber-700 uppercase tracking-wide">
-                  Applications
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <UserPlus className="h-6 w-6 text-white" />
-                </div>
+          {/* Applications Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-amber-50 rounded-full">
+                <UserPlus className="h-5 w-5 text-amber-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {statsData.hostApplicants}
-              </div>
-              <p className="text-amber-600 font-medium text-sm">
-                Host & travel plan applications
-              </p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              {statsData.hostApplicants}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Applications
+            </p>
           </div>
 
           {/* Total Bookings Card */}
-          <div className="relative group bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl p-6 shadow-lg border border-purple-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-violet-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wide">
-                  Total Bookings
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-50 rounded-full">
+                <Calendar className="h-5 w-5 text-blue-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {statsData.totalBookings}
-              </div>
-              <p className="text-purple-600 font-medium text-sm">
-                All time bookings
-              </p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              {statsData.totalBookings}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Total Bookings
+            </p>
           </div>
 
           {/* Total Sales Card */}
-          <div className="relative group bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-green-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-green-700 uppercase tracking-wide">
-                  Total Sales
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <DollarSign className="h-6 w-6 text-white" />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-emerald-50 rounded-full">
+                <DollarSign className="h-5 w-5 text-emerald-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                ${statsData.totalSales.toLocaleString()}
-              </div>
-              <p className="text-green-600 font-medium text-sm">
-                Platform revenue
-              </p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              ${statsData.totalSales.toLocaleString()}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Total Sales
+            </p>
           </div>
 
           {/* Pending Refunds Card */}
-          <div className="relative group bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl p-6 shadow-lg border border-red-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/20 to-pink-500/20 rounded-full -translate-y-16 translate-x-16" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-red-700 uppercase tracking-wide">
-                  Pending Refunds
-                </h3>
-                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <RefreshCw className="h-6 w-6 text-white" />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-red-50 rounded-full">
+                <RefreshCw className="h-5 w-5 text-red-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                ${statsData.pendingRefunds.toLocaleString()}
-              </div>
-              <p className="text-red-600 font-medium text-sm">Refund amount</p>
             </div>
+            <div className="text-2xl font-bold text-gray-900 font-bricolage">
+              ${statsData.pendingRefunds.toLocaleString()}
+            </div>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">
+              Refunds
+            </p>
           </div>
         </div>
 
         {/* Tabbed Content */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           {activeTab === "users" && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      User Management
-                    </h3>
-                    <p className="text-gray-600 font-medium">
-                      View all users and manage their roles
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    User Management
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    View all users and manage their roles
+                  </p>
+                </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Filter className="w-5 h-5 text-purple-600" />
@@ -647,40 +548,40 @@ export default function AdminDashboard() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setUserFilter("all")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           userFilter === "all"
-                            ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         All ({users.length})
                       </button>
                       <button
                         onClick={() => setUserFilter("users")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           userFilter === "users"
-                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         Users ({users.filter((u) => u.role === "USER").length})
                       </button>
                       <button
                         onClick={() => setUserFilter("hosts")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           userFilter === "hosts"
-                            ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         Hosts ({users.filter((u) => u.role === "HOST").length})
                       </button>
                       <button
                         onClick={() => setUserFilter("admins")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           userFilter === "admins"
-                            ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         Admins ({users.filter((u) => u.role === "ADMIN").length}
@@ -689,24 +590,23 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-              </div>
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                  <TableHeader className="bg-gray-50 border-b border-gray-200">
                     <TableRow>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Name
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Email
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Phone
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Role
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -720,28 +620,28 @@ export default function AdminDashboard() {
                         >
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center">
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                              <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm mr-3">
                                 {user.name.charAt(0).toUpperCase()}
                               </div>
-                              <span className="font-medium text-gray-900">
+                              <span className="font-medium text-gray-900 font-instrument">
                                 {user.name}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-gray-600">
+                          <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                             {user.email}
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-gray-600">
+                          <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                             {user.phone}
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Badge
                               className={
                                 user.role === "ADMIN"
-                                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                                  ? "bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
                                   : user.role === "HOST"
-                                  ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white px-3 py-1 rounded-full text-sm font-medium"
-                                  : "bg-gradient-to-r from-slate-600 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+                                  ? "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
+                                  : "bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
                               }
                             >
                               {user.role}
@@ -754,7 +654,7 @@ export default function AdminDashboard() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                     onClick={() =>
                                       handleUpdateRole(
                                         user.email,
@@ -769,7 +669,7 @@ export default function AdminDashboard() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="bg-amber-600 text-white hover:bg-amber-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                     onClick={() =>
                                       handleUpdateRole(user.email, "ADMIN")
                                     }
@@ -782,7 +682,7 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-gradient-to-r from-slate-600 to-gray-600 text-white hover:from-slate-700 hover:to-gray-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="bg-gray-600 text-white hover:bg-gray-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleUpdateRole(user.email, "USER")
                                   }
@@ -812,35 +712,33 @@ export default function AdminDashboard() {
 
           {activeTab === "hosts" && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Host Management
-                    </h3>
-                    <p className="text-gray-600 font-medium">
-                      View and manage all active hosts on the platform
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Host Management
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    View and manage all active hosts on the platform
+                  </p>
                 </div>
               </div>
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                  <TableHeader className="bg-gray-50 border-b border-gray-200">
                     <TableRow>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Name
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Email
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Phone
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Created At
                       </TableHead>
-                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                      <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -854,28 +752,28 @@ export default function AdminDashboard() {
                         >
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center">
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-sm mr-3">
                                 {host.name.charAt(0).toUpperCase()}
                               </div>
-                              <span className="font-medium text-gray-900">
+                              <span className="font-medium text-gray-900 font-instrument">
                                 {host.name}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-gray-600">
+                          <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                             {host.email}
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-gray-600">
+                          <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                             {host.phone}
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-gray-600">
+                          <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                             {formatDate(host.createdAt)}
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                             >
                               View Details
                             </Button>
@@ -900,17 +798,15 @@ export default function AdminDashboard() {
 
           {activeTab === "applicants" && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Applications Review
-                    </h3>
-                    <p className="text-gray-600 font-medium">
-                      Review and manage pending host applications and travel
-                      plans
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Applications Review
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    Review and manage pending host applications and travel plans
+                  </p>
+                </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Filter className="w-5 h-5 text-amber-600" />
@@ -921,30 +817,30 @@ export default function AdminDashboard() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setApplicationFilter("all")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           applicationFilter === "all"
-                            ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         All ({applicants.length + travelPlans.length})
                       </button>
                       <button
                         onClick={() => setApplicationFilter("hosts")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           applicationFilter === "hosts"
-                            ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         Host Applications ({applicants.length})
                       </button>
                       <button
                         onClick={() => setApplicationFilter("travelplans")}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           applicationFilter === "travelplans"
-                            ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
                         Travel Plans ({travelPlans.length})
@@ -952,33 +848,32 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-              </div>
 
               {/* Host Applications Table */}
               {(applicationFilter === "all" ||
                 applicationFilter === "hosts") && (
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <UserPlus className="w-5 h-5 text-emerald-600" />
+                  <h4 className="text-lg font-semibold text-gray-900 font-bricolage flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-purple-600" />
                     Host Applications
                   </h4>
                   <div className="overflow-x-auto">
                     <Table>
-                      <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                      <TableHeader className="bg-gray-50 border-b border-gray-200">
                         <TableRow>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Name
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Email
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Phone
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Applied Date
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Actions
                           </TableHead>
                         </TableRow>
@@ -992,28 +887,28 @@ export default function AdminDashboard() {
                             >
                               <TableCell className="px-6 py-4">
                                 <div className="flex items-center">
-                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                  <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-sm mr-3">
                                     {applicant.name.charAt(0).toUpperCase()}
                                   </div>
-                                  <span className="font-medium text-gray-900">
+                                  <span className="font-medium text-gray-900 font-instrument">
                                     {applicant.name}
                                   </span>
                                 </div>
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 {applicant.email}
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 {applicant.phone}
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 {formatDate(applicant.createdAt)}
                               </TableCell>
                               <TableCell className="px-6 py-4 space-x-2">
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleApproveHost(applicant.email)
                                   }
@@ -1023,7 +918,7 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="bg-red-600 text-white hover:bg-red-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleRejectHost(applicant.email)
                                   }
@@ -1053,30 +948,30 @@ export default function AdminDashboard() {
               {(applicationFilter === "all" ||
                 applicationFilter === "travelplans") && (
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <h4 className="text-lg font-semibold text-gray-900 font-bricolage flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-purple-600" />
                     Inactive Travel Plans
                   </h4>
                   <div className="overflow-x-auto">
                     <Table>
-                      <TableHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                      <TableHeader className="bg-gray-50 border-b border-gray-200">
                         <TableRow>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Title
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Location
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Duration
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Price
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Created Date
                           </TableHead>
-                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                          <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                             Actions
                           </TableHead>
                         </TableRow>
@@ -1090,20 +985,20 @@ export default function AdminDashboard() {
                             >
                               <TableCell className="px-6 py-4">
                                 <div className="flex items-center">
-                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3 shadow-lg">
+                                  <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm mr-3">
                                     {plan.title.charAt(0).toUpperCase()}
                                   </div>
                                   <div>
-                                    <span className="font-medium text-gray-900 block">
+                                    <span className="font-medium text-gray-900 block font-instrument">
                                       {plan.title}
                                     </span>
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-sm text-gray-500 font-instrument">
                                       {plan.description.substring(0, 50)}...
                                     </span>
                                   </div>
                                 </div>
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 <div>
                                   <div className="font-medium">
                                     {plan.city}, {plan.state}
@@ -1113,20 +1008,20 @@ export default function AdminDashboard() {
                                   </div>
                                 </div>
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 {plan.noOfDays} days
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 ${plan.price}
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-gray-600">
+                              <TableCell className="px-6 py-4 text-gray-600 font-instrument">
                                 {formatDate(plan.createdAt)}
                               </TableCell>
                               <TableCell className="px-6 py-4 space-x-2">
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleViewTravelPlanDetails(
                                       plan.travelPlanId
@@ -1138,7 +1033,7 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 border-0 font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleApproveTravelPlan(plan.travelPlanId)
                                   }
@@ -1169,13 +1064,13 @@ export default function AdminDashboard() {
                 applicants.length === 0 &&
                 travelPlans.length === 0 && (
                   <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                      <UserPlus className="h-10 w-10 text-white" />
+                    <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <UserPlus className="h-10 w-10 text-purple-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 font-bricolage">
                       No Applications Found
                     </h3>
-                    <p className="text-gray-600 max-w-md mx-auto text-lg leading-relaxed">
+                    <p className="text-gray-600 max-w-md mx-auto font-instrument">
                       There are currently no pending host applications or
                       inactive travel plans to review.
                     </p>
@@ -1186,78 +1081,70 @@ export default function AdminDashboard() {
 
           {activeTab === "revenue" && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Revenue Overview
-                    </h3>
-                    <p className="text-gray-600 font-medium">
-                      Monitor platform revenue and refunds
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Revenue Overview
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    Monitor platform revenue and refunds
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="relative group bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-green-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-16 translate-x-16" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-bold text-green-700">
-                        Total Sales
-                      </h3>
-                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <DollarSign className="h-6 w-6 text-white" />
-                      </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                      Total Sales
+                    </h3>
+                    <div className="p-3 bg-green-50 rounded-full">
+                      <DollarSign className="h-5 w-5 text-green-600" />
                     </div>
-                    <div className="text-3xl font-bold text-green-600 mb-2">
-                      ${revenue.totalSales._sum.totalPrice || 0}
-                    </div>
-                    <p className="text-green-600 font-medium text-sm">
-                      {revenue.totalSales._count.id || 0} confirmed bookings
-                    </p>
                   </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
+                    ${revenue.totalSales._sum.totalPrice || 0}
+                  </div>
+                  <p className="text-gray-600 text-sm font-instrument">
+                    {revenue.totalSales._count.id || 0} confirmed bookings
+                  </p>
                 </div>
 
-                <div className="relative group bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl p-6 shadow-lg border border-red-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/20 to-pink-500/20 rounded-full -translate-y-16 translate-x-16" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-bold text-red-700">
-                        Refund Amounts
-                      </h3>
-                      <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <RefreshCw className="h-6 w-6 text-white" />
-                      </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                      Refund Amounts
+                    </h3>
+                    <div className="p-3 bg-red-50 rounded-full">
+                      <RefreshCw className="h-5 w-5 text-red-600" />
                     </div>
-                    <div className="text-3xl font-bold text-red-600 mb-2">
-                      ${revenue.refundAmount._sum.refundAmount || 0}
-                    </div>
-                    <p className="text-red-600 font-medium text-sm">
-                      {revenue.refundAmount._count.id || 0} cancelled/refunded
-                      bookings
-                    </p>
                   </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
+                    ${revenue.refundAmount._sum.refundAmount || 0}
+                  </div>
+                  <p className="text-gray-600 text-sm font-instrument">
+                    {revenue.refundAmount._count.id || 0} cancelled/refunded
+                    bookings
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-8 border border-slate-200/50">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 font-bricolage">
                   Revenue Management
                 </h3>
-                <p className="mb-6 text-gray-700 leading-relaxed">
+                <p className="mb-6 text-gray-600 font-instrument">
                   The admin dashboard allows you to track revenue from confirmed
                   bookings and manage refunds. Use the booking management
                   section to handle any pending refund requests.
                 </p>
 
                 <div className="flex space-x-4">
-                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl">
+                  <Button className="bg-purple-600 text-white hover:bg-purple-700 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full">
                     Download Revenue Report
                   </Button>
                   <Button
                     variant="outline"
-                    className="text-purple-600 border-purple-300 hover:bg-purple-50 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl"
+                    className="text-purple-600 border-purple-600 hover:bg-purple-50 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full"
                   >
                     View Detailed Analytics
                   </Button>
@@ -1268,13 +1155,13 @@ export default function AdminDashboard() {
 
           {activeTab === "messages" && (
             <div className="text-center py-16">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                <MessageSquare className="h-10 w-10 text-white" />
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MessageSquare className="h-10 w-10 text-purple-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 font-bricolage">
                 Message Center
               </h3>
-              <p className="text-gray-600 max-w-md mx-auto text-lg leading-relaxed">
+              <p className="text-gray-600 max-w-md mx-auto font-instrument">
                 This section is coming soon! You&apos;ll be able to communicate
                 with users and hosts directly from the admin dashboard.
               </p>
