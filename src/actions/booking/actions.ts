@@ -18,17 +18,19 @@ export const createBooking = async (bookingData: {
   // submissionType?: "individual" | "team";
 }) => {
   const session = await requireUser();
+
+  console.log("hello from server side");
   if (!session || session.user.id !== bookingData.userId)
     return { error: "Unauthorized" };
 
   try {
     const travelPlan = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: bookingData.travelPlanId },
+      where: { travelPlanId: bookingData.travelPlanId }
     });
 
     if (!travelPlan || travelPlan.status !== "ACTIVE") {
       return {
-        error: "This travel plan is not currently available for booking",
+        error: "This travel plan is not currently available for booking"
       };
     }
 
@@ -39,7 +41,7 @@ export const createBooking = async (bookingData: {
       return { error: "Number of participants must be at least 1" };
     if (participants > travelPlan.maxParticipants) {
       return {
-        error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`,
+        error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`
       };
     }
 
@@ -64,12 +66,12 @@ export const createBooking = async (bookingData: {
         participants,
         pricePerPerson,
         totalPrice,
-        status: "PENDING",
-      },
+        status: "PENDING"
+      }
     });
 
     revalidatePath(`/booking/${bookingData.travelPlanId}`);
-    console.log(booking);
+    console.log("ttt:,", booking);
     return { success: true, booking };
   } catch (error) {
     console.error("Error creating booking:", error);
@@ -91,7 +93,7 @@ export const updateBookingGuestInfo = async (
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { travelPlan: true },
+      include: { travelPlan: true }
     });
 
     if (!booking || booking.userId !== session.user.id)
@@ -102,7 +104,7 @@ export const updateBookingGuestInfo = async (
 
     if (guestData.participants > booking.travelPlan.maxParticipants) {
       return {
-        error: `Maximum ${booking.travelPlan.maxParticipants} participants allowed for this plan`,
+        error: `Maximum ${booking.travelPlan.maxParticipants} participants allowed for this plan`
       };
     }
 
@@ -112,25 +114,25 @@ export const updateBookingGuestInfo = async (
       data: {
         participants: guestData.participants,
         totalPrice,
-        specialRequirements: guestData.specialRequirements || undefined,
-      },
+        specialRequirements: guestData.specialRequirements || undefined
+      }
     });
     await prisma.teamMember.deleteMany({
-      where: { bookingId },
+      where: { bookingId }
     });
 
     await prisma.teamMember.createMany({
       data: guestData.guests.map((guest) => ({
         ...guest,
-        bookingId,
-      })),
+        bookingId
+      }))
     });
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        formSubmitted: true,
-      },
+        formSubmitted: true
+      }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
@@ -150,7 +152,7 @@ export const updateBookingStatus = async (
 
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
+      where: { id: bookingId }
     });
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
@@ -159,8 +161,8 @@ export const updateBookingStatus = async (
       where: { id: bookingId },
       data: {
         status: { set: status as BookingStatus },
-        ...(status === "CANCELLED" && { cancelledAt: new Date() }),
-      },
+        ...(status === "CANCELLED" && { cancelledAt: new Date() })
+      }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
@@ -180,8 +182,8 @@ export const getBookingById = async (bookingId: string) => {
       where: { id: bookingId },
       include: {
         travelPlan: true,
-        user: { select: { id: true, email: true, name: true } },
-      },
+        user: { select: { id: true, email: true, name: true } }
+      }
     });
 
     if (!booking || booking.userId !== session.user.id)
@@ -210,11 +212,11 @@ export const getUserBookings = async (userId: string) => {
             country: true,
             state: true,
             city: true,
-            noOfDays: true,
-          },
-        },
+            noOfDays: true
+          }
+        }
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "desc" }
     });
 
     return { success: true, bookings };
@@ -230,7 +232,7 @@ export const cancelBooking = async (bookingId: string) => {
 
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
+      where: { id: bookingId }
     });
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
@@ -258,8 +260,8 @@ export const cancelBooking = async (bookingId: string) => {
       data: {
         status: { set: "CANCELLED" },
         cancelledAt: new Date(),
-        refundAmount,
-      },
+        refundAmount
+      }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
@@ -281,7 +283,7 @@ export const updateBookingDates = async (
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { travelPlan: true },
+      include: { travelPlan: true }
     });
 
     if (!booking || booking.userId !== session.user.id) {
@@ -297,8 +299,8 @@ export const updateBookingDates = async (
       where: { id: bookingId },
       data: {
         startDate,
-        endDate,
-      },
+        endDate
+      }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
@@ -317,7 +319,7 @@ export const updateFormSubmittedStatus = async (bookingId: string) => {
     console.log("hii");
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { travelPlan: true },
+      include: { travelPlan: true }
     });
 
     if (!booking || booking.userId !== session.user.id) {
@@ -327,8 +329,8 @@ export const updateFormSubmittedStatus = async (bookingId: string) => {
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        formSubmitted: false,
-      },
+        formSubmitted: false
+      }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
@@ -349,7 +351,7 @@ export const editBookingAction = async (bookingId: string) => {
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { travelPlan: true },
+      include: { travelPlan: true }
     });
 
     if (!booking || booking.userId !== session.user.id) {
@@ -360,8 +362,8 @@ export const editBookingAction = async (bookingId: string) => {
     await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        formSubmitted: false,
-      },
+        formSubmitted: false
+      }
     });
 
     // Return the travel plan ID for navigation
@@ -388,11 +390,11 @@ export const completePaymentAction = async (
     const booking = await prisma.booking.findFirst({
       where: {
         travelPlanId: travelPlanId,
-        userId: session.user.id,
+        userId: session.user.id
       },
       include: {
-        travelPlan: true,
-      },
+        travelPlan: true
+      }
     });
 
     if (!booking) {
@@ -402,14 +404,14 @@ export const completePaymentAction = async (
     // Update booking status to CONFIRMED (payment completed)
     const updatedBooking = await prisma.booking.update({
       where: {
-        id: booking.id,
+        id: booking.id
       },
       data: {
         status: "CONFIRMED",
         totalPrice: amount,
         participants: numberOfGuests,
-        updatedAt: new Date(),
-      },
+        updatedAt: new Date()
+      }
     });
 
     revalidatePath(`/trips/booking/${travelPlanId}`);
@@ -418,7 +420,7 @@ export const completePaymentAction = async (
     return {
       success: true,
       message: "Payment completed successfully",
-      booking: updatedBooking,
+      booking: updatedBooking
     };
   } catch (error) {
     console.error("Payment completion error:", error);

@@ -23,7 +23,6 @@ export function TripCard({
   cancellationPolicy,
   hostInfo
 }: TripCardProps) {
-  // Premium color palette
   const cardColors = useMemo(
     () => ({
       header: "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50",

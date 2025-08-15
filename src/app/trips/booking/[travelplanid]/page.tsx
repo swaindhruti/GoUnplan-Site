@@ -17,7 +17,7 @@ export default async function Booking({ params }: Props) {
   if (!trip) {
     return <div>Booking not found</div>;
   }
-
+  console.log(booking);
   if (booking?.formSubmitted) {
     redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
   }
@@ -29,7 +29,7 @@ export default async function Booking({ params }: Props) {
           existingBookingData={booking || {}}
           userId={userSession.user.id || ""}
           tripData={{
-            ...trip,
+            ...trip
           }}
         />
       }
