@@ -4,7 +4,6 @@ import React, { useState, useMemo } from "react";
 import {
   Calendar,
   Users,
-  DollarSign,
   MapPin,
   Filter,
   Search,
@@ -12,13 +11,10 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
-  AlertTriangle,
   Plane,
-  Star,
   ChevronRight,
   Eye,
   Edit3,
-  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +29,7 @@ interface TravelPlan {
   travelPlanId: string;
   title: string;
   description: string;
-  destination: string;
+  destination: string | null;
   country?: string;
   state?: string;
   city?: string;
@@ -73,42 +69,47 @@ const statusConfig = {
     label: "Pending",
     icon: Clock,
     color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    bgColor: "bg-yellow-50"
+    bgColor: "bg-yellow-50",
   },
   CONFIRMED: {
     label: "Confirmed",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50"
+    bgColor: "bg-green-50",
   },
   CANCELLED: {
     label: "Cancelled",
     icon: XCircle,
     color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50"
+    bgColor: "bg-red-50",
   },
   REFUNDED: {
     label: "Refunded",
     icon: RotateCcw,
     color: "bg-blue-100 text-blue-800 border-blue-200",
-    bgColor: "bg-blue-50"
-  }
+    bgColor: "bg-blue-50",
+  },
 };
 
-export default function MyTripsComponent({ bookings, user }: MyTripsComponentProps) {
+export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
   const [sortBy, setSortBy] = useState<"date" | "price" | "status">("date");
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
-    let filtered = bookings.filter((booking) => {
-      const matchesSearch = 
-        booking.travelPlan.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.travelPlan.destination.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === "ALL" || booking.status === statusFilter;
-      
+    const filtered = bookings.filter((booking) => {
+      const matchesSearch =
+        booking.travelPlan.title
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (booking.travelPlan.destination || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "ALL" || booking.status === statusFilter;
+
       return matchesSearch && matchesStatus;
     });
 
@@ -116,7 +117,9 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "date":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         case "price":
           return b.totalPrice - a.totalPrice;
         case "status":
@@ -135,55 +138,37 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
       acc[booking.status] = (acc[booking.status] || 0) + 1;
       return acc;
     }, {} as Record<BookingStatus, number>);
-    
+
     return {
       ALL: bookings.length,
-      ...counts
+      ...counts,
     };
   }, [bookings]);
 
   // Categorize bookings for better organization
   const categorizedBookings = useMemo(() => {
     const now = new Date();
-    return filteredAndSortedBookings.reduce((acc, booking) => {
-      const startDate = new Date(booking.startDate);
-      
-      if (booking.status === "CONFIRMED" && startDate > now) {
-        acc.upcoming.push(booking);
-      } else if (booking.status === "CONFIRMED" && startDate <= now) {
-        acc.completed.push(booking);
-      } else {
-        acc.other.push(booking);
+    return filteredAndSortedBookings.reduce(
+      (acc, booking) => {
+        const startDate = new Date(booking.startDate);
+
+        if (booking.status === "CONFIRMED" && startDate > now) {
+          acc.upcoming.push(booking);
+        } else if (booking.status === "CONFIRMED" && startDate <= now) {
+          acc.completed.push(booking);
+        } else {
+          acc.other.push(booking);
+        }
+
+        return acc;
+      },
+      {
+        upcoming: [] as Booking[],
+        completed: [] as Booking[],
+        other: [] as Booking[],
       }
-      
-      return acc;
-    }, {
-      upcoming: [] as Booking[],
-      completed: [] as Booking[],
-      other: [] as Booking[]
-    });
+    );
   }, [filteredAndSortedBookings]);
-
-  const formatDate = (date: Date | string) => {
-    return format(new Date(date), "MMM dd, yyyy");
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR"
-    }).format(amount);
-  };
-
-  const getStatusConfig = (status: BookingStatus) => {
-    return statusConfig[status] || statusConfig.PENDING;
-  };
-
-  const isUpcoming = (booking: Booking) => {
-    const startDate = new Date(booking.startDate);
-    const now = new Date();
-    return booking.status === "CONFIRMED" && startDate > now;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-instrument">
@@ -191,7 +176,7 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
       <div
         className="relative bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -209,7 +194,7 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
               <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
                 Track and manage all your bookings in one place
               </p>
-              
+
               <div className="flex flex-wrap gap-3 mt-6">
                 <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument">
                   Total Trips: {bookings.length}
@@ -232,7 +217,6 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
       <div className="relative -mt-16 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
-            
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-purple-100 p-2 rounded-lg">
@@ -263,26 +247,42 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
                     Filter by Status
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(["ALL", "CONFIRMED", "PENDING", "CANCELLED", "REFUNDED"] as FilterStatus[]).map((status) => (
+                    {(
+                      [
+                        "ALL",
+                        "CONFIRMED",
+                        "PENDING",
+                        "CANCELLED",
+                        "REFUNDED",
+                      ] as FilterStatus[]
+                    ).map((status) => (
                       <Button
                         key={status}
-                        variant={statusFilter === status ? "default" : "outline"}
+                        variant={
+                          statusFilter === status ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setStatusFilter(status)}
                         className={`
-                          ${statusFilter === status 
-                            ? "bg-purple-600 text-white border-purple-600 shadow-sm" 
-                            : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                          ${
+                            statusFilter === status
+                              ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                              : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
                           } 
                           rounded-lg font-instrument transition-all duration-200 hover:scale-105
                         `}
                       >
-                        {status === "ALL" ? "All Trips" : statusConfig[status as BookingStatus]?.label || status}
-                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                          statusFilter === status 
-                            ? "bg-white/20 text-white" 
-                            : "bg-gray-100 text-gray-600"
-                        }`}>
+                        {status === "ALL"
+                          ? "All Trips"
+                          : statusConfig[status as BookingStatus]?.label ||
+                            status}
+                        <span
+                          className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                            statusFilter === status
+                              ? "bg-white/20 text-white"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
                           {statusCounts[status] || 0}
                         </span>
                       </Button>
@@ -298,7 +298,9 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
                   <div className="relative">
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as "date" | "price" | "status")}
+                      onChange={(e) =>
+                        setSortBy(e.target.value as "date" | "price" | "status")
+                      }
                       className="w-full h-10 border border-gray-300 rounded-lg px-4 pr-10 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500 bg-white appearance-none cursor-pointer"
                     >
                       <option value="date">Most Recent</option>
@@ -306,8 +308,18 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
                       <option value="status">Status</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -321,12 +333,14 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
                     <span className="font-semibold">Active Filters:</span>
                     {searchTerm && (
                       <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
-                        Search: "{searchTerm}"
+                        Search: &quot;{searchTerm}&quot;
                       </span>
                     )}
                     {statusFilter !== "ALL" && (
                       <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
-                        Status: {statusConfig[statusFilter as BookingStatus]?.label || statusFilter}
+                        Status:{" "}
+                        {statusConfig[statusFilter as BookingStatus]?.label ||
+                          statusFilter}
                       </span>
                     )}
                   </div>
@@ -346,7 +360,15 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
 
               {/* Results Summary */}
               <div className="text-sm text-gray-600 font-instrument">
-                Showing <span className="font-semibold text-gray-900">{filteredAndSortedBookings.length}</span> of <span className="font-semibold text-gray-900">{bookings.length}</span> trips
+                Showing{" "}
+                <span className="font-semibold text-gray-900">
+                  {filteredAndSortedBookings.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-gray-900">
+                  {bookings.length}
+                </span>{" "}
+                trips
               </div>
             </div>
           </div>
@@ -362,11 +384,13 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
               <Plane className="h-12 w-12 text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
-              {searchTerm || statusFilter !== "ALL" ? "No trips found" : "No trips yet"}
+              {searchTerm || statusFilter !== "ALL"
+                ? "No trips found"
+                : "No trips yet"}
             </h3>
             <p className="text-gray-600 font-instrument mb-6">
-              {searchTerm || statusFilter !== "ALL" 
-                ? "Try adjusting your search or filters" 
+              {searchTerm || statusFilter !== "ALL"
+                ? "Try adjusting your search or filters"
                 : "Start your adventure by exploring our amazing destinations"}
             </p>
             {!searchTerm && statusFilter === "ALL" && (
@@ -399,16 +423,23 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
             )}
 
             {/* Other Trips */}
-            {(categorizedBookings.completed.length > 0 || categorizedBookings.other.length > 0) && (
+            {(categorizedBookings.completed.length > 0 ||
+              categorizedBookings.other.length > 0) && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-6 flex items-center gap-3">
                   <div className="bg-gray-100 p-2 rounded-lg">
                     <Clock className="h-5 w-5 text-gray-600" />
                   </div>
-                  Trip History ({categorizedBookings.completed.length + categorizedBookings.other.length})
+                  Trip History (
+                  {categorizedBookings.completed.length +
+                    categorizedBookings.other.length}
+                  )
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...categorizedBookings.completed, ...categorizedBookings.other].map((booking) => (
+                  {[
+                    ...categorizedBookings.completed,
+                    ...categorizedBookings.other,
+                  ].map((booking) => (
                     <BookingCard key={booking.id} booking={booking} />
                   ))}
                 </div>
@@ -428,10 +459,12 @@ function BookingCard({ booking }: { booking: Booking }) {
   const isUpcomingTrip = isUpcoming(booking);
 
   return (
-    <div className={`
+    <div
+      className={`
       bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden
-      ${isUpcomingTrip ? 'ring-2 ring-green-200' : ''}
-    `}>
+      ${isUpcomingTrip ? "ring-2 ring-green-200" : ""}
+    `}
+    >
       {/* Trip Image */}
       <div className="relative h-48 bg-gradient-to-r from-purple-500 to-blue-600">
         <Image
@@ -441,10 +474,12 @@ function BookingCard({ booking }: { booking: Booking }) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
-        
+
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
-          <Badge className={`${statusConfig.color} font-instrument flex items-center gap-1`}>
+          <Badge
+            className={`${statusConfig.color} font-instrument flex items-center gap-1`}
+          >
             <StatusIcon className="h-3 w-3" />
             {statusConfig.label}
           </Badge>
@@ -466,7 +501,7 @@ function BookingCard({ booking }: { booking: Booking }) {
           </h3>
           <div className="flex items-center gap-1 text-white/90 text-sm mt-1">
             <MapPin className="h-3 w-3" />
-            {booking.travelPlan.destination}
+            {booking.travelPlan.destination || "Unknown"}
           </div>
         </div>
       </div>
@@ -479,12 +514,15 @@ function BookingCard({ booking }: { booking: Booking }) {
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="h-4 w-4 text-purple-600" />
               <span className="font-instrument">
-                {format(new Date(booking.startDate), "MMM dd")} - {format(new Date(booking.endDate), "MMM dd")}
+                {format(new Date(booking.startDate), "MMM dd")} -{" "}
+                {format(new Date(booking.endDate), "MMM dd")}
               </span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="h-4 w-4 text-purple-600" />
-              <span className="font-instrument">{booking.participants} travelers</span>
+              <span className="font-instrument">
+                {booking.participants} travelers
+              </span>
             </div>
           </div>
 
@@ -505,7 +543,10 @@ function BookingCard({ booking }: { booking: Booking }) {
 
           {/* Actions */}
           <div className="flex gap-2 pt-4 border-t border-gray-100">
-            <Link href={`/trips/booking/${booking.travelPlan.travelPlanId}/booking-summary`} className="flex-1">
+            <Link
+              href={`/trips/booking/${booking.travelPlan.travelPlanId}/booking-summary`}
+              className="flex-1"
+            >
               <Button
                 variant="outline"
                 size="sm"
@@ -515,9 +556,12 @@ function BookingCard({ booking }: { booking: Booking }) {
                 View Details
               </Button>
             </Link>
-            
+
             {isUpcomingTrip && (
-              <Link href={`/trips/${booking.travelPlan.travelPlanId}`} className="flex-1">
+              <Link
+                href={`/trips/${booking.travelPlan.travelPlanId}`}
+                className="flex-1"
+              >
                 <Button
                   size="sm"
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white font-instrument"
@@ -542,7 +586,7 @@ function getStatusConfig(status: BookingStatus) {
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "INR"
+    currency: "INR",
   }).format(amount);
 }
 

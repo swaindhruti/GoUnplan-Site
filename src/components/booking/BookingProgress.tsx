@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { CheckCircle, Calendar, Clock, Users, Tag } from "lucide-react";
+import { Calendar, Clock, Users, Tag } from "lucide-react";
 import type { BookingData } from "@/types/booking";
 
 interface BookingProgressProps {
@@ -24,14 +24,16 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
       <h4 className="text-sm font-semibold text-gray-900 font-instrument">
         Booking Details
       </h4>
-      
+
       <div className="space-y-3">
         {/* Booking ID */}
         {bookingData.id ? (
           <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">Booking ID:</span>
+              <span className="text-sm text-gray-700 font-instrument">
+                Booking ID:
+              </span>
             </div>
             <span className="text-sm font-semibold text-gray-900 font-instrument">
               #{bookingData.id.slice(-8)}
@@ -49,7 +51,9 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
         <div className="flex justify-between items-center py-2">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-500" />
-            <span className="text-sm text-gray-700 font-instrument">Status:</span>
+            <span className="text-sm text-gray-700 font-instrument">
+              Status:
+            </span>
           </div>
           <span
             className={`text-sm px-2 py-1 rounded-md font-semibold font-instrument ${getStatusStyle(
@@ -65,10 +69,13 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
           <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">Dates:</span>
+              <span className="text-sm text-gray-700 font-instrument">
+                Dates:
+              </span>
             </div>
             <span className="text-sm font-semibold text-gray-900 font-instrument">
-              {format(bookingData.startDate, "MMM dd")} - {format(bookingData.endDate!, "MMM dd")}
+              {format(bookingData.startDate, "MMM dd")} -{" "}
+              {format(bookingData.endDate!, "MMM dd")}
             </span>
           </div>
         )}
@@ -78,10 +85,13 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
           <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">Travelers:</span>
+              <span className="text-sm text-gray-700 font-instrument">
+                Travelers:
+              </span>
             </div>
             <span className="text-sm font-semibold text-gray-900 font-instrument">
-              {bookingData.participants} {bookingData.participants === 1 ? 'person' : 'people'}
+              {bookingData.participants}{" "}
+              {bookingData.participants === 1 ? "person" : "people"}
             </span>
           </div>
         )}

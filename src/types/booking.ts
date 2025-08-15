@@ -67,6 +67,7 @@ export interface HostProfile {
 }
 
 export interface TravelPlan {
+  tripImage?: string | null;
   travelPlanId: string;
   title: string;
   description: string;

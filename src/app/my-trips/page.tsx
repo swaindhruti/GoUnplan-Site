@@ -3,18 +3,23 @@ import { getUserBookings } from "@/actions/booking/actions";
 import { redirect } from "next/navigation";
 import MyTripsComponent from "@/components/trips/MyTripsComponent";
 
+export const dynamic = "force-dynamic";
+
 export default async function MyTripsPage() {
   try {
     // Require user authentication
     const userSession = await requireUser();
-    
+
     if (!userSession) {
       redirect("/auth/signin");
     }
 
     // Fetch user bookings
+    if (!userSession.user.id) {
+      redirect("/auth/signin");
+    }
     const bookingsResponse = await getUserBookings(userSession.user.id);
-    
+
     if (!bookingsResponse.success) {
       console.error("Failed to fetch bookings:", bookingsResponse.error);
       return (
@@ -32,9 +37,13 @@ export default async function MyTripsPage() {
     }
 
     return (
-      <MyTripsComponent 
-        bookings={bookingsResponse.bookings || []} 
-        user={userSession.user}
+      <MyTripsComponent
+        bookings={bookingsResponse.bookings || []}
+        user={{
+          id: userSession.user.id,
+          name: userSession.user.name || "",
+          email: userSession.user.email || "",
+        }}
       />
     );
   } catch (error) {
