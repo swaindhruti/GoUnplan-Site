@@ -1,19 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { DateSelector } from "./DateSelector";
-import { TripSummary } from "./TripSummary";
 import { BookingProgress } from "./BookingProgress";
 import { GuestInformationForm } from "./GuestInformation";
-import { format, addDays } from "date-fns";
 import { useBookingStore } from "@/store/booking-store";
 import type { TravelPlan, BookingFormData, BookingData } from "@/types/booking";
 import {
   Loader2,
   Calendar,
   Users,
-  CheckCircle,
   DollarSign,
   MessageCircle,
   Languages,
@@ -90,17 +85,8 @@ export function BookingPage({
   const bookingData = useBookingStore((state) => state.bookingData);
   const isLoading = useBookingStore((state) => state.isLoading);
   const updateBookingData = useBookingStore((state) => state.updateBookingData);
-  const updateDateSelection = useBookingStore(
-    (state) => state.updateDateSelection
-  );
   const updateGuestInfo = useBookingStore((state) => state.updateGuestInfo);
   const createNewBooking = useBookingStore((state) => state.createNewBooking);
-  const [startDate, setStartDate] = useState<Date>(
-    bookingData.startDate || new Date()
-  );
-  const [endDate, setEndDate] = useState<Date>(
-    bookingData.endDate || addDays(new Date(), (tripData.noOfDays || 1) - 1)
-  );
   const [numberOfGuests, setNumberOfGuests] = useState<number>(
     bookingData.participants || 1
   );
@@ -123,22 +109,8 @@ export function BookingPage({
   ]);
 
   useEffect(() => {
-    if (bookingData.startDate) setStartDate(bookingData.startDate);
-    if (bookingData.endDate) setEndDate(bookingData.endDate);
     if (bookingData.participants) setNumberOfGuests(bookingData.participants);
   }, [bookingData]);
-
-  const handleDateChange = useCallback(
-    async (newStartDate: Date, newEndDate: Date) => {
-      setStartDate(newStartDate);
-      setEndDate(newEndDate);
-      await updateDateSelection({
-        startDate: newStartDate,
-        endDate: newEndDate
-      });
-    },
-    [updateDateSelection]
-  );
 
   const handleContinue = useCallback(async () => {
     setIsTransitioning(true);
@@ -146,9 +118,9 @@ export function BookingPage({
       const initialBookingData = {
         userId,
         travelPlanId: tripData.travelPlanId,
-        startDate,
-        endDate,
         pricePerPerson: tripData.price,
+        startDate: new Date(tripData.startDate || new Date()),
+        endDate: new Date(tripData.endDate || new Date()),
         participants: numberOfGuests,
         status: "PENDING" as const,
         totalPrice: (tripData?.price || 0) * numberOfGuests
@@ -169,23 +141,13 @@ export function BookingPage({
     currentStep,
     bookingData.id,
     userId,
+    tripData.startDate,
+    tripData.endDate,
     tripData.travelPlanId,
-    startDate,
-    endDate,
     tripData.price,
     numberOfGuests,
     createNewBooking
   ]);
-
-  const handleBack = useCallback(() => {
-    if (currentStep > 1) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentStep((prev) => prev - 1);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  }, [currentStep]);
 
   const handleGuestInfoSubmit = useCallback(
     async (guestCount: number, guestData: BookingFormData) => {
@@ -272,80 +234,37 @@ export function BookingPage({
                   : "opacity-100 scale-100"
               }`}
             >
-              {/* Progress Steps */}
               <div className="flex justify-center items-center gap-8 mb-12">
-                {[
-                  { icon: Calendar, label: "Select Date", step: 1 },
-                  { icon: Users, label: "Guest Info", step: 2 },
-                  { icon: CheckCircle, label: "Confirmation", step: 3 }
-                ].map(({ icon: Icon, label, step }, index) => (
-                  <div key={step} className="flex flex-col items-center">
-                    <div
-                      className={`flex items-center justify-center h-16 w-16 rounded-2xl border-2 transition-all duration-300 ${
-                        currentStep >= step
-                          ? "bg-gradient-to-r from-purple-600 to-purple-700 border-purple-600 text-white shadow-lg"
-                          : "bg-white/60 border-slate-200 text-slate-400"
-                      }`}
-                    >
-                      <Icon className="h-8 w-8" strokeWidth={2} />
+                {[{ icon: Users, label: "Guest Info", step: 1 }].map(
+                  ({ icon: Icon, label, step }, index) => (
+                    <div key={step} className="flex flex-col items-center">
+                      <div
+                        className={`flex items-center justify-center h-16 w-16 rounded-2xl border-2 transition-all duration-300 ${
+                          currentStep >= step
+                            ? "bg-gradient-to-r from-purple-600 to-purple-700 border-purple-600 text-white shadow-lg"
+                            : "bg-white/60 border-slate-200 text-slate-400"
+                        }`}
+                      >
+                        <Icon className="h-8 w-8" strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-semibold text-gray-700 mt-3 font-roboto">
+                        {label}
+                      </span>
+                      {index < 1 && (
+                        <div className="h-1 w-12 bg-slate-200 rounded-full mt-3" />
+                      )}
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 mt-3 font-roboto">
-                      {label}
-                    </span>
-                    {index < 2 && (
-                      <div className="h-1 w-12 bg-slate-200 rounded-full mt-3" />
-                    )}
-                  </div>
-                ))}
+                  )
+                )}
               </div>
 
               {currentStep === 1 && (
-                <>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-8 font-bricolage">
-                    Select Your Travel Date
-                  </h2>
-                  <DateSelector
-                    tripDuration={tripData.noOfDays || 0}
-                    onDateChange={handleDateChange}
-                    selectedDate={startDate}
-                  />
-
-                  <div className="mt-12">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-bricolage">
-                      Trip Summary
-                    </h3>
-                    <TripSummary
-                      startDate={format(startDate, "MMMM dd, yyyy")}
-                      endDate={format(endDate, "MMMM dd, yyyy")}
-                      duration={`${tripData.noOfDays} days`}
-                      location={`${tripData.city}, ${tripData.state}, ${tripData.country}`}
-                    />
-                  </div>
-
-                  <div className="mt-12">
-                    <Button
-                      onClick={handleContinue}
-                      disabled={isTransitioning}
-                      className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-montserrat"
-                    >
-                      Continue to Guest Details
-                    </Button>
-                  </div>
-                </>
-              )}
-
-              {currentStep === 2 && (
-                <GuestInformationForm
-                  onBack={handleBack}
-                  onContinue={handleGuestInfoSubmit}
-                />
+                <GuestInformationForm onContinue={handleGuestInfoSubmit} />
               )}
             </div>
           </div>
-          {/* Sidebar */}
-          <div className="flex flex-col space-y-6 order-1 lg:order-2">
-            {/* Trip Card */}
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
+          <div className="flex flex-col   space-y-6 order-1 lg:order-2">
+            <div className="bg-white/80 sticky top-5 backdrop-blur-sm border border-slate-200/60 rounded-3xl shadow-xl p-8">
               <div className="flex items-center gap-4 mb-6">
                 <DollarSign className="h-8 w-8 text-purple-600" />
                 <span className="text-3xl font-bold text-gray-900 font-bricolage">
