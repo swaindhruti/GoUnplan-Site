@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   AlertCircle,
   CheckCircle2,
@@ -370,16 +371,18 @@ export default function SignInPage() {
             </div>
           </div>
         </div>
-
         {/* Right Side - Image */}
         <div className="hidden lg:block flex-1 relative">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2070&auto=format&fit=crop"
             alt="Travel adventure"
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/40 to-blue-600/40"></div>
-          
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600/40 to-blue-600/40"></div>
+
           <div className="relative z-10 flex items-center justify-center h-full p-12">
             <div className="max-w-lg">
               <div className="space-y-8">
@@ -389,7 +392,8 @@ export default function SignInPage() {
                     Welcome Back, Explorer
                   </h2>
                   <p className="text-white/90 text-lg font-instrument">
-                    Continue your journey and discover amazing new destinations with trusted local hosts.
+                    Continue your journey and discover amazing new destinations
+                    with trusted local hosts.
                   </p>
                 </div>
 
@@ -403,7 +407,8 @@ export default function SignInPage() {
                         Your Adventures Await
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Pick up where you left off and continue exploring incredible destinations
+                        Pick up where you left off and continue exploring
+                        incredible destinations
                       </p>
                     </div>
                   </div>
@@ -417,7 +422,8 @@ export default function SignInPage() {
                         Trusted Community
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Connect with verified hosts and fellow travelers from around the world
+                        Connect with verified hosts and fellow travelers from
+                        around the world
                       </p>
                     </div>
                   </div>
@@ -431,7 +437,8 @@ export default function SignInPage() {
                         Seamless Experience
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Your personalized dashboard with bookings, messages, and recommendations
+                        Your personalized dashboard with bookings, messages, and
+                        recommendations
                       </p>
                     </div>
                   </div>
