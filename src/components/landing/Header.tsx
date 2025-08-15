@@ -22,7 +22,6 @@ import {
 import {
   Menu,
   User,
-  Settings,
   LogOut,
   Calendar,
   Home,
@@ -52,6 +51,8 @@ export default function Header() {
   const [isMobileDashboardOpen, setIsMobileDashboardOpen] = useState(false);
   // State for host mode toggle
   const [isHostMode, setIsHostMode] = useState(false);
+  // State for admin mode toggle
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -214,7 +215,7 @@ export default function Header() {
 
   // Unified header styling for all pages
   const headerClasses = `
-    fixed top-0 left-0 right-0 z-50 transition-all overflow-x-hidden duration-500 ease-out
+    fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
     bg-white backdrop-blur-xl border-b border-gray-200 shadow-sm
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
@@ -225,8 +226,10 @@ export default function Header() {
     session?.user?.role !== "ADMIN";
 
   // Determine if current user is a host
-  const isUserHost =
-    session?.user?.role === "HOST" || session?.user?.role === "ADMIN";
+  const isUserHost = session?.user?.role === "HOST";
+  
+  // Determine if current user is an admin
+  const isUserAdmin = session?.user?.role === "ADMIN";
 
   // Handle host mode toggle
   const handleHostModeToggle = (checked: boolean) => {
@@ -239,10 +242,36 @@ export default function Header() {
     setIsDashboardMenuOpen(false);
   };
 
-  // Update host mode state based on current route
+  // Handle admin mode toggle
+  const handleAdminModeToggle = (checked: boolean) => {
+    setIsAdminMode(checked);
+    if (checked) {
+      router.push("/dashboard/admin");
+    } else {
+      router.push("/");
+    }
+    setIsDashboardMenuOpen(false);
+  };
+
+  // Update host mode and admin mode state based on current route
   useEffect(() => {
     setIsHostMode(pathname.startsWith("/dashboard/host"));
+    setIsAdminMode(pathname.startsWith("/dashboard/admin"));
   }, [pathname]);
+
+  // Prevent horizontal scrolling when dropdown is open
+  useEffect(() => {
+    if (isDashboardMenuOpen) {
+      document.body.style.overflowX = 'hidden';
+    } else {
+      document.body.style.overflowX = '';
+    }
+
+    // Cleanup function
+    return () => {
+      document.body.style.overflowX = '';
+    };
+  }, [isDashboardMenuOpen]);
 
   if (!isHomePage) {
     return (
@@ -299,7 +328,7 @@ export default function Header() {
             <div className="flex items-center">
               {status === "authenticated" ? (
                 <div className="flex items-center space-x-4">
-                  {/* Host Mode Toggle - Show outside dropdown for hosts */}
+                  {/* Host Mode Toggle - Show only for HOST role */}
                   {isUserHost && (
                     <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                       <Crown className="h-4 w-4 text-purple-600" />
@@ -310,6 +339,21 @@ export default function Header() {
                         checked={isHostMode}
                         onCheckedChange={handleHostModeToggle}
                         className="data-[state=checked]:bg-purple-600"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Admin Mode Toggle - Show only for ADMIN role */}
+                  {isUserAdmin && (
+                    <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
+                      <Shield className="h-4 w-4 text-red-600" />
+                      <span className="font-medium text-gray-700 text-sm font-instrument">
+                        Admin Mode
+                      </span>
+                      <Switch
+                        checked={isAdminMode}
+                        onCheckedChange={handleAdminModeToggle}
+                        className="data-[state=checked]:bg-red-600"
                       />
                     </div>
                   )}
@@ -325,8 +369,10 @@ export default function Header() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                      className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
+                      className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl max-w-[calc(100vw-2rem)]"
                       align="end"
+                      sideOffset={8}
+                      avoidCollisions={true}
                     >
                       <div className="p-4 border-b border-gray-100">
                         <div className="flex items-center space-x-3">
@@ -430,18 +476,6 @@ export default function Header() {
                           </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem
-                          onClick={() => router.push("/profile/settings")}
-                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900">
-                            Settings
-                          </span>
-                          <DropdownMenuShortcut className="text-gray-400">
-                            ⌘S
-                          </DropdownMenuShortcut>
-                        </DropdownMenuItem>
 
                         <DropdownMenuItem
                           onClick={() =>
@@ -555,7 +589,7 @@ export default function Header() {
               </Button>
             ) : (
               <div className="flex items-center space-x-4">
-                {/* Host Mode Toggle - Show outside dropdown for hosts */}
+                {/* Host Mode Toggle - Show only for HOST role */}
                 {isUserHost && (
                   <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                     <Crown className="h-4 w-4 text-purple-600" />
@@ -566,6 +600,21 @@ export default function Header() {
                       checked={isHostMode}
                       onCheckedChange={handleHostModeToggle}
                       className="data-[state=checked]:bg-purple-600"
+                    />
+                  </div>
+                )}
+                
+                {/* Admin Mode Toggle - Show only for ADMIN role */}
+                {isUserAdmin && (
+                  <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
+                    <Shield className="h-4 w-4 text-red-600" />
+                    <span className="font-medium text-gray-700 text-sm font-instrument">
+                      Admin Mode
+                    </span>
+                    <Switch
+                      checked={isAdminMode}
+                      onCheckedChange={handleAdminModeToggle}
+                      className="data-[state=checked]:bg-red-600"
                     />
                   </div>
                 )}
@@ -581,8 +630,10 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl"
+                    className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl max-w-[calc(100vw-2rem)]"
                     align="end"
+                    sideOffset={8}
+                    avoidCollisions={true}
                   >
                     <div className="p-4 border-b border-gray-100">
                       <div className="flex items-center space-x-3">
@@ -686,18 +737,6 @@ export default function Header() {
                         </DropdownMenuItem>
                       )}
 
-                      <DropdownMenuItem
-                        onClick={() => router.push("/profile/settings")}
-                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <Settings className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900">
-                          Settings
-                        </span>
-                        <DropdownMenuShortcut className="text-gray-400">
-                          ⌘S
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
 
                       <DropdownMenuItem
                         onClick={() =>
@@ -940,23 +979,6 @@ export default function Header() {
                           </button>
                         )}
 
-                        {/* Settings */}
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            router.push("/profile/settings");
-                          }}
-                          className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
-                        >
-                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
-                            <div className="flex items-center">
-                              <Settings className="mr-3 h-5 w-5 text-purple-600" />
-                              Settings
-                            </div>
-                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                        </button>
                       </>
                     )}
                   </nav>

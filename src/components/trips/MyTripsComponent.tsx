@@ -232,54 +232,121 @@ export default function MyTripsComponent({ bookings, user }: MyTripsComponentPro
       <div className="relative -mt-16 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Search */}
+            
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-purple-100 p-2 rounded-lg">
+                <Filter className="h-5 w-5 text-purple-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 font-bricolage">
+                Filter & Search
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {/* Search Bar - Full Width */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
                   placeholder="Search trips by destination or title..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                  className="pl-10 w-full h-12 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-purple-500 font-instrument text-base"
                 />
               </div>
 
-              {/* Status Filter */}
-              <div className="flex flex-wrap gap-2">
-                {(["ALL", "CONFIRMED", "PENDING", "CANCELLED", "REFUNDED"] as FilterStatus[]).map((status) => (
-                  <Button
-                    key={status}
-                    variant={statusFilter === status ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter(status)}
-                    className={`
-                      ${statusFilter === status 
-                        ? "bg-purple-600 text-white" 
-                        : "bg-white text-gray-700 hover:bg-gray-100"
-                      } 
-                      border border-gray-300 rounded-lg font-instrument
-                    `}
-                  >
-                    {status === "ALL" ? "All" : statusConfig[status as BookingStatus]?.label || status}
-                    <span className="ml-2 text-xs">
-                      ({statusCounts[status] || 0})
-                    </span>
-                  </Button>
-                ))}
+              {/* Filters Row */}
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Status Filter */}
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
+                    Filter by Status
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {(["ALL", "CONFIRMED", "PENDING", "CANCELLED", "REFUNDED"] as FilterStatus[]).map((status) => (
+                      <Button
+                        key={status}
+                        variant={statusFilter === status ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setStatusFilter(status)}
+                        className={`
+                          ${statusFilter === status 
+                            ? "bg-purple-600 text-white border-purple-600 shadow-sm" 
+                            : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                          } 
+                          rounded-lg font-instrument transition-all duration-200 hover:scale-105
+                        `}
+                      >
+                        {status === "ALL" ? "All Trips" : statusConfig[status as BookingStatus]?.label || status}
+                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                          statusFilter === status 
+                            ? "bg-white/20 text-white" 
+                            : "bg-gray-100 text-gray-600"
+                        }`}>
+                          {statusCounts[status] || 0}
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sort Options */}
+                <div className="lg:w-64">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
+                    Sort by
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as "date" | "price" | "status")}
+                      className="w-full h-10 border border-gray-300 rounded-lg px-4 pr-10 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500 bg-white appearance-none cursor-pointer"
+                    >
+                      <option value="date">Most Recent</option>
+                      <option value="price">Highest Price</option>
+                      <option value="status">Status</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Sort */}
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as "date" | "price" | "status")}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="price">Sort by Price</option>
-                  <option value="status">Sort by Status</option>
-                </select>
+              {/* Active Filters Summary */}
+              {(searchTerm || statusFilter !== "ALL") && (
+                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-center gap-2 text-sm text-purple-700 font-instrument">
+                    <span className="font-semibold">Active Filters:</span>
+                    {searchTerm && (
+                      <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
+                        Search: "{searchTerm}"
+                      </span>
+                    )}
+                    {statusFilter !== "ALL" && (
+                      <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
+                        Status: {statusConfig[statusFilter as BookingStatus]?.label || statusFilter}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStatusFilter("ALL");
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-100 p-1 h-auto font-instrument"
+                  >
+                    Clear All
+                  </Button>
+                </div>
+              )}
+
+              {/* Results Summary */}
+              <div className="text-sm text-gray-600 font-instrument">
+                Showing <span className="font-semibold text-gray-900">{filteredAndSortedBookings.length}</span> of <span className="font-semibold text-gray-900">{bookings.length}</span> trips
               </div>
             </div>
           </div>
