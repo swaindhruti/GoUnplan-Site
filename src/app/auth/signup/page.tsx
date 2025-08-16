@@ -18,7 +18,7 @@ import {
   ArrowRight,
   Sparkles,
   MapPin,
-  Compass,
+  Compass
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,10 +27,11 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
+  FormLabel
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Image from "next/image";
 
 const formSchema = z
   .object({
@@ -39,7 +40,7 @@ const formSchema = z
       .min(2, { message: "Name must be at least 2 characters." })
       .max(50, { message: "Name must not exceed 50 characters." })
       .regex(/^[a-zA-Z\s]+$/, {
-        message: "Name can only contain letters and spaces.",
+        message: "Name can only contain letters and spaces."
       }),
     email: z
       .string()
@@ -50,7 +51,7 @@ const formSchema = z
       .min(10, { message: "Phone number must be at least 10 digits." })
       .max(15, { message: "Phone number must not exceed 15 digits." })
       .regex(/^\+?[1-9]\d{1,14}$/, {
-        message: "Please enter a valid phone number.",
+        message: "Please enter a valid phone number."
       }),
     password: z
       .string()
@@ -58,13 +59,13 @@ const formSchema = z
       .max(100, { message: "Password must not exceed 100 characters." })
       .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
         message:
-          "Password must contain at least one uppercase letter, one lowercase letter, and one number.",
+          "Password must contain at least one uppercase letter, one lowercase letter, and one number."
       }),
-    confirmPassword: z.string(),
+    confirmPassword: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",
-    path: ["confirmPassword"],
+    path: ["confirmPassword"]
   });
 
 type FormData = z.infer<typeof formSchema>;
@@ -83,8 +84,8 @@ function SignUpForm() {
       email: "",
       phone: "",
       password: "",
-      confirmPassword: "",
-    },
+      confirmPassword: ""
+    }
   });
 
   const onSubmit = async (values: FormData) => {
@@ -95,14 +96,14 @@ function SignUpForm() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           name: values.name.trim(),
           email: values.email.trim(),
           phone: values.phone.trim(),
-          password: values.password,
-        }),
+          password: values.password
+        })
       });
 
       const data = await response.json();
@@ -114,7 +115,7 @@ function SignUpForm() {
               if (error.path && error.path[0]) {
                 form.setError(error.path[0] as keyof FormData, {
                   type: "server",
-                  message: error.message,
+                  message: error.message
                 });
               }
             }
@@ -458,13 +459,14 @@ export default function SignUpPage() {
 
         {/* Right Side - Image */}
         <div className="hidden lg:block flex-1 relative">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=2070&auto=format&fit=crop"
             alt="Travel adventure"
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/40 to-blue-600/40"></div>
-          
+
           <div className="relative z-10 flex items-center justify-center h-full p-12">
             <div className="max-w-lg">
               <div className="space-y-8">
@@ -474,7 +476,8 @@ export default function SignUpPage() {
                     Start Your Journey Today
                   </h2>
                   <p className="text-white/90 text-lg font-instrument">
-                    Join thousands of travelers discovering unique, personalized experiences around the world.
+                    Join thousands of travelers discovering unique, personalized
+                    experiences around the world.
                   </p>
                 </div>
 
@@ -488,7 +491,8 @@ export default function SignUpPage() {
                         Unique Destinations
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Explore hidden gems and off-the-beaten-path locations curated by local hosts
+                        Explore hidden gems and off-the-beaten-path locations
+                        curated by local hosts
                       </p>
                     </div>
                   </div>
@@ -502,7 +506,8 @@ export default function SignUpPage() {
                         Verified Hosts
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Connect with trusted local experts who make your travel dreams come true
+                        Connect with trusted local experts who make your travel
+                        dreams come true
                       </p>
                     </div>
                   </div>
@@ -516,7 +521,8 @@ export default function SignUpPage() {
                         Personalized Experiences
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Every trip is tailored to your preferences for unforgettable memories
+                        Every trip is tailored to your preferences for
+                        unforgettable memories
                       </p>
                     </div>
                   </div>

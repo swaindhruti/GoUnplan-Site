@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import {
   BarChart3,
   MessageSquare,
   Shield,
-  Filter,
+  Filter
 } from "lucide-react";
 import {
   getAllUsers,
@@ -34,7 +34,7 @@ import {
   getTotalRevenue,
   updateUserRole,
   getAlltravelPlanApplications,
-  approveTravelPlan,
+  approveTravelPlan
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
@@ -44,7 +44,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   role: Role;
   createdAt: Date;
 }
@@ -53,7 +53,7 @@ interface Host {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   createdAt: Date;
 }
 
@@ -61,7 +61,7 @@ interface Applicant {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   createdAt: Date;
   role: Role;
 }
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
   const [travelPlans, setTravelPlans] = useState<TravelPlan[]>([]);
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
     hostApplicants: 0,
     totalBookings: 0,
     totalSales: 0,
-    pendingRefunds: 0,
+    pendingRefunds: 0
   });
 
   // Fetch data on component mount
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
             (revenueResponse.totalSales?._count?.id || 0) +
             (revenueResponse.refundAmount?._count?.id || 0),
           totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-          pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
+          pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
-        totalHosts: statsData.totalHosts + 1,
+        totalHosts: statsData.totalHosts + 1
       });
     } catch (err) {
       setError("Failed to approve host application");
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
       // Update stats
       setStatsData({
         ...statsData,
-        hostApplicants: statsData.hostApplicants - 1,
+        hostApplicants: statsData.hostApplicants - 1
       });
     } catch (err) {
       setError("Failed to reject host application");
@@ -321,32 +321,32 @@ export default function AdminDashboard() {
       id: "users",
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
-      description: "User Management",
+      description: "User Management"
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management",
+      description: "Host Management"
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews",
+      description: "Pending Reviews"
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics",
+      description: "Financial Analytics"
     },
     {
       id: "messages",
       label: "MESSAGES",
       icon: <MessageSquare className="w-5 h-5" />,
-      description: "Communication",
-    },
+      description: "Communication"
+    }
   ];
 
   if (loading) {
@@ -538,58 +538,57 @@ export default function AdminDashboard() {
                     View all users and manage their roles
                   </p>
                 </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Filter className="w-5 h-5 text-purple-600" />
-                      <span className="text-sm font-semibold text-gray-700">
-                        Filter:
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setUserFilter("all")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          userFilter === "all"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        All ({users.length})
-                      </button>
-                      <button
-                        onClick={() => setUserFilter("users")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          userFilter === "users"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Users ({users.filter((u) => u.role === "USER").length})
-                      </button>
-                      <button
-                        onClick={() => setUserFilter("hosts")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          userFilter === "hosts"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Hosts ({users.filter((u) => u.role === "HOST").length})
-                      </button>
-                      <button
-                        onClick={() => setUserFilter("admins")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          userFilter === "admins"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Admins ({users.filter((u) => u.role === "ADMIN").length}
-                        )
-                      </button>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm font-semibold text-gray-700">
+                      Filter:
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setUserFilter("all")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        userFilter === "all"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      All ({users.length})
+                    </button>
+                    <button
+                      onClick={() => setUserFilter("users")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        userFilter === "users"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Users ({users.filter((u) => u.role === "USER").length})
+                    </button>
+                    <button
+                      onClick={() => setUserFilter("hosts")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        userFilter === "hosts"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Hosts ({users.filter((u) => u.role === "HOST").length})
+                    </button>
+                    <button
+                      onClick={() => setUserFilter("admins")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        userFilter === "admins"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Admins ({users.filter((u) => u.role === "ADMIN").length})
+                    </button>
                   </div>
                 </div>
+              </div>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-gray-50 border-b border-gray-200">
@@ -807,47 +806,47 @@ export default function AdminDashboard() {
                     Review and manage pending host applications and travel plans
                   </p>
                 </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Filter className="w-5 h-5 text-amber-600" />
-                      <span className="text-sm font-semibold text-gray-700">
-                        Filter:
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setApplicationFilter("all")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          applicationFilter === "all"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        All ({applicants.length + travelPlans.length})
-                      </button>
-                      <button
-                        onClick={() => setApplicationFilter("hosts")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          applicationFilter === "hosts"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Host Applications ({applicants.length})
-                      </button>
-                      <button
-                        onClick={() => setApplicationFilter("travelplans")}
-                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                          applicationFilter === "travelplans"
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Travel Plans ({travelPlans.length})
-                      </button>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm font-semibold text-gray-700">
+                      Filter:
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setApplicationFilter("all")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        applicationFilter === "all"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      All ({applicants.length + travelPlans.length})
+                    </button>
+                    <button
+                      onClick={() => setApplicationFilter("hosts")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        applicationFilter === "hosts"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Host Applications ({applicants.length})
+                    </button>
+                    <button
+                      onClick={() => setApplicationFilter("travelplans")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        applicationFilter === "travelplans"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Travel Plans ({travelPlans.length})
+                    </button>
                   </div>
                 </div>
+              </div>
 
               {/* Host Applications Table */}
               {(applicationFilter === "all" ||
