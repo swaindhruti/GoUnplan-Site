@@ -46,8 +46,8 @@ export interface User {
   email?: string;
   name: string;
   bio?: string | null;
-  phone?: string;
-  password?: string;
+  phone?: string | null;
+  password?: string | null;
   role: Role;
   image?: string | null;
   createdAt?: Date;
@@ -62,7 +62,7 @@ export interface HostProfile {
   createdAt: Date;
   updatedAt: Date;
   hostEmail: string;
-  hostMobile: string;
+  hostMobile: string | null;
   user: User;
 }
 

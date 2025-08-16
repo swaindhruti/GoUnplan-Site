@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import {
   XCircle,
   Mail,
   Phone,
+
 } from "lucide-react";
 import {
   getAllUsers,
@@ -50,7 +51,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   role: Role;
   createdAt: Date;
 }
@@ -59,7 +60,7 @@ interface Host {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   createdAt: Date;
 }
 
@@ -67,7 +68,7 @@ interface Applicant {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   createdAt: Date;
   role: Role;
 }
@@ -171,7 +172,7 @@ export default function AdminDashboard() {
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -195,7 +196,7 @@ export default function AdminDashboard() {
     hostApplicants: 0,
     totalBookings: 0,
     totalSales: 0,
-    pendingRefunds: 0,
+    pendingRefunds: 0
   });
 
   // Fetch data on component mount
@@ -273,7 +274,7 @@ export default function AdminDashboard() {
             (revenueResponse.totalSales?._count?.id || 0) +
             (revenueResponse.refundAmount?._count?.id || 0),
           totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-          pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
+          pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -308,7 +309,7 @@ export default function AdminDashboard() {
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
-        totalHosts: statsData.totalHosts + 1,
+        totalHosts: statsData.totalHosts + 1
       });
     } catch (err) {
       setError("Failed to approve host application");
@@ -330,7 +331,7 @@ export default function AdminDashboard() {
       // Update stats
       setStatsData({
         ...statsData,
-        hostApplicants: statsData.hostApplicants - 1,
+        hostApplicants: statsData.hostApplicants - 1
       });
     } catch (err) {
       setError("Failed to reject host application");
@@ -439,32 +440,40 @@ export default function AdminDashboard() {
       id: "users",
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
-      description: "User Management",
+      description: "User Management"
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management",
+      description: "Host Management"
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews",
+      description: "Pending Reviews"
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics",
+      description: "Financial Analytics"
     },
     {
+
+      id: "messages",
+      label: "MESSAGES",
+      icon: <MessageSquare className="w-5 h-5" />,
+      description: "Communication"
+    }
+
       id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
       description: "Booking Management",
     },
+
   ];
 
   if (loading) {

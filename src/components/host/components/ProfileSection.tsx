@@ -19,7 +19,7 @@ interface HostDetails {
     id: string;
     name: string;
     email: string;
-    phone: string;
+    phone: string | null;
   };
 }
 
@@ -42,7 +42,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
   const [formData, setFormData] = useState<ProfileUpdateData>({
     description: "",
     image: "",
-    hostMobile: "",
+    hostMobile: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Add this to prevent hydration mismatch during initial render
@@ -72,7 +72,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           setFormData({
             description: response.host?.description || "",
             image: response.host?.image || "",
-            hostMobile: response.host?.user?.phone || "",
+            hostMobile: response.host?.user?.phone || ""
           });
         }
       } catch (err) {
@@ -92,7 +92,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
@@ -210,7 +210,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                         {
                           year: "numeric",
                           month: "long",
-                          day: "numeric",
+                          day: "numeric"
                         }
                       )
                     : "N/A"}
