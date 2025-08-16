@@ -16,7 +16,7 @@ import {
   Compass,
   Sparkles,
   MapPin,
-  User,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +37,7 @@ interface FormErrors {
 function SignInForm() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
-    password: "",
+    password: ""
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -58,17 +58,26 @@ function SignInForm() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
 
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: undefined,
+        [name]: undefined
       }));
     }
   };
-
+  const handleGoogleSignIn = async () => {
+    try {
+      await signIn("google", {
+        callbackUrl: "/",
+        redirect: true
+      });
+    } catch (error) {
+      console.error("Google signin error:", error);
+    }
+  };
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -99,7 +108,7 @@ function SignInForm() {
       const result = await signIn("credentials", {
         email: formData.email.trim(),
         password: formData.password,
-        redirect: false,
+        redirect: false
       });
 
       if (result?.error) {
@@ -273,9 +282,7 @@ function SignInForm() {
             type="button"
             variant="outline"
             className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
-            onClick={() => {
-              // TODO: Implement Google OAuth
-            }}
+            onClick={handleGoogleSignIn}
           >
             <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -298,6 +305,16 @@ function SignInForm() {
             Continue with Google
           </Button>
 
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
+            onClick={() => {
+              router.push("/auth/phone");
+            }}
+          >
+            Continue with Phone
+          </Button>
           <div className="text-center">
             <p className="text-sm text-gray-600 font-instrument">
               Don&apos;t have an account?{" "}
@@ -359,9 +376,7 @@ export default function SignInPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex flex-1 min-h-0">
-        {/* Left Side - Form */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">

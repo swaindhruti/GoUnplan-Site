@@ -12,8 +12,8 @@ model User {
   email          String       @unique
   name           String
   bio            String?      @default("Travelling with vibe")
-  phone          String       @unique
-  password       String
+  phone          String?       @unique
+  password       String?
   role           Role         @default(USER)
   image          String?      @default("https://avatar.iran.liara.run/public")
   createdAt      DateTime     @default(now())
@@ -218,6 +218,17 @@ model Message {
   @@index([chatId, createdAt])
   @@index([receiverId, isRead])
   @@map("messages")
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([phone])
+  @@index([phone, code])
 }
 
 enum Role {
