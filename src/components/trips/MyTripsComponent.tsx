@@ -14,7 +14,7 @@ import {
   Plane,
   ChevronRight,
   Eye,
-  Edit3,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,17 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { BookingStatus } from "@prisma/client";
 import Image from "next/image";
+import { cancelBooking } from "@/actions/booking/actions";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Types based on the existing booking structure
 interface TravelPlan {
@@ -454,9 +465,64 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
 // Individual Booking Card Component
 function BookingCard({ booking }: { booking: Booking }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const statusConfig = getStatusConfig(booking.status);
   const StatusIcon = statusConfig.icon;
   const isUpcomingTrip = isUpcoming(booking);
+
+  const canCancelBooking = () => {
+    if (booking.status !== "CONFIRMED") return false;
+    const now = new Date();
+    const startDate = new Date(booking.startDate);
+    const daysUntilTrip = Math.ceil(
+      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return daysUntilTrip >= 4;
+  };
+
+  const getDaysUntilTrip = () => {
+    const now = new Date();
+    const startDate = new Date(booking.startDate);
+    return Math.ceil(
+      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  };
+
+  const handleOpenCancelModal = () => {
+    if (!canCancelBooking()) {
+      toast.error(
+        "Cancellation not allowed less than 4 days prior to the trip"
+      );
+      return;
+    }
+    setShowCancelModal(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (isLoading) return; // Prevent double-clicks
+
+    setIsLoading(true);
+    try {
+      const result = await cancelBooking(booking.id);
+
+      if (result.success) {
+        toast.success(
+          "Booking cancelled successfully. Refund will be processed shortly."
+        );
+        setShowCancelModal(false);
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Frontend: Cancellation error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div
@@ -557,23 +623,123 @@ function BookingCard({ booking }: { booking: Booking }) {
               </Button>
             </Link>
 
-            {isUpcomingTrip && (
-              <Link
-                href={`/trips/${booking.travelPlan.travelPlanId}`}
-                className="flex-1"
+            {isUpcomingTrip && canCancelBooking() && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleOpenCancelModal}
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 font-instrument"
               >
+                <XCircle className="h-3 w-3 mr-1" />
+                Cancel Booking
+              </Button>
+            )}
+
+            {isUpcomingTrip &&
+              !canCancelBooking() &&
+              booking.status === "CONFIRMED" && (
                 <Button
                   size="sm"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-instrument"
+                  variant="outline"
+                  disabled
+                  className="flex-1 border-gray-300 text-gray-400 cursor-not-allowed font-instrument"
+                  title="Cancellation not allowed less than 4 days prior to trip"
                 >
-                  <Edit3 className="h-3 w-3 mr-1" />
-                  Manage
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Cannot Cancel
                 </Button>
-              </Link>
-            )}
+              )}
           </div>
         </div>
       </div>
+
+      {/* Cancellation Confirmation Modal */}
+      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600 font-bricolage">
+              <AlertTriangle className="h-5 w-5" />
+              Cancel Booking Confirmation
+            </DialogTitle>
+            <DialogDescription className="text-gray-700 font-instrument">
+              Are you sure you want to cancel this booking? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="font-semibold text-blue-900 font-instrument mb-2">
+                Booking Details:
+              </div>
+              <div className="text-sm text-blue-800 space-y-1 font-instrument">
+                <div>
+                  <strong>Trip:</strong> {booking.travelPlan.title}
+                </div>
+                <div>
+                  <strong>Start Date:</strong>{" "}
+                  {format(new Date(booking.startDate), "MMM dd, yyyy")}
+                </div>
+                <div>
+                  <strong>Days until trip:</strong> {getDaysUntilTrip()} days
+                </div>
+                <div>
+                  <strong>Total Amount:</strong>{" "}
+                  {formatCurrency(booking.totalPrice)}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="font-semibold text-green-900 font-instrument mb-2">
+                Refund Information:
+              </div>
+              <div className="text-sm text-green-800 font-instrument">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>
+                    <strong>Full refund:</strong>{" "}
+                    {formatCurrency(booking.totalPrice)}
+                  </span>
+                </div>
+                <div className="mt-1 text-green-700">
+                  The refund amount will be processed shortly after
+                  cancellation.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelModal(false)}
+              disabled={isLoading}
+              className="font-instrument"
+            >
+              Keep Booking
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelBooking}
+              disabled={isLoading}
+              className="font-instrument"
+            >
+              {isLoading ? (
+                <>
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Cancel Booking
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

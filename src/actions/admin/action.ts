@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/roleGaurd";
 import { Role } from "@/types/auth";
-import { TravelPlanStatus } from "@prisma/client";
+import { TravelPlanStatus, BookingStatus, Prisma } from "@prisma/client";
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();
@@ -192,6 +192,93 @@ export const getTotalRevenue = async () => {
   } catch (error) {
     console.error("Error fetching total sales:", error);
     return { error: "Failed to fetch sales data" };
+  }
+};
+
+export const getAllBookings = async (statusFilter?: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    // Build where clause for bookings
+    const whereClause: Prisma.BookingWhereInput = {};
+    
+    // Add status filter if provided
+    if (statusFilter && statusFilter !== "ALL") {
+      whereClause.status = statusFilter as BookingStatus;
+    }
+
+    // Fetch bookings with related data
+    const bookings = await prisma.booking.findMany({
+      where: whereClause,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            image: true
+          }
+        },
+        travelPlan: {
+          select: {
+            travelPlanId: true,
+            title: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+            tripImage: true,
+            host: {
+              select: {
+                hostId: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        guests: true
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    // Get booking counts by status
+    const bookingCounts = await prisma.booking.groupBy({
+      by: ["status"],
+      _count: {
+        id: true
+      }
+    });
+
+    const counts = {
+      ALL: 0,
+      PENDING: 0,
+      CONFIRMED: 0,
+      CANCELLED: 0,
+      REFUNDED: 0
+    };
+
+    bookingCounts.forEach((count) => {
+      counts[count.status] = count._count.id;
+      counts.ALL += count._count.id;
+    });
+
+    return {
+      success: true,
+      bookings,
+      counts
+    };
+  } catch (error) {
+    console.error("Error fetching all bookings:", error);
+    return { error: "Failed to fetch bookings" };
   }
 };
 

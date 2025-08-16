@@ -35,6 +35,14 @@ export type Trip = {
   noOfDays: number;
   startDate?: Date | null;
   endDate?: Date | null;
+  tripImage?: string | null;
+  city?: string | null;
+  state?: string | null;
+  maxParticipants?: number;
+  reviewCount?: number;
+  averageRating?: number;
+  filters?: string[];
+  languages?: string[];
 };
 
 export type HostData = {

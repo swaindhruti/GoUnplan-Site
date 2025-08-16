@@ -160,7 +160,7 @@ export const updateBookingStatus = async (
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        status: { set: status as BookingStatus },
+        status: status as BookingStatus,
         ...(status === "CANCELLED" && { cancelledAt: new Date() })
       }
     });
@@ -234,6 +234,7 @@ export const cancelBooking = async (bookingId: string) => {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId }
     });
+    
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
 
@@ -248,22 +249,42 @@ export const cancelBooking = async (bookingId: string) => {
       (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    let refundAmount = 0;
-    if (daysUntilTrip >= 14) {
-      refundAmount = booking.totalPrice;
-    } else if (daysUntilTrip >= 7) {
-      refundAmount = Math.floor(booking.totalPrice * 0.5);
+    if (daysUntilTrip < 4) {
+      return { error: "Cancellation not allowed less than 4 days prior to the trip" };
     }
 
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        status: { set: "CANCELLED" },
-        cancelledAt: new Date(),
-        refundAmount
+    let refundAmount = 0;
+    if (daysUntilTrip >= 4) {
+      refundAmount = booking.totalPrice;
+    }
+
+    // Use transaction to ensure atomicity and prevent race conditions
+    const updatedBooking = await prisma.$transaction(async (tx) => {
+      // First, verify the booking still exists and hasn't been modified
+      const currentBooking = await tx.booking.findUnique({
+        where: { id: bookingId }
+      });
+      
+      if (!currentBooking) {
+        throw new Error("Booking not found during update");
       }
+      
+      if (currentBooking.status === "CANCELLED") {
+        throw new Error("Booking is already cancelled");
+      }
+      
+      // Update the booking
+      return await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: "CANCELLED",
+          cancelledAt: new Date(),
+          refundAmount
+        }
+      });
     });
 
+    revalidatePath("/my-trips");
     revalidatePath(`/booking/${booking.travelPlanId}`);
     return { success: true, booking: updatedBooking, refundAmount };
   } catch (error) {
@@ -425,5 +446,35 @@ export const completePaymentAction = async (
   } catch (error) {
     console.error("Payment completion error:", error);
     return { error: "Failed to complete payment" };
+  }
+};
+
+export const markBookingAsRefunded = async (bookingId: string) => {
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId }
+    });
+
+    if (!booking) {
+      return { error: "Booking not found" };
+    }
+
+    if (booking.status !== "CANCELLED") {
+      return { error: "Only cancelled bookings can be marked as refunded" };
+    }
+
+    const updatedBooking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: "REFUNDED",
+        updatedAt: new Date()
+      }
+    });
+
+    revalidatePath("/dashboard/admin");
+    return { success: true, booking: updatedBooking };
+  } catch (error) {
+    console.error("Error marking booking as refunded:", error);
+    return { error: "Failed to mark booking as refunded" };
   }
 };
