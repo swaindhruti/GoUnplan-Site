@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Calendar,
   Users,
@@ -14,7 +14,8 @@ import {
   Plane,
   ChevronRight,
   Eye,
-  Edit3,
+  AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,20 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { BookingStatus } from "@prisma/client";
 import Image from "next/image";
+import { cancelBooking } from "@/actions/booking/actions";
+import { getSuggestedTripsWrapper } from "@/actions/trips/getSuggestedTripsWrapper";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { TripCard } from "./TripCard";
+import { Trip } from "@/types/trips";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Types based on the existing booking structure
 interface TravelPlan {
@@ -378,30 +393,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       {/* Bookings Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {filteredAndSortedBookings.length === 0 ? (
-          // Empty State
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Plane className="h-12 w-12 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
-              {searchTerm || statusFilter !== "ALL"
-                ? "No trips found"
-                : "No trips yet"}
-            </h3>
-            <p className="text-gray-600 font-instrument mb-6">
-              {searchTerm || statusFilter !== "ALL"
-                ? "Try adjusting your search or filters"
-                : "Start your adventure by exploring our amazing destinations"}
-            </p>
-            {!searchTerm && statusFilter === "ALL" && (
-              <Link href="/trips">
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument">
-                  Explore Trips
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
-          </div>
+          // Empty State with Suggested Trips
+          <EmptyTripState
+            hasFilters={!!(searchTerm || statusFilter !== "ALL")}
+            searchTerm={searchTerm}
+          />
         ) : (
           // Bookings Grid
           <div className="space-y-8">
@@ -454,9 +450,64 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
 // Individual Booking Card Component
 function BookingCard({ booking }: { booking: Booking }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const statusConfig = getStatusConfig(booking.status);
   const StatusIcon = statusConfig.icon;
   const isUpcomingTrip = isUpcoming(booking);
+
+  const canCancelBooking = () => {
+    if (booking.status !== "CONFIRMED") return false;
+    const now = new Date();
+    const startDate = new Date(booking.startDate);
+    const daysUntilTrip = Math.ceil(
+      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return daysUntilTrip >= 4;
+  };
+
+  const getDaysUntilTrip = () => {
+    const now = new Date();
+    const startDate = new Date(booking.startDate);
+    return Math.ceil(
+      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  };
+
+  const handleOpenCancelModal = () => {
+    if (!canCancelBooking()) {
+      toast.error(
+        "Cancellation not allowed less than 4 days prior to the trip"
+      );
+      return;
+    }
+    setShowCancelModal(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (isLoading) return; // Prevent double-clicks
+
+    setIsLoading(true);
+    try {
+      const result = await cancelBooking(booking.id);
+
+      if (result.success) {
+        toast.success(
+          "Booking cancelled successfully. Refund will be processed shortly."
+        );
+        setShowCancelModal(false);
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Frontend: Cancellation error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div
@@ -557,23 +608,123 @@ function BookingCard({ booking }: { booking: Booking }) {
               </Button>
             </Link>
 
-            {isUpcomingTrip && (
-              <Link
-                href={`/trips/${booking.travelPlan.travelPlanId}`}
-                className="flex-1"
+            {isUpcomingTrip && canCancelBooking() && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleOpenCancelModal}
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 font-instrument"
               >
+                <XCircle className="h-3 w-3 mr-1" />
+                Cancel Booking
+              </Button>
+            )}
+
+            {isUpcomingTrip &&
+              !canCancelBooking() &&
+              booking.status === "CONFIRMED" && (
                 <Button
                   size="sm"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-instrument"
+                  variant="outline"
+                  disabled
+                  className="flex-1 border-gray-300 text-gray-400 cursor-not-allowed font-instrument"
+                  title="Cancellation not allowed less than 4 days prior to trip"
                 >
-                  <Edit3 className="h-3 w-3 mr-1" />
-                  Manage
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Cannot Cancel
                 </Button>
-              </Link>
-            )}
+              )}
           </div>
         </div>
       </div>
+
+      {/* Cancellation Confirmation Modal */}
+      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600 font-bricolage">
+              <AlertTriangle className="h-5 w-5" />
+              Cancel Booking Confirmation
+            </DialogTitle>
+            <DialogDescription className="text-gray-700 font-instrument">
+              Are you sure you want to cancel this booking? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="font-semibold text-blue-900 font-instrument mb-2">
+                Booking Details:
+              </div>
+              <div className="text-sm text-blue-800 space-y-1 font-instrument">
+                <div>
+                  <strong>Trip:</strong> {booking.travelPlan.title}
+                </div>
+                <div>
+                  <strong>Start Date:</strong>{" "}
+                  {format(new Date(booking.startDate), "MMM dd, yyyy")}
+                </div>
+                <div>
+                  <strong>Days until trip:</strong> {getDaysUntilTrip()} days
+                </div>
+                <div>
+                  <strong>Total Amount:</strong>{" "}
+                  {formatCurrency(booking.totalPrice)}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="font-semibold text-green-900 font-instrument mb-2">
+                Refund Information:
+              </div>
+              <div className="text-sm text-green-800 font-instrument">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>
+                    <strong>Full refund:</strong>{" "}
+                    {formatCurrency(booking.totalPrice)}
+                  </span>
+                </div>
+                <div className="mt-1 text-green-700">
+                  The refund amount will be processed shortly after
+                  cancellation.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelModal(false)}
+              disabled={isLoading}
+              className="font-instrument"
+            >
+              Keep Booking
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelBooking}
+              disabled={isLoading}
+              className="font-instrument"
+            >
+              {isLoading ? (
+                <>
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Cancel Booking
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -594,4 +745,145 @@ function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
   return booking.status === "CONFIRMED" && startDate > now;
+}
+
+// Empty State Component for My Trips
+function EmptyTripState({
+  hasFilters,
+  searchTerm,
+}: {
+  hasFilters: boolean;
+  searchTerm: string;
+}) {
+  const [suggestedTrips, setSuggestedTrips] = useState<Trip[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!hasFilters || !searchTerm) return;
+
+      setIsLoadingSuggestions(true);
+      try {
+        const result = await getSuggestedTripsWrapper({ searchTerm }, 6);
+        if (result.trips) {
+          // Transform the raw trip data to match Trip type
+          const transformedTrips: Trip[] = result.trips.map(trip => ({
+            ...trip,
+            vibes: trip.filters || [],
+            tripImage: `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`,
+            languages: trip.languages || [],
+            filters: trip.filters || [],
+            averageRating: trip.averageRating || 0,
+            reviewCount: trip.reviewCount || 0,
+            createdAt: typeof trip.createdAt === 'string' ? trip.createdAt : trip.createdAt.toISOString()
+          }));
+          setSuggestedTrips(transformedTrips);
+        }
+      } catch (error) {
+        console.error("Error fetching suggested trips:", error);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [hasFilters, searchTerm]);
+
+  return (
+    <div className="space-y-8">
+      {/* Original Empty State */}
+      <div className="text-center py-16">
+        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Plane className="h-12 w-12 text-gray-400" />
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
+          {hasFilters ? "No trips found" : "No trips yet"}
+        </h3>
+        <p className="text-gray-600 font-instrument mb-6">
+          {hasFilters
+            ? suggestedTrips.length > 0
+              ? "No matching trips in your bookings, but here are some similar adventures you might like!"
+              : "Try adjusting your search or filters"
+            : "Start your adventure by exploring our amazing destinations"}
+        </p>
+        {!hasFilters && (
+          <Link href="/trips">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument">
+              Explore Trips
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {/* Suggested Trips Section */}
+      {hasFilters && (isLoadingSuggestions || suggestedTrips.length > 0) && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bricolage font-bold text-gray-900">
+                  Discover Similar Adventures
+                </h3>
+                <p className="text-gray-600 font-instrument text-sm">
+                  Since you&apos;re looking for &quot;{searchTerm}&quot;, here
+                  are some trips you might enjoy
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {isLoadingSuggestions ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[400px] flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm p-4"
+                >
+                  <div className="relative h-48 w-full overflow-hidden rounded-t-2xl mb-4">
+                    <div className="bg-gray-200 animate-pulse w-full h-full rounded-lg" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-gray-200 animate-pulse h-6 w-3/4 rounded-lg" />
+                    <div className="bg-gray-200 animate-pulse h-4 w-full rounded-md" />
+                    <div className="bg-gray-200 animate-pulse h-4 w-2/3 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {suggestedTrips.map((trip) => (
+                <div key={trip.travelPlanId} className="relative">
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                      Suggested
+                    </div>
+                  </div>
+                  <TripCard trip={trip} onClick={() => {}} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {suggestedTrips.length > 0 && (
+            <div className="text-center mt-8">
+              <Link href="/trips">
+                <Button
+                  variant="outline"
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 font-instrument font-semibold px-8 py-3 rounded-full"
+                >
+                  Explore All Trips
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

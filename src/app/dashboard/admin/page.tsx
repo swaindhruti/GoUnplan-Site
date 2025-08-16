@@ -21,9 +21,14 @@ import {
   RefreshCw,
   User,
   BarChart3,
-  MessageSquare,
   Shield,
-  Filter
+  Filter,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Mail,
+  Phone,
+
 } from "lucide-react";
 import {
   getAllUsers,
@@ -34,8 +39,10 @@ import {
   getTotalRevenue,
   updateUserRole,
   getAlltravelPlanApplications,
-  approveTravelPlan
+  approveTravelPlan,
+  getAllBookings,
 } from "@/actions/admin/action";
+import { markBookingAsRefunded } from "@/actions/booking/actions";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
 
@@ -79,6 +86,64 @@ interface TravelPlan {
   createdAt: Date;
 }
 
+interface Booking {
+  id: string;
+  userId: string;
+  travelPlanId: string;
+  startDate: Date;
+  endDate: Date;
+  totalPrice: number;
+  participants: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  specialRequirements: string | null;
+  pricePerPerson: number;
+  refundAmount: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    image: string | null;
+  };
+  travelPlan: {
+    travelPlanId: string;
+    title: string;
+    destination: string | null;
+    startDate: Date | null;
+    endDate: Date | null;
+    price: number;
+    tripImage: string | null;
+    host: {
+      hostId: string;
+      user: {
+        name: string;
+        email: string;
+      };
+    };
+  };
+  guests: {
+    id: string;
+    isteamLead: boolean;
+    phone: string;
+    firstName: string;
+    lastName: string;
+    memberEmail: string;
+    createdAt: Date;
+    updatedAt: Date;
+    bookingId: string;
+  }[];
+}
+
+interface BookingCounts {
+  ALL: number;
+  PENDING: number;
+  CONFIRMED: number;
+  CANCELLED: number;
+  REFUNDED: number;
+}
+
 // Define the revenue data structure
 interface RevenueData {
   totalSales: {
@@ -97,6 +162,14 @@ export default function AdminDashboard() {
   const [hosts, setHosts] = useState<Host[]>([]);
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [travelPlans, setTravelPlans] = useState<TravelPlan[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingCounts, setBookingCounts] = useState<BookingCounts>({
+    ALL: 0,
+    PENDING: 0,
+    CONFIRMED: 0,
+    CANCELLED: 0,
+    REFUNDED: 0,
+  });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
     refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
@@ -110,6 +183,7 @@ export default function AdminDashboard() {
   const [applicationFilter, setApplicationFilter] = useState<
     "all" | "hosts" | "travelplans"
   >("all");
+  const [bookingFilter, setBookingFilter] = useState<string>("ALL");
   const [selectedTravelPlanId, setSelectedTravelPlanId] = useState<
     string | null
   >(null);
@@ -161,6 +235,25 @@ export default function AdminDashboard() {
           return;
         }
         setTravelPlans(travelPlansResponse.travelPlans || []);
+
+        // Fetch bookings
+        const bookingsResponse = await getAllBookings();
+        if (bookingsResponse.error) {
+          setError(bookingsResponse.error);
+          return;
+        }
+        if (bookingsResponse.success) {
+          setBookings(bookingsResponse.bookings || []);
+          setBookingCounts(
+            bookingsResponse.counts || {
+              ALL: 0,
+              PENDING: 0,
+              CONFIRMED: 0,
+              CANCELLED: 0,
+              REFUNDED: 0,
+            }
+          );
+        }
 
         // Fetch revenue data
         const revenueResponse = await getTotalRevenue();
@@ -301,6 +394,32 @@ export default function AdminDashboard() {
     setSelectedTravelPlanId(null);
   };
 
+  const handleMarkAsRefunded = async (bookingId: string) => {
+    try {
+      const result = await markBookingAsRefunded(bookingId);
+      if (result.success) {
+        // Update local state
+        setBookings(bookings.map(booking => 
+          booking.id === bookingId 
+            ? { ...booking, status: "REFUNDED" }
+            : booking
+        ));
+        
+        // Update booking counts
+        setBookingCounts(prev => ({
+          ...prev,
+          CANCELLED: prev.CANCELLED - 1,
+          REFUNDED: prev.REFUNDED + 1
+        }));
+      } else {
+        setError(result.error || "Failed to mark booking as refunded");
+      }
+    } catch (err) {
+      setError("Failed to mark booking as refunded");
+      console.error(err);
+    }
+  };
+
   // Format date helper function
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString();
@@ -342,11 +461,19 @@ export default function AdminDashboard() {
       description: "Financial Analytics"
     },
     {
+
       id: "messages",
       label: "MESSAGES",
       icon: <MessageSquare className="w-5 h-5" />,
       description: "Communication"
     }
+
+      id: "bookings",
+      label: "BOOKINGS",
+      icon: <Calendar className="w-5 h-5" />,
+      description: "Booking Management",
+    },
+
   ];
 
   if (loading) {
@@ -376,7 +503,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-16">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -1152,18 +1279,233 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "messages" && (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <MessageSquare className="h-10 w-10 text-purple-600" />
+          {activeTab === "bookings" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Booking Management
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    View and manage all platform bookings
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm font-semibold text-gray-700">
+                      Filter:
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {[
+                      "ALL",
+                      "CONFIRMED",
+                      "PENDING",
+                      "REFUNDED",
+                      "CANCELLED",
+                    ].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setBookingFilter(status)}
+                        className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                          bookingFilter === status
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        {status} ({bookingCounts[status as keyof BookingCounts]}
+                        )
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 font-bricolage">
-                Message Center
-              </h3>
-              <p className="text-gray-600 max-w-md mx-auto font-instrument">
-                This section is coming soon! You&apos;ll be able to communicate
-                with users and hosts directly from the admin dashboard.
-              </p>
+
+              {/* Bookings List */}
+              <div className="space-y-4">
+                {bookings.filter(
+                  (booking) =>
+                    bookingFilter === "ALL" || booking.status === bookingFilter
+                ).length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Calendar className="h-10 w-10 text-purple-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      No Bookings Found
+                    </h3>
+                    <p className="text-gray-600 mt-2">
+                      {bookingFilter === "ALL"
+                        ? "There are no bookings in the system yet."
+                        : `No ${bookingFilter.toLowerCase()} bookings found.`}
+                    </p>
+                  </div>
+                ) : (
+                  bookings
+                    .filter(
+                      (booking) =>
+                        bookingFilter === "ALL" ||
+                        booking.status === bookingFilter
+                    )
+                    .map((booking) => (
+                      <div
+                        key={booking.id}
+                        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          {/* Booking Details */}
+                          <div className="flex-grow space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                              <div>
+                                <h4 className="text-lg font-semibold text-gray-900">
+                                  {booking.travelPlan.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {booking.travelPlan.destination ||
+                                    "Destination not specified"}
+                                </p>
+                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-4 w-4" />
+                                    {new Date(
+                                      booking.startDate
+                                    ).toLocaleDateString()}{" "}
+                                    -{" "}
+                                    {new Date(
+                                      booking.endDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Users className="h-4 w-4" />
+                                    {booking.participants}{" "}
+                                    {booking.participants === 1
+                                      ? "guest"
+                                      : "guests"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-col items-start sm:items-end gap-2">
+                                <span
+                                  className={`px-3 py-1 rounded-full border text-xs font-semibold flex items-center gap-1 ${
+                                    booking.status === "CONFIRMED"
+                                      ? "bg-green-100 text-green-800 border-green-200"
+                                      : booking.status === "PENDING"
+                                      ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                      : booking.status === "CANCELLED"
+                                      ? "bg-red-100 text-red-800 border-red-200"
+                                      : "bg-purple-100 text-purple-800 border-purple-200"
+                                  }`}
+                                >
+                                  {booking.status === "CONFIRMED" && (
+                                    <CheckCircle className="h-4 w-4" />
+                                  )}
+                                  {booking.status === "PENDING" && (
+                                    <Clock className="h-4 w-4" />
+                                  )}
+                                  {booking.status === "CANCELLED" && (
+                                    <XCircle className="h-4 w-4" />
+                                  )}
+                                  {booking.status === "REFUNDED" && (
+                                    <RefreshCw className="h-4 w-4" />
+                                  )}
+                                  {booking.status}
+                                </span>
+                                <p className="text-xl font-bold text-gray-900">
+                                  ${booking.totalPrice.toLocaleString()}
+                                </p>
+                                {booking.refundAmount > 0 && (
+                                  <p className="text-sm text-red-600">
+                                    Refunded: $
+                                    {booking.refundAmount.toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Customer & Host Info */}
+                            <div className="border-t pt-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-sm font-semibold text-gray-700 mb-2">
+                                    Customer Details
+                                  </p>
+                                  <div className="space-y-1">
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                      <User className="h-4 w-4" />
+                                      {booking.user.name}
+                                    </p>
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                      <Mail className="h-4 w-4" />
+                                      {booking.user.email}
+                                    </p>
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                      <Phone className="h-4 w-4" />
+                                      {booking.user.phone}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-semibold text-gray-700 mb-2">
+                                    Host Details
+                                  </p>
+                                  <div className="space-y-1">
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                      <UserCheck className="h-4 w-4" />
+                                      {booking.travelPlan.host.user.name}
+                                    </p>
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                      <Mail className="h-4 w-4" />
+                                      {booking.travelPlan.host.user.email}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Special Requirements */}
+                              {booking.specialRequirements && (
+                                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                                  <p className="text-sm font-medium text-gray-700">
+                                    Special Requirements:
+                                  </p>
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    {booking.specialRequirements}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Booking Metadata */}
+                              <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                <div className="flex items-center gap-4">
+                                  <span>Booking ID: {booking.id}</span>
+                                  <span>
+                                    Created:{" "}
+                                    {new Date(
+                                      booking.createdAt
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                
+                                {/* Admin Actions */}
+                                {booking.status === "CANCELLED" && booking.refundAmount > 0 && (
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-white font-instrument text-xs"
+                                    onClick={() => handleMarkAsRefunded(booking.id)}
+                                  >
+                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                    Mark as Refunded
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
             </div>
           )}
         </div>

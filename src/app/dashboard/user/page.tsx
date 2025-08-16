@@ -6,7 +6,7 @@ import { getUserProfile, getUserBookings } from "@/actions/user/action";
 import {
   getPendingReviewBookings,
   getUserReviews,
-  submitReview
+  submitReview,
 } from "@/actions/reviews/action";
 import {
   UserProfile,
@@ -14,7 +14,7 @@ import {
   Review,
   PendingReview,
   ReviewFormState,
-  ReviewStats
+  ReviewStats,
 } from "@/types/dashboard";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { NavigationTabs } from "@/components/dashboard/NavigationTabs";
@@ -27,7 +27,7 @@ import { LoadingAndErrorStates } from "@/components/dashboard/LoadingAndErrorSta
 
 export default function UserDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  
+
   const handleProfileUpdate = (updatedProfile: UserProfile) => {
     setProfile(updatedProfile);
   };
@@ -36,7 +36,7 @@ export default function UserDashboard() {
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats>({
     count: 0,
-    averageRating: 0
+    averageRating: 0,
   });
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({
     bookingId: "",
@@ -44,7 +44,7 @@ export default function UserDashboard() {
     comment: "",
     isSubmitting: false,
     success: null,
-    error: null
+    error: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export default function UserDashboard() {
             setUserReviews(userReviewsRes.reviews || []);
             setReviewStats({
               count: userReviewsRes.count || 0,
-              averageRating: userReviewsRes.averageRating || 0
+              averageRating: userReviewsRes.averageRating || 0,
             });
           }
 
@@ -127,7 +127,7 @@ export default function UserDashboard() {
       ...prev,
       isSubmitting: true,
       error: null,
-      success: null
+      success: null,
     }));
     try {
       if (!profile?.id) throw new Error("User not found");
@@ -135,7 +135,7 @@ export default function UserDashboard() {
         userId: profile.id,
         bookingId: reviewForm.bookingId,
         rating: reviewForm.rating,
-        comment: reviewForm.comment
+        comment: reviewForm.comment,
       });
       if (res.success) {
         setReviewForm({
@@ -144,7 +144,7 @@ export default function UserDashboard() {
           comment: "",
           isSubmitting: false,
           success: "Review submitted successfully!",
-          error: null
+          error: null,
         });
         // Refresh reviews and pending reviews
         if (profile.id) {
@@ -153,7 +153,7 @@ export default function UserDashboard() {
             setUserReviews(userReviewsRes.reviews || []);
             setReviewStats({
               count: userReviewsRes.count || 0,
-              averageRating: userReviewsRes.averageRating || 0
+              averageRating: userReviewsRes.averageRating || 0,
             });
           }
           const pendingReviewsRes = await getPendingReviewBookings(profile.id);
@@ -165,7 +165,7 @@ export default function UserDashboard() {
         setReviewForm((prev) => ({
           ...prev,
           isSubmitting: false,
-          error: res.message || "Failed to submit review"
+          error: res.message || "Failed to submit review",
         }));
       }
     } catch (err: unknown) {
@@ -179,7 +179,7 @@ export default function UserDashboard() {
       setReviewForm((prev) => ({
         ...prev,
         isSubmitting: false,
-        error: errorMsg
+        error: errorMsg,
       }));
     }
   };
@@ -190,7 +190,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-16">
       {/* Header */}
       <DashboardHeader profile={profile} />
 
@@ -205,7 +205,7 @@ export default function UserDashboard() {
         {/* Tabbed Content */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           {activeTab === "profile" && (
-            <ProfileTab 
+            <ProfileTab
               profile={profile}
               onProfileUpdate={handleProfileUpdate}
             />

@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { requireHost } from "@/lib/roleGaurd";
 import { TravelPlanStatuses } from "@/types/travel";
-import { TravelPlanStatus } from "@prisma/client";
+import { TravelPlanStatus, BookingStatus, Prisma } from "@prisma/client";
 
 export const getHostDetails = async () => {
   const session = await requireHost();
@@ -289,6 +289,8 @@ export const updateTravelPlan = async (
     filters?: string[];
     languages?: string[];
     status?: "ACTIVE" | "INACTIVE";
+    destination?: string;
+    tripImage?: string;
   }
 ) => {
   const session = await requireHost();
@@ -330,6 +332,76 @@ export const updateTravelPlan = async (
   }
 };
 
+export const submitTripForVerification = async (
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    includedActivities?: string[];
+    restrictions?: string[];
+    noOfDays?: number;
+    price?: number;
+    startDate?: Date;
+    endDate?: Date;
+    maxParticipants?: number;
+    country?: string;
+    state?: string;
+    city?: string;
+    filters?: string[];
+    languages?: string[];
+    destination?: string;
+    tripImage?: string;
+  }
+) => {
+  const session = await requireHost();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hostProfile = await prisma.hostProfile.findUnique({
+      where: { hostId: session.user.id }
+    });
+
+    if (!hostProfile) {
+      return { error: "Host profile not found" };
+    }
+
+    const existingPlan = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: id },
+      include: {
+        bookings: {
+          where: {
+            status: { in: ["CONFIRMED", "PENDING"] }
+          }
+        }
+      }
+    });
+
+    if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
+      return { error: "Travel plan not found or unauthorized access" };
+    }
+
+    // Update the travel plan and set status to INACTIVE for admin verification
+    // This won't affect existing bookings as they are linked by travelPlanId
+    const updatedPlan = await prisma.travelPlans.update({
+      where: { travelPlanId: id },
+      data: {
+        ...data,
+        status: "INACTIVE" // Set to inactive for admin review
+      }
+    });
+
+    return {
+      success: true,
+      updatedPlan,
+      message: "Travel plan submitted for verification. It will be active after admin approval. Existing bookings remain unaffected.",
+      existingBookingsCount: existingPlan.bookings.length
+    };
+  } catch (error) {
+    console.error("Error submitting travel plan for verification:", error);
+    return { error: "Failed to submit travel plan for verification" };
+  }
+};
+
 export const getTripById = async (tripId: string) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
@@ -355,6 +427,103 @@ export const getTripById = async (tripId: string) => {
   } catch (error) {
     console.error("Error fetching trip by ID:", error);
     return { error: "Failed to fetch trip" };
+  }
+};
+
+export const getHostBookings = async (statusFilter?: string) => {
+  const session = await requireHost();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hostProfile = await prisma.hostProfile.findUnique({
+      where: { hostId: session.user.id }
+    });
+
+    if (!hostProfile) {
+      return { error: "Host profile not found" };
+    }
+
+    // Get all travel plans by this host
+    const travelPlans = await prisma.travelPlans.findMany({
+      where: { hostId: hostProfile.hostId },
+      select: { travelPlanId: true }
+    });
+
+    const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
+
+    // Build where clause for bookings
+    const whereClause: Prisma.BookingWhereInput = {
+      travelPlanId: { in: travelPlanIds }
+    };
+
+    // Add status filter if provided
+    if (statusFilter && statusFilter !== "ALL") {
+      whereClause.status = statusFilter as BookingStatus;
+    }
+
+    // Fetch bookings with related data
+    const bookings = await prisma.booking.findMany({
+      where: whereClause,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            image: true
+          }
+        },
+        travelPlan: {
+          select: {
+            travelPlanId: true,
+            title: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+            tripImage: true
+          }
+        },
+        guests: true
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    // Get booking counts by status
+    const bookingCounts = await prisma.booking.groupBy({
+      by: ["status"],
+      _count: {
+        id: true
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds }
+      }
+    });
+
+    const counts = {
+      ALL: 0,
+      PENDING: 0,
+      CONFIRMED: 0,
+      CANCELLED: 0,
+      REFUNDED: 0
+    };
+
+    bookingCounts.forEach((count) => {
+      counts[count.status] = count._count.id;
+      counts.ALL += count._count.id;
+    });
+
+    return {
+      success: true,
+      bookings,
+      counts
+    };
+  } catch (error) {
+    console.error("Error fetching host bookings:", error);
+    return { error: "Failed to fetch bookings" };
   }
 };
 
