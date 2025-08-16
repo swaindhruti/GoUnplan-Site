@@ -465,7 +465,16 @@ export default function TripsPage() {
 
         {/* Empty state */}
         {!isLoading && !error && filteredTrips.length === 0 && (
-          <EmptyState onClearFilters={clearAllFilters} />
+          <EmptyState 
+            onClearFilters={clearAllFilters} 
+            searchContext={{
+              searchTerm: filters.searchTerm,
+              vibeFilter: filters.vibeFilter,
+              travellerFilter: filters.travellerFilter,
+              priceRange: filters.priceRange,
+              languageFilter: filters.languageFilter
+            }}
+          />
         )}
 
         {/* Results */}

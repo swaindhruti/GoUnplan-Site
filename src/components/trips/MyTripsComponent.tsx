@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Calendar,
   Users,
@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Eye,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,11 @@ import { format } from "date-fns";
 import { BookingStatus } from "@prisma/client";
 import Image from "next/image";
 import { cancelBooking } from "@/actions/booking/actions";
+import { getSuggestedTripsWrapper } from "@/actions/trips/getSuggestedTripsWrapper";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { TripCard } from "./TripCard";
+import { Trip } from "@/types/trips";
 import {
   Dialog,
   DialogContent,
@@ -389,30 +393,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       {/* Bookings Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {filteredAndSortedBookings.length === 0 ? (
-          // Empty State
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Plane className="h-12 w-12 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
-              {searchTerm || statusFilter !== "ALL"
-                ? "No trips found"
-                : "No trips yet"}
-            </h3>
-            <p className="text-gray-600 font-instrument mb-6">
-              {searchTerm || statusFilter !== "ALL"
-                ? "Try adjusting your search or filters"
-                : "Start your adventure by exploring our amazing destinations"}
-            </p>
-            {!searchTerm && statusFilter === "ALL" && (
-              <Link href="/trips">
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument">
-                  Explore Trips
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
-          </div>
+          // Empty State with Suggested Trips
+          <EmptyTripState
+            hasFilters={!!(searchTerm || statusFilter !== "ALL")}
+            searchTerm={searchTerm}
+          />
         ) : (
           // Bookings Grid
           <div className="space-y-8">
@@ -760,4 +745,145 @@ function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
   return booking.status === "CONFIRMED" && startDate > now;
+}
+
+// Empty State Component for My Trips
+function EmptyTripState({
+  hasFilters,
+  searchTerm,
+}: {
+  hasFilters: boolean;
+  searchTerm: string;
+}) {
+  const [suggestedTrips, setSuggestedTrips] = useState<Trip[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!hasFilters || !searchTerm) return;
+
+      setIsLoadingSuggestions(true);
+      try {
+        const result = await getSuggestedTripsWrapper({ searchTerm }, 6);
+        if (result.trips) {
+          // Transform the raw trip data to match Trip type
+          const transformedTrips: Trip[] = result.trips.map(trip => ({
+            ...trip,
+            vibes: trip.filters || [],
+            tripImage: `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`,
+            languages: trip.languages || [],
+            filters: trip.filters || [],
+            averageRating: trip.averageRating || 0,
+            reviewCount: trip.reviewCount || 0,
+            createdAt: typeof trip.createdAt === 'string' ? trip.createdAt : trip.createdAt.toISOString()
+          }));
+          setSuggestedTrips(transformedTrips);
+        }
+      } catch (error) {
+        console.error("Error fetching suggested trips:", error);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [hasFilters, searchTerm]);
+
+  return (
+    <div className="space-y-8">
+      {/* Original Empty State */}
+      <div className="text-center py-16">
+        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Plane className="h-12 w-12 text-gray-400" />
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
+          {hasFilters ? "No trips found" : "No trips yet"}
+        </h3>
+        <p className="text-gray-600 font-instrument mb-6">
+          {hasFilters
+            ? suggestedTrips.length > 0
+              ? "No matching trips in your bookings, but here are some similar adventures you might like!"
+              : "Try adjusting your search or filters"
+            : "Start your adventure by exploring our amazing destinations"}
+        </p>
+        {!hasFilters && (
+          <Link href="/trips">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument">
+              Explore Trips
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {/* Suggested Trips Section */}
+      {hasFilters && (isLoadingSuggestions || suggestedTrips.length > 0) && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bricolage font-bold text-gray-900">
+                  Discover Similar Adventures
+                </h3>
+                <p className="text-gray-600 font-instrument text-sm">
+                  Since you&apos;re looking for &quot;{searchTerm}&quot;, here
+                  are some trips you might enjoy
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {isLoadingSuggestions ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[400px] flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm p-4"
+                >
+                  <div className="relative h-48 w-full overflow-hidden rounded-t-2xl mb-4">
+                    <div className="bg-gray-200 animate-pulse w-full h-full rounded-lg" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-gray-200 animate-pulse h-6 w-3/4 rounded-lg" />
+                    <div className="bg-gray-200 animate-pulse h-4 w-full rounded-md" />
+                    <div className="bg-gray-200 animate-pulse h-4 w-2/3 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {suggestedTrips.map((trip) => (
+                <div key={trip.travelPlanId} className="relative">
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                      Suggested
+                    </div>
+                  </div>
+                  <TripCard trip={trip} onClick={() => {}} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {suggestedTrips.length > 0 && (
+            <div className="text-center mt-8">
+              <Link href="/trips">
+                <Button
+                  variant="outline"
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 font-instrument font-semibold px-8 py-3 rounded-full"
+                >
+                  Explore All Trips
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
