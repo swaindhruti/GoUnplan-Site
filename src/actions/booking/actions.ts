@@ -342,40 +342,64 @@ export const updateBookingDates = async (
   }
 };
 
-export const updateFormSubmittedStatus = async (bookingId: string) => {
+// Updated function with better naming and error handling
+export const setFormSubmissionStatus = async (
+  bookingId: string,
+  status: boolean
+) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
   try {
-    console.log("hii");
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { travelPlan: true }
     });
 
     if (!booking || booking.userId !== session.user.id) {
-      return { error: "Unauthorized" };
+      return { error: "Booking not found or unauthorized access" };
     }
-
+    if (status === false) {
+      await prisma.booking.delete({
+        where: { id: bookingId }
+      });
+    }
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        formSubmitted: false
+        formSubmitted: status,
+        updatedAt: new Date()
       }
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
-    return { success: true, booking: updatedBooking };
+    revalidatePath(`/trips/booking/${booking.travelPlanId}`);
+
+    return {
+      success: true,
+      booking: updatedBooking,
+      message: `Form submission status updated to ${status}`
+    };
   } catch (error) {
-    console.error("Error updating booking dates:", error);
-    return { error: "Failed to update booking dates" };
+    console.error("Error updating form submission status:", error);
+    return { error: "Failed to update form submission status" };
   }
 };
 
-// New client action for editing booking
-export const editBookingAction = async (bookingId: string) => {
-  "use server";
+export const enableBookingEdit = async (bookingId: string) => {
+  return await setFormSubmissionStatus(bookingId, false);
+};
 
+export const completeBookingForm = async (bookingId: string) => {
+  return await setFormSubmissionStatus(bookingId, true);
+};
+
+// Keep the old function name for backward compatibility but with improved implementation
+export const unCompleteBookingForm = async (bookingId: string) => {
+  return await enableBookingEdit(bookingId);
+};
+
+export const editBookingAction = async (bookingId: string) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
@@ -393,7 +417,8 @@ export const editBookingAction = async (bookingId: string) => {
     await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        formSubmitted: false
+        formSubmitted: false,
+        updatedAt: new Date()
       }
     });
 

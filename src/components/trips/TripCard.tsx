@@ -98,7 +98,7 @@ export const TripCard = ({
             </span>
           </div>
         </div>
-        {isTripPage && (
+        {isTripPage ? (
           <div className="space-y-3 mt-4">
             <div className="flex flex-col gap-1 text-sm text-gray-700 font-instrument">
               <div className="flex items-center gap-2">
@@ -147,12 +147,13 @@ export const TripCard = ({
               </button>
             </Link>
           </div>
+        ) : (
+          <Link href={`/trips/${trip.travelPlanId}`}>
+            <button className="w-full text-sm mt-3 font-instrument font-semibold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-colors duration-200">
+              View Details <ArrowRight className="w-4 h-4" />
+            </button>
+          </Link>
         )}
-        <Link href={`/trips/${trip.travelPlanId}`}>
-          <button className="w-full text-sm mt-3 font-instrument font-semibold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-colors duration-200">
-            View Details <ArrowRight className="w-4 h-4" />
-          </button>
-        </Link>
       </div>
     </div>
   );

@@ -7,11 +7,15 @@ import {
   ArrowRight,
   Edit2,
   CheckCircle,
-  CreditCard
+  CreditCard,
+  XCircle,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import {
-  editBookingAction
+  editBookingAction,
+  unCompleteBookingForm
   /*   updateBookingStatus */
 } from "@/actions/booking/actions";
 /* import { BookingStatus } from "@prisma/client"; */
@@ -37,10 +41,7 @@ export interface BookingSummaryProps {
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
   ({ booking, travelPlan, loading = false, allTrips }) => {
     const router = useRouter();
-    /*  const [step, setStep] = useState(1); */
-    /*     const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentCompleted, setPaymentCompleted] = useState(false); */
-    /*     const [timer, setTimer] = useState(10); */
+    const isCancelled = booking?.status === "CANCELLED";
 
     const formatDate = useCallback(
       (dateString: Date | string | undefined | null): string => {
@@ -99,6 +100,21 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       }
     }, [booking?.id, router]);
 
+    const handleBookAgain = useCallback(async () => {
+      if (!booking?.id || !booking?.travelPlanId) return;
+
+      try {
+        const response = await unCompleteBookingForm(booking.id);
+        if (response.success) {
+          router.push(`/trips/booking/${booking.travelPlanId}`);
+        } else {
+          console.error("Failed to enable booking edit:", response.error);
+        }
+      } catch (error) {
+        console.error("Error enabling booking edit:", error);
+      }
+    }, [booking?.id, booking?.travelPlanId, router]);
+
     const getDuration = useCallback((): string => {
       if (!booking?.startDate || !booking?.endDate) return "N/A";
       const start = new Date(booking.startDate);
@@ -108,82 +124,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       return `${diffDays}`;
     }, [booking?.startDate, booking?.endDate]);
 
-    /*     const getStatusColor = useCallback((status: string | undefined): string => {
-      switch (status) {
-        case "CONFIRMED":
-          return "bg-gradient-to-r from-green-100 to-green-200 text-green-800 border-green-300";
-        case "PENDING":
-          return "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300";
-        case "CANCELLED":
-          return "bg-gradient-to-r from-red-100 to-red-200 text-red-800 border-red-300";
-        case "REFUNDED":
-          return "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300";
-        default:
-          return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border-gray-300";
-      }
-    }, []); */
-
     const handleContinueToPayment = () => {
       router.push(`/trips/booking/${booking?.travelPlanId}/payment-form`);
     };
-    /* 
-    const handleConfirmPayment = useCallback(
-      async (confirmed: boolean) => {
-        if (confirmed) {
-          if (!booking?.id) {
-            console.error("No booking ID available");
-            return;
-          }
-
-          setIsProcessing(true);
-
-          try {
-            // Update booking status to CONFIRMED
-            const response = await updateBookingStatus(
-              booking.id,
-              BookingStatus.CONFIRMED
-            );
-
-            if (response.success) {
-              // Update local state to reflect the new status
-              setTimeout(() => {
-                setIsProcessing(false);
-                setPaymentCompleted(true);
-
-                // Update the booking object with new status
-                if (booking) {
-                  booking.status = "CONFIRMED";
-                  booking.updatedAt = new Date();
-                }
-              }, 2000); // Reduced time for better UX
-            } else {
-              setIsProcessing(false);
-              console.error("Failed to update booking status:", response.error);
-              alert("Payment failed. Please try again.");
-            }
-          } catch (error) {
-            setIsProcessing(false);
-            console.error("Error processing payment:", error);
-            alert("Payment failed. Please try again.");
-          }
-        } else {
-          setStep(1);
-        }
-      },
-      [booking]
-    );
- */
-
-    /* useEffect(() => {
-      if (paymentCompleted && timer > 0) {
-        const countdown = setInterval(() => {
-          setTimer((prev) => prev - 1);
-        }, 1000);
-        return () => clearInterval(countdown);
-      } else if (paymentCompleted && timer === 0) {
-        router.push("/trips");
-      }
-    }, [paymentCompleted, timer, router]); */
 
     // Loading state
     if (loading) {
@@ -239,19 +182,29 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
             <div className="flex items-center justify-between mt-12">
               <div className="space-y-4">
-                <div className="inline-flex items-center px-6 py-2 bg-purple-600/80 backdrop-blur-sm rounded-full mb-4">
+                <div
+                  className={`inline-flex items-center px-6 py-2 backdrop-blur-sm rounded-full mb-4 ${
+                    isCancelled ? "bg-red-600/80" : "bg-purple-600/80"
+                  }`}
+                >
                   <span className="text-white text-sm font-semibold tracking-wide uppercase font-instrument">
-                    Booking Summary
+                    {isCancelled ? "Cancelled Booking" : "Booking Summary"}
                   </span>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
-                  Review Your Booking
-                  <span className="block text-purple-300 mt-2">
+                  {isCancelled ? "Trip Cancelled" : "Review Your Booking"}
+                  <span
+                    className={`block mt-2 ${
+                      isCancelled ? "text-red-300" : "text-purple-300"
+                    }`}
+                  >
                     {travelPlan?.title}
                   </span>
                 </h1>
                 <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
-                  Verify your trip details and proceed to secure payment
+                  {isCancelled
+                    ? "Your booking has been cancelled. Refund will be processed soon."
+                    : "Verify your trip details and proceed to secure payment"}
                 </p>
 
                 <div className="flex flex-wrap gap-3 mt-6">
@@ -268,15 +221,44 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
               </div>
               <div className="flex items-center gap-4">
                 <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
-                  <CheckCircle className="h-8 w-8 text-white" />
+                  {isCancelled ? (
+                    <XCircle className="h-8 w-8 text-white" />
+                  ) : (
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Cancellation Alert */}
+        {isCancelled && (
+          <div className="relative -mt-16 z-30 mb-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-sm">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-medium text-red-800 font-instrument">
+                      Trip Cancelled
+                    </h3>
+                    <div className="mt-1 text-sm text-red-700 font-instrument">
+                      <p>
+                        Your booking has been cancelled successfully. The refund
+                        will be processed within 5-6 business days and credited
+                        to your original payment method.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Booking Details Section */}
-        <div className="relative -mt-16 z-20">
+        <div className={`relative z-20 ${isCancelled ? "-mt-4" : "-mt-16"}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
@@ -286,8 +268,16 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     {/* Trip Header */}
                     <div className="text-center mb-6">
                       <div className="flex items-center gap-3 justify-center mb-3">
-                        <div className="bg-purple-100 p-2 rounded-lg">
-                          <MapPin className="w-4 h-4 text-purple-600" />
+                        <div
+                          className={`p-2 rounded-lg ${
+                            isCancelled ? "bg-red-100" : "bg-purple-100"
+                          }`}
+                        >
+                          <MapPin
+                            className={`w-4 h-4 ${
+                              isCancelled ? "text-red-600" : "text-purple-600"
+                            }`}
+                          />
                         </div>
                         <h2 className="text-lg font-semibold text-gray-900 font-bricolage">
                           Trip Details
@@ -296,8 +286,13 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                       <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-1">
                         {travelPlan?.title || "Travel Package"}
                       </h3>
-                      <p className="text-sm text-purple-600 font-medium font-instrument">
+                      <p
+                        className={`text-sm font-medium font-instrument ${
+                          isCancelled ? "text-red-600" : "text-purple-600"
+                        }`}
+                      >
                         {travelPlan?.destination || "Destination"}
+                        {isCancelled && " (Cancelled)"}
                       </p>
                     </div>
 
@@ -310,7 +305,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             <span>{formatDate(booking.startDate)}</span>
                             <ArrowRight className="w-4 h-4 text-gray-400" />
                             <span>{formatDate(booking.endDate)}</span>
-                            <span className="text-purple-600 text-sm">
+                            <span
+                              className={`text-sm ${
+                                isCancelled ? "text-red-600" : "text-purple-600"
+                              }`}
+                            >
                               ({getDuration()} days)
                             </span>
                           </div>
@@ -329,7 +328,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   key={member.memberEmail + index}
                                   className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                                     member.isteamLead
-                                      ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                      ? isCancelled
+                                        ? "bg-red-100 text-red-800 border border-red-200"
+                                        : "bg-purple-100 text-purple-800 border border-purple-200"
                                       : "bg-gray-100 text-gray-700 border border-gray-200"
                                   }`}
                                 >
@@ -345,22 +346,39 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                           </div>
                         </div>
 
-                        {/* Edit Details Button */}
+                        {/* Action Button */}
                         <div className="pt-3 border-t border-gray-200">
-                          <button
-                            onClick={handleEditDetails}
-                            className="w-full bg-gray-100 text-gray-700 font-medium text-sm
-                                     border border-gray-300 rounded-lg py-2.5 px-4
-                                     hover:bg-gray-200 hover:border-gray-400
-                                     transition-all duration-200
-                                     disabled:opacity-50 disabled:cursor-not-allowed
-                                     flex items-center justify-center gap-2 font-instrument"
-                            disabled={loading}
-                            type="button"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                            Edit Details
-                          </button>
+                          {isCancelled ? (
+                            <button
+                              onClick={handleBookAgain}
+                              className="w-full bg-red-100 text-red-700 font-medium text-sm
+                                       border border-red-300 rounded-lg py-2.5 px-4
+                                       hover:bg-red-200 hover:border-red-400
+                                       transition-all duration-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed
+                                       flex items-center justify-center gap-2 font-instrument"
+                              disabled={loading}
+                              type="button"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              Book Again
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleEditDetails}
+                              className="w-full bg-gray-100 text-gray-700 font-medium text-sm
+                                       border border-gray-300 rounded-lg py-2.5 px-4
+                                       hover:bg-gray-200 hover:border-gray-400
+                                       transition-all duration-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed
+                                       flex items-center justify-center gap-2 font-instrument"
+                              disabled={loading}
+                              type="button"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              Edit Details
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -406,11 +424,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <CarouselPrevious />
                         <CarouselNext />
                       </Carousel>
-
-                      {/*  <button className="w-full mt-4 bg-purple-600 text-white font-medium text-sm rounded-lg py-2.5 px-4 hover:bg-purple-700 transition-all duration-200 flex items-center justify-center gap-2 font-instrument">
-                          View All Destinations
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button> */}
                     </div>
 
                     {/* Special Requirements */}
@@ -439,90 +452,162 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                 <div className="space-y-6 lg:sticky lg:top-10">
                   <div className="bg-white  border border-gray-200 rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="bg-purple-100 p-2 rounded-lg">
-                        <CreditCard className="w-5 h-5 text-purple-600" />
+                      <div
+                        className={`p-2 rounded-lg ${
+                          isCancelled ? "bg-red-100" : "bg-purple-100"
+                        }`}
+                      >
+                        <CreditCard
+                          className={`w-5 h-5 ${
+                            isCancelled ? "text-red-600" : "text-purple-600"
+                          }`}
+                        />
                       </div>
                       <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-                        Payment Details
+                        {isCancelled ? "Refund Details" : "Payment Details"}
                       </h3>
                     </div>
 
-                    {/* Payment Breakdown */}
-                    <div className="space-y-4 mb-6">
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-instrument text-sm">
-                              Cost per person:
-                            </span>
-                            <span className="font-semibold text-gray-900 font-instrument text-sm">
-                              {formatCurrency(booking.pricePerPerson)}
-                            </span>
+                    {/* Payment/Refund Information */}
+                    {isCancelled ? (
+                      <div className="space-y-4 mb-6">
+                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                            <div>
+                              <h4 className="text-sm font-semibold text-red-800 font-instrument mb-2">
+                                Trip Cancelled - Refund Processing
+                              </h4>
+                              <div className="space-y-2 text-sm text-red-700 font-instrument">
+                                <p>
+                                  • Your refund of{" "}
+                                  <strong>
+                                    {formatCurrency(paymentBreakdown.total)}
+                                  </strong>{" "}
+                                  is being processed
+                                </p>
+                                <p>
+                                  • Amount will be credited to your original
+                                  payment method
+                                </p>
+                                <p>• Processing time: 5-6 business days</p>
+                                <p>
+                                  • You will receive a confirmation email once
+                                  processed
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-instrument text-sm">
-                              Number of persons:
-                            </span>
-                            <span className="font-semibold text-gray-900 font-instrument text-sm">
-                              {booking.participants || 0}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-instrument text-sm">
-                              Subtotal:
-                            </span>
-                            <span className="font-semibold text-gray-900 font-instrument text-sm">
-                              {formatCurrency(paymentBreakdown.subtotal)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-instrument text-sm">
-                              Tax (GST 18%):
-                            </span>
-                            <span className="font-semibold text-gray-900 font-instrument text-sm">
-                              {formatCurrency(paymentBreakdown.tax)}
-                            </span>
-                          </div>
-                          <div className="bg-purple-50 rounded-lg p-3 mt-3">
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-900 font-bold font-instrument">
-                                Total Amount:
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Original Amount:
                               </span>
-                              <span className="text-lg font-bold text-purple-600 font-instrument">
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
                                 {formatCurrency(paymentBreakdown.total)}
                               </span>
+                            </div>
+                            <div className="bg-red-50 rounded-lg p-3 mt-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-900 font-bold font-instrument">
+                                  Refund Amount:
+                                </span>
+                                <span className="text-lg font-bold text-red-600 font-instrument">
+                                  {formatCurrency(paymentBreakdown.total)}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      {/* Proceed to Pay Button */}
+                    ) : (
+                      <div className="space-y-4 mb-6">
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Cost per person:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(booking.pricePerPerson)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Number of persons:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {booking.participants || 0}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Subtotal:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(paymentBreakdown.subtotal)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Tax (GST 18%):
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(paymentBreakdown.tax)}
+                              </span>
+                            </div>
+                            <div className="bg-purple-50 rounded-lg p-3 mt-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-900 font-bold font-instrument">
+                                  Total Amount:
+                                </span>
+                                <span className="text-lg font-bold text-purple-600 font-instrument">
+                                  {formatCurrency(paymentBreakdown.total)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                      {booking.status !== "CONFIRMED" && (
-                        <button
-                          onClick={handleContinueToPayment}
-                          className="w-full bg-purple-600 text-white font-semibold
-                               border border-purple-600 rounded-xl py-3 px-6
-                               hover:bg-purple-700 hover:border-purple-700
-                               transition-all duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-2 font-instrument"
-                          disabled={loading}
-                          type="button"
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          Proceed to Pay
-                        </button>
-                      )}
-                      <p className="text-xs text-gray-500 font-instrument mt-2 text-center">
-                        By proceeding, you agree to our
-                        <a
-                          href="#"
-                          className="text-purple-600 hover:text-purple-700 underline transition-colors"
-                        >
-                          Terms & Conditions
-                        </a>
-                      </p>
-                    </div>
+                        {/* Proceed to Pay Button - Only show if not cancelled and not confirmed */}
+                        {booking.status !== "CONFIRMED" && (
+                          <button
+                            onClick={handleContinueToPayment}
+                            className="w-full bg-purple-600 text-white font-semibold
+                                 border border-purple-600 rounded-xl py-3 px-6
+                                 hover:bg-purple-700 hover:border-purple-700
+                                 transition-all duration-200
+                                 disabled:opacity-50 disabled:cursor-not-allowed
+                                 flex items-center justify-center gap-2 font-instrument"
+                            disabled={loading}
+                            type="button"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            Proceed to Pay
+                          </button>
+                        )}
+
+                        <p className="text-xs text-gray-500 font-instrument mt-2 text-center">
+                          By proceeding, you agree to our
+                          <a
+                            href="#"
+                            className="text-purple-600 hover:text-purple-700 underline transition-colors"
+                          >
+                            Terms & Conditions
+                          </a>
+                          &nbsp;and&nbsp;
+                          <a
+                            href="#"
+                            className="text-purple-600 hover:text-purple-700 underline transition-colors"
+                          >
+                            Cancellation Policy
+                          </a>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

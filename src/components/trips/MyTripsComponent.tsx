@@ -48,7 +48,7 @@ interface TravelPlan {
   country?: string;
   state?: string;
   city?: string;
-  tripImage?: string;
+  tripImage?: string | null;
   noOfDays: number;
 }
 
