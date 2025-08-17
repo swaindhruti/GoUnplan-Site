@@ -9,7 +9,7 @@ import { TripCard } from "@/components/trips/TripCard";
 import {
   LoadingSkeleton,
   EmptyState,
-  ErrorDisplay,
+  ErrorDisplay
 } from "@/components/trips/LoadingStates";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,7 +20,7 @@ import { Search, Filter, Sparkles, X } from "lucide-react";
 const FloatingActionButton = ({
   onClick,
   children,
-  className = "",
+  className = ""
 }: {
   onClick: () => void;
   children: React.ReactNode;
@@ -51,6 +51,7 @@ export default function TripsPage() {
   }, [mounted, status, router]);
 
   const { trips, isLoading, error } = useTripsData();
+  console.log("Trips data:", trips);
 
   const {
     filters,
@@ -58,7 +59,7 @@ export default function TripsPage() {
     clearAllFilters,
     filteredTrips,
     activeFiltersCount,
-    filterOptions,
+    filterOptions
   } = useFilters(trips);
 
   const [showFilters, setShowFilters] = useState(false);
@@ -108,12 +109,12 @@ export default function TripsPage() {
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "rgba(147, 51, 234, 0.5)",
-          boxShadow: "0 6px 25px rgba(147, 51, 234, 0.15)",
+          boxShadow: "0 6px 25px rgba(147, 51, 234, 0.15)"
         },
         "&:focus-within": {
           borderColor: "rgb(147, 51, 234)",
-          boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.1)",
-        },
+          boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.1)"
+        }
       }),
       option: (
         baseStyles: Record<string, unknown>,
@@ -129,7 +130,7 @@ export default function TripsPage() {
         fontWeight: state.isSelected ? "600" : "500",
         padding: "10px 14px",
         fontSize: "0.875rem",
-        transition: "all 0.2s ease",
+        transition: "all 0.2s ease"
       }),
       multiValue: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -137,13 +138,13 @@ export default function TripsPage() {
         border: "1px solid rgba(147, 51, 234, 0.3)",
         borderRadius: "0.5rem",
         padding: "2px 6px",
-        margin: "2px 4px 2px 0",
+        margin: "2px 4px 2px 0"
       }),
       multiValueLabel: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(147, 51, 234)",
         fontWeight: "500",
-        fontSize: "0.875rem",
+        fontSize: "0.875rem"
       }),
       multiValueRemove: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -151,28 +152,28 @@ export default function TripsPage() {
         transition: "all 0.2s ease",
         "&:hover": {
           backgroundColor: "rgb(147, 51, 234)",
-          color: "white",
-        },
+          color: "white"
+        }
       }),
       placeholder: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(107, 114, 128)",
-        fontWeight: "400",
+        fontWeight: "400"
       }),
       input: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(55, 65, 81)",
-        fontWeight: "500",
+        fontWeight: "500"
       }),
       indicatorSeparator: () => ({
-        display: "none",
+        display: "none"
       }),
       dropdownIndicator: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
         color: "rgb(147, 51, 234)",
         "&:hover": {
-          color: "rgb(126, 34, 206)",
-        },
+          color: "rgb(126, 34, 206)"
+        }
       }),
       menu: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
@@ -180,16 +181,16 @@ export default function TripsPage() {
         border: "1px solid rgba(147, 51, 234, 0.2)",
         borderRadius: "0.75rem",
         boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
-        overflow: "hidden",
+        overflow: "hidden"
       }),
       menuList: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "6px",
+        padding: "6px"
       }),
       valueContainer: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "4px 8px",
-      }),
+        padding: "4px 8px"
+      })
     }),
     []
   );
@@ -206,7 +207,7 @@ export default function TripsPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateFilter("priceRange", [
         filters.priceRange[0],
-        +e.target.value || Infinity,
+        +e.target.value || Infinity
       ]);
     },
     [updateFilter, filters.priceRange]
@@ -279,7 +280,7 @@ export default function TripsPage() {
 
       window.scrollTo({
         top: y,
-        behavior: "smooth",
+        behavior: "smooth"
       });
     }
   }, []);
@@ -304,7 +305,7 @@ export default function TripsPage() {
       <div
         className="relative bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80')`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80')`
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -421,12 +422,12 @@ export default function TripsPage() {
               initial={false}
               animate={{
                 height: showFilters ? "auto" : 0,
-                opacity: showFilters ? 1 : 0,
+                opacity: showFilters ? 1 : 0
               }}
               transition={{
                 duration: 0.5,
                 ease: [0.4, 0.0, 0.2, 1],
-                opacity: { duration: 0.3 },
+                opacity: { duration: 0.3 }
               }}
               className="overflow-hidden"
             >
@@ -465,8 +466,8 @@ export default function TripsPage() {
 
         {/* Empty state */}
         {!isLoading && !error && filteredTrips.length === 0 && (
-          <EmptyState 
-            onClearFilters={clearAllFilters} 
+          <EmptyState
+            onClearFilters={clearAllFilters}
             searchContext={{
               searchTerm: filters.searchTerm,
               vibeFilter: filters.vibeFilter,

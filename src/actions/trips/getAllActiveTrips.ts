@@ -7,7 +7,7 @@ export const getAllActiveTrips = async () => {
   try {
     const activeTrips = await prisma.travelPlans.findMany({
       where: {
-        status: "ACTIVE",
+        status: "ACTIVE"
       },
       select: {
         travelPlanId: true,
@@ -21,11 +21,11 @@ export const getAllActiveTrips = async () => {
         noOfDays: true,
         price: true,
         hostId: true,
-        createdAt: true,
+        createdAt: true
       },
       orderBy: {
-        createdAt: "desc",
-      },
+        createdAt: "desc"
+      }
     });
 
     // Add default vibes to trips that don't have any filters
@@ -70,7 +70,7 @@ export const getAllActiveTrips = async () => {
             "Adventure",
             "Cultural",
             "Nature",
-            "Relaxation",
+            "Relaxation"
           ];
           generatedVibes.push(
             defaultVibes[Math.floor(Math.random() * defaultVibes.length)]
@@ -79,7 +79,7 @@ export const getAllActiveTrips = async () => {
 
         return {
           ...trip,
-          filters: generatedVibes,
+          filters: generatedVibes
         };
       }
       return trip;

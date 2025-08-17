@@ -116,7 +116,7 @@ export const HeroSection = () => {
               src={slide.image}
               alt={`Hero Image ${index + 1}`}
               fill
-              priority={index === 0}
+              priority
               sizes="100vw"
               className="object-cover transition-transform duration-1000 ease-in-out"
             />

@@ -314,84 +314,70 @@ export default async function TripDetailsPage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Trip Image at Bottom */}
-              <div className="relative h-[120px] sm:h-[160px] rounded-xl  overflow-hidden">
-                <Image
-                  src={trip.tripImage || ""}
-                  alt={trip.title}
-                  fill
-                  className="object-cover  "
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Host Information Section - Full Width */}
-        <div className="mt-8 lg:mt-12">
-          <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-gray-200 pb-6 mb-6 sm:mb-8">
-              <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 sm:p-4 rounded-xl text-white shadow-sm flex-shrink-0">
-                <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" />
-              </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 font-serif">
-                About Your Host
-              </h3>
-            </div>
-
-            {/* Host Profile */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center mb-6 sm:mb-8">
-              <Avatar className="h-12 w-12 sm:h-16 sm:w-16 lg:h-20 lg:w-20 border-3 border-purple-200 shadow-sm flex-shrink-0">
-                <AvatarImage src={hostInfo.image} />
-                <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-lg sm:text-xl font-bold">
-                  {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 font-serif mb-2 truncate">
-                  {hostInfo.name}
-                </p>
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-3 w-3 sm:h-4 sm:w-4 ${
-                          i < Math.round(trip.host.averageRating)
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs sm:text-sm text-gray-600">
-                    {trip.host.averageRating > 0
-                      ? trip.host.averageRating.toFixed(1)
-                      : "No ratings"}{" "}
-                    ({trip.host.reviewCount}{" "}
-                    {trip.host.reviewCount === 1 ? "review" : "reviews"})
-                  </span>
+              {/* About Your Host Section - Moved here from bottom */}
+              <div className="border-t border-gray-200 pt-4 sm:pt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageCircle className="h-4 w-4 text-purple-600" />
+                  <h4 className="text-sm sm:text-base font-semibold text-gray-900">
+                    About Your Host
+                  </h4>
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-600">
-                  Host since {hostInfo.createdYear}
-                </p>
+                {/* Host Profile - Compact Version */}
+                <div className="flex gap-3 items-start mb-3">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-purple-200 flex-shrink-0">
+                    <AvatarImage src={hostInfo.image} />
+                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-bold">
+                      {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                      {hostInfo.name}
+                    </p>
+
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-3 w-3 ${
+                              i < Math.round(trip.host.averageRating)
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-600">
+                        {trip.host.averageRating > 0
+                          ? trip.host.averageRating.toFixed(1)
+                          : "No ratings"}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-gray-600">
+                      Host since {hostInfo.createdYear}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Host Description - Truncated */}
+                <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-3">
+                    {hostInfo.description}
+                  </p>
+                </div>
+
+                {/* View Profile Button */}
+                <Link href={`/host/${trip.host.hostId}`}>
+                  <button className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-all duration-300 text-sm">
+                    View Host Profile
+                  </button>
+                </Link>
               </div>
             </div>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
-              <p className="text-gray-800 leading-relaxed text-sm sm:text-base">
-                {hostInfo.description}
-              </p>
-            </div>
-            <Link href={`/host/${trip.host.hostId}`}>
-              <button className="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-800 font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] text-sm sm:text-base">
-                View Profile
-              </button>
-            </Link>
           </div>
         </div>
       </div>

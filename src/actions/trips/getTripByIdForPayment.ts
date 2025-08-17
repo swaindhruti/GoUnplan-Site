@@ -14,21 +14,24 @@ export const getTripById = async (tripId: string) => {
         price: true,
         travelPlanId: true,
         maxParticipants: true,
-      },
+        tripImage: true
+      }
     });
     const booking = await prisma.booking.findFirst({
       where: {
         userId: session.user.id,
-        travelPlanId: tripId,
+        travelPlanId: tripId
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "desc"
       },
       select: {
         guests: true,
         startDate: true,
         endDate: true,
-      },
+        pricePerPerson: true,
+        participants: true
+      }
     });
 
     return { trip, booking };

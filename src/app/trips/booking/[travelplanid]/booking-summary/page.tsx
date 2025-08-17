@@ -1,3 +1,4 @@
+import { getAllActiveTrips } from "@/actions/trips/getAllActiveTrips";
 import { getTripById } from "@/actions/trips/getTripByIdForBookingSummary";
 import BookingSummary from "@/components/booking/Bookingsummary";
 // import { GetTrip } from "@/hooks/use-get-trip";
@@ -19,11 +20,11 @@ export default async function BookingSummaryPage({ params }: Props) {
       getTripById(tripId),
       requireUser()
     ]);
+    const result = await getAllActiveTrips();
 
     if (!userSession) {
       redirect("/auth/signin");
     }
-    // Only redirect if form is not submitted and we're not in edit mode
     if (!booking?.formSubmitted) {
       redirect(`/trips/booking/${tripId}`);
     }
@@ -35,6 +36,7 @@ export default async function BookingSummaryPage({ params }: Props) {
             ...booking
           }}
           travelPlan={trip}
+          allTrips={result.trips}
         />
       </>
     );
