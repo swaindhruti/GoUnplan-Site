@@ -9,7 +9,7 @@ import {
   RefreshCw,
   Mail,
   Phone,
-  User,
+  User
 } from "lucide-react";
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
@@ -33,7 +33,7 @@ type Booking = {
     id: string;
     name: string;
     email: string;
-    phone: string;
+    phone: string | null;
     image: string | null;
   };
   travelPlan: {
@@ -67,7 +67,7 @@ export const BookingsSection = () => {
     PENDING: 0,
     CONFIRMED: 0,
     CANCELLED: 0,
-    REFUNDED: 0,
+    REFUNDED: 0
   });
 
   const filterBookings = useCallback(() => {
@@ -105,7 +105,7 @@ export const BookingsSection = () => {
             PENDING: 0,
             CONFIRMED: 0,
             CANCELLED: 0,
-            REFUNDED: 0,
+            REFUNDED: 0
           }
         );
       }
@@ -116,7 +116,6 @@ export const BookingsSection = () => {
       setLoading(false);
     }
   };
-
 
   const getStatusIcon = (status: BookingStatus) => {
     switch (status) {
@@ -152,7 +151,7 @@ export const BookingsSection = () => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
@@ -160,7 +159,7 @@ export const BookingsSection = () => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 0
     }).format(amount);
   };
 
@@ -412,4 +411,3 @@ export const BookingsSection = () => {
     </div>
   );
 };
-
