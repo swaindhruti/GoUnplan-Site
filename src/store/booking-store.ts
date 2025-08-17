@@ -39,20 +39,24 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
 
     try {
       updateBookingData(update);
+
       if (bookingData.id) {
         const result = await updateBookingGuestInfo(bookingData.id, {
           participants: update.participants,
           guests: update.guests,
           specialRequirements: update.specialRequirements
         });
+
         if (result.error) {
           set({ error: result.error });
           return false;
         }
+
         if (result.booking) {
           updateBookingData(result.booking);
         }
       }
+
       return true;
     } catch (err) {
       set({
@@ -71,16 +75,20 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
 
     try {
       updateBookingData(update);
+
       if (bookingData.id) {
         const result = await updateBookingStatus(bookingData.id, update.status);
+
         if (result.error) {
           set({ error: result.error });
           return false;
         }
+
         if (result.booking) {
           updateBookingData(result.booking);
         }
       }
+
       return true;
     } catch (err) {
       set({
@@ -94,23 +102,23 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
 
   createNewBooking: async (data) => {
     set({ isLoading: true, error: null });
-    const { bookingData, updateBookingData } = get();
+    const { updateBookingData } = get();
 
     try {
+      // Create payload with all the data including guest information
       const payload = {
-        userId: data.userId || bookingData.userId!,
-        travelPlanId: data.travelPlanId || bookingData.travelPlanId!,
-        startDate: new Date(data.startDate || bookingData.startDate!),
-        endDate: new Date(data.endDate || bookingData.endDate!),
-        participants: data.participants || bookingData.participants || 1,
-        specialRequirements: data.specialRequirements ?? undefined,
-        guests: data.guests
+        userId: data.userId!,
+        travelPlanId: data.travelPlanId!,
+        startDate: new Date(data.startDate!),
+        endDate: new Date(data.endDate!),
+        participants: data.participants || 1,
+        guests: data.guests, // Include guests data
+        specialRequirements: data.specialRequirements ?? undefined
       };
-      console.log("hiiiiiiiiiiii");
-      console.log(payload);
+
+      console.log("Creating booking with complete data:", payload);
 
       const result = await createBooking(payload);
-
       console.log("Booking created:", result);
 
       if (result.error) {

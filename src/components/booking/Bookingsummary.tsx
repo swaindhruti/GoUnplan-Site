@@ -1,45 +1,54 @@
 "use client";
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   Calendar,
-  Users,
-  DollarSign,
-  User,
   MapPin,
   FileText,
   ArrowRight,
   Edit2,
   CheckCircle,
-  Clock,
-  CreditCard
+  CreditCard,
+  XCircle,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
-import { editBookingAction, updateBookingStatus } from "@/actions/booking/actions";
-import { BookingStatus } from "@prisma/client";
+import {
+  editBookingAction,
+  unCompleteBookingForm
+  /*   updateBookingStatus */
+} from "@/actions/booking/actions";
+/* import { BookingStatus } from "@prisma/client"; */
 import { useRouter } from "next/navigation";
-import { BackButton } from "@/components/global/buttons";
+import { TripCard } from "../trips/TripCard";
+import { RawTrip } from "@/types/trips";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "../ui/carousel";
 
 export interface BookingSummaryProps {
   booking: BookingData | null;
   travelPlan: Partial<TravelPlan> | null;
   onEditDetails?: () => void;
   loading?: boolean;
+  allTrips?: RawTrip[];
 }
 
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
-  ({ booking, travelPlan, loading = false }) => {
+  ({ booking, travelPlan, loading = false, allTrips }) => {
     const router = useRouter();
-    const [step, setStep] = useState(1);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentCompleted, setPaymentCompleted] = useState(false);
-    const [timer, setTimer] = useState(10);
+    const isCancelled = booking?.status === "CANCELLED";
 
     const formatDate = useCallback(
       (dateString: Date | string | undefined | null): string => {
         if (!dateString) return "N/A";
         return new Date(dateString).toLocaleDateString("en-IN", {
           year: "numeric",
-          month: "long",
+          month: "short",
           day: "numeric"
         });
       },
@@ -57,6 +66,25 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       []
     );
 
+    // Calculate tax and totals
+    const calculatePaymentBreakdown = useCallback(() => {
+      if (!booking) return { subtotal: 0, tax: 0, total: 0 };
+
+      const subtotal =
+        (booking.pricePerPerson || 0) * (booking.participants || 0);
+      const taxRate = 0.18; // 18% GST
+      const tax = subtotal * taxRate;
+      const total = subtotal + tax;
+
+      return {
+        subtotal,
+        tax,
+        total
+      };
+    }, [booking]);
+
+    const paymentBreakdown = calculatePaymentBreakdown();
+
     const handleEditDetails = useCallback(async () => {
       if (!booking?.id) return;
 
@@ -72,6 +100,21 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       }
     }, [booking?.id, router]);
 
+    const handleBookAgain = useCallback(async () => {
+      if (!booking?.id || !booking?.travelPlanId) return;
+
+      try {
+        const response = await unCompleteBookingForm(booking.id);
+        if (response.success) {
+          router.push(`/trips/booking/${booking.travelPlanId}`);
+        } else {
+          console.error("Failed to enable booking edit:", response.error);
+        }
+      } catch (error) {
+        console.error("Error enabling booking edit:", error);
+      }
+    }, [booking?.id, booking?.travelPlanId, router]);
+
     const getDuration = useCallback((): string => {
       if (!booking?.startDate || !booking?.endDate) return "N/A";
       const start = new Date(booking.startDate);
@@ -81,79 +124,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       return `${diffDays}`;
     }, [booking?.startDate, booking?.endDate]);
 
-    const getStatusColor = useCallback((status: string | undefined): string => {
-      switch (status) {
-        case "CONFIRMED":
-          return "bg-gradient-to-r from-green-100 to-green-200 text-green-800 border-green-300";
-        case "PENDING":
-          return "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300";
-        case "CANCELLED":
-          return "bg-gradient-to-r from-red-100 to-red-200 text-red-800 border-red-300";
-        case "REFUNDED":
-          return "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300";
-        default:
-          return "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border-gray-300";
-      }
-    }, []);
-
-    const handleContinueToPayment = useCallback(() => {
-      setStep(2);
-    }, []);
-
-    const handleConfirmPayment = useCallback(async (confirmed: boolean) => {
-      if (confirmed) {
-        if (!booking?.id) {
-          console.error("No booking ID available");
-          return;
-        }
-
-        setIsProcessing(true);
-        
-        try {
-          // Update booking status to CONFIRMED
-          const response = await updateBookingStatus(booking.id, BookingStatus.CONFIRMED);
-          
-          if (response.success) {
-            // Update local state to reflect the new status
-            setTimeout(() => {
-              setIsProcessing(false);
-              setPaymentCompleted(true);
-              
-              // Update the booking object with new status
-              if (booking) {
-                booking.status = "CONFIRMED";
-                booking.updatedAt = new Date();
-              }
-            }, 2000); // Reduced time for better UX
-          } else {
-            setIsProcessing(false);
-            console.error("Failed to update booking status:", response.error);
-            alert("Payment failed. Please try again.");
-          }
-        } catch (error) {
-          setIsProcessing(false);
-          console.error("Error processing payment:", error);
-          alert("Payment failed. Please try again.");
-        }
-      } else {
-        setStep(1);
-      }
-    }, [booking]);
-
-    const handleGoToTrips = useCallback(() => {
-      router.push("/trips");
-    }, [router]);
-
-    useEffect(() => {
-      if (paymentCompleted && timer > 0) {
-        const countdown = setInterval(() => {
-          setTimer((prev) => prev - 1);
-        }, 1000);
-        return () => clearInterval(countdown);
-      } else if (paymentCompleted && timer === 0) {
-        router.push("/trips");
-      }
-    }, [paymentCompleted, timer, router]);
+    const handleContinueToPayment = () => {
+      router.push(`/trips/booking/${booking?.travelPlanId}/payment-form`);
+    };
 
     // Loading state
     if (loading) {
@@ -200,448 +173,441 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         <div
           className="relative bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${travelPlan?.tripImage || 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'}')`
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
+              travelPlan?.tripImage ||
+              "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
+            }')`
           }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-            <BackButton isWhite={true} route="/trips" />
-            
             <div className="flex items-center justify-between mt-12">
               <div className="space-y-4">
-                <div className="inline-flex items-center px-6 py-2 bg-purple-600/80 backdrop-blur-sm rounded-full mb-4">
+                <div
+                  className={`inline-flex items-center px-6 py-2 backdrop-blur-sm rounded-full mb-4 ${
+                    isCancelled ? "bg-red-600/80" : "bg-purple-600/80"
+                  }`}
+                >
                   <span className="text-white text-sm font-semibold tracking-wide uppercase font-instrument">
-                    {step === 1
-                      ? "Booking Summary"
-                      : step === 2 && !paymentCompleted
-                      ? "Payment Confirmation"
-                      : "Payment Complete"}
+                    {isCancelled ? "Cancelled Booking" : "Booking Summary"}
                   </span>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
-                  {step === 1
-                    ? "Review Your Booking"
-                    : step === 2 && !paymentCompleted
-                    ? "Complete Payment"
-                    : "Booking Confirmed"}
-                  <span className="block text-purple-300 mt-2">{travelPlan?.title}</span>
+                  {isCancelled ? "Trip Cancelled" : "Review Your Booking"}
+                  <span
+                    className={`block mt-2 ${
+                      isCancelled ? "text-red-300" : "text-purple-300"
+                    }`}
+                  >
+                    {travelPlan?.title}
+                  </span>
                 </h1>
                 <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
-                  {step === 1
-                    ? "Verify your trip details and proceed to secure payment"
-                    : step === 2 && !paymentCompleted
-                    ? "Confirm your payment to finalize your booking"
-                    : `Redirecting to your trips in ${timer} seconds`}
+                  {isCancelled
+                    ? "Your booking has been cancelled. Refund will be processed soon."
+                    : "Verify your trip details and proceed to secure payment"}
                 </p>
-                
+
                 <div className="flex flex-wrap gap-3 mt-6">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    ID: {booking.id?.slice(-8)}
+                    <Calendar className="h-4 w-4" />
+                    {formatDate(booking?.startDate)} -{" "}
+                    {formatDate(booking?.endDate)}
                   </div>
                   <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
                     <CreditCard className="h-4 w-4" />
-                    {formatCurrency(booking.totalPrice)}
+                    {formatCurrency(paymentBreakdown.total)}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
-                  <CheckCircle className="h-8 w-8 text-white" />
+                  {isCancelled ? (
+                    <XCircle className="h-8 w-8 text-white" />
+                  ) : (
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Cancellation Alert */}
+        {isCancelled && (
+          <div className="relative -mt-16 z-30 mb-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-sm">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-medium text-red-800 font-instrument">
+                      Trip Cancelled
+                    </h3>
+                    <div className="mt-1 text-sm text-red-700 font-instrument">
+                      <p>
+                        Your booking has been cancelled successfully. The refund
+                        will be processed within 5-6 business days and credited
+                        to your original payment method.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Booking Details Section */}
-        <div className="relative -mt-16 z-20">
+        <div className={`relative z-20 ${isCancelled ? "-mt-4" : "-mt-16"}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2">
                 <div className="backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 space-y-8">
-              {step === 1 && (
-                <>
-                  {/* Trip Header */}
-                  <div className="text-center mb-8">
-                    <div className="flex items-center gap-3 justify-center mb-4">
-                      <div className="bg-purple-100 p-2 rounded-lg">
-                        <MapPin className="w-5 h-5 text-purple-600" />
+                  <>
+                    {/* Trip Header */}
+                    <div className="text-center mb-6">
+                      <div className="flex items-center gap-3 justify-center mb-3">
+                        <div
+                          className={`p-2 rounded-lg ${
+                            isCancelled ? "bg-red-100" : "bg-purple-100"
+                          }`}
+                        >
+                          <MapPin
+                            className={`w-4 h-4 ${
+                              isCancelled ? "text-red-600" : "text-purple-600"
+                            }`}
+                          />
+                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900 font-bricolage">
+                          Trip Details
+                        </h2>
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900 font-bricolage">
-                        Trip Details
-                      </h2>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-2">
-                      {travelPlan?.title || "Travel Package"}
-                    </h3>
-                    <p className="text-purple-600 font-semibold font-instrument">
-                      {travelPlan?.destination || "Destination"}
-                    </p>
-                    {travelPlan?.description && (
-                      <p className="text-gray-600 font-instrument mt-4 leading-relaxed">
-                        {travelPlan.description}
+                      <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-1">
+                        {travelPlan?.title || "Travel Package"}
+                      </h3>
+                      <p
+                        className={`text-sm font-medium font-instrument ${
+                          isCancelled ? "text-red-600" : "text-purple-600"
+                        }`}
+                      >
+                        {travelPlan?.destination || "Destination"}
+                        {isCancelled && " (Cancelled)"}
                       </p>
-                    )}
-                  </div>
-
-                  {/* Trip Details & Pricing Grid */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Trip Details Card */}
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-purple-100 p-2 rounded-lg">
-                          <Calendar className="w-5 h-5 text-purple-600" />
-                        </div>
-                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
-                          Travel Schedule
-                        </h4>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Check-in:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {formatDate(booking.startDate)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Check-out:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {formatDate(booking.endDate)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Duration:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {getDuration()} days
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Travelers:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {booking.participants || 0}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                          <span className="text-gray-700 font-instrument">
-                            Status:
-                          </span>
-                          <span
-                            className={`px-3 py-1 text-sm rounded-md font-semibold ${getStatusColor(
-                              booking.status
-                            )}`}
-                          >
-                            {booking.status || "PENDING"}
-                          </span>
-                        </div>
-                      </div>
                     </div>
 
-                    {/* Pricing Card */}
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-green-100 p-2 rounded-lg">
-                          <DollarSign className="w-5 h-5 text-green-600" />
-                        </div>
-                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
-                          Cost Breakdown
-                        </h4>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Price per person:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {formatCurrency(booking.pricePerPerson)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-gray-700 font-instrument">
-                            Total travelers:
-                          </span>
-                          <span className="font-semibold text-gray-900 font-instrument">
-                            {booking.participants || 0}
-                          </span>
-                        </div>
-                        <div className="bg-purple-50 rounded-lg p-4 mt-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-900 font-bold font-instrument">
-                              Total Amount:
-                            </span>
-                            <span className="text-xl font-bold text-purple-600 font-instrument">
-                              {formatCurrency(booking.totalPrice)}
+                    {/* Compact Trip Details Section */}
+                    <div className="bg-gray-50 rounded-xl p-5">
+                      <div className="space-y-5">
+                        {/* Trip Dates and Duration */}
+                        <div>
+                          <div className="flex items-center justify-between text-base font-semibold text-gray-900 font-instrument">
+                            <span>{formatDate(booking.startDate)}</span>
+                            <ArrowRight className="w-4 h-4 text-gray-400" />
+                            <span>{formatDate(booking.endDate)}</span>
+                            <span
+                              className={`text-sm ${
+                                isCancelled ? "text-red-600" : "text-purple-600"
+                              }`}
+                            >
+                              ({getDuration()} days)
                             </span>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Travelers Card */}
-                  {booking.guests && booking.guests.length > 0 && (
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-blue-100 p-2 rounded-lg">
-                          <Users className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
-                          Travelers ({booking.guests.length})
-                        </h4>
-                      </div>
-                      <div className="space-y-3">
-                        {booking.guests.map((member, index) => (
-                          <div
-                            key={member.memberEmail + index}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
-                          >
-                            <div className="flex items-center gap-3 mb-2 sm:mb-0">
-                              <div className="bg-purple-100 p-2 rounded-lg">
-                                <User className="w-4 h-4 text-purple-600" />
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-900 font-instrument">
+                        {/* Guest Details */}
+                        <div>
+                          <h4 className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider font-instrument">
+                            Guest Details ({booking.participants || 0}{" "}
+                            travelers)
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {booking.guests && booking.guests.length > 0 ? (
+                              booking.guests.map((member, index) => (
+                                <span
+                                  key={member.memberEmail + index}
+                                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                                    member.isteamLead
+                                      ? isCancelled
+                                        ? "bg-red-100 text-red-800 border border-red-200"
+                                        : "bg-purple-100 text-purple-800 border border-purple-200"
+                                      : "bg-gray-100 text-gray-700 border border-gray-200"
+                                  }`}
+                                >
                                   {member.firstName} {member.lastName}
-                                </p>
-                                <p className="text-gray-600 font-instrument text-sm">
-                                  {member.memberEmail}
-                                </p>
-                              </div>
-                            </div>
-                            {member.isteamLead && (
-                              <span className="bg-purple-600 text-white px-3 py-1 rounded-md text-xs font-semibold">
-                                Primary Contact
+                                  {member.isteamLead && " (Lead)"}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-500 text-xs font-instrument">
+                                No guest details available
                               </span>
                             )}
                           </div>
-                        ))}
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="pt-3 border-t border-gray-200">
+                          {isCancelled ? (
+                            <button
+                              onClick={handleBookAgain}
+                              className="w-full bg-red-100 text-red-700 font-medium text-sm
+                                       border border-red-300 rounded-lg py-2.5 px-4
+                                       hover:bg-red-200 hover:border-red-400
+                                       transition-all duration-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed
+                                       flex items-center justify-center gap-2 font-instrument"
+                              disabled={loading}
+                              type="button"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              Book Again
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleEditDetails}
+                              className="w-full bg-gray-100 text-gray-700 font-medium text-sm
+                                       border border-gray-300 rounded-lg py-2.5 px-4
+                                       hover:bg-gray-200 hover:border-gray-400
+                                       transition-all duration-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed
+                                       flex items-center justify-center gap-2 font-instrument"
+                              disabled={loading}
+                              type="button"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              Edit Details
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  {/* Special Requirements */}
-                  {booking.specialRequirements && (
-                    <div className="bg-gray-50 rounded-xl p-6">
+                    {/* Explore More Trips */}
+                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-orange-100 p-2 rounded-lg">
-                          <FileText className="w-5 h-5 text-orange-600" />
+                        <div className="bg-purple-100 p-2 rounded-lg">
+                          <MapPin className="w-4 h-4 text-purple-600" />
                         </div>
-                        <h4 className="text-lg font-bold text-gray-900 font-bricolage">
-                          Special Requirements
+                        <h4 className="text-base font-semibold text-gray-900 font-bricolage">
+                          Explore More Trips
                         </h4>
                       </div>
-                      <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <p className="text-gray-700 font-instrument leading-relaxed">
-                          {booking.specialRequirements}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                {step === 1 ? (
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <button
-                      onClick={handleEditDetails}
-                      className="flex-1 bg-gray-100 text-gray-700 font-semibold
-                               border border-gray-300 rounded-xl py-3 px-6
-                               hover:bg-gray-200 hover:border-gray-400
-                               transition-all duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-2 font-instrument"
-                      disabled={loading}
-                      type="button"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                      Edit Details
-                    </button>
-
-                    <button
-                      onClick={handleContinueToPayment}
-                      className="flex-1 bg-purple-600 text-white font-semibold
-                               border border-purple-600 rounded-xl py-3 px-6
-                               hover:bg-purple-700 hover:border-purple-700
-                               transition-all duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-2 font-instrument"
-                      disabled={loading}
-                      type="button"
-                    >
-                      Continue to Payment
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : step === 2 && !paymentCompleted ? (
-                  isProcessing ? (
-                    <div className="flex justify-center items-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-4">
-                        Confirm Payment
-                      </h3>
-                      <p className="text-gray-600 font-instrument mb-6">
-                        Would you like to confirm the payment of {formatCurrency(booking.totalPrice)}?
+                      <p className="text-gray-600 font-instrument text-sm mb-4 leading-relaxed">
+                        Discover amazing destinations and create unforgettable
+                        memories with our curated travel packages.
                       </p>
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                          onClick={() => handleConfirmPayment(true)}
-                          className="flex-1 bg-purple-600 text-white font-semibold
-                                   border border-purple-600 rounded-xl py-3 px-6
-                                   hover:bg-purple-700 hover:border-purple-700
-                                   transition-all duration-200
-                                   disabled:opacity-50 disabled:cursor-not-allowed
-                                   flex items-center justify-center gap-2 font-instrument"
-                          disabled={loading}
-                          type="button"
-                        >
-                          Confirm Payment
-                        </button>
-                        <button
-                          onClick={() => handleConfirmPayment(false)}
-                          className="flex-1 bg-gray-100 text-gray-700 font-semibold
-                                   border border-gray-300 rounded-xl py-3 px-6
-                                   hover:bg-gray-200 hover:border-gray-400
-                                   transition-all duration-200
-                                   disabled:opacity-50 disabled:cursor-not-allowed
-                                   flex items-center justify-center gap-2 font-instrument"
-                          disabled={loading}
-                          type="button"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle className="h-8 w-8 text-green-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-2">
-                      Payment Successful!
-                    </h3>
-                    <p className="text-gray-600 font-instrument mb-6">
-                      Your booking is confirmed. Redirecting in {timer} seconds...
-                    </p>
-                    <button
-                      onClick={handleGoToTrips}
-                      className="bg-purple-600 text-white font-semibold
-                               border border-purple-600 rounded-xl py-3 px-6
-                               hover:bg-purple-700 hover:border-purple-700
-                               transition-all duration-200
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               flex items-center justify-center gap-2 font-instrument mx-auto"
-                      disabled={loading}
-                      type="button"
-                    >
-                      View My Trips
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
 
-                  {/* Terms and Conditions */}
-                  <div className="text-center mt-6 pt-6 border-t border-gray-200">
-                    <p className="text-gray-600 font-instrument text-sm">
-                      By proceeding, you agree to our{" "}
-                      <a
-                        href="#"
-                        className="text-purple-600 hover:text-purple-700 underline font-semibold transition-colors"
-                      >
-                        Terms & Conditions
-                      </a>
-                    </p>
-                  </div>
+                      <Carousel>
+                        <CarouselContent className="px-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {allTrips?.map((trip) => (
+                            <CarouselItem
+                              key={trip.travelPlanId}
+                              className=" p-2 overflow-visible"
+                            >
+                              <TripCard
+                                isTripPage={false}
+                                trip={{
+                                  ...trip,
+                                  tripImage: trip.tripImage || "",
+                                  reviewCount: trip.reviewCount || 0,
+                                  vibes: trip.filters || [],
+                                  filters: trip.filters || [],
+                                  languages: trip.languages || [],
+                                  averageRating: trip.averageRating ?? 0,
+                                  bookedSeats: trip.bookedSeats ?? 0
+                                }}
+                              />
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </Carousel>
+                    </div>
+
+                    {/* Special Requirements */}
+                    {booking.specialRequirements && (
+                      <div className="bg-gray-50 rounded-xl p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="bg-orange-100 p-2 rounded-lg">
+                            <FileText className="w-4 h-4 text-orange-600" />
+                          </div>
+                          <h4 className="text-base font-semibold text-gray-900 font-bricolage">
+                            Special Requirements
+                          </h4>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <p className="text-gray-700 font-instrument text-sm leading-relaxed">
+                            {booking.specialRequirements}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 </div>
               </div>
 
-              {/* Sidebar */}
-              <div className="space-y-6 lg:sticky lg:top-24">
-                {/* Booking Info Card */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-purple-100 p-2 rounded-lg">
-                      <FileText className="w-5 h-5 text-purple-600" />
+              <div>
+                <div className="space-y-6 lg:sticky lg:top-10">
+                  <div className="bg-white  border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className={`p-2 rounded-lg ${
+                          isCancelled ? "bg-red-100" : "bg-purple-100"
+                        }`}
+                      >
+                        <CreditCard
+                          className={`w-5 h-5 ${
+                            isCancelled ? "text-red-600" : "text-purple-600"
+                          }`}
+                        />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 font-bricolage">
+                        {isCancelled ? "Refund Details" : "Payment Details"}
+                      </h3>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-                      Booking Details
-                    </h3>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                      <span className="text-sm text-gray-600 font-instrument">
-                        Booking ID
-                      </span>
-                      <p className="font-mono font-semibold text-gray-900 text-sm break-all mt-1">
-                        {booking.id}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                      <span className="text-sm text-gray-600 font-instrument">
-                        Booking Date
-                      </span>
-                      <p className="font-semibold text-gray-900 font-instrument text-sm mt-1">
-                        {formatDate(booking.createdAt)}
-                      </p>
-                      {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
-                        <div className="mt-2 pt-2 border-t border-gray-200">
-                          <span className="text-xs text-gray-600 font-instrument">
-                            Last Updated
-                          </span>
-                          <p className="font-semibold text-gray-900 font-instrument text-xs mt-1">
-                            {formatDate(booking.updatedAt)}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Quick Summary Card */}
-                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-gray-900 font-bricolage mb-4">
-                    Summary
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-purple-200">
-                      <span className="text-gray-700 font-instrument">
-                        Duration:
-                      </span>
-                      <span className="font-semibold text-gray-900 font-instrument">
-                        {getDuration()} days
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-purple-200">
-                      <span className="text-gray-700 font-instrument">
-                        Travelers:
-                      </span>
-                      <span className="font-semibold text-gray-900 font-instrument">
-                        {booking.participants || 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-700 font-instrument">
-                        Total:
-                      </span>
-                      <span className="font-bold text-purple-600 font-instrument text-lg">
-                        {formatCurrency(booking.totalPrice)}
-                      </span>
-                    </div>
+                    {/* Payment/Refund Information */}
+                    {isCancelled ? (
+                      <div className="space-y-4 mb-6">
+                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                            <div>
+                              <h4 className="text-sm font-semibold text-red-800 font-instrument mb-2">
+                                Trip Cancelled - Refund Processing
+                              </h4>
+                              <div className="space-y-2 text-sm text-red-700 font-instrument">
+                                <p>
+                                  • Your refund of{" "}
+                                  <strong>
+                                    {formatCurrency(paymentBreakdown.total)}
+                                  </strong>{" "}
+                                  is being processed
+                                </p>
+                                <p>
+                                  • Amount will be credited to your original
+                                  payment method
+                                </p>
+                                <p>• Processing time: 5-6 business days</p>
+                                <p>
+                                  • You will receive a confirmation email once
+                                  processed
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Original Amount:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(paymentBreakdown.total)}
+                              </span>
+                            </div>
+                            <div className="bg-red-50 rounded-lg p-3 mt-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-900 font-bold font-instrument">
+                                  Refund Amount:
+                                </span>
+                                <span className="text-lg font-bold text-red-600 font-instrument">
+                                  {formatCurrency(paymentBreakdown.total)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 mb-6">
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Cost per person:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(booking.pricePerPerson)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Number of persons:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {booking.participants || 0}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Subtotal:
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(paymentBreakdown.subtotal)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                              <span className="text-gray-700 font-instrument text-sm">
+                                Tax (GST 18%):
+                              </span>
+                              <span className="font-semibold text-gray-900 font-instrument text-sm">
+                                {formatCurrency(paymentBreakdown.tax)}
+                              </span>
+                            </div>
+                            <div className="bg-purple-50 rounded-lg p-3 mt-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-900 font-bold font-instrument">
+                                  Total Amount:
+                                </span>
+                                <span className="text-lg font-bold text-purple-600 font-instrument">
+                                  {formatCurrency(paymentBreakdown.total)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Proceed to Pay Button - Only show if not cancelled and not confirmed */}
+                        {booking.status !== "CONFIRMED" && (
+                          <button
+                            onClick={handleContinueToPayment}
+                            className="w-full bg-purple-600 text-white font-semibold
+                                 border border-purple-600 rounded-xl py-3 px-6
+                                 hover:bg-purple-700 hover:border-purple-700
+                                 transition-all duration-200
+                                 disabled:opacity-50 disabled:cursor-not-allowed
+                                 flex items-center justify-center gap-2 font-instrument"
+                            disabled={loading}
+                            type="button"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            Proceed to Pay
+                          </button>
+                        )}
+
+                        <p className="text-xs text-gray-500 font-instrument mt-2 text-center">
+                          By proceeding, you agree to our
+                          <a
+                            href="#"
+                            className="text-purple-600 hover:text-purple-700 underline transition-colors"
+                          >
+                            Terms & Conditions
+                          </a>
+                          &nbsp;and&nbsp;
+                          <a
+                            href="#"
+                            className="text-purple-600 hover:text-purple-700 underline transition-colors"
+                          >
+                            Cancellation Policy
+                          </a>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -649,10 +615,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           </div>
         </div>
 
-        {/* Additional content sections can be added here */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Footer content if needed */}
-        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"></div>
       </div>
     );
   }

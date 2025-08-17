@@ -12,10 +12,9 @@ import {
   DollarSign,
   MessageCircle,
   Languages,
-  Star,
+  Star
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BackButton } from "@/components/global/buttons";
 
 interface BookingPageProps {
   userId: string;
@@ -28,15 +27,17 @@ interface BookingPageProps {
 const EnhancedLoadingState = () => {
   const [loadingText, setLoadingText] = useState("Preparing your booking...");
   const [progress, setProgress] = useState(0);
+
   useEffect(() => {
     const messages = [
       "Preparing your booking...",
-      "Checking availability...",
+      "Processing guest information...",
       "Securing your spot...",
-      "Almost ready...",
+      "Almost ready..."
     ];
     let messageIndex = 0;
     let progressValue = 0;
+
     const interval = setInterval(() => {
       progressValue += 25;
       setProgress(progressValue);
@@ -49,8 +50,10 @@ const EnhancedLoadingState = () => {
         setLoadingText("Finalizing booking...");
       }
     }, 800);
+
     return () => clearInterval(interval);
   }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8 text-center">
@@ -65,7 +68,7 @@ const EnhancedLoadingState = () => {
           {loadingText}
         </h2>
         <p className="text-gray-600 text-sm font-instrument mb-6">
-          Please don&apos;t close this page while we prepare your booking
+          Please don&apos;t close this page while we create your booking
         </p>
         <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
           <div
@@ -85,15 +88,15 @@ export function BookingPage({
   userId,
   tripData,
   existingBookingData,
-  Step,
+  Step
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const bookingData = useBookingStore((state) => state.bookingData);
   const isLoading = useBookingStore((state) => state.isLoading);
   const updateBookingData = useBookingStore((state) => state.updateBookingData);
-  const updateGuestInfo = useBookingStore((state) => state.updateGuestInfo);
   const createNewBooking = useBookingStore((state) => state.createNewBooking);
+
   const [numberOfGuests, setNumberOfGuests] = useState<number>(
     bookingData.participants || 1
   );
@@ -104,7 +107,7 @@ export function BookingPage({
       travelPlanId: tripData.travelPlanId,
       pricePerPerson: tripData.price,
       participants: tripData.maxParticipants,
-      ...existingBookingData,
+      ...existingBookingData
     });
   }, [
     existingBookingData,
@@ -112,84 +115,81 @@ export function BookingPage({
     tripData.travelPlanId,
     updateBookingData,
     userId,
-    tripData.maxParticipants,
+    tripData.maxParticipants
   ]);
 
   useEffect(() => {
     if (bookingData.participants) setNumberOfGuests(bookingData.participants);
   }, [bookingData]);
 
-  const handleContinue = useCallback(async () => {
-    setIsTransitioning(true);
-    if (currentStep === 1 && !bookingData.id) {
-      const initialBookingData = {
-        userId,
-        travelPlanId: tripData.travelPlanId,
-        pricePerPerson: tripData.price,
-        startDate: new Date(tripData.startDate || new Date()),
-        endDate: new Date(tripData.endDate || new Date()),
-        participants: numberOfGuests,
-        status: "PENDING" as const,
-        totalPrice: (tripData?.price || 0) * numberOfGuests,
-      };
-      const newBooking = await createNewBooking(initialBookingData);
-      if (!newBooking) {
-        setIsTransitioning(false);
-        return;
-      }
-    }
-    if (currentStep < 3) {
-      setTimeout(() => {
-        setCurrentStep((prev) => prev + 1);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  }, [
-    currentStep,
-    bookingData.id,
-    userId,
-    tripData.startDate,
-    tripData.endDate,
-    tripData.travelPlanId,
-    tripData.price,
-    numberOfGuests,
-    createNewBooking,
-  ]);
-
+  // Modified handleGuestInfoSubmit to create booking with all guest data
   const handleGuestInfoSubmit = useCallback(
     async (guestCount: number, guestData: BookingFormData) => {
+      setIsTransitioning(true);
       setNumberOfGuests(guestCount);
-      const success = await updateGuestInfo({
-        participants: guestCount,
-        guests: guestData.guests,
-        specialRequirements: guestData.specialRequirements,
-      });
-      if (success) {
-        handleContinue();
+
+      try {
+        // Create booking with all guest information at once
+        const completeBookingData = {
+          userId,
+          travelPlanId: tripData.travelPlanId,
+          pricePerPerson: tripData.price,
+          startDate: new Date(tripData.startDate || new Date()),
+          endDate: new Date(tripData.endDate || new Date()),
+          participants: guestCount,
+          guests: guestData.guests,
+          specialRequirements: guestData.specialRequirements,
+          status: "PENDING" as const,
+          totalPrice: (tripData?.price || 0) * guestCount
+        };
+
+        const newBooking = await createNewBooking(completeBookingData);
+
+        if (newBooking) {
+          // Move to next step after successful creation
+          setTimeout(() => {
+            setCurrentStep((prev) => prev + 1);
+            setIsTransitioning(false);
+          }, 300);
+        } else {
+          setIsTransitioning(false);
+        }
+      } catch (error) {
+        console.error("Failed to create booking:", error);
+        setIsTransitioning(false);
       }
     },
-    [updateGuestInfo, handleContinue]
+    [userId, tripData, createNewBooking]
   );
 
-  const createdYear = new Date(tripData.createdAt || new Date()).getFullYear();
+  const formatDate = (date?: string | Date | null) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  };
+
   const heroTags = [
-    "Available year-round",
-    `${tripData.noOfDays} days`,
-    `Max ${tripData.maxParticipants} people`,
-    `₹${tripData.price} per person`,
+    `${formatDate(tripData.startDate)} - ${formatDate(tripData.endDate)}`
   ];
+
+  const createdYear = new Date(tripData.createdAt || new Date()).getFullYear();
+
   const hostInfo = {
     name: tripData.host?.user.name || "Host",
     image: tripData.host?.image || "https://via.placeholder.com/60",
     email: tripData.host?.hostEmail || "",
     description: tripData.host?.description || "",
-    createdYear,
+    createdYear
   };
+
   const tripStats = {
     price: tripData.price || 0,
     noOfDays: tripData.noOfDays || 0,
     maxParticipants: tripData.maxParticipants || 0,
-    languages: tripData.languages?.join(", ") || "English",
+    languages: tripData.languages?.join(", ") || "English"
   };
 
   if (isLoading) {
@@ -205,12 +205,10 @@ export function BookingPage({
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
             tripData.tripImage ||
             "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-          }')`,
+          }')`
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <BackButton isWhite={true} route="/trips" />
-
           <div className="flex items-center justify-between mt-12">
             <div className="space-y-4">
               <div className="inline-flex items-center px-6 py-2 bg-purple-600/80 backdrop-blur-sm rounded-full mb-4">
@@ -233,7 +231,7 @@ export function BookingPage({
                 {heroTags.map((tag, i) => (
                   <span
                     key={i}
-                    className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument"
+                    className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-xl font-medium font-instrument"
                   >
                     {tag}
                   </span>
@@ -249,11 +247,9 @@ export function BookingPage({
         </div>
       </div>
 
-      {/* Booking Form Section */}
-      <div className="relative -mt-16 z-20">
+      <div className=" -mt-16 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Booking Form */}
             <div className="lg:col-span-2">
               <div
                 className={`backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 ${
@@ -283,131 +279,142 @@ export function BookingPage({
                   {currentStep === 1 && (
                     <GuestInformationForm onContinue={handleGuestInfoSubmit} />
                   )}
+                  {/* Add other steps here as needed */}
+                  {currentStep === 2 && (
+                    <div className="text-center py-8">
+                      <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">
+                        Booking Created Successfully!
+                      </h3>
+                      <p className="text-gray-600 font-instrument">
+                        Your booking has been created with all guest
+                        information.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-            {/* Sidebar */}
-            <div className="space-y-6 lg:sticky lg:top-24">
-              {/* Trip Summary Card */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
-                    <DollarSign className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                    Trip Summary
-                  </h3>
-                </div>
 
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-3xl font-bold text-gray-900 font-bricolage">
-                      ₹{tripStats.price.toLocaleString()}
-                    </span>
-                    <span className="text-gray-600 font-instrument">
-                      per person
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 font-instrument">
-                    Total: ₹
-                    {(tripStats.price * numberOfGuests).toLocaleString()} for{" "}
-                    {numberOfGuests} {numberOfGuests === 1 ? "guest" : "guests"}
-                  </p>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-purple-50 p-2 rounded-lg">
-                      <Calendar className="h-4 w-4 text-purple-600" />
+            <div>
+              <div className="space-y-6 lg:sticky lg:top-10 ">
+                <div className=" bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
+                      <DollarSign className="h-5 w-5" />
                     </div>
-                    <span className="text-gray-700 font-instrument">
-                      {tripStats.noOfDays} days experience
-                    </span>
+                    <h3 className="text-xl font-bold text-gray-900 font-bricolage">
+                      Trip Summary
+                    </h3>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-50 p-2 rounded-lg">
-                      <Users className="h-4 w-4 text-green-600" />
-                    </div>
-                    <span className="text-gray-700 font-instrument">
-                      Up to {tripStats.maxParticipants} travelers
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-50 p-2 rounded-lg">
-                      <Languages className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <span className="text-gray-700 font-instrument">
-                      {tripStats.languages}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="border-t border-gray-200 pt-6">
-                  <BookingProgress bookingData={bookingData} />
-                </div>
-              </div>
-
-              {/* Host Information Card */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                    Meet Your Host
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-4 mb-4">
-                  <Avatar className="h-12 w-12 border-2 border-purple-200">
-                    <AvatarImage src={hostInfo.image} />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold">
-                      {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-900 font-instrument">
-                      {hostInfo.name}
-                    </p>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="h-3 w-3 text-yellow-400 fill-yellow-400"
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-gray-600 font-instrument">
-                        4.9 (124 reviews)
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-3xl font-bold text-gray-900 font-bricolage">
+                        ₹{tripStats.price.toLocaleString()}
+                      </span>
+                      <span className="text-gray-600 font-instrument">
+                        per person
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 font-instrument">
-                      Host since {hostInfo.createdYear}
+                      Total: ₹
+                      {(tripStats.price * numberOfGuests).toLocaleString()} for{" "}
+                      {numberOfGuests}{" "}
+                      {numberOfGuests === 1 ? "guest" : "guests"}
                     </p>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-purple-50 p-2 rounded-lg">
+                        <Calendar className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <span className="text-gray-700 font-instrument">
+                        {tripStats.noOfDays} days experience
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-green-50 p-2 rounded-lg">
+                        <Users className="h-4 w-4 text-green-600" />
+                      </div>
+                      <span className="text-gray-700 font-instrument">
+                        Up to {tripStats.maxParticipants} travelers
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-50 p-2 rounded-lg">
+                        <Languages className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700 font-instrument">
+                        {tripStats.languages}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-6">
+                    <BookingProgress bookingData={bookingData} />
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-700 font-instrument leading-relaxed">
-                    {hostInfo.description ||
-                      "Experienced travel guide passionate about sharing local culture and creating unforgettable experiences."}
-                  </p>
-                </div>
+                {/* Host Information Card */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
+                      <MessageCircle className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 font-bricolage">
+                      Meet Your Host
+                    </h3>
+                  </div>
 
-                <button className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-800 font-semibold py-3 rounded-xl transition-all duration-300 font-instrument text-sm">
-                  View Host Profile
-                </button>
+                  <div className="flex items-center gap-4 mb-4">
+                    <Avatar className="h-12 w-12 border-2 border-purple-200">
+                      <AvatarImage src={hostInfo.image} />
+                      <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold">
+                        {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900 font-instrument">
+                        {hostInfo.name}
+                      </p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-3 w-3 text-yellow-400 fill-yellow-400"
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-600 font-instrument">
+                          4.9 (124 reviews)
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-instrument">
+                        Host since {hostInfo.createdYear}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-gray-700 font-instrument leading-relaxed">
+                      {hostInfo.description ||
+                        "Experienced travel guide passionate about sharing local culture and creating unforgettable experiences."}
+                    </p>
+                  </div>
+
+                  <button className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-800 font-semibold py-3 rounded-xl transition-all duration-300 font-instrument text-sm">
+                    View Host Profile
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Additional content sections can be added here */}
-      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"></div>
     </div>
   );
 }

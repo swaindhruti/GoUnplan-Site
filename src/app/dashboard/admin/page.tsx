@@ -28,7 +28,7 @@ import {
   XCircle,
   Mail,
   Phone,
-
+  MessageSquare
 } from "lucide-react";
 import {
   getAllUsers,
@@ -40,7 +40,7 @@ import {
   updateUserRole,
   getAlltravelPlanApplications,
   approveTravelPlan,
-  getAllBookings,
+  getAllBookings
 } from "@/actions/admin/action";
 import { markBookingAsRefunded } from "@/actions/booking/actions";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
@@ -104,7 +104,7 @@ interface Booking {
     id: string;
     name: string;
     email: string;
-    phone: string;
+    phone: string | null;
     image: string | null;
   };
   travelPlan: {
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
     PENDING: 0,
     CONFIRMED: 0,
     CANCELLED: 0,
-    REFUNDED: 0,
+    REFUNDED: 0
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
@@ -243,14 +243,14 @@ export default function AdminDashboard() {
           return;
         }
         if (bookingsResponse.success) {
-          setBookings(bookingsResponse.bookings || []);
+          setBookings(bookingsResponse?.bookings || []);
           setBookingCounts(
             bookingsResponse.counts || {
               ALL: 0,
               PENDING: 0,
               CONFIRMED: 0,
               CANCELLED: 0,
-              REFUNDED: 0,
+              REFUNDED: 0
             }
           );
         }
@@ -399,14 +399,16 @@ export default function AdminDashboard() {
       const result = await markBookingAsRefunded(bookingId);
       if (result.success) {
         // Update local state
-        setBookings(bookings.map(booking => 
-          booking.id === bookingId 
-            ? { ...booking, status: "REFUNDED" }
-            : booking
-        ));
-        
+        setBookings(
+          bookings.map((booking) =>
+            booking.id === bookingId
+              ? { ...booking, status: "REFUNDED" }
+              : booking
+          )
+        );
+
         // Update booking counts
-        setBookingCounts(prev => ({
+        setBookingCounts((prev) => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
           REFUNDED: prev.REFUNDED + 1
@@ -461,19 +463,17 @@ export default function AdminDashboard() {
       description: "Financial Analytics"
     },
     {
-
       id: "messages",
       label: "MESSAGES",
       icon: <MessageSquare className="w-5 h-5" />,
       description: "Communication"
-    }
-
+    },
+    {
       id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
-      description: "Booking Management",
-    },
-
+      description: "Booking Management"
+    }
   ];
 
   if (loading) {
@@ -1303,7 +1303,7 @@ export default function AdminDashboard() {
                       "CONFIRMED",
                       "PENDING",
                       "REFUNDED",
-                      "CANCELLED",
+                      "CANCELLED"
                     ].map((status) => (
                       <button
                         key={status}
@@ -1486,18 +1486,21 @@ export default function AdminDashboard() {
                                     ).toLocaleDateString()}
                                   </span>
                                 </div>
-                                
+
                                 {/* Admin Actions */}
-                                {booking.status === "CANCELLED" && booking.refundAmount > 0 && (
-                                  <Button
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white font-instrument text-xs"
-                                    onClick={() => handleMarkAsRefunded(booking.id)}
-                                  >
-                                    <RefreshCw className="h-3 w-3 mr-1" />
-                                    Mark as Refunded
-                                  </Button>
-                                )}
+                                {booking.status === "CANCELLED" &&
+                                  booking.refundAmount > 0 && (
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white font-instrument text-xs"
+                                      onClick={() =>
+                                        handleMarkAsRefunded(booking.id)
+                                      }
+                                    >
+                                      <RefreshCw className="h-3 w-3 mr-1" />
+                                      Mark as Refunded
+                                    </Button>
+                                  )}
                               </div>
                             </div>
                           </div>

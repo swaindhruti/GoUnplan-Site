@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Eye,
   AlertTriangle,
-  Sparkles,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 
 // Types based on the existing booking structure
@@ -48,6 +48,7 @@ interface TravelPlan {
   country?: string;
   state?: string;
   city?: string;
+  tripImage?: string | null;
   noOfDays: number;
 }
 
@@ -84,26 +85,26 @@ const statusConfig = {
     label: "Pending",
     icon: Clock,
     color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    bgColor: "bg-yellow-50",
+    bgColor: "bg-yellow-50"
   },
   CONFIRMED: {
     label: "Confirmed",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50",
+    bgColor: "bg-green-50"
   },
   CANCELLED: {
     label: "Cancelled",
     icon: XCircle,
     color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50",
+    bgColor: "bg-red-50"
   },
   REFUNDED: {
     label: "Refunded",
     icon: RotateCcw,
     color: "bg-blue-100 text-blue-800 border-blue-200",
-    bgColor: "bg-blue-50",
-  },
+    bgColor: "bg-blue-50"
+  }
 };
 
 export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
@@ -156,7 +157,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
     return {
       ALL: bookings.length,
-      ...counts,
+      ...counts
     };
   }, [bookings]);
 
@@ -180,7 +181,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       {
         upcoming: [] as Booking[],
         completed: [] as Booking[],
-        other: [] as Booking[],
+        other: [] as Booking[]
       }
     );
   }, [filteredAndSortedBookings]);
@@ -191,7 +192,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       <div
         className="relative bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -268,7 +269,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                         "CONFIRMED",
                         "PENDING",
                         "CANCELLED",
-                        "REFUNDED",
+                        "REFUNDED"
                       ] as FilterStatus[]
                     ).map((status) => (
                       <Button
@@ -434,7 +435,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
                     ...categorizedBookings.completed,
-                    ...categorizedBookings.other,
+                    ...categorizedBookings.other
                   ].map((booking) => (
                     <BookingCard key={booking.id} booking={booking} />
                   ))}
@@ -448,7 +449,6 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   );
 }
 
-// Individual Booking Card Component
 function BookingCard({ booking }: { booking: Booking }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -519,7 +519,10 @@ function BookingCard({ booking }: { booking: Booking }) {
       {/* Trip Image */}
       <div className="relative h-48 bg-gradient-to-r from-purple-500 to-blue-600">
         <Image
-          src={`https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`}
+          src={
+            booking.travelPlan.tripImage ||
+            `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`
+          }
           alt={booking.travelPlan.title}
           fill
           className="object-cover"
@@ -595,7 +598,7 @@ function BookingCard({ booking }: { booking: Booking }) {
           {/* Actions */}
           <div className="flex gap-2 pt-4 border-t border-gray-100">
             <Link
-              href={`/trips/booking/${booking.travelPlan.travelPlanId}/booking-summary`}
+              href={`/trips/booking/${booking.travelPlan.travelPlanId}`}
               className="flex-1"
             >
               <Button
@@ -737,7 +740,7 @@ function getStatusConfig(status: BookingStatus) {
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "INR",
+    currency: "INR"
   }).format(amount);
 }
 
@@ -750,7 +753,7 @@ function isUpcoming(booking: Booking) {
 // Empty State Component for My Trips
 function EmptyTripState({
   hasFilters,
-  searchTerm,
+  searchTerm
 }: {
   hasFilters: boolean;
   searchTerm: string;
@@ -767,7 +770,7 @@ function EmptyTripState({
         const result = await getSuggestedTripsWrapper({ searchTerm }, 6);
         if (result.trips) {
           // Transform the raw trip data to match Trip type
-          const transformedTrips: Trip[] = result.trips.map(trip => ({
+          const transformedTrips: Trip[] = result.trips.map((trip) => ({
             ...trip,
             vibes: trip.filters || [],
             tripImage: `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`,
@@ -775,7 +778,10 @@ function EmptyTripState({
             filters: trip.filters || [],
             averageRating: trip.averageRating || 0,
             reviewCount: trip.reviewCount || 0,
-            createdAt: typeof trip.createdAt === 'string' ? trip.createdAt : trip.createdAt.toISOString()
+            createdAt:
+              typeof trip.createdAt === "string"
+                ? trip.createdAt
+                : trip.createdAt.toISOString()
           }));
           setSuggestedTrips(transformedTrips);
         }

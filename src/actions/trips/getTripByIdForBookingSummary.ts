@@ -12,7 +12,8 @@ export const getTripById = async (tripId: string) => {
         description: true,
         destination: true,
         travelPlanId: true,
-        noOfDays: true
+        noOfDays: true,
+        tripImage: true
       }
     });
     const booking = await prisma.booking.findFirst({
