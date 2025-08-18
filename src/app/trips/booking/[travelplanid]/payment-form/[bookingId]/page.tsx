@@ -39,6 +39,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       <>
         <PaymentForm
           booking={booking}
+          bookingId={bookingId}
           tripData={{
             ...trip,
             tripImage:
