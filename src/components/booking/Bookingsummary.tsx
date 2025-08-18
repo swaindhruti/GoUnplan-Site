@@ -9,8 +9,7 @@ import {
   CheckCircle,
   CreditCard,
   XCircle,
-  AlertTriangle,
-  RefreshCw
+  AlertTriangle
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import {
@@ -91,7 +90,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       try {
         const response = await editBookingAction(booking.id);
         if (response.success) {
-          router.push(`/trips/booking/${response.travelPlanId}`);
+          router.push(`/trips/booking/${response.travelPlanId}/${booking.id}`);
         } else {
           console.error("Failed to update booking:", response.error);
         }
@@ -100,8 +99,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       }
     }, [booking?.id, router]);
 
-    const handleBookAgain = useCallback(async () => {
-      if (!booking?.id || !booking?.travelPlanId) return;
+    /*     const handleBookAgain = useCallback(async () => {
+      if (!booking?.travelPlanId) return;
       router.push(`/trips/${booking.travelPlanId}`);
       /*  try {
         const response = await unCompleteBookingForm(booking.id);
@@ -113,7 +112,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       } catch (error) {
         console.error("Error enabling booking edit:", error);
       } */
-    }, [booking?.id, booking?.travelPlanId, router]);
+    //    }, [booking?.travelPlanId, router]);
 
     const getDuration = useCallback((): string => {
       if (!booking?.startDate || !booking?.endDate) return "N/A";
@@ -342,22 +341,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
                         {/* Action Button */}
                         <div className="pt-3 border-t border-gray-200">
-                          {isCancelled ? (
-                            <button
-                              onClick={handleBookAgain}
-                              className="w-full bg-red-100 text-red-700 font-medium text-sm
-                                       border border-red-300 rounded-lg py-2.5 px-4
-                                       hover:bg-red-200 hover:border-red-400
-                                       transition-all duration-200
-                                       disabled:opacity-50 disabled:cursor-not-allowed
-                                       flex items-center justify-center gap-2 font-instrument"
-                              disabled={loading}
-                              type="button"
-                            >
-                              <RefreshCw className="w-3.5 h-3.5" />
-                              Book Again
-                            </button>
-                          ) : (
+                          {!isCancelled && (
                             <button
                               onClick={handleEditDetails}
                               className="w-full bg-gray-100 text-gray-700 font-medium text-sm

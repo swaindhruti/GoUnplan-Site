@@ -16,6 +16,7 @@ import { requireUser } from "@/lib/roleGaurd";
 import TripItinerary from "@/components/trips/Itenary";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
+import { v4 as uuidv4 } from "uuid";
 
 type Props = {
   params: Promise<{
@@ -27,6 +28,7 @@ export default async function TripDetailsPage({ params }: Props) {
   const tripId = (await params).tripId;
   const trip = await getTripById(tripId);
   const UserSession = await requireUser();
+  const bookingId = uuidv4();
 
   if (!trip || "error" in trip) return notFound();
 
@@ -275,7 +277,7 @@ export default async function TripDetailsPage({ params }: Props) {
 
               {/* Reserve Button */}
               <Link
-                href={`/trips/booking/${trip.travelPlanId}`}
+                href={`/trips/booking/${trip.travelPlanId}/${bookingId}`}
                 className="block mb-4 sm:mb-6"
               >
                 <button className="w-full bg-purple-600 flex items-center justify-center gap-2 hover:bg-purple-700 text-white font-semibold py-4 sm:py-6 lg:py-7 px-4 sm:px-6 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] text-sm sm:text-base lg:text-lg">
