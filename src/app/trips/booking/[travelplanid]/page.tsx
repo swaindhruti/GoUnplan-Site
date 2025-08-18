@@ -3,7 +3,6 @@ import { BookingPage } from "@/components/booking/BookingPage";
 // import { GetTrip } from "@/hooks/use-get-trip";
 import { requireUser } from "@/lib/roleGaurd";
 // import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 type Props = {
   params: Promise<{
     travelplanid: string;
@@ -18,9 +17,9 @@ export default async function Booking({ params }: Props) {
     return <div>Booking not found</div>;
   }
   console.log(booking);
-  if (booking?.formSubmitted) {
+  /*  if (booking?.formSubmitted) {
     redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
-  }
+  } */
 
   return (
     <>

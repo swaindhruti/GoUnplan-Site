@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import {
-  editBookingAction,
-  unCompleteBookingForm
+  editBookingAction
+  /*  unCompleteBookingForm */
   /*   updateBookingStatus */
 } from "@/actions/booking/actions";
 /* import { BookingStatus } from "@prisma/client"; */
@@ -102,8 +102,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
     const handleBookAgain = useCallback(async () => {
       if (!booking?.id || !booking?.travelPlanId) return;
-
-      try {
+      router.push(`/trips/${booking.travelPlanId}`);
+      /*  try {
         const response = await unCompleteBookingForm(booking.id);
         if (response.success) {
           router.push(`/trips/booking/${booking.travelPlanId}`);
@@ -112,7 +112,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         }
       } catch (error) {
         console.error("Error enabling booking edit:", error);
-      }
+      } */
     }, [booking?.id, booking?.travelPlanId, router]);
 
     const getDuration = useCallback((): string => {
@@ -125,10 +125,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     }, [booking?.startDate, booking?.endDate]);
 
     const handleContinueToPayment = () => {
-      router.push(`/trips/booking/${booking?.travelPlanId}/payment-form`);
+      router.push(
+        `/trips/booking/${booking?.travelPlanId}/payment-form/${booking?.id}`
+      );
     };
 
-    // Loading state
     if (loading) {
       return (
         <div className="min-h-screen bg-gray-50 py-16 px-6">
@@ -169,7 +170,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
     return (
       <div className="min-h-screen bg-gray-50 font-instrument">
-        {/* Hero Section */}
         <div
           className="relative bg-cover bg-center bg-no-repeat"
           style={{
@@ -232,7 +232,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           </div>
         </div>
 
-        {/* Cancellation Alert */}
         {isCancelled && (
           <div className="relative -mt-16 z-30 mb-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -257,15 +256,12 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           </div>
         )}
 
-        {/* Booking Details Section */}
         <div className={`relative z-20 ${isCancelled ? "-mt-4" : "-mt-16"}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Content */}
               <div className="lg:col-span-2">
                 <div className="backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 space-y-8">
                   <>
-                    {/* Trip Header */}
                     <div className="text-center mb-6">
                       <div className="flex items-center gap-3 justify-center mb-3">
                         <div
@@ -296,10 +292,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                       </p>
                     </div>
 
-                    {/* Compact Trip Details Section */}
                     <div className="bg-gray-50 rounded-xl p-5">
                       <div className="space-y-5">
-                        {/* Trip Dates and Duration */}
                         <div>
                           <div className="flex items-center justify-between text-base font-semibold text-gray-900 font-instrument">
                             <span>{formatDate(booking.startDate)}</span>

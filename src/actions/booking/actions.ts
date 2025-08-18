@@ -360,6 +360,7 @@ export const setFormSubmissionStatus = async (
       return { error: "Booking not found or unauthorized access" };
     }
     if (status === false) {
+      console.log("hii");
       await prisma.booking.delete({
         where: { id: bookingId }
       });

@@ -1,6 +1,6 @@
 import { prisma, requireUser } from "@/lib/shared";
 
-export const getTripById = async (tripId: string) => {
+export const getTripById = async (tripId: string, bookingId: string) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
@@ -20,7 +20,8 @@ export const getTripById = async (tripId: string) => {
     const booking = await prisma.booking.findFirst({
       where: {
         userId: session.user.id,
-        travelPlanId: tripId
+        travelPlanId: tripId,
+        id: bookingId
       },
       orderBy: {
         createdAt: "desc"

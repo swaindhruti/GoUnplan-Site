@@ -15,6 +15,7 @@ import {
   Star
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 
 interface BookingPageProps {
   userId: string;
@@ -93,6 +94,7 @@ export function BookingPage({
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const bookingData = useBookingStore((state) => state.bookingData);
+  const router = useRouter();
   const isLoading = useBookingStore((state) => state.isLoading);
   const updateBookingData = useBookingStore((state) => state.updateBookingData);
   const createNewBooking = useBookingStore((state) => state.createNewBooking);
@@ -151,6 +153,9 @@ export function BookingPage({
             setCurrentStep((prev) => prev + 1);
             setIsTransitioning(false);
           }, 300);
+          router.push(
+            `/trips/booking/${tripData.travelPlanId}/booking-summary/${newBooking.id}`
+          );
         } else {
           setIsTransitioning(false);
         }
@@ -159,7 +164,7 @@ export function BookingPage({
         setIsTransitioning(false);
       }
     },
-    [userId, tripData, createNewBooking]
+    [userId, tripData, createNewBooking, router]
   );
 
   const formatDate = (date?: string | Date | null) => {
