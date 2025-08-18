@@ -6,11 +6,13 @@ import { requireUser } from "@/lib/roleGaurd";
 type Props = {
   params: Promise<{
     travelplanid: string;
+    bookingId: string;
   }>;
 };
 export default async function Booking({ params }: Props) {
   const tripId = (await params).travelplanid;
-  const { trip, booking } = await getTripById(tripId);
+  const bookingId = (await params).bookingId;
+  const { trip, booking } = await getTripById(tripId, bookingId);
   const userSession = await requireUser();
 
   if (!trip) {
@@ -25,6 +27,7 @@ export default async function Booking({ params }: Props) {
     <>
       {
         <BookingPage
+          bookingId={bookingId}
           existingBookingData={booking || {}}
           userId={userSession.user.id || ""}
           tripData={{

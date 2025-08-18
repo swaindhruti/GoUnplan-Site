@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 // import type { BookingStatus } from "@/types/booking";
 
 export const createBooking = async (bookingData: {
+  id: string;
   userId: string;
   travelPlanId: string;
   startDate: Date;
@@ -58,6 +59,7 @@ export const createBooking = async (bookingData: {
 
     const booking = await prisma.booking.create({
       data: {
+        id: bookingData.id,
         userId: bookingData.userId,
         travelPlanId: bookingData.travelPlanId,
         startDate: bookingData.startDate,

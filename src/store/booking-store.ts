@@ -105,14 +105,14 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     const { updateBookingData } = get();
 
     try {
-      // Create payload with all the data including guest information
       const payload = {
+        id: data.id || "",
         userId: data.userId!,
         travelPlanId: data.travelPlanId!,
         startDate: new Date(data.startDate!),
         endDate: new Date(data.endDate!),
         participants: data.participants || 1,
-        guests: data.guests, // Include guests data
+        guests: data.guests,
         specialRequirements: data.specialRequirements ?? undefined
       };
 

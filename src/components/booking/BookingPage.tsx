@@ -23,6 +23,7 @@ interface BookingPageProps {
   tripData: TravelPlan;
   existingBookingId?: string;
   Step?: number;
+  bookingId: string;
 }
 
 const EnhancedLoadingState = () => {
@@ -89,7 +90,8 @@ export function BookingPage({
   userId,
   tripData,
   existingBookingData,
-  Step
+  Step,
+  bookingId
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -124,15 +126,14 @@ export function BookingPage({
     if (bookingData.participants) setNumberOfGuests(bookingData.participants);
   }, [bookingData]);
 
-  // Modified handleGuestInfoSubmit to create booking with all guest data
   const handleGuestInfoSubmit = useCallback(
     async (guestCount: number, guestData: BookingFormData) => {
       setIsTransitioning(true);
       setNumberOfGuests(guestCount);
 
       try {
-        // Create booking with all guest information at once
         const completeBookingData = {
+          id: bookingId,
           userId,
           travelPlanId: tripData.travelPlanId,
           pricePerPerson: tripData.price,
@@ -148,7 +149,6 @@ export function BookingPage({
         const newBooking = await createNewBooking(completeBookingData);
 
         if (newBooking) {
-          // Move to next step after successful creation
           setTimeout(() => {
             setCurrentStep((prev) => prev + 1);
             setIsTransitioning(false);
@@ -164,7 +164,7 @@ export function BookingPage({
         setIsTransitioning(false);
       }
     },
-    [userId, tripData, createNewBooking, router]
+    [userId, tripData, createNewBooking, router, bookingId]
   );
 
   const formatDate = (date?: string | Date | null) => {

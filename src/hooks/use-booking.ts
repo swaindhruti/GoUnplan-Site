@@ -195,6 +195,7 @@ export function useBookingState({
 
       try {
         const bookingPayload = {
+          id: bookingData.id || "",
           userId: userId || bookingData.userId!,
           travelPlanId: travelPlanId || bookingData.travelPlanId!,
           startDate: data.startDate || bookingData.startDate!,
