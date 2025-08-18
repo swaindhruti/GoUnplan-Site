@@ -32,7 +32,8 @@ import {
   Crown,
   Shield,
   UserCog,
-  FileText
+  FileText,
+  MapPin
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -101,18 +102,6 @@ export default function Header() {
     }
     setIsOpen(false);
   };
-
-  /*   const getDashboardUrl = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "/dashboard/admin";
-      case "HOST":
-        return "/dashboard/host";
-      case "USER":
-      default:
-        return "/dashboard/user";
-    }
-  }; */
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
@@ -227,7 +216,7 @@ export default function Header() {
 
   // Determine if current user is a host
   const isUserHost = session?.user?.role === "HOST";
-  
+
   // Determine if current user is an admin
   const isUserAdmin = session?.user?.role === "ADMIN";
 
@@ -262,16 +251,188 @@ export default function Header() {
   // Prevent horizontal scrolling when dropdown is open
   useEffect(() => {
     if (isDashboardMenuOpen) {
-      document.body.style.overflowX = 'hidden';
+      document.body.style.overflowX = "hidden";
     } else {
-      document.body.style.overflowX = '';
+      document.body.style.overflowX = "";
     }
 
     // Cleanup function
     return () => {
-      document.body.style.overflowX = '';
+      document.body.style.overflowX = "";
     };
   }, [isDashboardMenuOpen]);
+
+  // Standard Dropdown Menu Component (used for both home and non-home pages)
+  const StandardDropdownMenu = () => (
+    <DropdownMenu
+      open={isDashboardMenuOpen}
+      onOpenChange={setIsDashboardMenuOpen}
+    >
+      <DropdownMenuTrigger asChild>
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
+          <Menu className="h-4 w-4 mr-2" />
+          <span className="hidden sm:inline">Menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl max-w-[calc(100vw-2rem)]"
+        align="end"
+        sideOffset={8}
+        avoidCollisions={true}
+      >
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+              <User className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">
+                {session?.user?.name || "User"}
+              </p>
+              <p className="text-gray-500 text-xs">{session?.user?.email}</p>
+            </div>
+          </div>
+        </div>
+
+        <DropdownMenuGroup className="p-2">
+          {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
+          <div className="relative">
+            <DropdownMenuItem
+              onClick={handleDashboardClick}
+              className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+              aria-expanded={
+                isDashboardMenuOpen &&
+                (session?.user?.role === "HOST" ||
+                  session?.user?.role === "ADMIN")
+              }
+              aria-haspopup={session?.user?.role !== "USER"}
+            >
+              <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+              <span className="font-medium text-gray-900 flex-1">
+                Dashboard
+              </span>
+              {/* Show toggle icon for HOST/ADMIN roles */}
+              {(session?.user?.role === "HOST" ||
+                session?.user?.role === "ADMIN") && (
+                <>
+                  {isDashboardMenuOpen ? (
+                    <ChevronUp className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-gray-400" />
+                  )}
+                </>
+              )}
+              {/* Show shortcut only for USER role */}
+              {session?.user?.role === "USER" && (
+                <DropdownMenuShortcut className="text-gray-400">
+                  ⌘D
+                </DropdownMenuShortcut>
+              )}
+            </DropdownMenuItem>
+
+            {/* Nested Dashboard Options */}
+            {isDashboardMenuOpen &&
+              (session?.user?.role === "HOST" ||
+                session?.user?.role === "ADMIN") && (
+                <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
+                  {getDashboardMenuItems().map((item) => (
+                    <DropdownMenuItem
+                      key={item.href}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsDashboardMenuOpen(false);
+                      }}
+                      className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
+                    >
+                      <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                      <span className="font-medium text-gray-800">
+                        {item.label}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              )}
+          </div>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/trips")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <MapPin className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">Explore Trips</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘E
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/my-trips")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">My Trips</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘T
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
+          {/* Apply for Host button - only show for non-hosts */}
+          {shouldShowHostButton && (
+            <DropdownMenuItem
+              onClick={() => router.push("/dashboard/host")}
+              className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
+            >
+              <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
+              <span className="font-medium text-gray-900 group-hover:text-amber-600">
+                Apply for Host
+              </span>
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuItem
+            onClick={() => window.open("/terms-and-conditions.pdf", "_blank")}
+            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900 ">
+              Terms and Conditions
+            </span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => window.open("/privacy-policy.pdf", "_blank")}
+            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900 ">Privacy Policy</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => window.open("/cancellation-policy.pdf", "_blank")}
+            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900 ">
+              Cancellation Policy
+            </span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <div className="border-t border-gray-100 p-2">
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
+            <span className="font-medium text-gray-900 group-hover:text-red-600">
+              Sign Out
+            </span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⇧⌘Q
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   if (!isHomePage) {
     return (
@@ -292,33 +453,40 @@ export default function Header() {
                   />
                 </div>
               </Link>
-              
+
               <div className="hidden md:flex items-center">
                 <Breadcrumb>
                   <BreadcrumbList className="flex items-center gap-2 text-gray-600">
-                  {breadcrumbs.map((crumb, index) => (
-                    <div key={crumb.href} className="flex items-center min-w-0">
-                      <BreadcrumbItem>
-                        {crumb.isActive ? (
-                          <BreadcrumbPage className="font-semibold text-purple-600 font-instrument">
-                            {crumb.label}
-                          </BreadcrumbPage>
-                        ) : (
-                          <BreadcrumbLink
-                            href={crumb.href}
-                            className="font-medium text-gray-600 hover:text-purple-600 transition-colors duration-200 font-instrument"
-                          >
-                            {index === 0 ? <Home className="h-4 w-4" /> : crumb.label}
-                          </BreadcrumbLink>
+                    {breadcrumbs.map((crumb, index) => (
+                      <div
+                        key={crumb.href}
+                        className="flex items-center min-w-0"
+                      >
+                        <BreadcrumbItem>
+                          {crumb.isActive ? (
+                            <BreadcrumbPage className="font-semibold text-purple-600 font-instrument">
+                              {crumb.label}
+                            </BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink
+                              href={crumb.href}
+                              className="font-medium text-gray-600 hover:text-purple-600 transition-colors duration-200 font-instrument"
+                            >
+                              {index === 0 ? (
+                                <Home className="h-4 w-4" />
+                              ) : (
+                                crumb.label
+                              )}
+                            </BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                        {index < breadcrumbs.length - 1 && (
+                          <BreadcrumbSeparator className="mx-2 text-gray-400">
+                            <ChevronRight className="h-3 w-3" />
+                          </BreadcrumbSeparator>
                         )}
-                      </BreadcrumbItem>
-                      {index < breadcrumbs.length - 1 && (
-                        <BreadcrumbSeparator className="mx-2 text-gray-400">
-                          <ChevronRight className="h-3 w-3" />
-                        </BreadcrumbSeparator>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    ))}
                   </BreadcrumbList>
                 </Breadcrumb>
               </div>
@@ -342,7 +510,7 @@ export default function Header() {
                       />
                     </div>
                   )}
-                  
+
                   {/* Admin Mode Toggle - Show only for ADMIN role */}
                   {isUserAdmin && (
                     <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
@@ -358,176 +526,7 @@ export default function Header() {
                     </div>
                   )}
 
-                  <DropdownMenu
-                    open={isDashboardMenuOpen}
-                    onOpenChange={setIsDashboardMenuOpen}
-                  >
-                    <DropdownMenuTrigger asChild>
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
-                        <Menu className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl max-w-[calc(100vw-2rem)]"
-                      align="end"
-                      sideOffset={8}
-                      avoidCollisions={true}
-                    >
-                      <div className="p-4 border-b border-gray-100">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                            <User className="h-5 w-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">
-                              {session?.user?.name || "User"}
-                            </p>
-                            <p className="text-gray-500 text-xs">
-                              {session?.user?.email}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <DropdownMenuGroup className="p-2">
-                        {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
-                        <div className="relative">
-                          <DropdownMenuItem
-                            onClick={handleDashboardClick}
-                            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                            aria-expanded={
-                              isDashboardMenuOpen &&
-                              (session?.user?.role === "HOST" ||
-                                session?.user?.role === "ADMIN")
-                            }
-                            aria-haspopup={session?.user?.role !== "USER"}
-                          >
-                            <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                            <span className="font-medium text-gray-900 flex-1">
-                              Dashboard
-                            </span>
-                            {/* Show toggle icon for HOST/ADMIN roles */}
-                            {(session?.user?.role === "HOST" ||
-                              session?.user?.role === "ADMIN") && (
-                              <>
-                                {isDashboardMenuOpen ? (
-                                  <ChevronUp className="h-4 w-4 text-gray-400" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4 text-gray-400" />
-                                )}
-                              </>
-                            )}
-                            {/* Show shortcut only for USER role */}
-                            {session?.user?.role === "USER" && (
-                              <DropdownMenuShortcut className="text-gray-400">
-                                ⌘D
-                              </DropdownMenuShortcut>
-                            )}
-                          </DropdownMenuItem>
-
-                          {/* Nested Dashboard Options */}
-                          {isDashboardMenuOpen &&
-                            (session?.user?.role === "HOST" ||
-                              session?.user?.role === "ADMIN") && (
-                              <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                                {getDashboardMenuItems().map((item) => (
-                                  <DropdownMenuItem
-                                    key={item.href}
-                                    onClick={() => {
-                                      router.push(item.href);
-                                      setIsDashboardMenuOpen(false);
-                                    }}
-                                    className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                                  >
-                                    <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                    <span className="font-medium text-gray-800">
-                                      {item.label}
-                                    </span>
-                                  </DropdownMenuItem>
-                                ))}
-                              </div>
-                            )}
-                        </div>
-
-                        <DropdownMenuItem
-                          onClick={() => router.push("/my-trips")}
-                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900">
-                            My Trips
-                          </span>
-                          <DropdownMenuShortcut className="text-gray-400">
-                            ⌘T
-                          </DropdownMenuShortcut>
-                        </DropdownMenuItem>
-
-                        {/* Apply for Host button - only show for non-hosts */}
-                        {shouldShowHostButton && (
-                          <DropdownMenuItem
-                            onClick={() => router.push("/dashboard/host")}
-                            className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
-                          >
-                            <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
-                            <span className="font-medium text-gray-900 group-hover:text-amber-600">
-                              Apply for Host
-                            </span>
-                          </DropdownMenuItem>
-                        )}
-
-
-                        <DropdownMenuItem
-                          onClick={() =>
-                            window.open("/terms-and-conditions.pdf", "_blank")
-                          }
-                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900 ">
-                            Terms and Conditions
-                          </span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            window.open("/privacy-policy.pdf", "_blank")
-                          }
-                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900 ">
-                            Privacy Policy
-                          </span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            window.open("/cancellation-policy.pdf", "_blank")
-                          }
-                          className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900 ">
-                            Cancellation Policy
-                          </span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-
-                      <div className="border-t border-gray-100 p-2">
-                        <DropdownMenuItem
-                          onClick={handleSignOut}
-                          className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
-                          <span className="font-medium text-gray-900 group-hover:text-red-600">
-                            Sign Out
-                          </span>
-                          <DropdownMenuShortcut className="text-gray-400">
-                            ⇧⌘Q
-                          </DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <StandardDropdownMenu />
                 </div>
               ) : (
                 <Button
@@ -603,7 +602,7 @@ export default function Header() {
                     />
                   </div>
                 )}
-                
+
                 {/* Admin Mode Toggle - Show only for ADMIN role */}
                 {isUserAdmin && (
                   <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
@@ -619,176 +618,7 @@ export default function Header() {
                   </div>
                 )}
 
-                <DropdownMenu
-                  open={isDashboardMenuOpen}
-                  onOpenChange={setIsDashboardMenuOpen}
-                >
-                  <DropdownMenuTrigger asChild>
-                    <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
-                      <Menu className="h-4 w-4 mr-2" />
-                      Menu
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-64 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/60 shadow-xl rounded-xl max-w-[calc(100vw-2rem)]"
-                    align="end"
-                    sideOffset={8}
-                    avoidCollisions={true}
-                  >
-                    <div className="p-4 border-b border-gray-100">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 text-sm">
-                            {session?.user?.name || "User"}
-                          </p>
-                          <p className="text-gray-500 text-xs">
-                            {session?.user?.email}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <DropdownMenuGroup className="p-2">
-                      {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
-                      <div className="relative">
-                        <DropdownMenuItem
-                          onClick={handleDashboardClick}
-                          className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                          aria-expanded={
-                            isDashboardMenuOpen &&
-                            (session?.user?.role === "HOST" ||
-                              session?.user?.role === "ADMIN")
-                          }
-                          aria-haspopup={session?.user?.role !== "USER"}
-                        >
-                          <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                          <span className="font-medium text-gray-900 flex-1">
-                            Dashboard
-                          </span>
-                          {/* Show toggle icon for HOST/ADMIN roles */}
-                          {(session?.user?.role === "HOST" ||
-                            session?.user?.role === "ADMIN") && (
-                            <>
-                              {isDashboardMenuOpen ? (
-                                <ChevronUp className="h-4 w-4 text-gray-400" />
-                              ) : (
-                                <ChevronDown className="h-4 w-4 text-gray-400" />
-                              )}
-                            </>
-                          )}
-                          {/* Show shortcut only for USER role */}
-                          {session?.user?.role === "USER" && (
-                            <DropdownMenuShortcut className="text-gray-400">
-                              ⌘D
-                            </DropdownMenuShortcut>
-                          )}
-                        </DropdownMenuItem>
-
-                        {/* Nested Dashboard Options */}
-                        {isDashboardMenuOpen &&
-                          (session?.user?.role === "HOST" ||
-                            session?.user?.role === "ADMIN") && (
-                            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                              {getDashboardMenuItems().map((item) => (
-                                <DropdownMenuItem
-                                  key={item.href}
-                                  onClick={() => {
-                                    router.push(item.href);
-                                    setIsDashboardMenuOpen(false);
-                                  }}
-                                  className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
-                                >
-                                  <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
-                                  <span className="font-medium text-gray-800">
-                                    {item.label}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                            </div>
-                          )}
-                      </div>
-
-                      <DropdownMenuItem
-                        onClick={() => router.push("/trips")}
-                        className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900">
-                          My Trips
-                        </span>
-                        <DropdownMenuShortcut className="text-gray-400">
-                          ⌘T
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-
-                      {/* Apply for Host button - only show for non-hosts */}
-                      {shouldShowHostButton && (
-                        <DropdownMenuItem
-                          onClick={() => router.push("/dashboard/host")}
-                          className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
-                        >
-                          <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
-                          <span className="font-medium text-gray-900 group-hover:text-amber-600">
-                            Apply for Host
-                          </span>
-                        </DropdownMenuItem>
-                      )}
-
-
-                      <DropdownMenuItem
-                        onClick={() =>
-                          window.open("/terms-and-conditions.pdf", "_blank")
-                        }
-                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900 ">
-                          Terms and Conditions
-                        </span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          window.open("/privacy-policy.pdf", "_blank")
-                        }
-                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900 ">
-                          Privacy Policy
-                        </span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          window.open("/cancellation-policy.pdf", "_blank")
-                        }
-                        className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-                        <span className="font-medium text-gray-900 ">
-                          Cancellation Policy
-                        </span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-
-                    <div className="border-t border-gray-100 p-2">
-                      <DropdownMenuItem
-                        onClick={handleSignOut}
-                        className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
-                      >
-                        <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
-                        <span className="font-medium text-gray-900 group-hover:text-red-600">
-                          Sign Out
-                        </span>
-                        <DropdownMenuShortcut className="text-gray-400">
-                          ⇧⌘Q
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <StandardDropdownMenu />
               </div>
             )}
           </div>
@@ -844,8 +674,6 @@ export default function Header() {
                 className="w-full h-full bg-gradient-to-br from-white via-purple-50/30 to-blue-50/30 backdrop-blur-xl border-none p-0"
               >
                 <div className="flex flex-col h-full">
-                  {/* Mobile Header - Fixed close button issue */}
-
                   {/* Mobile Navigation */}
                   <nav className="flex-1 flex flex-col justify-start px-6 py-8 space-y-2 overflow-y-auto">
                     {/* Navigation Items */}
@@ -941,11 +769,29 @@ export default function Header() {
                             )}
                         </div>
 
-                        {/* My Trips */}
+                        {/* Explore Trips */}
                         <button
                           onClick={() => {
                             setIsOpen(false);
                             router.push("/trips");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <MapPin className="mr-3 h-5 w-5 text-purple-600" />
+                              Explore Trips
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
+                        {/* My Trips */}
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/my-trips");
                           }}
                           className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
@@ -978,7 +824,6 @@ export default function Header() {
                             <div className="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-orange-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                           </button>
                         )}
-
                       </>
                     )}
                   </nav>
@@ -1015,8 +860,8 @@ export default function Header() {
                         router.push("/trips");
                       }}
                     >
-                      <Calendar className="inline mr-2 h-5 w-5" />
-                      Plan Your Trip
+                      <MapPin className="inline mr-2 h-5 w-5" />
+                      Explore Trips
                     </Button>
                   </div>
                 </div>

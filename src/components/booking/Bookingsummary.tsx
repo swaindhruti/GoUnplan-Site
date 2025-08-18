@@ -99,7 +99,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       }
     }, [booking?.id, router]);
 
-    /*     const handleBookAgain = useCallback(async () => {
+    const handleBookAgain = useCallback(async () => {
       if (!booking?.travelPlanId) return;
       router.push(`/trips/${booking.travelPlanId}`);
       /*  try {
@@ -112,7 +112,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       } catch (error) {
         console.error("Error enabling booking edit:", error);
       } */
-    //    }, [booking?.travelPlanId, router]);
+    }, [booking?.travelPlanId, router]);
 
     const getDuration = useCallback((): string => {
       if (!booking?.startDate || !booking?.endDate) return "N/A";
@@ -308,7 +308,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                           </div>
                         </div>
 
-                        {/* Guest Details */}
                         <div>
                           <h4 className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider font-instrument">
                             Guest Details ({booking.participants || 0}{" "}
@@ -339,17 +338,31 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                           </div>
                         </div>
 
-                        {/* Action Button */}
                         <div className="pt-3 border-t border-gray-200">
-                          {!isCancelled && (
+                          {isCancelled ? (
+                            <button
+                              onClick={handleBookAgain}
+                              className="w-full bg-red-600 text-white font-medium text-sm
+               border border-red-600 rounded-lg py-2.5 px-4
+               hover:bg-red-700 hover:border-red-700
+               transition-all duration-200
+               disabled:opacity-50 disabled:cursor-not-allowed
+               flex items-center justify-center gap-2 font-instrument"
+                              disabled={loading}
+                              type="button"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                              Book Trip Again
+                            </button>
+                          ) : (
                             <button
                               onClick={handleEditDetails}
                               className="w-full bg-gray-100 text-gray-700 font-medium text-sm
-                                       border border-gray-300 rounded-lg py-2.5 px-4
-                                       hover:bg-gray-200 hover:border-gray-400
-                                       transition-all duration-200
-                                       disabled:opacity-50 disabled:cursor-not-allowed
-                                       flex items-center justify-center gap-2 font-instrument"
+               border border-gray-300 rounded-lg py-2.5 px-4
+               hover:bg-gray-200 hover:border-gray-400
+               transition-all duration-200
+               disabled:opacity-50 disabled:cursor-not-allowed
+               flex items-center justify-center gap-2 font-instrument"
                               disabled={loading}
                               type="button"
                             >

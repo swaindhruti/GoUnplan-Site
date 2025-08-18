@@ -435,7 +435,7 @@ export const editBookingAction = async (bookingId: string) => {
 
 // Server action for completing payment
 export const completePaymentAction = async (
-  travelPlanId: string,
+  bookingId: string,
   amount: number,
   numberOfGuests: number
 ) => {
@@ -445,11 +445,8 @@ export const completePaymentAction = async (
   }
 
   try {
-    const booking = await prisma.booking.findFirst({
-      where: {
-        travelPlanId: travelPlanId,
-        userId: session.user.id
-      },
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
       include: {
         travelPlan: true
       }
@@ -459,9 +456,17 @@ export const completePaymentAction = async (
       return { error: "Booking not found" };
     }
 
+    if (booking.userId !== session.user.id) {
+      return { error: "Unauthorized access to booking" };
+    }
+
+    if (booking.status !== "PENDING") {
+      return { error: "Booking is not in a valid state for payment" };
+    }
+
     const updatedBooking = await prisma.booking.update({
       where: {
-        id: booking.id
+        id: bookingId
       },
       data: {
         status: "CONFIRMED",
@@ -471,7 +476,7 @@ export const completePaymentAction = async (
       }
     });
 
-    revalidatePath(`/trips/booking/${travelPlanId}`);
+    revalidatePath(`/trips/booking/${booking.travelPlanId}`);
     revalidatePath(`/dashboard/user`);
 
     return {

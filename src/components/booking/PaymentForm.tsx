@@ -39,9 +39,10 @@ interface PaymentFormProps {
     };
   };
   booking: Partial<BookingData>;
+  bookingId: string;
 }
 
-export function PaymentForm({ tripData }: PaymentFormProps) {
+export function PaymentForm({ tripData, bookingId }: PaymentFormProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -117,7 +118,7 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
 
     try {
       const result = await completePaymentAction(
-        tripData.travelPlanId,
+        bookingId,
         total,
         tripData.numberOfGuests
       );
@@ -130,10 +131,10 @@ export function PaymentForm({ tripData }: PaymentFormProps) {
       console.error("Payment error:", error);
       setShowLoader(false);
       setPaymentStatus("failed");
-      setShowPaymentModal(true); // Show modal with failed state
+      setShowPaymentModal(true);
       setIsProcessing(false);
     }
-  }, [tripData.travelPlanId, total, tripData.numberOfGuests]);
+  }, [bookingId, total, tripData.numberOfGuests]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
