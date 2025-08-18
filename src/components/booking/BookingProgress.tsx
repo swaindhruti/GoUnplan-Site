@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Calendar, Clock, Users, Tag } from "lucide-react";
+import { Calendar, Users, Tag } from "lucide-react";
 import type { BookingData } from "@/types/booking";
 
 interface BookingProgressProps {
@@ -8,7 +8,7 @@ interface BookingProgressProps {
 
 export function BookingProgress({ bookingData }: BookingProgressProps) {
   // Dynamic status styling
-  const getStatusStyle = (status?: string) => {
+  /*   const getStatusStyle = (status?: string) => {
     switch (status) {
       case "CONFIRMED":
         return "bg-green-600 text-white font-bold";
@@ -17,7 +17,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
       default:
         return "bg-purple-600 text-white font-bold";
     }
-  };
+  }; */
 
   return (
     <div className="space-y-4">
@@ -48,7 +48,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
         )}
 
         {/* Status */}
-        <div className="flex justify-between items-center py-2">
+        {/*     <div className="flex justify-between items-center py-2">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-500" />
             <span className="text-sm text-gray-700 font-instrument">
@@ -62,7 +62,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
           >
             {bookingData.status || "DRAFT"}
           </span>
-        </div>
+        </div> */}
 
         {/* Dates */}
         {bookingData.startDate && (

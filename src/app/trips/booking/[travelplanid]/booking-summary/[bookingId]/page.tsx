@@ -9,15 +9,17 @@ import { notFound, redirect } from "next/navigation";
 type Props = {
   params: Promise<{
     travelplanid: string;
+    bookingId: string;
   }>;
 };
 
 export default async function BookingSummaryPage({ params }: Props) {
   const tripId = (await params).travelplanid;
+  const bookingId = (await params).bookingId;
 
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
-      getTripById(tripId),
+      getTripById(tripId, bookingId),
       requireUser()
     ]);
     const result = await getAllActiveTrips();

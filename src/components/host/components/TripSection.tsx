@@ -19,7 +19,7 @@ import {
   Clock,
   Edit,
   Eye,
-  Activity,
+  Activity
 } from "lucide-react";
 
 type TripSectionProps = {
@@ -78,7 +78,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 0
     }).format(amount);
   };
 
@@ -172,7 +172,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium text-gray-600 font-instrument">
-                Inactive
+                Draft
               </p>
               <p className="text-2xl font-bold text-gray-900 font-bricolage">
                 {stats.inactiveTrips}
@@ -237,7 +237,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
-                Inactive
+                Draft
                 <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
                   {stats.inactiveTrips}
                 </span>
@@ -409,22 +409,26 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                       {((trip.filters && trip.filters.length > 0) ||
                         (trip.languages && trip.languages.length > 0)) && (
                         <div className="flex flex-wrap gap-2 pt-3">
-                          {trip.filters?.map((filter: string, index: number) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium"
-                            >
-                              {filter}
-                            </span>
-                          ))}
-                          {trip.languages?.map((language: string, index: number) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
-                            >
-                              {language}
-                            </span>
-                          ))}
+                          {trip.filters?.map(
+                            (filter: string, index: number) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium"
+                              >
+                                {filter}
+                              </span>
+                            )
+                          )}
+                          {trip.languages?.map(
+                            (language: string, index: number) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
+                              >
+                                {language}
+                              </span>
+                            )
+                          )}
                         </div>
                       )}
                     </div>

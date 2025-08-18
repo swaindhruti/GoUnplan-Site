@@ -598,7 +598,7 @@ function BookingCard({ booking }: { booking: Booking }) {
           {/* Actions */}
           <div className="flex gap-2 pt-4 border-t border-gray-100">
             <Link
-              href={`/trips/booking/${booking.travelPlan.travelPlanId}`}
+              href={`/trips/booking/${booking.travelPlan.travelPlanId}/booking-summary/${booking.id}`}
               className="flex-1"
             >
               <Button
