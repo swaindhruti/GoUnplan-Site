@@ -1,1 +1,1 @@
-export type TravelPlanStatuses = "ACTIVE" | "INACTIVE";
+export type TravelPlanStatuses = "ACTIVE" | "INACTIVE" | "DRAFT";

@@ -79,7 +79,7 @@ export interface TravelPlan {
   country?: string;
   state?: string;
   city?: string;
-  status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
+  status: "ACTIVE" | "INACTIVE" | "DRAFT";
   maxParticipants?: number;
   destination?: string | null;
   filters?: string[];

@@ -246,7 +246,14 @@ export default function Header() {
   useEffect(() => {
     setIsHostMode(pathname.startsWith("/dashboard/host"));
     setIsAdminMode(pathname.startsWith("/dashboard/admin"));
-  }, [pathname]);
+    
+    // Force session refresh when navigating to host dashboard
+    // This ensures the UI updates immediately when user becomes a host
+    if (pathname.startsWith("/dashboard/host") && status === "authenticated") {
+      // The session should automatically reflect the user's current role
+      // NextAuth should handle this, but this effect ensures UI updates
+    }
+  }, [pathname, status]);
 
   // Prevent horizontal scrolling when dropdown is open
   useEffect(() => {

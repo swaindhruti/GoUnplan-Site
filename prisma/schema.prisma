@@ -247,6 +247,7 @@ enum BookingStatus {
 enum TravelPlanStatus {
   ACTIVE
   INACTIVE
+  DRAFT
 }
 
 enum MessageType {

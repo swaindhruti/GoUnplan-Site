@@ -114,6 +114,7 @@ export const createTravelPlan = async (data: {
   city: string;
   languages: string[];
   tripImage?: string;
+  status?: "ACTIVE" | "INACTIVE" | "DRAFT";
   dayWiseData?: Array<{
     dayNumber: number;
     title: string;
@@ -156,6 +157,24 @@ export const createTravelPlan = async (data: {
       console.log("WARNING: No day-wise data received or the array is empty");
     }
 
+    // Determine the status to set
+    console.log("🔍 DEBUG ACTION: Received status =", data.status);
+    console.log("🔍 DEBUG ACTION: TravelPlanStatus enum values:", { 
+      DRAFT: TravelPlanStatus.DRAFT, 
+      ACTIVE: TravelPlanStatus.ACTIVE, 
+      INACTIVE: TravelPlanStatus.INACTIVE 
+    });
+    
+    let statusToSet;
+    if (data.status === "DRAFT") {
+      statusToSet = TravelPlanStatus.DRAFT;
+    } else if (data.status === "ACTIVE") {
+      statusToSet = TravelPlanStatus.ACTIVE;
+    } else {
+      statusToSet = TravelPlanStatus.INACTIVE;
+    }
+    console.log("🔍 DEBUG ACTION: statusToSet =", statusToSet);
+    
     // Create the travel plan first (without transaction)
     const travelPlan = await prisma.travelPlans.create({
       data: {
@@ -176,11 +195,11 @@ export const createTravelPlan = async (data: {
         languages: data.languages || [],
         filters: data.filters || [],
         tripImage: data.tripImage || "https://avatar.iran.liara.run/public",
-        status: TravelPlanStatus.INACTIVE
+        status: statusToSet
       }
     });
 
-    console.log("Travel plan created successfully:", travelPlan);
+    console.log("🔍 DEBUG ACTION: Travel plan created with status:", travelPlan.status);
 
     if (data.dayWiseData && data.dayWiseData.length > 0) {
       console.log(`Processing ${data.dayWiseData.length} day entries...`);
@@ -332,7 +351,7 @@ export const updateTravelPlan = async (
   }
 };
 
-export const submitTripForVerification = async (
+export const saveDraftTrip = async (
   id: string,
   data: {
     title?: string;
@@ -365,6 +384,70 @@ export const submitTripForVerification = async (
       return { error: "Host profile not found" };
     }
 
+    // Check if the travel plan exists and belongs to the host
+    const existingPlan = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: id },
+      select: { hostId: true, status: true }
+    });
+
+    if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
+      return { error: "Travel plan not found or unauthorized access" };
+    }
+
+    // Update the travel plan and keep it as DRAFT
+    const updatedPlan = await prisma.travelPlans.update({
+      where: { travelPlanId: id },
+      data: {
+        ...data,
+        status: "DRAFT" // Keep as draft
+      }
+    });
+
+    return {
+      success: true,
+      updatedPlan,
+      message: "Draft saved successfully"
+    };
+  } catch (error) {
+    console.error("Error saving draft trip:", error);
+    return { error: "Failed to save draft" };
+  }
+};
+
+export const submitTripForVerification = async (
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    includedActivities?: string[];
+    restrictions?: string[];
+    noOfDays?: number;
+    price?: number;
+    startDate?: Date;
+    endDate?: Date;
+    maxParticipants?: number;
+    country?: string;
+    state?: string;
+    city?: string;
+    filters?: string[];
+    languages?: string[];
+    destination?: string;
+    tripImage?: string;
+    status?: "ACTIVE" | "INACTIVE" | "DRAFT";
+  }
+) => {
+  const session = await requireHost();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const hostProfile = await prisma.hostProfile.findUnique({
+      where: { hostId: session.user.id }
+    });
+
+    if (!hostProfile) {
+      return { error: "Host profile not found" };
+    }
+
     const existingPlan = await prisma.travelPlans.findUnique({
       where: { travelPlanId: id },
       include: {
@@ -380,20 +463,46 @@ export const submitTripForVerification = async (
       return { error: "Travel plan not found or unauthorized access" };
     }
 
-    // Update the travel plan and set status to INACTIVE for admin verification
+    // Get the current trip to check its status
+    const currentTrip = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: id }
+    });
+
+    if (!currentTrip) {
+      return { error: "Trip not found" };
+    }
+
+    // Determine the new status
+    let newStatus = data.status;
+    if (!newStatus) {
+      // If status is not provided:
+      // - If it's a draft being completed, set to INACTIVE for admin review
+      // - Otherwise keep current status unless explicitly changing it
+      if (currentTrip.status === "DRAFT") {
+        newStatus = "INACTIVE";
+      } else {
+        newStatus = currentTrip.status;
+      }
+    }
+
+    // Update the travel plan
     // This won't affect existing bookings as they are linked by travelPlanId
     const updatedPlan = await prisma.travelPlans.update({
       where: { travelPlanId: id },
       data: {
         ...data,
-        status: "INACTIVE" // Set to inactive for admin review
+        status: newStatus
       }
     });
 
+    const message = currentTrip.status === "DRAFT" 
+      ? "Draft trip completed and submitted for admin verification. It will be active after admin approval."
+      : "Travel plan submitted for verification. It will be active after admin approval. Existing bookings remain unaffected.";
+    
     return {
       success: true,
       updatedPlan,
-      message: "Travel plan submitted for verification. It will be active after admin approval. Existing bookings remain unaffected.",
+      message,
       existingBookingsCount: existingPlan.bookings.length
     };
   } catch (error) {

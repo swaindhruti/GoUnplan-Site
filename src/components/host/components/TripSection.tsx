@@ -14,12 +14,11 @@ import {
   FileText,
   TrendingUp,
   Users,
-  Star,
   MapPin,
   Clock,
   Edit,
   Eye,
-  Activity
+  Activity,
 } from "lucide-react";
 
 type TripSectionProps = {
@@ -47,9 +46,12 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
     const inactiveTrips = trips.filter(
       (t) => t.status.toLowerCase() === "inactive"
     ).length;
+    const draftTrips = trips.filter(
+      (t) => t.status.toLowerCase() === "draft"
+    ).length;
     const totalRevenue = trips.reduce((sum, trip) => sum + trip.price, 0);
 
-    return { totalTrips, activeTrips, inactiveTrips, totalRevenue };
+    return { totalTrips, activeTrips, inactiveTrips, draftTrips, totalRevenue };
   }, [trips]);
 
   const getStatusColor = (status: string) => {
@@ -58,8 +60,10 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         return "bg-green-100 text-green-800 border-green-200";
       case "inactive":
         return "bg-gray-100 text-gray-800 border-gray-200";
-      default:
+      case "draft":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -69,6 +73,8 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         return <Activity className="h-4 w-4" />;
       case "inactive":
         return <Clock className="h-4 w-4" />;
+      case "draft":
+        return <FileText className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
     }
@@ -78,7 +84,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -175,11 +181,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 Draft
               </p>
               <p className="text-2xl font-bold text-gray-900 font-bricolage">
-                {stats.inactiveTrips}
+                {stats.draftTrips}
               </p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Star className="w-6 h-6 text-orange-600" />
+              <FileText className="w-6 h-6 text-orange-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
@@ -237,9 +243,22 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
-                Draft
+                Inactive
                 <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
                   {stats.inactiveTrips}
+                </span>
+              </button>
+              <button
+                onClick={() => setStatusFilter("draft")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
+                  statusFilter === "draft"
+                    ? "bg-purple-600 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Draft
+                <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
+                  {stats.draftTrips}
                 </span>
               </button>
             </div>
@@ -383,6 +402,19 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 pt-4 border-t">
+                        {trip.status.toLowerCase() === "draft" && (
+                          <button
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/host/edit/${trip.travelPlanId}?complete=true`
+                              )
+                            }
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+                          >
+                            <Activity className="h-4 w-4" />
+                            Complete Trip
+                          </button>
+                        )}
                         <button
                           onClick={() =>
                             router.push(

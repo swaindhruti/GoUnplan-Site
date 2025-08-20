@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { submitTripForVerification } from "@/actions/host/action";
 import {
   ArrowLeft,
@@ -49,10 +49,14 @@ interface EditTripFormProps {
 
 export const EditTripForm = ({ trip }: EditTripFormProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isCompletingDraft =
+    searchParams.get("complete") === "true" && trip.status === "DRAFT";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showCompleteDraftMessage] = useState(isCompletingDraft);
 
   const [formData, setFormData] = useState({
     title: trip.title,
@@ -165,15 +169,21 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Edit Trip</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {isCompletingDraft ? "Complete Draft Trip" : "Edit Trip"}
+              </h1>
               <p className="text-gray-600 mt-2">
-                Update your trip details and submit for admin verification
+                {isCompletingDraft
+                  ? "Complete your draft trip and submit for admin verification"
+                  : "Update your trip details and submit for admin verification"}
               </p>
             </div>
             <div
               className={`px-3 py-1 rounded-full text-sm font-semibold ${
                 trip.status === "ACTIVE"
                   ? "bg-green-100 text-green-800 border border-green-200"
+                  : trip.status === "DRAFT"
+                  ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
                   : "bg-gray-100 text-gray-800 border border-gray-200"
               }`}
             >
@@ -183,6 +193,18 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
         </div>
 
         {/* Alert Messages */}
+        {showCompleteDraftMessage && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-blue-900">Completing Draft</h3>
+              <p className="text-blue-700">
+                You are completing a draft trip. Review all details carefully
+                and click &quot;Submit for Verification&quot; when ready.
+              </p>
+            </div>
+          </div>
+        )}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
