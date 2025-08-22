@@ -67,5 +67,6 @@ export type TabType =
   | "trips"
   | "profile"
   | "bookings"
+  | "bookingsHistory"
   | "earnings"
   | "messages";

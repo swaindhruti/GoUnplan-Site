@@ -595,7 +595,7 @@ export const getTripById = async (tripId: string) => {
   }
 };
 
-export const getHostBookings = async (statusFilter?: string) => {
+export const getHostBookings = async (statusFilter?: string, selectedTripId?: string) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
 
@@ -608,10 +608,24 @@ export const getHostBookings = async (statusFilter?: string) => {
       return { error: "Host profile not found" };
     }
 
-    // Get all travel plans by this host
+    // Get all active travel plans by this host
     const travelPlans = await prisma.travelPlans.findMany({
-      where: { hostId: hostProfile.hostId },
-      select: { travelPlanId: true },
+      where: { 
+        hostId: hostProfile.hostId,
+        status: "ACTIVE"
+      },
+      select: { 
+        travelPlanId: true, 
+        title: true,
+        startDate: true,
+        endDate: true,
+        maxParticipants: true,
+        destination: true,
+        tripImage: true
+      },
+      orderBy: {
+        startDate: 'asc'
+      }
     });
 
     const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
@@ -620,6 +634,11 @@ export const getHostBookings = async (statusFilter?: string) => {
     const whereClause: Prisma.BookingWhereInput = {
       travelPlanId: { in: travelPlanIds },
     };
+
+    // Add trip filter if provided
+    if (selectedTripId) {
+      whereClause.travelPlanId = selectedTripId;
+    }
 
     // Add status filter if provided
     if (statusFilter && statusFilter !== "ALL") {
@@ -648,6 +667,7 @@ export const getHostBookings = async (statusFilter?: string) => {
             endDate: true,
             price: true,
             tripImage: true,
+            maxParticipants: true,
           },
         },
         guests: true,
@@ -657,15 +677,17 @@ export const getHostBookings = async (statusFilter?: string) => {
       },
     });
 
-    // Get booking counts by status
+    // Get booking counts by status (for selected trip if specified)
+    const bookingCountsWhere = selectedTripId 
+      ? { travelPlanId: selectedTripId }
+      : { travelPlanId: { in: travelPlanIds } };
+
     const bookingCounts = await prisma.booking.groupBy({
       by: ["status"],
       _count: {
         id: true,
       },
-      where: {
-        travelPlanId: { in: travelPlanIds },
-      },
+      where: bookingCountsWhere,
     });
 
     const counts = {
@@ -681,10 +703,35 @@ export const getHostBookings = async (statusFilter?: string) => {
       counts.ALL += count._count.id;
     });
 
+    // Calculate confirmed participants for each trip
+    const tripsWithBookingData = await Promise.all(
+      travelPlans.map(async (trip) => {
+        const confirmedBookings = await prisma.booking.findMany({
+          where: {
+            travelPlanId: trip.travelPlanId,
+            status: 'CONFIRMED'
+          },
+          select: {
+            participants: true
+          }
+        });
+
+        const confirmedParticipants = confirmedBookings.reduce((sum, booking) => sum + booking.participants, 0);
+        const remainingSeats = Math.max(0, (trip.maxParticipants || 50) - confirmedParticipants);
+
+        return {
+          ...trip,
+          confirmedParticipants,
+          remainingSeats
+        };
+      })
+    );
+
     return {
       success: true,
       bookings,
       counts,
+      trips: tripsWithBookingData,
     };
   } catch (error) {
     console.error("Error fetching host bookings:", error);

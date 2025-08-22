@@ -4,6 +4,7 @@ import { getAllTrips, getRevenueAnalytics } from "@/actions/host/action";
 import { TripSection } from "./components/TripSection";
 import { ProfileSection } from "./components/ProfileSection";
 import { BookingsSection } from "./components/BookingsSection";
+import { BookingsHistory } from "./components/BookingsHistory";
 import { EarningsSection } from "./components/EarningsSection";
 import { MessageSection } from "./components/MessageSection";
 import { HostData, RevenueAnalytics, Trip, TabType } from "./types";
@@ -171,6 +172,12 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
                 description: "Guest Management",
               },
               {
+                id: "bookingsHistory",
+                label: "HISTORY",
+                icon: "📋",
+                description: "All Bookings",
+              },
+              {
                 id: "earnings",
                 label: "EARNINGS",
                 icon: "💰",
@@ -214,6 +221,8 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
         {activeTab === "profile" && <ProfileSection hostData={hostData} />}
 
         {activeTab === "bookings" && <BookingsSection />}
+
+        {activeTab === "bookingsHistory" && <BookingsHistory />}
 
         {activeTab === "earnings" && (
           <EarningsSection

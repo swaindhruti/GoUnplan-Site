@@ -5,18 +5,16 @@ import {
   MapPin,
   FileText,
   ArrowRight,
-  Edit2,
   CheckCircle,
   CreditCard,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
-import {
-  editBookingAction
-  /*  unCompleteBookingForm */
-  /*   updateBookingStatus */
-} from "@/actions/booking/actions";
+import // editBookingAction,
+/*  unCompleteBookingForm */
+/*   updateBookingStatus */
+"@/actions/booking/actions";
 /* import { BookingStatus } from "@prisma/client"; */
 import { useRouter } from "next/navigation";
 import { TripCard } from "../trips/TripCard";
@@ -26,7 +24,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious
+  CarouselPrevious,
 } from "../ui/carousel";
 
 export interface BookingSummaryProps {
@@ -48,7 +46,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         return new Date(dateString).toLocaleDateString("en-IN", {
           year: "numeric",
           month: "short",
-          day: "numeric"
+          day: "numeric",
         });
       },
       []
@@ -59,7 +57,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         if (!amount) return "₹0";
         return new Intl.NumberFormat("en-IN", {
           style: "currency",
-          currency: "INR"
+          currency: "INR",
         }).format(amount);
       },
       []
@@ -78,26 +76,26 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       return {
         subtotal,
         tax,
-        total
+        total,
       };
     }, [booking]);
 
     const paymentBreakdown = calculatePaymentBreakdown();
 
-    const handleEditDetails = useCallback(async () => {
-      if (!booking?.id) return;
+    // const handleEditDetails = useCallback(async () => {
+    //   if (!booking?.id) return;
 
-      try {
-        const response = await editBookingAction(booking.id);
-        if (response.success) {
-          router.push(`/trips/booking/${response.travelPlanId}/${booking.id}`);
-        } else {
-          console.error("Failed to update booking:", response.error);
-        }
-      } catch (error) {
-        console.error("Error updating booking status:", error);
-      }
-    }, [booking?.id, router]);
+    //   try {
+    //     const response = await editBookingAction(booking.id);
+    //     if (response.success) {
+    //       router.push(`/trips/booking/${response.travelPlanId}/${booking.id}`);
+    //     } else {
+    //       console.error("Failed to update booking:", response.error);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error updating booking status:", error);
+    //   }
+    // }, [booking?.id, router]);
 
     const handleBookAgain = useCallback(async () => {
       if (!booking?.travelPlanId) return;
@@ -175,7 +173,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
               travelPlan?.tripImage ||
               "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-            }')`
+            }')`,
           }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -339,7 +337,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         </div>
 
                         <div className="pt-3 border-t border-gray-200">
-                          {isCancelled ? (
+                          {isCancelled && (
                             <button
                               onClick={handleBookAgain}
                               className="w-full bg-red-600 text-white font-medium text-sm
@@ -353,21 +351,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             >
                               <Calendar className="w-3.5 h-3.5" />
                               Book Trip Again
-                            </button>
-                          ) : (
-                            <button
-                              onClick={handleEditDetails}
-                              className="w-full bg-gray-100 text-gray-700 font-medium text-sm
-               border border-gray-300 rounded-lg py-2.5 px-4
-               hover:bg-gray-200 hover:border-gray-400
-               transition-all duration-200
-               disabled:opacity-50 disabled:cursor-not-allowed
-               flex items-center justify-center gap-2 font-instrument"
-                              disabled={loading}
-                              type="button"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                              Edit Details
                             </button>
                           )}
                         </div>
@@ -406,7 +389,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   filters: trip.filters || [],
                                   languages: trip.languages || [],
                                   averageRating: trip.averageRating ?? 0,
-                                  bookedSeats: trip.bookedSeats ?? 0
+                                  bookedSeats: trip.bookedSeats ?? 0,
                                 }}
                               />
                             </CarouselItem>
