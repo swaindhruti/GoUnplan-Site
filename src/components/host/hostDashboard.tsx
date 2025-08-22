@@ -31,7 +31,7 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
         if ("error" in response) {
           setError(response?.error || null);
         } else {
-          setTrips(response?.trips);
+          setTrips(response?.trips as Trip[]);
         }
       } catch (err) {
         console.error("Error fetching trips:", err);

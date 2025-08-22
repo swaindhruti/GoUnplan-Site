@@ -109,4 +109,7 @@ export type FormSchemaType = z.ZodType<
 export interface FormComponentProps {
   FormData: FormFields[];
   FormSchema?: FormSchemaType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
+  isEditMode?: boolean;
 }

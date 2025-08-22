@@ -7,8 +7,17 @@ import {
   BarChart3,
   TrendingUp,
   Target,
-  Award,
 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 type EarningsSectionProps = {
   revenueData: RevenueAnalytics | null;
@@ -72,10 +81,10 @@ export const EarningsSection = ({
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-emerald-600">
-                    ₹{revenueData.summary.netRevenue.toLocaleString()}
+                    ₹{revenueData.confirmed.revenue.toLocaleString()}
                   </div>
                   <div className="text-sm text-emerald-500 font-medium">
-                    +12.5%
+                    Confirmed
                   </div>
                 </div>
               </div>
@@ -83,7 +92,7 @@ export const EarningsSection = ({
                 Net Revenue
               </h3>
               <p className="text-slate-500 text-base">
-                Total earnings after fees
+                Sum of confirmed bookings
               </p>
             </div>
 
@@ -116,17 +125,19 @@ export const EarningsSection = ({
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-orange-600">
-                    {revenueData.summary.cancellationRate}%
+                    {revenueData.cancelled.bookingCount}
                   </div>
                   <div className="text-sm text-orange-500 font-medium">
-                    -2.1%
+                    {revenueData.summary.cancellationRate}% rate
                   </div>
                 </div>
               </div>
               <h3 className="text-slate-700 font-semibold text-lg mb-1">
-                Cancellation Rate
+                Cancelled Trips
               </h3>
-              <p className="text-slate-500 text-base">Cancelled bookings</p>
+              <p className="text-slate-500 text-base">
+                Number of cancellations
+              </p>
             </div>
 
             <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100 shadow-sm hover:shadow-lg transition-all duration-300">
@@ -136,179 +147,217 @@ export const EarningsSection = ({
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-red-600">
-                    ₹{revenueData.summary.revenueAtRisk.toLocaleString()}
+                    ₹{revenueData.pending.bookingValue.toLocaleString()}
                   </div>
-                  <div className="text-sm text-red-500 font-medium">+5.3%</div>
+                  <div className="text-sm text-red-500 font-medium">
+                    {revenueData.pending.bookingCount} pending
+                  </div>
                 </div>
               </div>
               <h3 className="text-slate-700 font-semibold text-lg mb-1">
                 Revenue at Risk
               </h3>
-              <p className="text-slate-500 text-base">Pending confirmations</p>
+              <p className="text-slate-500 text-base">
+                Bookings pending payment
+              </p>
             </div>
           </div>
 
-          {/* Detailed Revenue Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Confirmed Bookings */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">
-                      Confirmed Bookings
-                    </h3>
-                    <p className="text-slate-600 font-medium text-base">
-                      Successful reservations and revenue
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <Award className="h-6 w-6 text-emerald-600" />
-                  </div>
+          {/* Monthly Revenue Analysis Chart */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 border-b border-slate-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    Monthly Revenue Analytics
+                  </h3>
+                  <p className="text-slate-600 font-medium text-base">
+                    Time vs Sales Performance
+                  </p>
                 </div>
-              </div>
-              <div className="p-6">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Total Revenue
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        From confirmed bookings
-                      </p>
-                    </div>
-                    <span className="font-bold text-emerald-700 bg-emerald-100 rounded-lg px-4 py-2 text-base">
-                      ₹{revenueData.confirmed.revenue.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Number of Bookings
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        Confirmed reservations
-                      </p>
-                    </div>
-                    <span className="font-bold text-purple-700 bg-purple-100 rounded-lg px-4 py-2 text-base">
-                      {revenueData.confirmed.bookingCount}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Average Booking Value
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        Per confirmed booking
-                      </p>
-                    </div>
-                    <span className="font-bold text-blue-700 bg-blue-100 rounded-lg px-4 py-2 text-base">
-                      ₹
-                      {revenueData.confirmed.bookingCount > 0
-                        ? Math.round(
-                            revenueData.confirmed.revenue /
-                              revenueData.confirmed.bookingCount
-                          ).toLocaleString()
-                        : 0}
-                    </span>
-                  </div>
+                <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
               </div>
             </div>
+            <div className="p-6">
+              {(() => {
+                const monthNames = [
+                  "Jan",
+                  "Feb",
+                  "Mar",
+                  "Apr",
+                  "May",
+                  "Jun",
+                  "Jul",
+                  "Aug",
+                  "Sep",
+                  "Oct",
+                  "Nov",
+                  "Dec",
+                ];
 
-            {/* Cancelled Bookings */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">
-                      Cancelled Bookings
-                    </h3>
-                    <p className="text-slate-600 font-medium text-base">
-                      Cancellations and refunds
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                    <AlertCircle className="h-6 w-6 text-orange-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Total Booking Value
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        Before cancellation
-                      </p>
-                    </div>
-                    <span className="font-bold text-blue-700 bg-blue-100 rounded-lg px-4 py-2 text-base">
-                      ₹{revenueData.cancelled.bookingValue.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Total Refunds
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        Processed refunds
-                      </p>
-                    </div>
-                    <span className="font-bold text-red-700 bg-red-100 rounded-lg px-4 py-2 text-base">
-                      ₹{revenueData.cancelled.refundAmount.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-100">
-                    <div>
-                      <span className="text-slate-700 font-semibold text-base">
-                        Number of Cancellations
-                      </span>
-                      <p className="text-slate-500 text-base">
-                        Cancelled bookings
-                      </p>
-                    </div>
-                    <span className="font-bold text-orange-700 bg-orange-100 rounded-lg px-4 py-2 text-base">
-                      {revenueData.cancelled.bookingCount}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                // Use actual monthly trend data from backend
+                const chartData =
+                  revenueData.monthlyTrend &&
+                  revenueData.monthlyTrend.length > 0
+                    ? revenueData.monthlyTrend.map((item) => ({
+                        month: `${monthNames[item.monthNum]} ${item.year
+                          .toString()
+                          .slice(-2)}`,
+                        revenue: item.revenue,
+                        bookings: item.bookingCount,
+                      }))
+                    : // Fallback to generated data if no actual data
+                      (() => {
+                        const data = [];
+                        const currentMonth = new Date().getMonth();
+                        const currentYear = new Date().getFullYear();
 
-            {/* Monthly Revenue Analysis */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden lg:col-span-2">
-              <div className="bg-gradient-to-r from-slate-50 to-purple-50 p-6 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">
-                      Monthly Revenue Analysis
-                    </h3>
-                    <p className="text-slate-600 font-medium text-base">
-                      Revenue trends and performance insights
-                    </p>
+                        for (let i = 5; i >= 0; i--) {
+                          const monthIndex = (currentMonth - i + 12) % 12;
+                          const year =
+                            currentMonth - i < 0
+                              ? currentYear - 1
+                              : currentYear;
+
+                          data.push({
+                            month: `${monthNames[monthIndex]} ${year
+                              .toString()
+                              .slice(-2)}`,
+                            revenue: 0,
+                            bookings: 0,
+                          });
+                        }
+                        return data;
+                      })();
+
+                // Custom tooltip
+                const CustomTooltip = ({
+                  active,
+                  payload,
+                  label,
+                }: {
+                  active?: boolean;
+                  payload?: Array<{
+                    value: number;
+                    payload: { bookings: number };
+                  }>;
+                  label?: string;
+                }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+                        <p className="text-sm font-semibold text-gray-800 mb-2">
+                          {label}
+                        </p>
+                        <div className="space-y-1">
+                          <p className="text-sm text-purple-600 font-medium">
+                            Revenue: ₹{payload[0]?.value?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-sm text-indigo-600 font-medium">
+                            Bookings: {payload[0]?.payload?.bookings || 0}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                };
+
+                return (
+                  <div className="space-y-4">
+                    {/* Main Revenue Chart */}
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={chartData}
+                          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient
+                              id="colorRevenue"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="#8b5cf6"
+                                stopOpacity={0.4}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="#8b5cf6"
+                                stopOpacity={0.05}
+                              />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#e5e7eb"
+                          />
+                          <XAxis
+                            dataKey="month"
+                            stroke="#6b7280"
+                            style={{ fontSize: "12px" }}
+                          />
+                          <YAxis
+                            stroke="#6b7280"
+                            style={{ fontSize: "12px" }}
+                            domain={[0, 200000]}
+                            ticks={[0, 50000, 100000, 150000, 200000]}
+                            tickFormatter={(value) => {
+                              if (value === 0) return "₹0";
+                              return `₹${(value / 1000).toFixed(0)}k`;
+                            }}
+                          />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Legend
+                            wrapperStyle={{ fontSize: "14px" }}
+                            iconType="line"
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="revenue"
+                            stroke="#8b5cf6"
+                            strokeWidth={3}
+                            fillOpacity={1}
+                            fill="url(#colorRevenue)"
+                            name="Sales Revenue (₹)"
+                            dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 5 }}
+                            activeDot={{
+                              r: 7,
+                              stroke: "#8b5cf6",
+                              strokeWidth: 2,
+                            }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Monthly Booking Count Bars */}
+                    <div className="grid grid-cols-6 gap-2">
+                      {chartData.map((item, index) => (
+                        <div key={index} className="text-center">
+                          <div className="bg-gradient-to-t from-indigo-100 to-indigo-50 rounded-lg p-3 border border-indigo-200">
+                            <div className="text-2xl font-bold text-indigo-600">
+                              {item.bookings}
+                            </div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              Bookings
+                            </div>
+                            <div className="text-xs font-medium text-gray-700 mt-1">
+                              {item.month}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-center h-64">
-                  <div className="text-center p-8 bg-gradient-to-br from-slate-50 to-purple-50 rounded-2xl border border-slate-200">
-                    <BarChart3 className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                    <p className="text-slate-600 font-medium text-base">
-                      {revenueData.monthlyTrend.length === 0
-                        ? "No monthly trend data available yet"
-                        : "Monthly trend data available. Implement chart visualization here."}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
           </div>
         </>

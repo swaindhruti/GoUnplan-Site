@@ -5,7 +5,6 @@ import {
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -17,11 +16,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm, useFieldArray } from "react-hook-form";
-import { z } from "zod";
 import { FormComponentProps } from "@/types/form";
-import { createTravelPlan } from "@/actions/host/action";
+import { createTravelPlan, updateTravelPlan } from "@/actions/host/action";
 import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
+import { getValidationSchema, CreateDestinationSchema } from "@/config/form/formSchemaData/CreateDestinationSchema";
+import { z } from "zod";
+
+// Define the form data type
+type FormDataType = z.infer<typeof CreateDestinationSchema>;
 import {
   Plus,
   Minus,
@@ -59,47 +62,89 @@ const getSelectOptions = (options?: string[]) => {
 
 export const CreateDestinationForm = ({
   FormData,
-  FormSchema,
+  initialData,
+  isEditMode = false,
 }: FormComponentProps) => {
-  const schema = FormSchema;
+  // Use full schema by default, but we'll validate dynamically
   const router = useRouter();
   const { uploadedFile, UploadButton } = useCloudinaryUpload();
   const { data: session } = useSession();
 
-  // Initialize form with proper defaultValues
-  const defaultValues = {
-    ...FormData.reduce(
-      (acc, field) => ({
-        ...acc,
-        [field.id]:
-          field.type === "number"
-            ? 0
-            : field.type === "date"
-            ? ""
-            : field.type === "multi-select"
-            ? []
-            : "",
-      }),
-      {}
-    ),
-    dayWiseData: [
-      {
-        dayNumber: 1,
-        title: "",
-        description: "",
-        activities: [],
-        meals: "",
-        accommodation: "",
-        dayWiseImage: "",
-      },
-    ],
-    // Add tripImage field
-    tripImage: "",
+  // Helper function to format date for form input
+  const formatDateForFormInput = (date: Date | string | null | undefined) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
   };
 
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  // Initialize form with proper defaultValues
+  const defaultValues = initialData
+    ? {
+        tripName: initialData.title || "",
+        destination: initialData.destination || "",
+        country: initialData.country || "",
+        state: initialData.state || "",
+        city: initialData.city || "",
+        price: initialData.price || 0,
+        maxLimit: initialData.maxParticipants || 0,
+        minLimit: initialData.minParticipants || 0,
+        description: initialData.description || "",
+        startDate: formatDateForFormInput(initialData.startDate),
+        endDate: formatDateForFormInput(initialData.endDate),
+        filters: initialData.filters || [],
+        languages: initialData.languages || [],
+        includedActivities: initialData.includedActivities || [],
+        restrictions: initialData.restrictions || [],
+        tripImage: initialData.tripImage || "",
+        dayWiseData:
+          initialData.dayWiseData?.length > 0
+            ? initialData.dayWiseData
+            : [
+                {
+                  dayNumber: 1,
+                  title: "",
+                  description: "",
+                  activities: [],
+                  meals: "",
+                  accommodation: "",
+                  dayWiseImage: "",
+                },
+              ],
+      }
+    : {
+        ...FormData.reduce(
+          (acc, field) => ({
+            ...acc,
+            [field.id]:
+              field.type === "number"
+                ? 0
+                : field.type === "date"
+                ? ""
+                : field.type === "multi-select"
+                ? []
+                : "",
+          }),
+          {}
+        ),
+        dayWiseData: [
+          {
+            dayNumber: 1,
+            title: "",
+            description: "",
+            activities: [],
+            meals: "",
+            accommodation: "",
+            dayWiseImage: "",
+          },
+        ],
+        // Add tripImage field
+        tripImage: "",
+      };
+
+  const form = useForm({
+    resolver: undefined, // We'll handle validation manually
     defaultValues,
+    mode: "onChange", // Enable real-time validation feedback
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -259,8 +304,14 @@ export const CreateDestinationForm = ({
     </CldUploadWidget>
   );
 
+  // Dynamic validation function
+  const validateFormData = (data: Partial<FormDataType>, isDraft: boolean) => {
+    const validationSchema = getValidationSchema(isDraft);
+    return validationSchema.safeParse(data);
+  };
+
   const onSubmit = async (
-    data: z.infer<typeof schema>,
+    data: Partial<FormDataType>,
     isDraft: boolean = false
   ) => {
     // Log the raw form data to check what we're working with
@@ -271,16 +322,29 @@ export const CreateDestinationForm = ({
     );
     console.log("Saving as draft:", isDraft);
 
+    // Perform dynamic validation
+    const validationResult = validateFormData(data, isDraft);
+
+    if (!validationResult.success) {
+      console.error("Validation failed:", validationResult.error);
+      // If it's not a draft, show validation errors
+      if (!isDraft) {
+        // The form will handle showing the validation errors
+        return;
+      }
+      // For drafts, we continue even with validation errors
+    }
+
     try {
-      const start = new Date(data.startDate);
-      const end = new Date(data.endDate);
+      const start = new Date(data.startDate || '');
+      const end = new Date(data.endDate || '');
       const noOfDays =
         Math.ceil(
           Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
         ) + 1;
 
       // Process dayWiseData to ensure all fields are properly formatted
-      const processedDayWiseData = data.dayWiseData.map(
+      const processedDayWiseData = (data.dayWiseData || []).map(
         (
           day: {
             title?: string;
@@ -304,7 +368,7 @@ export const CreateDestinationForm = ({
       console.log("whole travel plan: ", data);
       console.log("Submitting day-wise data:", processedDayWiseData);
 
-      const statusToSend = isDraft ? "DRAFT" : "INACTIVE";
+      const statusToSend: "DRAFT" | "INACTIVE" = isDraft ? "DRAFT" : "INACTIVE";
       console.log(
         "🔍 DEBUG: isDraft =",
         isDraft,
@@ -312,36 +376,82 @@ export const CreateDestinationForm = ({
         statusToSend
       );
 
-      const result = await createTravelPlan({
-        title: data.tripName,
-        description: data.description,
-        destination: data.destination,
+      const tripData = {
+        title: data.tripName || "",
+        description: data.description || "",
+        destination: data.destination || "",
         includedActivities: data.includedActivities || [],
         restrictions: data.restrictions || [],
         noOfDays,
-        price: data.price,
+        price: data.price || 0,
         startDate: start,
         endDate: end,
-        maxParticipants: data.maxLimit,
-        country: data.country,
-        state: data.state,
-        city: data.city,
+        maxParticipants: data.maxLimit || 0,
+        country: data.country || "",
+        state: data.state || "",
+        city: data.city || "",
         languages: data.languages || [],
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
         status: statusToSend,
-      });
+      };
+
+      let result;
+      if (isEditMode && initialData?.travelPlanId) {
+        result = await updateTravelPlan(initialData.travelPlanId, tripData);
+      } else {
+        result = await createTravelPlan(tripData);
+      }
 
       if (result?.error) {
-        console.error("Failed to create travel plan:", result.error);
+        console.error(
+          `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
+          result.error
+        );
       } else {
-        console.log("🔍 DEBUG RESULT: Travel plan creation result:", result);
+        console.log(
+          `🔍 DEBUG RESULT: Travel plan ${
+            isEditMode ? "update" : "creation"
+          } result:`,
+          result
+        );
         router.push("/dashboard/host");
       }
     } catch (err) {
       console.error("Unexpected error:", err);
     }
+  };
+
+  // Handle draft submission - minimal validation
+  const handleDraftSubmit = async () => {
+    const formData = form.getValues();
+    await onSubmit(formData, true);
+  };
+
+  // Handle full submission - complete validation
+  const handleFullSubmit = async () => {
+    const formData = form.getValues();
+
+    // Validate with full schema
+    const validationResult = validateFormData(formData, false);
+
+    if (!validationResult.success) {
+      // Set form errors for display
+      const errors = validationResult.error.flatten().fieldErrors;
+      Object.keys(errors).forEach((field) => {
+        const errorMessage = errors[field as keyof typeof errors];
+        if (errorMessage && errorMessage[0]) {
+          form.setError(field as keyof FormDataType, {
+            type: "manual",
+            message: errorMessage[0],
+          });
+        }
+      });
+      return; // Don't submit if validation fails
+    }
+
+    await onSubmit(formData, false);
   };
 
   const formatDateForInput = (date: Date | string | number | undefined) => {
@@ -417,14 +527,17 @@ export const CreateDestinationForm = ({
             <div className="space-y-2">
               <div className="inline-flex items-center px-6 py-2 bg-purple-100 rounded-full mb-4">
                 <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase font-instrument">
-                  Create Experience
+                  {isEditMode ? "Edit Experience" : "Create Experience"}
                 </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-bricolage leading-[1.05] tracking-tighter">
-                Hello, {session?.user?.name || "Host"}! Let&apos;s get started
+                Hello, {session?.user?.name || "Host"}!{" "}
+                {isEditMode ? "Let's update your trip" : "Let's get started"}
               </h1>
               <p className="text-lg text-gray-600 font-instrument mt-2">
-                Create your new travel experience and share it with the world
+                {isEditMode
+                  ? "Update your travel experience details"
+                  : "Create your new travel experience and share it with the world"}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -468,7 +581,10 @@ export const CreateDestinationForm = ({
           <div className="p-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit((data) => onSubmit(data, false))}
+                onSubmit={(e) => {
+                  e.preventDefault(); // Prevent default form submission
+                  handleFullSubmit(); // Use our custom validation
+                }}
                 className="space-y-6"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -481,7 +597,7 @@ export const CreateDestinationForm = ({
                           <FormField
                             key={data.id}
                             control={form.control}
-                            name={data.id}
+                            name={data.id as keyof FormDataType}
                             render={({ field }) => (
                               <FormItem className={data.className}>
                                 <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
@@ -508,7 +624,7 @@ export const CreateDestinationForm = ({
                           <FormField
                             key={data.id}
                             control={form.control}
-                            name={data.id}
+                            name={data.id as keyof FormDataType}
                             render={({ field }) => (
                               <FormItem className={data.className}>
                                 <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
@@ -541,7 +657,7 @@ export const CreateDestinationForm = ({
                           <FormField
                             key={data.id}
                             control={form.control}
-                            name={data.id}
+                            name={data.id as keyof FormDataType}
                             render={({ field }) => (
                               <FormItem
                                 className={`${data.className} md:col-span-2`}
@@ -595,7 +711,7 @@ export const CreateDestinationForm = ({
                           <FormField
                             key={data.id}
                             control={form.control}
-                            name={data.id}
+                            name={data.id as keyof FormDataType}
                             render={({ field }) => (
                               <FormItem className={data.className}>
                                 <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
@@ -1110,9 +1226,7 @@ export const CreateDestinationForm = ({
                     {currentStep === 3 && (
                       <Button
                         type="button"
-                        onClick={() =>
-                          form.handleSubmit((data) => onSubmit(data, true))()
-                        }
+                        onClick={handleDraftSubmit}
                         variant="outline"
                         className="px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
                       >
@@ -1132,7 +1246,7 @@ export const CreateDestinationForm = ({
                           <polyline points="17 21 17 13 7 13 7 21" />
                           <polyline points="7 3 7 8 15 8" />
                         </svg>
-                        Save as Draft
+                        {isEditMode ? "Update as Draft" : "Save as Draft"}
                       </Button>
                     )}
 
@@ -1147,10 +1261,13 @@ export const CreateDestinationForm = ({
                       </Button>
                     ) : (
                       <Button
-                        type="submit"
+                        type="button"
+                        onClick={handleFullSubmit}
                         className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
                       >
-                        Create Travel Experience
+                        {isEditMode
+                          ? "Update Travel Experience"
+                          : "Create Travel Experience"}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"

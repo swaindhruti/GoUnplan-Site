@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDateRange } from "./common/utils";
 import Image from "next/image";
+import { TripDetailsModal } from "./TripDetailsModal";
 import {
   Plus,
   Map,
@@ -29,7 +30,19 @@ type TripSectionProps = {
 
 export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+
+  const openTripModal = (trip: Trip) => {
+    setSelectedTrip(trip);
+    setIsModalOpen(true);
+  };
+
+  const closeTripModal = () => {
+    setSelectedTrip(null);
+    setIsModalOpen(false);
+  };
 
   const filteredTrips = useMemo(() => {
     if (statusFilter === "all") return trips;
@@ -406,7 +419,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                           <button
                             onClick={() =>
                               router.push(
-                                `/dashboard/host/edit/${trip.travelPlanId}?complete=true`
+                                `/dashboard/host/create-new-task?tripId=${trip.travelPlanId}&complete=true`
                               )
                             }
                             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
@@ -418,7 +431,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                         <button
                           onClick={() =>
                             router.push(
-                              `/dashboard/host/edit/${trip.travelPlanId}`
+                              `/dashboard/host/create-new-task?tripId=${trip.travelPlanId}`
                             )
                           }
                           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
@@ -427,9 +440,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                           Edit Trip
                         </button>
                         <button
-                          onClick={() =>
-                            router.push(`/trips/${trip.travelPlanId}`)
-                          }
+                          onClick={() => openTripModal(trip)}
                           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
                         >
                           <Eye className="h-4 w-4" />
@@ -471,6 +482,13 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
           )}
         </div>
       </div>
+
+      {/* Trip Details Modal */}
+      <TripDetailsModal
+        trip={selectedTrip}
+        isOpen={isModalOpen}
+        onClose={closeTripModal}
+      />
     </div>
   );
 };

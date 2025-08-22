@@ -18,10 +18,11 @@ export type RevenueAnalytics = {
     cancellationRate: number;
   };
   monthlyTrend: Array<{
-    status: string;
-    _sum: {
-      totalPrice: number;
-    };
+    month: string;
+    year: number;
+    monthNum: number;
+    revenue: number;
+    bookingCount: number;
   }>;
 };
 
@@ -43,6 +44,15 @@ export type Trip = {
   averageRating?: number;
   filters?: string[];
   languages?: string[];
+  dayWiseData?: Array<{
+    dayNumber: number;
+    title: string;
+    description: string;
+    activities: string[];
+    meals: string;
+    accommodation: string;
+    dayWiseImage: string;
+  }>;
 };
 
 export type HostData = {
