@@ -171,30 +171,51 @@ export const getAllHosts = async () => {
   }
 };
 
-export const getTotalRevenue = async () => {
+export const getTotalRevenue = async (
+  startDate?: string,
+  endDate?: string,
+  totalrevenue?: boolean
+) => {
   try {
+    const dateFilter =
+      !totalrevenue && startDate && endDate
+        ? {
+            createdAt: {
+              gte: new Date(startDate + "T00:00:00.000Z"), // Start of the start date
+              lte: new Date(endDate + "T23:59:59.999Z") // End of the end date
+            }
+          }
+        : {};
+
+    console.log("DAte:", dateFilter);
+
     const totalSales = await prisma.booking.aggregate({
-      where: { status: "CONFIRMED" },
+      where: {
+        status: "CONFIRMED",
+        ...dateFilter
+      },
       _sum: { totalPrice: true },
       _count: { id: true }
     });
 
     const refundAmount = await prisma.booking.aggregate({
-      where: { status: "CANCELLED" },
+      where: {
+        status: { in: ["CANCELLED", "REFUNDED"] },
+        ...dateFilter
+      },
       _sum: { refundAmount: true },
       _count: { id: true }
     });
-
+    console.log("totalSales", totalSales);
     return {
       totalSales,
       refundAmount
     };
   } catch (error) {
-    console.error("Error fetching total sales:", error);
-    return { error: "Failed to fetch sales data" };
+    console.error("Error fetching total revenue:", error);
+    return { error: "Failed to fetch revenue data" };
   }
 };
-
 export const getAllBookings = async (statusFilter?: string) => {
   const session = await requireAdmin();
   if (!session) return { error: "Unauthorized" };
@@ -202,7 +223,7 @@ export const getAllBookings = async (statusFilter?: string) => {
   try {
     // Build where clause for bookings
     const whereClause: Prisma.BookingWhereInput = {};
-    
+
     // Add status filter if provided
     if (statusFilter && statusFilter !== "ALL") {
       whereClause.status = statusFilter as BookingStatus;
@@ -400,5 +421,579 @@ export const getTravelPlanDetails = async (travelPlanId: string) => {
   } catch (error) {
     console.error("Error fetching travel plan details:", error);
     return { error: "Failed to fetch travel plan details" };
+  }
+};
+
+export const getTransactionsByDateRange = async (
+  startDate?: string,
+  endDate?: string
+) => {
+  try {
+    const dateFilter =
+      startDate && endDate
+        ? {
+            createdAt: {
+              gte: new Date(startDate + "T00:00:00.000Z"),
+              lte: new Date(endDate + "T23:59:59.999Z")
+            }
+          }
+        : {};
+
+    const salesTransactions = await prisma.booking.findMany({
+      where: {
+        status: "CONFIRMED",
+        ...dateFilter
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            image: true
+          }
+        },
+        travelPlan: {
+          select: {
+            travelPlanId: true,
+            title: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+            tripImage: true,
+            host: {
+              select: {
+                hostId: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        guests: true
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    const refundTransactions = await prisma.booking.findMany({
+      where: {
+        status: { in: ["CANCELLED", "REFUNDED"] },
+        ...dateFilter
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            image: true
+          }
+        },
+        travelPlan: {
+          select: {
+            travelPlanId: true,
+            title: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+            tripImage: true,
+            host: {
+              select: {
+                hostId: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        guests: true
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    const salesData = salesTransactions.map((booking) => ({
+      id: `sale-${booking.id}`,
+      bookingId: booking.id,
+      userId: booking.userId,
+      travelPlanId: booking.travelPlanId,
+      amount: booking.totalPrice,
+      type: "SALE" as const,
+      status: booking.status,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt,
+      user: {
+        name: booking.user.name || "Unknown",
+        email: booking.user.email,
+        phone: booking.user.phone
+      },
+      travelPlan: {
+        title: booking.travelPlan.title,
+        destination: booking.travelPlan.destination || "Unknown",
+        host: {
+          name: booking.travelPlan.host.user.name || "Unknown Host"
+        }
+      },
+      participants: booking.participants,
+      specialRequirements: booking.specialRequirements,
+      pricePerPerson: booking.pricePerPerson
+    }));
+
+    const refundData = refundTransactions.map((booking) => ({
+      id: `refund-${booking.id}`,
+      bookingId: booking.id,
+      userId: booking.userId,
+      travelPlanId: booking.travelPlanId,
+      amount: booking.refundAmount || booking.totalPrice,
+      type: "REFUND" as const,
+      status: booking.status,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt,
+      user: {
+        name: booking.user.name || "Unknown",
+        email: booking.user.email,
+        phone: booking.user.phone
+      },
+      travelPlan: {
+        title: booking.travelPlan.title,
+        destination: booking.travelPlan.destination || "Unknown",
+        host: {
+          name: booking.travelPlan.host.user.name || "Unknown Host"
+        }
+      },
+      participants: booking.participants,
+      refundAmount: booking.refundAmount || booking.totalPrice,
+      specialRequirements: booking.specialRequirements,
+      pricePerPerson: booking.pricePerPerson
+    }));
+
+    const allTransactions = [...salesData, ...refundData].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      success: true,
+      transactions: allTransactions,
+      summary: {
+        totalSales: salesData.reduce((sum, t) => sum + t.amount, 0),
+        totalRefunds: refundData.reduce((sum, t) => sum + t.amount, 0),
+        salesCount: salesData.length,
+        refundsCount: refundData.length,
+        netRevenue:
+          salesData.reduce((sum, t) => sum + t.amount, 0) -
+          refundData.reduce((sum, t) => sum + t.amount, 0)
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return {
+      success: false,
+      error: "Failed to fetch transaction data",
+      transactions: [],
+      summary: {
+        totalSales: 0,
+        totalRefunds: 0,
+        salesCount: 0,
+        refundsCount: 0,
+        netRevenue: 0
+      }
+    };
+  }
+};
+
+export const getAnalyticsData = async (
+  startDate?: string,
+  endDate?: string
+) => {
+  try {
+    const dateFilter =
+      startDate && endDate
+        ? {
+            createdAt: {
+              gte: new Date(startDate + "T00:00:00.000Z"),
+              lte: new Date(endDate + "T23:59:59.999Z")
+            }
+          }
+        : {};
+
+    // Get all bookings for the period
+    const allBookings = await prisma.booking.findMany({
+      where: dateFilter,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        travelPlan: {
+          select: {
+            title: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+            host: {
+              select: {
+                user: {
+                  select: {
+                    name: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    // Monthly Revenue Data
+    const monthlyData = new Map();
+
+    allBookings.forEach((booking) => {
+      const monthKey = new Date(booking.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short"
+      });
+
+      if (!monthlyData.has(monthKey)) {
+        monthlyData.set(monthKey, {
+          month: monthKey,
+          sales: 0,
+          refunds: 0,
+          netRevenue: 0
+        });
+      }
+
+      const monthStats = monthlyData.get(monthKey);
+
+      if (booking.status === "CONFIRMED") {
+        monthStats.sales += booking.totalPrice;
+      } else if (
+        booking.status === "CANCELLED" ||
+        booking.status === "REFUNDED"
+      ) {
+        monthStats.refunds += booking.refundAmount || booking.totalPrice;
+      }
+
+      monthStats.netRevenue = monthStats.sales - monthStats.refunds;
+    });
+
+    const monthlyRevenue = Array.from(monthlyData.values()).sort(
+      (a, b) =>
+        new Date(a.month + " 1").getTime() - new Date(b.month + " 1").getTime()
+    );
+
+    // Status Distribution
+    const statusCounts = {
+      CONFIRMED: 0,
+      CANCELLED: 0,
+      REFUNDED: 0,
+      PENDING: 0
+    };
+
+    allBookings.forEach((booking) => {
+      statusCounts[booking.status]++;
+    });
+
+    const totalBookings = allBookings.length;
+    const statusDistribution = [
+      {
+        name: "Confirmed",
+        value:
+          totalBookings > 0
+            ? Math.round((statusCounts.CONFIRMED / totalBookings) * 100)
+            : 0,
+        color: "#10B981",
+        count: statusCounts.CONFIRMED
+      },
+      {
+        name: "Cancelled",
+        value:
+          totalBookings > 0
+            ? Math.round((statusCounts.CANCELLED / totalBookings) * 100)
+            : 0,
+        color: "#EF4444",
+        count: statusCounts.CANCELLED
+      },
+      {
+        name: "Refunded",
+        value:
+          totalBookings > 0
+            ? Math.round((statusCounts.REFUNDED / totalBookings) * 100)
+            : 0,
+        color: "#F59E0B",
+        count: statusCounts.REFUNDED
+      },
+      {
+        name: "Pending",
+        value:
+          totalBookings > 0
+            ? Math.round((statusCounts.PENDING / totalBookings) * 100)
+            : 0,
+        color: "#6B7280",
+        count: statusCounts.PENDING
+      }
+    ];
+
+    // Daily Transactions for Last 30 Days
+    const last30Days = [];
+    const now = endDate ? new Date(endDate) : new Date();
+
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split("T")[0];
+
+      const dayBookings = allBookings.filter(
+        (booking) => booking.createdAt.toISOString().split("T")[0] === dateStr
+      );
+
+      const dayRevenue = dayBookings
+        .filter((b) => b.status === "CONFIRMED")
+        .reduce((sum, b) => sum + b.totalPrice, 0);
+
+      last30Days.push({
+        date: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric"
+        }),
+        transactions: dayBookings.length,
+        revenue: dayRevenue
+      });
+    }
+
+    // Top Destinations
+    const destinationData = new Map();
+
+    allBookings
+      .filter((b) => b.status === "CONFIRMED")
+      .forEach((booking) => {
+        const dest = booking.travelPlan.destination || "Unknown";
+
+        if (!destinationData.has(dest)) {
+          destinationData.set(dest, {
+            destination: dest,
+            bookings: 0,
+            revenue: 0
+          });
+        }
+
+        const destStats = destinationData.get(dest);
+        destStats.bookings++;
+        destStats.revenue += booking.totalPrice;
+      });
+
+    const topDestinations = Array.from(destinationData.values())
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10);
+
+    // Revenue by Travel Plan (as proxy for travel type)
+    const travelPlanRevenue = new Map();
+
+    allBookings
+      .filter((b) => b.status === "CONFIRMED")
+      .forEach((booking) => {
+        const planTitle = booking.travelPlan.title;
+
+        if (!travelPlanRevenue.has(planTitle)) {
+          travelPlanRevenue.set(planTitle, {
+            type: planTitle,
+            amount: 0,
+            bookings: 0
+          });
+        }
+
+        const planStats = travelPlanRevenue.get(planTitle);
+        planStats.amount += booking.totalPrice;
+        planStats.bookings++;
+      });
+
+    const revenueByType = Array.from(travelPlanRevenue.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 8); // Top 8 travel plans
+
+    // Calculate summary statistics
+    const confirmedBookings = allBookings.filter(
+      (b) => b.status === "CONFIRMED"
+    );
+    const refundedBookings = allBookings.filter(
+      (b) => b.status === "CANCELLED" || b.status === "REFUNDED"
+    );
+
+    const totalSales = confirmedBookings.reduce(
+      (sum, b) => sum + b.totalPrice,
+      0
+    );
+    const totalRefunds = refundedBookings.reduce(
+      (sum, b) => sum + (b.refundAmount || b.totalPrice),
+      0
+    );
+
+    // Growth calculations (compare with previous period)
+    const periodDays =
+      startDate && endDate
+        ? Math.ceil(
+            (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        : 30;
+
+    const previousPeriodStart = new Date();
+    const previousPeriodEnd = new Date();
+
+    if (startDate && endDate) {
+      previousPeriodEnd.setTime(new Date(startDate).getTime() - 1);
+      previousPeriodStart.setTime(
+        previousPeriodEnd.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
+    } else {
+      previousPeriodStart.setDate(previousPeriodStart.getDate() - 60);
+      previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 30);
+    }
+
+    const previousBookings = await prisma.booking.findMany({
+      where: {
+        createdAt: {
+          gte: previousPeriodStart,
+          lte: previousPeriodEnd
+        }
+      }
+    });
+
+    const prevConfirmedBookings = previousBookings.filter(
+      (b) => b.status === "CONFIRMED"
+    );
+    const prevTotalSales = prevConfirmedBookings.reduce(
+      (sum, b) => sum + b.totalPrice,
+      0
+    );
+    const prevRefundedBookings = previousBookings.filter(
+      (b) => b.status === "CANCELLED" || b.status === "REFUNDED"
+    );
+    /*   const prevTotalRefunds = prevRefundedBookings.reduce(
+      (sum, b) => sum + (b.refundAmount || b.totalPrice),
+      0
+    ); */
+
+    const revenueGrowth =
+      prevTotalSales > 0
+        ? ((totalSales - prevTotalSales) / prevTotalSales) * 100
+        : 0;
+    const transactionGrowth =
+      previousBookings.length > 0
+        ? ((allBookings.length - previousBookings.length) /
+            previousBookings.length) *
+          100
+        : 0;
+    const avgOrderValueGrowth =
+      prevConfirmedBookings.length > 0
+        ? ((totalSales / confirmedBookings.length -
+            prevTotalSales / prevConfirmedBookings.length) /
+            (prevTotalSales / prevConfirmedBookings.length)) *
+          100
+        : 0;
+    const refundRateChange =
+      previousBookings.length > 0
+        ? (refundedBookings.length / allBookings.length -
+            prevRefundedBookings.length / previousBookings.length) *
+          100
+        : 0;
+    console.log("Revenue Growth:", topDestinations);
+    return {
+      success: true,
+      data: {
+        monthlyRevenue,
+        statusDistribution,
+        dailyTransactions: last30Days,
+        topDestinations,
+        revenueByType,
+        summary: {
+          totalSales,
+          totalRefunds,
+          netRevenue: totalSales - totalRefunds,
+          totalTransactions: allBookings.length,
+          confirmedBookings: confirmedBookings.length,
+          refundedBookings: refundedBookings.length,
+          avgOrderValue:
+            confirmedBookings.length > 0
+              ? totalSales / confirmedBookings.length
+              : 0,
+          refundRate:
+            allBookings.length > 0
+              ? (refundedBookings.length / allBookings.length) * 100
+              : 0
+        },
+        growth: {
+          revenue: revenueGrowth,
+          transactions: transactionGrowth,
+          avgOrderValue: avgOrderValueGrowth,
+          refundRate: refundRateChange
+        },
+        period: {
+          startDate:
+            startDate ||
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+          endDate: endDate || new Date().toISOString().split("T")[0],
+          totalDays: periodDays
+        }
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching analytics data:", error);
+    return {
+      success: false,
+      error: "Failed to fetch analytics data",
+      data: {
+        monthlyRevenue: [],
+        statusDistribution: [],
+        dailyTransactions: [],
+        topDestinations: [],
+        revenueByType: [],
+        summary: {
+          totalSales: 0,
+          totalRefunds: 0,
+          netRevenue: 0,
+          totalTransactions: 0,
+          confirmedBookings: 0,
+          refundedBookings: 0,
+          avgOrderValue: 0,
+          refundRate: 0
+        },
+        growth: {
+          revenue: 0,
+          transactions: 0,
+          avgOrderValue: 0,
+          refundRate: 0
+        },
+        period: {
+          startDate: startDate || new Date().toISOString().split("T")[0],
+          endDate: endDate || new Date().toISOString().split("T")[0],
+          totalDays: 0
+        }
+      }
+    };
   }
 };

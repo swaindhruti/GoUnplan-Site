@@ -142,6 +142,8 @@ export default function Header() {
         href: "/dashboard/user",
         icon: User
       });
+    }
+    if (userRole === "HOST") {
       items.push({
         label: "Host Dashboard",
         href: "/dashboard/host",
@@ -246,7 +248,7 @@ export default function Header() {
   useEffect(() => {
     setIsHostMode(pathname.startsWith("/dashboard/host"));
     setIsAdminMode(pathname.startsWith("/dashboard/admin"));
-    
+
     // Force session refresh when navigating to host dashboard
     // This ensures the UI updates immediately when user becomes a host
     if (pathname.startsWith("/dashboard/host") && status === "authenticated") {
