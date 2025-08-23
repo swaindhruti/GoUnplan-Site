@@ -28,7 +28,7 @@ import {
   XCircle,
   Mail,
   Phone,
-  MessageSquare
+  EyeIcon
 } from "lucide-react";
 import {
   getAllUsers,
@@ -45,6 +45,15 @@ import {
 import { markBookingAsRefunded } from "@/actions/booking/actions";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
+import RevenueReport from "@/components/dashboard/RevenueReport";
+import RevenueAnalytics from "@/components/dashboard/RevenueAnalytics";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 
 // Define interfaces for your data types
 interface User {
@@ -159,10 +168,12 @@ interface RevenueData {
 export default function AdminDashboard() {
   // State for all data
   const [users, setUsers] = useState<User[]>([]);
+  const [analyticsModal, setAnalyticsModal] = useState(false);
   const [hosts, setHosts] = useState<Host[]>([]);
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [travelPlans, setTravelPlans] = useState<TravelPlan[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [revenueReportModal, setRevenueReportModal] = useState(false);
   const [bookingCounts, setBookingCounts] = useState<BookingCounts>({
     ALL: 0,
     PENDING: 0,
@@ -174,8 +185,16 @@ export default function AdminDashboard() {
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
     refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
   });
+
+  const [totalRevenue, setTotalRevenue] = useState<RevenueData>({
+    totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedHost, setSelectedHost] = useState<Host>();
+  const [open, setOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState("users");
   const [userFilter, setUserFilter] = useState<
     "all" | "users" | "hosts" | "admins"
@@ -189,6 +208,22 @@ export default function AdminDashboard() {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleRevenueReportButton = () => {
+    if (analyticsModal === true) setAnalyticsModal(false);
+
+    setRevenueReportModal(true);
+  };
+
+  const handleBackRevenueModal = () => {
+    setRevenueReportModal(false);
+  };
+
+  const [dateRange, setDateRange] = useState({
+    startDate: "",
+    endDate: ""
+  });
+  const [isDateFilterActive, setIsDateFilterActive] = useState(false);
+
   // State for dashboard stats
   const [statsData, setStatsData] = useState({
     totalUsers: 0,
@@ -198,6 +233,65 @@ export default function AdminDashboard() {
     totalSales: 0,
     pendingRefunds: 0
   });
+
+  // NEW: Set default dates (last 30 days)
+  useEffect(() => {
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+
+    setDateRange({
+      startDate: thirtyDaysAgo.toISOString().split("T")[0],
+      endDate: today.toISOString().split("T")[0]
+    });
+  }, []);
+  const handleAnalyticsModal = () => {
+    if (revenueReportModal === true) setRevenueReportModal(false);
+    setAnalyticsModal(true);
+  };
+  const handleCloseAnalyticsModal = () => setAnalyticsModal(false);
+
+  const fetchRevenueData = async (startDate?: string, endDate?: string) => {
+    try {
+      const revenueResponse = await getTotalRevenue(startDate, endDate, false);
+      if (revenueResponse.error) {
+        setError(revenueResponse.error);
+        return;
+      }
+      setRevenue(revenueResponse as RevenueData);
+
+      setStatsData((prev) => ({
+        ...prev,
+        totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
+        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
+      }));
+    } catch (err) {
+      setError("Failed to fetch revenue data");
+      console.error(err);
+    }
+  };
+
+  // NEW: Handle date change
+  const handleDateChange = (field: "startDate" | "endDate", value: string) => {
+    const newDateRange = { ...dateRange, [field]: value };
+    setDateRange(newDateRange);
+
+    // Only fetch data if both dates are selected and we're on revenue tab
+    if (
+      newDateRange.startDate &&
+      newDateRange.endDate &&
+      activeTab === "revenue"
+    ) {
+      setIsDateFilterActive(true);
+      fetchRevenueData(newDateRange.startDate, newDateRange.endDate);
+    }
+  };
+
+  // NEW: Reset date filter
+  const resetDateFilter = () => {
+    setIsDateFilterActive(false);
+    fetchRevenueData();
+  };
 
   // Fetch data on component mount
   useEffect(() => {
@@ -228,7 +322,6 @@ export default function AdminDashboard() {
         }
         setApplicants(applicantsResponse.hostApplicants || []);
 
-        // Fetch travel plans
         const travelPlansResponse = await getAlltravelPlanApplications();
         if (travelPlansResponse.error) {
           setError(travelPlansResponse.error);
@@ -236,7 +329,6 @@ export default function AdminDashboard() {
         }
         setTravelPlans(travelPlansResponse.travelPlans || []);
 
-        // Fetch bookings
         const bookingsResponse = await getAllBookings();
         if (bookingsResponse.error) {
           setError(bookingsResponse.error);
@@ -254,14 +346,15 @@ export default function AdminDashboard() {
             }
           );
         }
+        await fetchRevenueData();
 
-        // Fetch revenue data
+        // Fetch revenue data (without date filter initially)
         const revenueResponse = await getTotalRevenue();
         if (revenueResponse.error) {
-          setError(revenueResponse.error);
-          return;
+          console.error(revenueResponse.error);
+        } else {
+          setTotalRevenue(revenueResponse as RevenueData);
         }
-        setRevenue(revenueResponse as RevenueData);
 
         // Update stats
         setStatsData({
@@ -270,11 +363,9 @@ export default function AdminDashboard() {
           hostApplicants:
             (applicantsResponse.hostApplicants?.length || 0) +
             (travelPlansResponse.travelPlans?.length || 0),
-          totalBookings:
-            (revenueResponse.totalSales?._count?.id || 0) +
-            (revenueResponse.refundAmount?._count?.id || 0),
-          totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-          pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
+          totalBookings: bookingsResponse.counts?.ALL || 0,
+          totalSales: totalRevenue.totalSales._sum.totalPrice || 0, // This will be updated by fetchRevenueData
+          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0 // This will be updated by fetchRevenueData
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -285,9 +376,11 @@ export default function AdminDashboard() {
     };
 
     fetchAdminData();
-  }, []);
+  }, [
+    totalRevenue.refundAmount._sum.refundAmount,
+    totalRevenue.totalSales._sum.totalPrice
+  ]);
 
-  // Handlers for actions
   const handleApproveHost = async (email: string) => {
     try {
       const response = await approveHostApplication(email);
@@ -296,16 +389,12 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Remove from applicants and add to hosts
       setApplicants(applicants.filter((app) => app.email !== email));
-
-      // Refetch hosts to get updated data
       const hostsResponse = await getAllHosts();
       if (hostsResponse.hosts) {
         setHosts(hostsResponse.hosts);
       }
 
-      // Update stats
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
@@ -324,11 +413,7 @@ export default function AdminDashboard() {
         setError(response.error);
         return;
       }
-
-      // Remove from applicants
       setApplicants(applicants.filter((app) => app.email !== email));
-
-      // Update stats
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1
@@ -346,14 +431,10 @@ export default function AdminDashboard() {
         setError(response.error);
         return;
       }
-
-      // Update users list
       const updatedUsers = users.map((user) =>
         user.email === email ? { ...user, role } : user
       );
       setUsers(updatedUsers);
-
-      // Refetch hosts if needed
       if (role === "HOST") {
         const hostsResponse = await getAllHosts();
         if (hostsResponse.hosts) {
@@ -373,8 +454,6 @@ export default function AdminDashboard() {
         setError(response.error);
         return;
       }
-
-      // Remove from travel plans
       setTravelPlans(
         travelPlans.filter((plan) => plan.travelPlanId !== travelPlanId)
       );
@@ -398,7 +477,6 @@ export default function AdminDashboard() {
     try {
       const result = await markBookingAsRefunded(bookingId);
       if (result.success) {
-        // Update local state
         setBookings(
           bookings.map((booking) =>
             booking.id === bookingId
@@ -406,8 +484,6 @@ export default function AdminDashboard() {
               : booking
           )
         );
-
-        // Update booking counts
         setBookingCounts((prev) => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
@@ -421,13 +497,38 @@ export default function AdminDashboard() {
       console.error(err);
     }
   };
-
-  // Format date helper function
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString();
   };
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+  const formatDateRange = () => {
+    if (!dateRange.startDate || !dateRange.endDate) return "";
 
-  // Filter users based on selected filter
+    const start = new Date(dateRange.startDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+    const end = new Date(dateRange.endDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+    return `${start} - ${end}`;
+  };
+  const getNetRevenue = () => {
+    const totalSales = revenue.totalSales._sum.totalPrice || 0;
+    const totalRefunds = revenue.refundAmount._sum.refundAmount || 0;
+    return totalSales - totalRefunds;
+  };
   const filteredUsers = users.filter((user) => {
     if (userFilter === "all") return true;
     if (userFilter === "users") return user.role === "USER";
@@ -435,8 +536,6 @@ export default function AdminDashboard() {
     if (userFilter === "admins") return user.role === "ADMIN";
     return true;
   });
-
-  // Define tabs with sophisticated styling and descriptions
   const tabs = [
     {
       id: "users",
@@ -462,12 +561,7 @@ export default function AdminDashboard() {
       icon: <BarChart3 className="w-5 h-5" />,
       description: "Financial Analytics"
     },
-    {
-      id: "messages",
-      label: "MESSAGES",
-      icon: <MessageSquare className="w-5 h-5" />,
-      description: "Communication"
-    },
+
     {
       id: "bookings",
       label: "BOOKINGS",
@@ -504,7 +598,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 mt-16">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between">
@@ -529,11 +622,9 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-
-      {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-2 overflow-x-auto py-4">
+          <div className="flex flex-col md:flex-row justify-center space-x-2 overflow-x-auto py-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -556,12 +647,8 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-12">
-          {/* Total Users Card */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-purple-50 rounded-full">
@@ -656,7 +743,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           {activeTab === "users" && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col md:flex-row overflow-x-auto md:items-center justify-between mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                     User Management
@@ -665,14 +752,14 @@ export default function AdminDashboard() {
                     View all users and manage their roles
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row w-full md:items-center gap-4">
+                  <div className="flex w-full items-center gap-2">
                     <Filter className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-semibold text-gray-700">
                       Filter:
                     </span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col md:flex-row gap-2">
                     <button
                       onClick={() => setUserFilter("all")}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
@@ -899,7 +986,11 @@ export default function AdminDashboard() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
+                              onClick={() => {
+                                setSelectedHost(host as Host);
+                                setOpen(true);
+                              }}
+                              className="bg-purple-600 text-white hover:text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                             >
                               View Details
                             </Button>
@@ -919,6 +1010,70 @@ export default function AdminDashboard() {
                   </TableBody>
                 </Table>
               </div>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="max-w-md rounded-2xl p-6 shadow-lg">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-gray-900 font-bricolage">
+                      Host Details
+                    </DialogTitle>
+                    <DialogDescription className="text-sm text-gray-500 font-instrument">
+                      View complete information about this host
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  {selectedHost && (
+                    <div className="space-y-6 mt-4">
+                      {/* Avatar + Name */}
+                      <div className="flex items-center gap-4 border-b pb-4">
+                        <div className="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xl">
+                          {selectedHost.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900 font-instrument">
+                            {selectedHost.name}
+                          </h4>
+                          <p className="text-sm text-gray-500 font-instrument">
+                            Active Host
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-1">
+                          <p className="text-gray-500 font-medium">Email</p>
+                          <p className="text-gray-900 font-instrument">
+                            {selectedHost.email}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-gray-500 font-medium">Phone</p>
+                          <p className="text-gray-900 font-instrument">
+                            {selectedHost.phone}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-gray-500 font-medium">
+                            Created At
+                          </p>
+                          <p className="text-gray-900 font-instrument">
+                            {formatDate(selectedHost.createdAt)}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-gray-500 font-medium">Status</p>
+                          <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Active
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           )}
 
@@ -1207,17 +1362,64 @@ export default function AdminDashboard() {
 
           {activeTab === "revenue" && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between mb-6">
+              {/* Header with Date Selector */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                     Revenue Overview
                   </h3>
                   <p className="text-gray-600 font-instrument mt-1">
                     Monitor platform revenue and refunds
+                    {isDateFilterActive && formatDateRange() && (
+                      <span className="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {formatDateRange()}
+                      </span>
+                    )}
                   </p>
                 </div>
+
+                {/* Date Range Selector */}
+                <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <label className="text-sm font-medium text-gray-700">
+                      From:
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.startDate}
+                      onChange={(e) =>
+                        handleDateChange("startDate", e.target.value)
+                      }
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      To:
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.endDate}
+                      onChange={(e) =>
+                        handleDateChange("endDate", e.target.value)
+                      }
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  {isDateFilterActive && (
+                    <Button
+                      variant="outline"
+                      onClick={resetDateFilter}
+                      className="text-xs px-3 py-1 h-8"
+                    >
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
@@ -1228,13 +1430,14 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
-                    ${revenue.totalSales._sum.totalPrice || 0}
+                    {formatCurrency(revenue.totalSales._sum.totalPrice || 0)}
                   </div>
                   <p className="text-gray-600 text-sm font-instrument">
                     {revenue.totalSales._count.id || 0} confirmed bookings
                   </p>
                 </div>
 
+                {/* Refund Amounts */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
@@ -1245,16 +1448,36 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
-                    ${revenue.refundAmount._sum.refundAmount || 0}
+                    {formatCurrency(
+                      revenue.refundAmount._sum.refundAmount || 0
+                    )}
                   </div>
                   <p className="text-gray-600 text-sm font-instrument">
                     {revenue.refundAmount._count.id || 0} cancelled/refunded
                     bookings
                   </p>
                 </div>
+
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                      Net Revenue
+                    </h3>
+                    <div className="p-3 bg-blue-50 rounded-full">
+                      <BarChart3 className="h-5 w-5 text-blue-600" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
+                    {formatCurrency(getNetRevenue())}
+                  </div>
+                  <p className="text-gray-600 text-sm font-instrument">
+                    Total sales minus refunds
+                  </p>
+                </div>
               </div>
 
-              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              {/* Revenue Management Section */}
+              <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 font-bricolage">
                   Revenue Management
                 </h3>
@@ -1263,17 +1486,72 @@ export default function AdminDashboard() {
                   bookings and manage refunds. Use the booking management
                   section to handle any pending refund requests.
                 </p>
-
-                <div className="flex space-x-4">
-                  <Button className="bg-purple-600 text-white hover:bg-purple-700 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full">
-                    Download Revenue Report
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    onClick={handleRevenueReportButton}
+                    className="bg-purple-600 text-white hover:bg-purple-700 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full flex items-center gap-2"
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                    See Revenue Report
                   </Button>
                   <Button
+                    onClick={handleAnalyticsModal}
                     variant="outline"
-                    className="text-purple-600 border-purple-600 hover:bg-purple-50 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full"
+                    className="text-purple-600 border-purple-600 hover:bg-purple-50 font-instrument font-semibold transition-colors duration-200 px-8 py-3 rounded-full flex items-center gap-2"
                   >
+                    <BarChart3 className="h-4 w-4" />
                     View Detailed Analytics
                   </Button>
+                </div>
+              </div>
+
+              {/* Revenue Report Modal */}
+              {revenueReportModal && (
+                <RevenueReport
+                  dateRange={dateRange}
+                  onBack={handleBackRevenueModal}
+                />
+              )}
+
+              {analyticsModal && (
+                <RevenueAnalytics
+                  dateRange={dateRange}
+                  onClose={handleCloseAnalyticsModal}
+                />
+              )}
+
+              {/* Quick Stats */}
+              <div className="bg-gray-100 border-[1px] border-gray-400 rounded-2xl p-6 text-black">
+                <h4 className="text-lg font-semibold mb-4">Quick Insights</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <p className="opacity-90">Average Booking Value</p>
+                    <p className="text-xl font-bold">
+                      {formatCurrency(
+                        (revenue.totalSales._sum.totalPrice || 0) /
+                          (revenue.totalSales._count.id || 1)
+                      )}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="opacity-90">Refund Rate</p>
+                    <p className="text-xl font-bold">
+                      {(
+                        (revenue.refundAmount._count.id /
+                          (revenue.totalSales._count.id +
+                            revenue.refundAmount._count.id)) *
+                          100 || 0
+                      ).toFixed(1)}
+                      %
+                    </p>
+                  </div>
+                  <div>
+                    <p className="opacity-90">Total Transactions</p>
+                    <p className="text-xl font-bold">
+                      {(revenue.totalSales._count.id || 0) +
+                        (revenue.refundAmount._count.id || 0)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1281,7 +1559,7 @@ export default function AdminDashboard() {
 
           {activeTab === "bookings" && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
                     Booking Management
@@ -1290,14 +1568,14 @@ export default function AdminDashboard() {
                     View and manage all platform bookings
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Filter className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-semibold text-gray-700">
                       Filter:
                     </span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col md:flex-row gap-2">
                     {[
                       "ALL",
                       "CONFIRMED",
