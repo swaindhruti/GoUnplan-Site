@@ -37,10 +37,15 @@ export const getTripById = async (tripId: string, bookingId: string) => {
         pricePerPerson: true,
         refundAmount: true,
         formSubmitted: true,
+        minPaymentAmount: true,
         // travelPlan: true,
         guests: true,
         updatedAt: true,
-        createdAt: true
+        paymentStatus: true,
+        paymentDeadline: true,
+        createdAt: true,
+        amountPaid: true,
+        remainingAmount: true
       }
     });
 

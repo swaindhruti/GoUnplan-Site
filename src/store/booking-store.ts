@@ -113,7 +113,8 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         endDate: new Date(data.endDate!),
         participants: data.participants || 1,
         guests: data.guests,
-        specialRequirements: data.specialRequirements ?? undefined
+        specialRequirements: data.specialRequirements ?? undefined,
+        allowPartialPayment: true
       };
 
       console.log("Creating booking with complete data:", payload);

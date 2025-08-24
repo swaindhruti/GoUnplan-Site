@@ -10,7 +10,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  RotateCcw,
   Plane,
   ChevronRight,
   Eye,
@@ -38,8 +37,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { PaymentSt } from "@/types/booking";
 
-// Types based on the existing booking structure
 interface TravelPlan {
   travelPlanId: string;
   title: string;
@@ -65,6 +64,13 @@ interface Booking {
   createdAt: Date | string;
   updatedAt: Date | string;
   travelPlan: TravelPlan;
+  paymentStatus:
+    | "PARTIALLY_PAID"
+    | "FULLY_PAID"
+    | "OVERDUE"
+    | "CANCELLED"
+    | "PENDING"
+    | "REFUNDED";
 }
 
 interface User {
@@ -78,20 +84,32 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type FilterStatus = "ALL" | BookingStatus;
+type FilterStatus = "ALL" | PaymentSt;
 
 const statusConfig = {
   PENDING: {
     label: "Pending",
-    icon: Clock,
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    bgColor: "bg-yellow-50"
-  },
-  CONFIRMED: {
-    label: "Confirmed",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
     bgColor: "bg-green-50"
+  },
+  FULLY_PAID: {
+    label: "Fully Paid",
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
+  },
+  PARTIALLY_PAID: {
+    label: "Partially Paid",
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
+  },
+  OVERDUE: {
+    label: "Overdue",
+    icon: XCircle,
+    color: "bg-red-100 text-red-800 border-red-200",
+    bgColor: "bg-red-50"
   },
   CANCELLED: {
     label: "Cancelled",
@@ -101,9 +119,9 @@ const statusConfig = {
   },
   REFUNDED: {
     label: "Refunded",
-    icon: RotateCcw,
-    color: "bg-blue-100 text-blue-800 border-blue-200",
-    bgColor: "bg-blue-50"
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
   }
 };
 
@@ -124,11 +142,14 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
           .includes(searchTerm.toLowerCase());
 
       const matchesStatus =
-        statusFilter === "ALL" || booking.status === statusFilter;
+        statusFilter === "ALL" ||
+        (statusFilter === "CANCELLED"
+          ? booking.status
+          : booking.paymentStatus) === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
-
+    console.log(filtered);
     // Sort bookings
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -151,9 +172,9 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   // Get status counts for filter buttons
   const statusCounts = useMemo(() => {
     const counts = bookings.reduce((acc, booking) => {
-      acc[booking.status] = (acc[booking.status] || 0) + 1;
+      acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
       return acc;
-    }, {} as Record<BookingStatus, number>);
+    }, {} as Record<PaymentSt, number>);
 
     return {
       ALL: bookings.length,
@@ -266,10 +287,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                     {(
                       [
                         "ALL",
-                        "CONFIRMED",
-                        "PENDING",
+                        "FULLY_PAID",
+                        "PARTIALLY_PAID",
                         "CANCELLED",
-                        "REFUNDED"
+                        "OVERDUE",
+                        "PENDING"
                       ] as FilterStatus[]
                     ).map((status) => (
                       <Button
@@ -290,8 +312,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                       >
                         {status === "ALL"
                           ? "All Trips"
-                          : statusConfig[status as BookingStatus]?.label ||
-                            status}
+                          : statusConfig[status as PaymentSt]?.label || status}
                         <span
                           className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
                             statusFilter === status
@@ -355,7 +376,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                     {statusFilter !== "ALL" && (
                       <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
                         Status:{" "}
-                        {statusConfig[statusFilter as BookingStatus]?.label ||
+                        {statusConfig[statusFilter as PaymentSt]?.label ||
                           statusFilter}
                       </span>
                     )}
@@ -453,12 +474,13 @@ function BookingCard({ booking }: { booking: Booking }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const statusConfig = getStatusConfig(booking.status);
+  const statusConfig = getStatusConfig(booking.paymentStatus);
   const StatusIcon = statusConfig.icon;
   const isUpcomingTrip = isUpcoming(booking);
 
   const canCancelBooking = () => {
-    if (booking.status !== "CONFIRMED") return false;
+    if (booking.paymentStatus !== "FULLY_PAID") return false;
+    console.log("hii");
     const now = new Date();
     const startDate = new Date(booking.startDate);
     const daysUntilTrip = Math.ceil(
@@ -491,7 +513,7 @@ function BookingCard({ booking }: { booking: Booking }) {
     setIsLoading(true);
     try {
       const result = await cancelBooking(booking.id);
-
+      console.log("hloooo");
       if (result.success) {
         toast.success(
           "Booking cancelled successfully. Refund will be processed shortly."
@@ -500,6 +522,7 @@ function BookingCard({ booking }: { booking: Booking }) {
         router.refresh();
       } else {
         toast.error(result.error || "Failed to cancel booking");
+        console.log(result.error);
       }
     } catch (error) {
       console.error("Frontend: Cancellation error:", error);
@@ -732,9 +755,8 @@ function BookingCard({ booking }: { booking: Booking }) {
   );
 }
 
-// Helper functions (moved outside component to avoid re-creation)
-function getStatusConfig(status: BookingStatus) {
-  return statusConfig[status] || statusConfig.PENDING;
+function getStatusConfig(status: PaymentSt) {
+  return statusConfig[status] || "";
 }
 
 function formatCurrency(amount: number) {
@@ -747,7 +769,7 @@ function formatCurrency(amount: number) {
 function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
-  return booking.status === "CONFIRMED" && startDate > now;
+  return booking.paymentStatus === "FULLY_PAID" && startDate > now;
 }
 
 // Empty State Component for My Trips

@@ -1,23 +1,26 @@
-// import { getTripById } from "@/actions/trips/getTripByIdForBookingSummary";
-// import BookingSummary from "@/components/booking/Bookingsummary";
 import { getTripById } from "@/actions/trips/getTripByIdForPayment";
 import { PaymentForm } from "@/components/booking/PaymentForm";
-// import { GetTrip } from "@/hooks/use-get-trip";
 import { requireUser } from "@/lib/roleGaurd";
 import { format } from "date-fns";
 import { notFound, redirect } from "next/navigation";
-// import { BookingSummary } from "@/components/booking/BookingSummary";
 
 type Props = {
   params: Promise<{
     travelplanid: string;
     bookingId: string;
   }>;
+  searchParams: Promise<{
+    "payment-type"?: string;
+  }>;
 };
 
-export default async function BookingSummaryPage({ params }: Props) {
+export default async function PaymentPage({ params, searchParams }: Props) {
   const tripId = (await params).travelplanid;
   const bookingId = (await params).bookingId;
+  const { "payment-type": paymentType } = await searchParams;
+
+  const isPartialPayment = paymentType === "partial-pay";
+  const isRemainingPayment = paymentType === "remaining-amount";
 
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
@@ -28,8 +31,9 @@ export default async function BookingSummaryPage({ params }: Props) {
     if (!userSession) {
       redirect("/auth/signin");
     }
+
     if (!booking || !trip) {
-      return <>booking not!...404</>;
+      return notFound();
     }
 
     const startDate = booking.startDate;
@@ -40,6 +44,9 @@ export default async function BookingSummaryPage({ params }: Props) {
         <PaymentForm
           booking={booking}
           bookingId={bookingId}
+          paymentType={paymentType || "full-pay"}
+          isPartialPayment={isPartialPayment}
+          isRemainingPayment={isRemainingPayment}
           tripData={{
             ...trip,
             tripImage:
@@ -54,7 +61,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       </>
     );
   } catch (error) {
-    console.error("Booking summary error:", error);
+    console.error("Payment page error:", error);
     return notFound();
   }
 }

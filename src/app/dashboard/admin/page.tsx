@@ -42,7 +42,6 @@ import {
   approveTravelPlan,
   getAllBookings
 } from "@/actions/admin/action";
-import { markBookingAsRefunded } from "@/actions/booking/actions";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
 import RevenueReport from "@/components/dashboard/RevenueReport";
@@ -54,6 +53,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { processRefund } from "@/actions/booking/actions";
+import { PaymentStatus } from "@/types/booking";
 
 // Define interfaces for your data types
 interface User {
@@ -109,6 +110,14 @@ interface Booking {
   specialRequirements: string | null;
   pricePerPerson: number;
   refundAmount: number;
+  paymentStatus?:
+    | PaymentStatus
+    | "PENDING"
+    | "PARTIALLY_PAID"
+    | "FULLY_PAID"
+    | "OVERDUE"
+    | "REFUNDED"
+    | "CANCELLED";
   user: {
     id: string;
     name: string;
@@ -147,10 +156,12 @@ interface Booking {
 
 interface BookingCounts {
   ALL: number;
-  PENDING: number;
-  CONFIRMED: number;
+  FULLY_PAID: number;
+  PARTIALLY_PAID: number;
   CANCELLED: number;
   REFUNDED: number;
+  PENDING: number;
+  OVERDUE: number;
 }
 
 // Define the revenue data structure
@@ -176,10 +187,12 @@ export default function AdminDashboard() {
   const [revenueReportModal, setRevenueReportModal] = useState(false);
   const [bookingCounts, setBookingCounts] = useState<BookingCounts>({
     ALL: 0,
-    PENDING: 0,
-    CONFIRMED: 0,
+    FULLY_PAID: 0,
+    PARTIALLY_PAID: 0,
     CANCELLED: 0,
-    REFUNDED: 0
+    REFUNDED: 0,
+    PENDING: 0,
+    OVERDUE: 0
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
@@ -339,16 +352,17 @@ export default function AdminDashboard() {
           setBookingCounts(
             bookingsResponse.counts || {
               ALL: 0,
-              PENDING: 0,
-              CONFIRMED: 0,
+              FULLY_PAID: 0,
+              PARTIALLY_PAID: 0,
               CANCELLED: 0,
-              REFUNDED: 0
+              REFUNDED: 0,
+              PENDING: 0,
+              OVERDUE: 0
             }
           );
         }
         await fetchRevenueData();
 
-        // Fetch revenue data (without date filter initially)
         const revenueResponse = await getTotalRevenue();
         if (revenueResponse.error) {
           console.error(revenueResponse.error);
@@ -475,7 +489,7 @@ export default function AdminDashboard() {
 
   const handleMarkAsRefunded = async (bookingId: string) => {
     try {
-      const result = await markBookingAsRefunded(bookingId);
+      const result = await processRefund(bookingId);
       if (result.success) {
         setBookings(
           bookings.map((booking) =>
@@ -1578,10 +1592,12 @@ export default function AdminDashboard() {
                   <div className="flex flex-col md:flex-row gap-2">
                     {[
                       "ALL",
-                      "CONFIRMED",
-                      "PENDING",
+                      "FULLY_PAID",
+                      "PARTIALLY_PAID",
+                      "CANCELLED",
                       "REFUNDED",
-                      "CANCELLED"
+                      "PENDING",
+                      "OVERDUE"
                     ].map((status) => (
                       <button
                         key={status}
@@ -1604,7 +1620,8 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 {bookings.filter(
                   (booking) =>
-                    bookingFilter === "ALL" || booking.status === bookingFilter
+                    bookingFilter === "ALL" ||
+                    booking.paymentStatus === bookingFilter
                 ).length === 0 ? (
                   <div className="text-center py-16">
                     <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -1624,7 +1641,7 @@ export default function AdminDashboard() {
                     .filter(
                       (booking) =>
                         bookingFilter === "ALL" ||
-                        booking.status === bookingFilter
+                        booking.paymentStatus === bookingFilter
                     )
                     .map((booking) => (
                       <div
@@ -1676,19 +1693,23 @@ export default function AdminDashboard() {
                                       : "bg-purple-100 text-purple-800 border-purple-200"
                                   }`}
                                 >
-                                  {booking.status === "CONFIRMED" && (
+                                  {booking.paymentStatus === "FULLY_PAID" && (
                                     <CheckCircle className="h-4 w-4" />
                                   )}
-                                  {booking.status === "PENDING" && (
+                                  {booking.paymentStatus ===
+                                    "PARTIALLY_PAID" && (
+                                    <CheckCircle className="h-4 w-4" />
+                                  )}
+                                  {booking.paymentStatus === "PENDING" && (
                                     <Clock className="h-4 w-4" />
                                   )}
-                                  {booking.status === "CANCELLED" && (
+                                  {booking.paymentStatus === "CANCELLED" && (
                                     <XCircle className="h-4 w-4" />
                                   )}
-                                  {booking.status === "REFUNDED" && (
+                                  {booking.paymentStatus === "REFUNDED" && (
                                     <RefreshCw className="h-4 w-4" />
                                   )}
-                                  {booking.status}
+                                  {booking.paymentStatus}
                                 </span>
                                 <p className="text-xl font-bold text-gray-900">
                                   ${booking.totalPrice.toLocaleString()}
@@ -1766,7 +1787,7 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {/* Admin Actions */}
-                                {booking.status === "CANCELLED" &&
+                                {booking.paymentStatus === "CANCELLED" &&
                                   booking.refundAmount > 0 && (
                                     <Button
                                       size="sm"

@@ -3,9 +3,13 @@
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/roleGaurd";
 import { TeamMemberInput } from "@/types/booking";
-import { BookingStatus } from "@prisma/client";
+import {
+  BookingStatus,
+  PaymentStatus,
+  PaymentType,
+  Prisma
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
-// import type { BookingStatus } from "@/types/booking";
 
 export const createBooking = async (bookingData: {
   id: string;
@@ -16,11 +20,10 @@ export const createBooking = async (bookingData: {
   participants?: number;
   specialRequirements?: string;
   guests?: Array<TeamMemberInput>;
-  // submissionType?: "individual" | "team";
+  allowPartialPayment?: boolean;
 }) => {
   const session = await requireUser();
 
-  console.log("hello from server side");
   if (!session || session.user.id !== bookingData.userId)
     return { error: "Unauthorized" };
 
@@ -34,8 +37,6 @@ export const createBooking = async (bookingData: {
         error: "This travel plan is not currently available for booking"
       };
     }
-
-    console.log("tt", bookingData);
 
     const participants = bookingData.participants || 1;
     if (participants <= 0)
@@ -57,6 +58,15 @@ export const createBooking = async (bookingData: {
     const pricePerPerson = travelPlan.price;
     const totalPrice = pricePerPerson * participants;
 
+    const paymentDeadline = new Date(
+      Math.min(
+        startDate.getTime() - 10 * 24 * 60 * 60 * 1000,
+        today.getTime() + 7 * 24 * 60 * 60 * 1000
+      )
+    );
+
+    const minPaymentAmount = totalPrice * 0.2;
+
     const booking = await prisma.booking.create({
       data: {
         id: bookingData.id,
@@ -68,9 +78,16 @@ export const createBooking = async (bookingData: {
         participants,
         pricePerPerson,
         totalPrice,
-        status: "PENDING"
+        remainingAmount: totalPrice - minPaymentAmount,
+        minPaymentAmount: minPaymentAmount,
+        paymentDeadline: bookingData.allowPartialPayment
+          ? paymentDeadline
+          : null,
+        paymentStatus: "PENDING"
       }
     });
+
+    console.log(booking);
 
     const updatedBooking = await prisma.booking.update({
       where: { id: booking.id },
@@ -80,11 +97,110 @@ export const createBooking = async (bookingData: {
     });
 
     revalidatePath(`/booking/${bookingData.travelPlanId}`);
-    console.log("ttt:,", booking);
     return { success: true, booking: updatedBooking };
   } catch (error) {
     console.error("Error creating booking:", error);
     return { error: "Failed to create booking" };
+  }
+};
+
+export const processPartialPayment = async (
+  bookingId: string,
+  amount: number,
+  paymentType: PaymentType = "PARTIAL"
+) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        travelPlan: true,
+        partialPayments: true
+      }
+    });
+    console.log(amount);
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Booking not found or unauthorized" };
+    }
+
+    if (booking.paymentStatus === "FULLY_PAID") {
+      return { error: "Booking is already fully paid" };
+    }
+
+    if (amount <= 0) {
+      return { error: "Payment amount must be greater than 0" };
+    }
+
+    if (amount > booking.remainingAmount) {
+      return { error: "Payment amount exceeds remaining balance" };
+    }
+
+    if (paymentType === "PARTIAL" && booking.partialPayments.length === 0) {
+      if (booking.minPaymentAmount && amount < booking.minPaymentAmount) {
+        return {
+          error: `Minimum payment amount is ${booking.minPaymentAmount}`
+        };
+      }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const partialPayment = await tx.partialPayment.create({
+        data: {
+          bookingId,
+          amount,
+          paymentType
+        }
+      });
+
+      const newAmountPaid = booking.amountPaid + amount;
+      const newRemainingAmount = booking.totalPrice - newAmountPaid;
+
+      // Determine new payment status
+      let newPaymentStatus: PaymentStatus;
+      let newBookingStatus: BookingStatus = booking.status;
+
+      if (newRemainingAmount === 0) {
+        newPaymentStatus = "FULLY_PAID";
+        newBookingStatus = "CONFIRMED";
+      } else {
+        newPaymentStatus = "PARTIALLY_PAID";
+      }
+
+      const updatedBooking = await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          amountPaid: newAmountPaid,
+          remainingAmount: newRemainingAmount,
+          paymentStatus: newPaymentStatus,
+          status: newBookingStatus,
+          updatedAt: new Date()
+        },
+        include: {
+          partialPayments: true,
+          travelPlan: true
+        }
+      });
+
+      return { partialPayment, booking: updatedBooking };
+    });
+    console.log(booking);
+    revalidatePath(`/booking/${booking.travelPlanId}`);
+    revalidatePath("/my-trips");
+
+    return {
+      success: true,
+      payment: result.partialPayment,
+      booking: result.booking,
+      message:
+        result.booking.paymentStatus === "FULLY_PAID"
+          ? "Payment completed successfully!"
+          : `Partial payment of ${amount} processed. Remaining: ${result.booking.remainingAmount}`
+    };
+  } catch (error) {
+    console.error("Error processing partial payment:", error);
+    return { error: "Failed to process payment" };
   }
 };
 
@@ -151,7 +267,6 @@ export const updateBookingGuestInfo = async (
     return { error: "Failed to update booking guest information" };
   }
 };
-
 export const updateBookingStatus = async (
   bookingId: string,
   status: BookingStatus
@@ -181,8 +296,7 @@ export const updateBookingStatus = async (
     return { error: "Failed to update booking status" };
   }
 };
-
-export const getBookingById = async (bookingId: string) => {
+export const getPaymentSummary = async (bookingId: string) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
@@ -190,20 +304,97 @@ export const getBookingById = async (bookingId: string) => {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
-        travelPlan: true,
-        user: { select: { id: true, email: true, name: true } }
+        partialPayments: {
+          orderBy: { paymentDate: "desc" }
+        },
+        travelPlan: {
+          select: {
+            title: true,
+            destination: true
+          }
+        }
       }
     });
 
-    if (!booking || booking.userId !== session.user.id)
-      return { error: "Unauthorized" };
-    return { success: true, booking };
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Booking not found or unauthorized" };
+    }
+
+    const paymentSummary = {
+      totalAmount: booking.totalPrice,
+      amountPaid: booking.amountPaid,
+      remainingAmount: booking.remainingAmount,
+      paymentStatus: booking.paymentStatus,
+      minPaymentAmount: booking.minPaymentAmount,
+      paymentDeadline: booking.paymentDeadline,
+      isOverdue: booking.paymentDeadline
+        ? new Date() > booking.paymentDeadline
+        : false,
+      payments: booking.partialPayments
+    };
+
+    return { success: true, paymentSummary, booking };
   } catch (error) {
-    console.error("Error fetching booking:", error);
-    return { error: "Failed to fetch booking" };
+    console.error("Error fetching payment summary:", error);
+    return { error: "Failed to fetch payment summary" };
   }
 };
 
+export const markOverdueBookings = async () => {
+  try {
+    const overdueBookings = await prisma.booking.updateMany({
+      where: {
+        paymentDeadline: {
+          lt: new Date()
+        },
+        paymentStatus: {
+          in: ["PENDING", "PARTIALLY_PAID"]
+        }
+      },
+      data: {
+        paymentStatus: "OVERDUE"
+      }
+    });
+
+    return {
+      success: true,
+      updatedCount: overdueBookings.count,
+      message: `${overdueBookings.count} bookings marked as overdue`
+    };
+  } catch (error) {
+    console.error("Error marking overdue bookings:", error);
+    return { error: "Failed to mark overdue bookings" };
+  }
+};
+
+// Complete remaining payment
+export const completeRemainingPayment = async (bookingId: string) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId }
+    });
+
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: "Booking not found or unauthorized" };
+    }
+
+    if (booking.remainingAmount === 0) {
+      return { error: "No remaining amount to pay" };
+    }
+
+    return await processPartialPayment(
+      bookingId,
+      booking.remainingAmount,
+      "FULL"
+    );
+  } catch (error) {
+    console.error("Error completing remaining payment:", error);
+    return { error: "Failed to complete remaining payment" };
+  }
+};
 export const getUserBookings = async (userId: string) => {
   const session = await requireUser();
   if (!session || session.user.id !== userId) return { error: "Unauthorized" };
@@ -228,7 +419,7 @@ export const getUserBookings = async (userId: string) => {
       },
       orderBy: { createdAt: "desc" }
     });
-
+    console.log(bookings);
     return { success: true, bookings };
   } catch (error) {
     console.error("Error fetching user bookings:", error);
@@ -242,15 +433,16 @@ export const cancelBooking = async (bookingId: string) => {
 
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId }
+      where: { id: bookingId },
+      include: { partialPayments: true }
     });
 
     if (!booking || booking.userId !== session.user.id)
       return { error: "Unauthorized" };
 
-    if (booking.status === "CANCELLED")
+    if (booking.paymentStatus === "CANCELLED")
       return { error: "Booking is already cancelled" };
-    if (booking.status === "REFUNDED")
+    if (booking.paymentStatus === "REFUNDED")
       return { error: "Cannot cancel a refunded booking" };
 
     const now = new Date();
@@ -266,231 +458,123 @@ export const cancelBooking = async (bookingId: string) => {
     }
 
     let refundAmount = 0;
-    if (daysUntilTrip >= 4) {
-      refundAmount = booking.totalPrice;
+    let refundPercentage = 0;
+
+    if (daysUntilTrip >= 30) {
+      refundPercentage = 1.0;
+    } else if (daysUntilTrip >= 14) {
+      refundPercentage = 0.8;
+    } else if (daysUntilTrip >= 7) {
+      refundPercentage = 0.5;
+    } else if (daysUntilTrip >= 4) {
+      refundPercentage = 0.2;
     }
 
-    // Use transaction to ensure atomicity and prevent race conditions
+    refundAmount = Math.floor(booking.amountPaid * refundPercentage);
+
     const updatedBooking = await prisma.$transaction(async (tx) => {
-      // First, verify the booking still exists and hasn't been modified
       const currentBooking = await tx.booking.findUnique({
         where: { id: bookingId }
       });
 
-      if (!currentBooking) {
-        throw new Error("Booking not found during update");
+      if (!currentBooking || currentBooking.paymentStatus === "CANCELLED") {
+        throw new Error("Booking not found or already cancelled");
       }
 
-      if (currentBooking.status === "CANCELLED") {
-        throw new Error("Booking is already cancelled");
+      if (refundAmount > 0) {
+        await tx.partialPayment.create({
+          data: {
+            bookingId,
+            amount: -refundAmount,
+            paymentType: "REFUND"
+          }
+        });
       }
 
-      // Update the booking
       return await tx.booking.update({
         where: { id: bookingId },
         data: {
-          status: "CANCELLED",
           cancelledAt: new Date(),
-          refundAmount
+          refundAmount,
+          paymentStatus: refundAmount > 0 ? "CANCELLED" : booking.paymentStatus
         }
       });
     });
 
     revalidatePath("/my-trips");
     revalidatePath(`/booking/${booking.travelPlanId}`);
-    return { success: true, booking: updatedBooking, refundAmount };
+
+    return {
+      success: true,
+      booking: updatedBooking,
+      refundAmount,
+      refundPercentage: Math.round(refundPercentage * 100),
+      message:
+        refundAmount > 0
+          ? `Booking cancelled. Refund of ${refundAmount} (${Math.round(
+              refundPercentage * 100
+            )}%) will be processed.`
+          : "Booking cancelled successfully."
+    };
   } catch (error) {
     console.error("Error cancelling booking:", error);
     return { error: "Failed to cancel booking" };
   }
 };
 
-export const updateBookingDates = async (
-  bookingId: string,
-  startDate: Date,
-  endDate: Date
-) => {
+export const getBookingsWithPayments = async (filters?: {
+  status?: BookingStatus;
+  paymentStatus?: PaymentStatus;
+  userId?: string;
+}) => {
   const session = await requireUser();
   if (!session) return { error: "Unauthorized" };
 
   try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { travelPlan: true }
-    });
+    const whereClause: Prisma.BookingWhereInput = {};
 
-    if (!booking || booking.userId !== session.user.id) {
-      return { error: "Unauthorized" };
-    }
+    if (filters?.status) whereClause.status = filters.status;
+    if (filters?.paymentStatus)
+      whereClause.paymentStatus = filters.paymentStatus;
+    if (filters?.userId) whereClause.userId = filters.userId;
 
-    // Optional: Add a check to ensure dates are valid (e.g., endDate after startDate)
-    if (startDate >= endDate) {
-      return { error: "End date must be after start date" };
-    }
-
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        startDate,
-        endDate
-      }
-    });
-
-    revalidatePath(`/booking/${booking.travelPlanId}`);
-    return { success: true, booking: updatedBooking };
-  } catch (error) {
-    console.error("Error updating booking dates:", error);
-    return { error: "Failed to update booking dates" };
-  }
-};
-
-// Updated function with better naming and error handling
-export const setFormSubmissionStatus = async (
-  bookingId: string,
-  status: boolean
-) => {
-  const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-
-  try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { travelPlan: true }
-    });
-
-    if (!booking || booking.userId !== session.user.id) {
-      return { error: "Booking not found or unauthorized access" };
-    }
-    if (status === false) {
-      console.log("hii");
-      await prisma.booking.delete({
-        where: { id: bookingId }
-      });
-    }
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        formSubmitted: status,
-        updatedAt: new Date()
-      }
-    });
-
-    revalidatePath(`/booking/${booking.travelPlanId}`);
-    revalidatePath(`/trips/booking/${booking.travelPlanId}`);
-
-    return {
-      success: true,
-      booking: updatedBooking,
-      message: `Form submission status updated to ${status}`
-    };
-  } catch (error) {
-    console.error("Error updating form submission status:", error);
-    return { error: "Failed to update form submission status" };
-  }
-};
-
-export const enableBookingEdit = async (bookingId: string) => {
-  return await setFormSubmissionStatus(bookingId, false);
-};
-
-export const completeBookingForm = async (bookingId: string) => {
-  return await setFormSubmissionStatus(bookingId, true);
-};
-
-// Keep the old function name for backward compatibility but with improved implementation
-export const unCompleteBookingForm = async (bookingId: string) => {
-  return await enableBookingEdit(bookingId);
-};
-
-export const editBookingAction = async (bookingId: string) => {
-  const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-
-  try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { travelPlan: true }
-    });
-
-    if (!booking || booking.userId !== session.user.id) {
-      return { error: "Unauthorized" };
-    }
-
-    // Update the form submitted status to false
-    await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        formSubmitted: false,
-        updatedAt: new Date()
-      }
-    });
-
-    // Return the travel plan ID for navigation
-    return { success: true, travelPlanId: booking.travelPlanId };
-  } catch (error) {
-    console.error("Error updating booking for edit:", error);
-    return { error: "Failed to update booking" };
-  }
-};
-
-// Server action for completing payment
-export const completePaymentAction = async (
-  bookingId: string,
-  amount: number,
-  numberOfGuests: number
-) => {
-  const session = await requireUser();
-  if (!session) {
-    return { error: "Unauthorized" };
-  }
-
-  try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
+    const bookings = await prisma.booking.findMany({
+      where: whereClause,
       include: {
-        travelPlan: true
-      }
-    });
-
-    if (!booking) {
-      return { error: "Booking not found" };
-    }
-
-    if (booking.userId !== session.user.id) {
-      return { error: "Unauthorized access to booking" };
-    }
-
-    if (booking.status !== "PENDING") {
-      return { error: "Booking is not in a valid state for payment" };
-    }
-
-    const updatedBooking = await prisma.booking.update({
-      where: {
-        id: bookingId
+        travelPlan: {
+          select: {
+            title: true,
+            destination: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        partialPayments: {
+          orderBy: { paymentDate: "desc" }
+        }
       },
-      data: {
-        status: "CONFIRMED",
-        totalPrice: amount,
-        participants: numberOfGuests,
-        updatedAt: new Date()
-      }
+      orderBy: { createdAt: "desc" }
     });
 
-    revalidatePath(`/trips/booking/${booking.travelPlanId}`);
-    revalidatePath(`/dashboard/user`);
-
-    return {
-      success: true,
-      message: "Payment completed successfully",
-      booking: updatedBooking
-    };
+    return { success: true, bookings };
   } catch (error) {
-    console.error("Payment completion error:", error);
-    return { error: "Failed to complete payment" };
+    console.error("Error fetching bookings with payments:", error);
+    return { error: "Failed to fetch bookings" };
   }
 };
 
-export const markBookingAsRefunded = async (bookingId: string) => {
+export const processRefund = async (
+  bookingId: string,
+  refundAmount?: number
+) => {
+  const session = await requireUser();
+  if (!session) return { error: "Unauthorized" };
+
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId }
@@ -501,21 +585,44 @@ export const markBookingAsRefunded = async (bookingId: string) => {
     }
 
     if (booking.status !== "CANCELLED") {
-      return { error: "Only cancelled bookings can be marked as refunded" };
+      return { error: "Only cancelled bookings can be refunded" };
     }
 
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        status: "REFUNDED",
-        updatedAt: new Date()
+    if (booking.paymentStatus === "REFUNDED") {
+      return { error: "Booking has already been refunded" };
+    }
+
+    const finalRefundAmount = refundAmount || booking.refundAmount;
+
+    const updatedBooking = await prisma.$transaction(async (tx) => {
+      if (finalRefundAmount > 0) {
+        await tx.partialPayment.create({
+          data: {
+            bookingId,
+            amount: -finalRefundAmount,
+            paymentType: "REFUND"
+          }
+        });
       }
+
+      return await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          paymentStatus: "REFUNDED",
+          refundAmount: finalRefundAmount,
+          updatedAt: new Date()
+        }
+      });
     });
 
     revalidatePath("/dashboard/admin");
-    return { success: true, booking: updatedBooking };
+    return {
+      success: true,
+      booking: updatedBooking,
+      message: `Refund of ${finalRefundAmount} processed successfully`
+    };
   } catch (error) {
-    console.error("Error marking booking as refunded:", error);
-    return { error: "Failed to mark booking as refunded" };
+    console.error("Error processing refund:", error);
+    return { error: "Failed to process refund" };
   }
 };

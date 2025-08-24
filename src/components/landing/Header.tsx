@@ -33,7 +33,8 @@ import {
   Shield,
   UserCog,
   FileText,
-  MapPin
+  MapPin,
+  HelpCircle
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -42,27 +43,27 @@ import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 
+// Define interface for navigation items
+interface NavigationItem {
+  name: string;
+  href: string;
+  section: string;
+}
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  // State for dashboard menu toggle (desktop)
   const [isDashboardMenuOpen, setIsDashboardMenuOpen] = useState(false);
-  // State for mobile dashboard menu toggle
   const [isMobileDashboardOpen, setIsMobileDashboardOpen] = useState(false);
-  // State for host mode toggle
   const [isHostMode, setIsHostMode] = useState(false);
-  // State for admin mode toggle
   const [isAdminMode, setIsAdminMode] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
-
-  // Determine text color based on route
-
   const { data: session, status } = useSession();
 
-  const navigationItems = [
+  const navigationItems: NavigationItem[] = [
     { name: "Home", href: "/", section: "#home" },
     { name: "Vibes", href: "/vibes", section: "#vibes" },
     { name: "About", href: "/about", section: "#about" },
@@ -88,11 +89,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScrollEvent);
   }, [lastScrollY]);
 
-  const handleNavClick = (item: {
-    name: string;
-    href: string;
-    section: string;
-  }) => {
+  const handleNavClick = (item: NavigationItem) => {
     if (item.name === "Home") {
       router.push("/");
     } else if (item.name === "Trips" || item.name === "Contact") {
@@ -134,7 +131,8 @@ export default function Header() {
 
   const getDashboardMenuItems = () => {
     const userRole = session?.user?.role || "USER";
-    const items = [];
+    const items: { label: string; href: string; icon: React.ComponentType }[] =
+      [];
 
     if (userRole === "HOST" || userRole === "ADMIN") {
       items.push({
@@ -162,12 +160,12 @@ export default function Header() {
     return items;
   };
 
-  // Generate breadcrumb items based on current path
   const generateBreadcrumbs = () => {
     const pathSegments = pathname
       .split("/")
       .filter((segment) => segment !== "");
-    const breadcrumbs = [];
+    const breadcrumbs: { label: string; href: string; isActive: boolean }[] =
+      [];
 
     breadcrumbs.push({
       label: "Home",
@@ -180,7 +178,6 @@ export default function Header() {
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;
 
-      // Capitalize and clean up segment names
       let label = segment.charAt(0).toUpperCase() + segment.slice(1);
       if (label === "Dashboard") {
         label =
@@ -203,26 +200,19 @@ export default function Header() {
 
   const breadcrumbs = generateBreadcrumbs();
   const isHomePage = pathname === "/";
+  const isDashboardPage =
+    pathname.startsWith("/dashboard/host") ||
+    pathname.startsWith("/dashboard/admin");
 
-  // Unified header styling for all pages
   const headerClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
     bg-white backdrop-blur-xl border-b border-gray-200 shadow-sm
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
 
-  const shouldShowHostButton =
-    status === "authenticated" &&
-    session?.user?.role !== "HOST" &&
-    session?.user?.role !== "ADMIN";
-
-  // Determine if current user is a host
   const isUserHost = session?.user?.role === "HOST";
-
-  // Determine if current user is an admin
   const isUserAdmin = session?.user?.role === "ADMIN";
 
-  // Handle host mode toggle
   const handleHostModeToggle = (checked: boolean) => {
     setIsHostMode(checked);
     if (checked) {
@@ -233,7 +223,6 @@ export default function Header() {
     setIsDashboardMenuOpen(false);
   };
 
-  // Handle admin mode toggle
   const handleAdminModeToggle = (checked: boolean) => {
     setIsAdminMode(checked);
     if (checked) {
@@ -244,20 +233,11 @@ export default function Header() {
     setIsDashboardMenuOpen(false);
   };
 
-  // Update host mode and admin mode state based on current route
   useEffect(() => {
     setIsHostMode(pathname.startsWith("/dashboard/host"));
     setIsAdminMode(pathname.startsWith("/dashboard/admin"));
-
-    // Force session refresh when navigating to host dashboard
-    // This ensures the UI updates immediately when user becomes a host
-    if (pathname.startsWith("/dashboard/host") && status === "authenticated") {
-      // The session should automatically reflect the user's current role
-      // NextAuth should handle this, but this effect ensures UI updates
-    }
   }, [pathname, status]);
 
-  // Prevent horizontal scrolling when dropdown is open
   useEffect(() => {
     if (isDashboardMenuOpen) {
       document.body.style.overflowX = "hidden";
@@ -265,13 +245,11 @@ export default function Header() {
       document.body.style.overflowX = "";
     }
 
-    // Cleanup function
     return () => {
       document.body.style.overflowX = "";
     };
   }, [isDashboardMenuOpen]);
 
-  // Standard Dropdown Menu Component (used for both home and non-home pages)
   const StandardDropdownMenu = () => (
     <DropdownMenu
       open={isDashboardMenuOpen}
@@ -304,7 +282,17 @@ export default function Header() {
         </div>
 
         <DropdownMenuGroup className="p-2">
-          {/* Dashboard Menu Item - Toggleable for HOST/ADMIN, Direct for USER */}
+          <DropdownMenuItem
+            onClick={() => router.push("/profile")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">Profile</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘P
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
           <div className="relative">
             <DropdownMenuItem
               onClick={handleDashboardClick}
@@ -320,7 +308,6 @@ export default function Header() {
               <span className="font-medium text-gray-900 flex-1">
                 Dashboard
               </span>
-              {/* Show toggle icon for HOST/ADMIN roles */}
               {(session?.user?.role === "HOST" ||
                 session?.user?.role === "ADMIN") && (
                 <>
@@ -331,7 +318,6 @@ export default function Header() {
                   )}
                 </>
               )}
-              {/* Show shortcut only for USER role */}
               {session?.user?.role === "USER" && (
                 <DropdownMenuShortcut className="text-gray-400">
                   ⌘D
@@ -339,7 +325,6 @@ export default function Header() {
               )}
             </DropdownMenuItem>
 
-            {/* Nested Dashboard Options */}
             {isDashboardMenuOpen &&
               (session?.user?.role === "HOST" ||
                 session?.user?.role === "ADMIN") && (
@@ -353,7 +338,7 @@ export default function Header() {
                       }}
                       className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
                     >
-                      <item.icon className="mr-3 h-3 w-3 text-gray-600 group-hover:text-purple-600" />
+                      <item.icon />
                       <span className="font-medium text-gray-800">
                         {item.label}
                       </span>
@@ -362,6 +347,39 @@ export default function Header() {
                 </div>
               )}
           </div>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/my-trips")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">My Trips</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘T
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/help")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <HelpCircle className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">Help and FAQ</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘H
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/contact")}
+            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+          >
+            <MapPin className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">Contact Us</span>
+            <DropdownMenuShortcut className="text-gray-400">
+              ⌘C
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
 
           <DropdownMenuItem
             onClick={() => router.push("/trips")}
@@ -375,57 +393,31 @@ export default function Header() {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => router.push("/my-trips")}
-            className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
+            onClick={() => window.open("/privacy-policy.pdf", "_blank")}
+            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
           >
-            <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">My Trips</span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘T
-            </DropdownMenuShortcut>
+            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
+            <span className="font-medium text-gray-900">Privacy Policy</span>
           </DropdownMenuItem>
-
-          {/* Apply for Host button - only show for non-hosts */}
-          {shouldShowHostButton && (
-            <DropdownMenuItem
-              onClick={() => router.push("/dashboard/host")}
-              className="flex items-center p-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 cursor-pointer group"
-            >
-              <Crown className="mr-3 h-4 w-4 text-gray-600 group-hover:text-amber-600" />
-              <span className="font-medium text-gray-900 group-hover:text-amber-600">
-                Apply for Host
-              </span>
-            </DropdownMenuItem>
-          )}
 
           <DropdownMenuItem
             onClick={() => window.open("/terms-and-conditions.pdf", "_blank")}
             className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
           >
             <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900 ">
-              Terms and Conditions
-            </span>
+            <span className="font-medium text-gray-900">Terms of Service</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => window.open("/privacy-policy.pdf", "_blank")}
-            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-          >
-            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900 ">Privacy Policy</span>
-          </DropdownMenuItem>
+
           <DropdownMenuItem
             onClick={() => window.open("/cancellation-policy.pdf", "_blank")}
             className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
           >
             <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900 ">
+            <span className="font-medium text-gray-900">
               Cancellation Policy
             </span>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
 
-        <div className="border-t border-gray-100 p-2">
           <DropdownMenuItem
             onClick={handleSignOut}
             className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
@@ -438,7 +430,7 @@ export default function Header() {
               ⇧⌘Q
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-        </div>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -448,7 +440,6 @@ export default function Header() {
       <div className={headerClasses}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo and Breadcrumb - Left Side */}
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center group flex-shrink-0">
                 <div className="relative bg-white rounded-full">
@@ -501,11 +492,9 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Menu Button - Right Side */}
             <div className="flex items-center">
               {status === "authenticated" ? (
                 <div className="flex items-center space-x-4">
-                  {/* Host Mode Toggle - Show only for HOST role */}
                   {isUserHost && (
                     <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                       <Crown className="h-4 w-4 text-purple-600" />
@@ -520,7 +509,6 @@ export default function Header() {
                     </div>
                   )}
 
-                  {/* Admin Mode Toggle - Show only for ADMIN role */}
                   {isUserAdmin && (
                     <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
                       <Shield className="h-4 w-4 text-red-600" />
@@ -534,17 +522,18 @@ export default function Header() {
                       />
                     </div>
                   )}
-
-                  <StandardDropdownMenu />
+                  {!isDashboardPage && <StandardDropdownMenu />}
                 </div>
               ) : (
-                <Button
-                  onClick={() => router.push("/auth/signin")}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
+                !isDashboardPage && (
+                  <Button
+                    onClick={() => router.push("/auth/signin")}
+                    className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Button>
+                )
               )}
             </div>
           </div>
@@ -553,12 +542,10 @@ export default function Header() {
     );
   }
 
-  // Full header for home page - consistent styling
   return (
     <header className={headerClasses}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
           <Link href="/" className="flex items-center group flex-shrink-0">
             <div className="relative bg-white rounded-full">
               <Image
@@ -572,7 +559,6 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-x-2 xl:gap-x-4">
             {navigationItems.map((item) => (
               <button
@@ -586,7 +572,6 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
             {status === "unauthenticated" ? (
               <Button
@@ -597,7 +582,6 @@ export default function Header() {
               </Button>
             ) : (
               <div className="flex items-center space-x-4">
-                {/* Host Mode Toggle - Show only for HOST role */}
                 {isUserHost && (
                   <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                     <Crown className="h-4 w-4 text-purple-600" />
@@ -612,7 +596,6 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Admin Mode Toggle - Show only for ADMIN role */}
                 {isUserAdmin && (
                   <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
                     <Shield className="h-4 w-4 text-red-600" />
@@ -632,40 +615,6 @@ export default function Header() {
             )}
           </div>
 
-          {/* Tablet Navigation */}
-          <div className="hidden md:flex lg:hidden items-center space-x-6">
-            <nav className="flex items-center space-x-4">
-              {navigationItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => handleNavClick(item)}
-                  className="px-3 py-2 font-instrument font-semibold transition-all duration-300 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50"
-                >
-                  {item.name}
-                </button>
-              ))}
-            </nav>
-            <div className="flex items-center space-x-3">
-              {status === "unauthenticated" ? (
-                <Button
-                  onClick={() => router.push("/auth/signin")}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
-                >
-                  Sign In
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSignOut}
-                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
@@ -683,14 +632,12 @@ export default function Header() {
                 className="w-full h-full bg-gradient-to-br from-white via-purple-50/30 to-blue-50/30 backdrop-blur-xl border-none p-0"
               >
                 <div className="flex flex-col h-full">
-                  {/* Mobile Navigation */}
                   <nav className="flex-1 flex flex-col justify-start px-6 py-8 space-y-2 overflow-y-auto">
-                    {/* Navigation Items */}
                     {navigationItems.map((item, index) => (
                       <button
                         key={item.name}
                         onClick={() => handleNavClick(item)}
-                        className="group relative  p-4 rounded-2xl  hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        className="group relative p-4 rounded-2xl hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         style={{
                           animationDelay: `${index * 100}ms`,
                           animation: isOpen
@@ -705,12 +652,27 @@ export default function Header() {
                       </button>
                     ))}
 
-                    {/* Authenticated User Menu Items */}
                     {status === "authenticated" && (
                       <>
                         <div className="border-t overflow-auto border-gray-200/60 my-6"></div>
 
-                        {/* Mobile Dashboard Menu - Toggleable */}
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/profile");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <User className="mr-3 h-5 w-5 text-purple-600" />
+                              Profile
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
                         <div className="space-y-2">
                           <button
                             onClick={handleMobileDashboardClick}
@@ -727,7 +689,6 @@ export default function Header() {
                                 <UserCog className="mr-3 h-5 w-5 text-purple-600" />
                                 Dashboard
                               </div>
-                              {/* Show toggle icon for HOST/ADMIN, navigation arrow for USER */}
                               {session?.user?.role === "USER" ? (
                                 <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                               ) : (
@@ -743,7 +704,6 @@ export default function Header() {
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                           </button>
 
-                          {/* Mobile Nested Dashboard Options */}
                           {isMobileDashboardOpen &&
                             (session?.user?.role === "HOST" ||
                               session?.user?.role === "ADMIN") && (
@@ -756,7 +716,7 @@ export default function Header() {
                                       setIsOpen(false);
                                       setIsMobileDashboardOpen(false);
                                     }}
-                                    className="group relative overflow-hidden p-3 rounded-xl transition-all duration-300 hover:scale-105 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-gray-200/40 hover:border-purple-300/40 hover:shadow-md w-full"
+                                    className="group relative overflow-hidden p-3 rounded-xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/40 hover:border-purple-300/40 hover:shadow-md w-full"
                                     style={{
                                       animationDelay: `${(index + 1) * 100}ms`,
                                       animation: isMobileDashboardOpen
@@ -766,7 +726,7 @@ export default function Header() {
                                   >
                                     <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
                                       <div className="flex items-center">
-                                        <item.icon className="mr-3 h-4 w-4 text-purple-600" />
+                                        <item.icon />
                                         {item.label}
                                       </div>
                                       <ChevronRight className="h-4 w-4 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
@@ -778,7 +738,57 @@ export default function Header() {
                             )}
                         </div>
 
-                        {/* Explore Trips */}
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/my-trips");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <Calendar className="mr-3 h-5 w-5 text-purple-600" />
+                              My Trips
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/help");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <HelpCircle className="mr-3 h-5 w-5 text-purple-600" />
+                              Help and FAQ
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/contact");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <MapPin className="mr-3 h-5 w-5 text-purple-600" />
+                              Contact Us
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
                         <button
                           onClick={() => {
                             setIsOpen(false);
@@ -796,48 +806,77 @@ export default function Header() {
                           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
 
-                        {/* My Trips */}
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/my-trips");
+                            window.open("/privacy-policy.pdf", "_blank");
                           }}
-                          className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
-                              <Calendar className="mr-3 h-5 w-5 text-purple-600" />
-                              My Trips
+                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
+                              Privacy Policy
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
                           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
 
-                        {/* Want to be Host - conditionally shown */}
-                        {shouldShowHostButton && (
-                          <button
-                            onClick={() => {
-                              setIsOpen(false);
-                              router.push("/dashboard/host");
-                            }}
-                            className="group relative  p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-amber-300/60 hover:shadow-lg"
-                          >
-                            <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
-                              <div className="flex items-center">
-                                <Crown className="mr-3 h-5 w-5 text-amber-600" />
-                                Want to be Host
-                              </div>
-                              <ChevronRight className="h-5 w-5 text-amber-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-orange-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                          </button>
-                        )}
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            window.open("/terms-and-conditions.pdf", "_blank");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
+                              Terms of Service
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            window.open("/cancellation-policy.pdf", "_blank");
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
+                              Cancellation Policy
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            handleSignOut();
+                          }}
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-red-300/60 hover:shadow-lg"
+                        >
+                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
+                            <div className="flex items-center">
+                              <LogOut className="mr-3 h-5 w-5 text-red-600" />
+                              Sign Out
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-red-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-orange-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
+                        </button>
                       </>
                     )}
                   </nav>
 
-                  {/* Mobile CTA */}
                   <div className="flex flex-col space-y-4 p-6 border-t border-gray-200/60 bg-white/60 backdrop-blur-sm">
                     {status === "unauthenticated" ? (
                       <Button
@@ -845,7 +884,7 @@ export default function Header() {
                           setIsOpen(false);
                           router.push("/auth/signin");
                         }}
-                        className="w-full bg-purple-600  hover:bg-purple-700  text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
                       >
                         <Sparkles className="mr-2 h-5 w-5" />
                         Sign In to Continue
@@ -863,7 +902,7 @@ export default function Header() {
                       </Button>
                     )}
                     <Button
-                      className="w-full bg-purple-600  hover:bg-purple-700 flex justify-center items-center text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center "
+                      className="w-full bg-purple-600 hover:bg-purple-700 flex justify-center items-center text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center"
                       onClick={() => {
                         setIsOpen(false);
                         router.push("/trips");
