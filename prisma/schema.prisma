@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id             String       @id @default(cuid())
-  email          String       @unique
-  name           String
-  bio            String?      @default("Travelling with vibe")
-  phone          String?       @unique
-  password       String?
-  role           Role         @default(USER)
-  image          String?      @default("https://avatar.iran.liara.run/public")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  appliedForHost Boolean      @default(false)
-  bookings       Booking[]
-  hostProfile    HostProfile?
-  reviews        Review[]
+  id              String       @id @default(cuid())
+  email           String       @unique
+  name            String
+  bio             String?      @default("Travelling with vibe")
+  phone           String?      @unique
+  password        String?
+  role            Role         @default(USER)
+  image           String?      @default("https://avatar.iran.liara.run/public")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  appliedForHost  Boolean      @default(false)
+  isEmailVerified Boolean      @default(false)
+  bookings        Booking[]
+  hostProfile     HostProfile?
+  reviews         Review[]
 
   sentMessages     Message[]         @relation("SentMessages")
   receivedMessages Message[]         @relation("ReceivedMessages")
@@ -43,10 +44,10 @@ model HostProfile {
   reviews       Review[]
 
   // Social Media Fields
-  instagramUrl  String?
-  twitterUrl    String?
-  linkedinUrl   String?
-  websiteUrl    String?
+  instagramUrl String?
+  twitterUrl   String?
+  linkedinUrl  String?
+  websiteUrl   String?
 
   user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   travelPlans TravelPlans[]
@@ -72,34 +73,34 @@ model DayWiseItinerary {
 }
 
 model TravelPlans {
-  travelPlanId       String             @id @default(cuid())
-  title              String
-  description        String
-  includedActivities String[]
+  travelPlanId          String             @id @default(cuid())
+  title                 String
+  description           String
+  includedActivities    String[]
   notIncludedActivities String[]
-  restrictions       String[]
-  noOfDays           Int
-  hostId             String
-  price              Int
-  country            String
-  state              String
-  city               String
-  status             TravelPlanStatus   @default(INACTIVE)
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  maxParticipants    Int                @default(10)
-  destination        String?
-  filters            String[]           @default([])
-  languages          String[]           @default([])
-  endDate            DateTime?
-  startDate          DateTime?
-  bookings           Booking[]
-  host               HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
-  dayWiseItinerary   DayWiseItinerary[]
-  tripImage          String?            @default("https://avatar.iran.liara.run/public")
-  reviewCount        Int                @default(0)
-  averageRating      Float              @default(0)
-  reviews            Review[]
+  restrictions          String[]
+  noOfDays              Int
+  hostId                String
+  price                 Int
+  country               String
+  state                 String
+  city                  String
+  status                TravelPlanStatus   @default(INACTIVE)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  maxParticipants       Int                @default(10)
+  destination           String?
+  filters               String[]           @default([])
+  languages             String[]           @default([])
+  endDate               DateTime?
+  startDate             DateTime?
+  bookings              Booking[]
+  host                  HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+  dayWiseItinerary      DayWiseItinerary[]
+  tripImage             String?            @default("https://avatar.iran.liara.run/public")
+  reviewCount           Int                @default(0)
+  averageRating         Float              @default(0)
+  reviews               Review[]
 
   @@map("travel_plans")
 }
@@ -226,7 +227,7 @@ model Otp {
   code      String
   expiresAt DateTime
   createdAt DateTime @default(now())
-  
+
   @@index([phone])
   @@index([phone, code])
 }

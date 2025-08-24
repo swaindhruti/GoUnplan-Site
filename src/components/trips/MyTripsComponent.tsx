@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Eye,
   AlertTriangle,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,7 +79,7 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type FilterStatus = "ALL" | BookingStatus;
+type DateFilter = "ALL" | "UPCOMING" | "PAST";
 
 const statusConfig = {
   PENDING: {
@@ -107,14 +108,30 @@ const statusConfig = {
   }
 };
 
+// Payment status configuration based on booking status
+const getPaymentStatus = (status: BookingStatus) => {
+  switch (status) {
+    case "CONFIRMED":
+      return { label: "Paid", color: "bg-green-100 text-green-800 border-green-200" };
+    case "PENDING":
+      return { label: "Unpaid", color: "bg-yellow-100 text-yellow-800 border-yellow-200" };
+    case "CANCELLED":
+      return { label: "Cancelled", color: "bg-red-100 text-red-800 border-red-200" };
+    case "REFUNDED":
+      return { label: "Refunded", color: "bg-blue-100 text-blue-800 border-blue-200" };
+    default:
+      return { label: "Unknown", color: "bg-gray-100 text-gray-800 border-gray-200" };
+  }
+};
+
 export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
-  const [sortBy, setSortBy] = useState<"date" | "price" | "status">("date");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("ALL");
+  const [sortBy, setSortBy] = useState<"date" | "price" | "status" | "confirmed" | "pending" | "cancelled" | "refunded">("date");
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
-    const filtered = bookings.filter((booking) => {
+    let filtered = bookings.filter((booking) => {
       const matchesSearch =
         booking.travelPlan.title
           .toLowerCase()
@@ -123,41 +140,57 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "ALL" || booking.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
-
-    // Sort bookings
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "date":
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        case "price":
-          return b.totalPrice - a.totalPrice;
-        case "status":
-          return a.status.localeCompare(b.status);
-        default:
-          return 0;
+      // Date filter logic
+      const now = new Date();
+      const startDate = new Date(booking.startDate);
+      let matchesDate = true;
+      
+      if (dateFilter === "UPCOMING") {
+        matchesDate = startDate > now;
+      } else if (dateFilter === "PAST") {
+        matchesDate = startDate <= now;
       }
+
+      return matchesSearch && matchesDate;
     });
+
+    // Sort/Filter bookings
+    if (sortBy === "confirmed" || sortBy === "pending" || sortBy === "cancelled" || sortBy === "refunded") {
+      // Filter by status and then sort by date
+      filtered = filtered.filter(booking => booking.status.toLowerCase() === sortBy);
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else {
+      // Regular sorting
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case "date":
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          case "price":
+            return b.totalPrice - a.totalPrice;
+          case "status":
+            return a.status.localeCompare(b.status);
+          default:
+            return 0;
+        }
+      });
+    }
 
     return filtered;
-  }, [bookings, searchTerm, statusFilter, sortBy]);
+  }, [bookings, searchTerm, dateFilter, sortBy]);
 
-  // Get status counts for filter buttons
-  const statusCounts = useMemo(() => {
-    const counts = bookings.reduce((acc, booking) => {
-      acc[booking.status] = (acc[booking.status] || 0) + 1;
-      return acc;
-    }, {} as Record<BookingStatus, number>);
 
+  // Get date filter counts
+  const dateCounts = useMemo(() => {
+    const now = new Date();
+    const upcoming = bookings.filter(booking => new Date(booking.startDate) > now).length;
+    const past = bookings.filter(booking => new Date(booking.startDate) <= now).length;
+    
     return {
       ALL: bookings.length,
-      ...counts
+      UPCOMING: upcoming,
+      PAST: past
     };
   }, [bookings]);
 
@@ -257,49 +290,36 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
               {/* Filters Row */}
               <div className="flex flex-col lg:flex-row gap-6">
-                {/* Status Filter */}
+                {/* Date Filter */}
                 <div className="flex-1">
                   <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
-                    Filter by Status
+                    Filter by Time
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(
-                      [
-                        "ALL",
-                        "CONFIRMED",
-                        "PENDING",
-                        "CANCELLED",
-                        "REFUNDED"
-                      ] as FilterStatus[]
-                    ).map((status) => (
+                    {(["ALL", "UPCOMING", "PAST"] as DateFilter[]).map((filter) => (
                       <Button
-                        key={status}
-                        variant={
-                          statusFilter === status ? "default" : "outline"
-                        }
+                        key={filter}
+                        variant={dateFilter === filter ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setStatusFilter(status)}
+                        onClick={() => setDateFilter(filter)}
                         className={`
                           ${
-                            statusFilter === status
-                              ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                            dateFilter === filter
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                               : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
                           } 
                           rounded-lg font-instrument transition-all duration-200 hover:scale-105
                         `}
                       >
-                        {status === "ALL"
-                          ? "All Trips"
-                          : statusConfig[status as BookingStatus]?.label ||
-                            status}
+                        {filter === "ALL" ? "All Times" : filter === "UPCOMING" ? "Upcoming" : "Past"}
                         <span
                           className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                            statusFilter === status
+                            dateFilter === filter
                               ? "bg-white/20 text-white"
                               : "bg-gray-100 text-gray-600"
                           }`}
                         >
-                          {statusCounts[status] || 0}
+                          {dateCounts[filter] || 0}
                         </span>
                       </Button>
                     ))}
@@ -309,19 +329,27 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                 {/* Sort Options */}
                 <div className="lg:w-64">
                   <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
-                    Sort by
+                    Sort / Filter by
                   </label>
                   <div className="relative">
                     <select
                       value={sortBy}
                       onChange={(e) =>
-                        setSortBy(e.target.value as "date" | "price" | "status")
+                        setSortBy(e.target.value as "date" | "price" | "status" | "confirmed" | "pending" | "cancelled" | "refunded")
                       }
                       className="w-full h-10 border border-gray-300 rounded-lg px-4 pr-10 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500 bg-white appearance-none cursor-pointer"
                     >
-                      <option value="date">Most Recent</option>
-                      <option value="price">Highest Price</option>
-                      <option value="status">Status</option>
+                      <optgroup label="Sort Options">
+                        <option value="date">Most Recent</option>
+                        <option value="price">Highest Price</option>
+                        <option value="status">Status</option>
+                      </optgroup>
+                      <optgroup label="Filter by Status">
+                        <option value="confirmed">Confirmed Trips</option>
+                        <option value="pending">Pending Trips</option>
+                        <option value="cancelled">Cancelled Trips</option>
+                        <option value="refunded">Refunded Trips</option>
+                      </optgroup>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                       <svg
@@ -343,7 +371,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
               </div>
 
               {/* Active Filters Summary */}
-              {(searchTerm || statusFilter !== "ALL") && (
+              {(searchTerm || dateFilter !== "ALL" || (sortBy !== "date" && sortBy !== "price" && sortBy !== "status")) && (
                 <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="flex items-center gap-2 text-sm text-purple-700 font-instrument">
                     <span className="font-semibold">Active Filters:</span>
@@ -352,18 +380,22 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                         Search: &quot;{searchTerm}&quot;
                       </span>
                     )}
-                    {statusFilter !== "ALL" && (
-                      <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
-                        Status:{" "}
-                        {statusConfig[statusFilter as BookingStatus]?.label ||
-                          statusFilter}
+                    {dateFilter !== "ALL" && (
+                      <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-md text-xs">
+                        Time: {dateFilter === "UPCOMING" ? "Upcoming" : "Past"}
+                      </span>
+                    )}
+                    {(sortBy === "confirmed" || sortBy === "pending" || sortBy === "cancelled" || sortBy === "refunded") && (
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded-md text-xs">
+                        Status: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
                       </span>
                     )}
                   </div>
                   <Button
                     onClick={() => {
                       setSearchTerm("");
-                      setStatusFilter("ALL");
+                      setDateFilter("ALL");
+                      setSortBy("date");
                     }}
                     variant="ghost"
                     size="sm"
@@ -396,7 +428,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
         {filteredAndSortedBookings.length === 0 ? (
           // Empty State with Suggested Trips
           <EmptyTripState
-            hasFilters={!!(searchTerm || statusFilter !== "ALL")}
+            hasFilters={!!(searchTerm || dateFilter !== "ALL" || (sortBy !== "date" && sortBy !== "price" && sortBy !== "status"))}
             searchTerm={searchTerm}
           />
         ) : (
@@ -530,12 +562,20 @@ function BookingCard({ booking }: { booking: Booking }) {
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Status Badge */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex flex-col gap-2">
           <Badge
             className={`${statusConfig.color} font-instrument flex items-center gap-1`}
           >
             <StatusIcon className="h-3 w-3" />
             {statusConfig.label}
+          </Badge>
+          
+          {/* Payment Status Badge */}
+          <Badge
+            className={`${getPaymentStatus(booking.status).color} font-instrument flex items-center gap-1`}
+          >
+            <CreditCard className="h-3 w-3" />
+            {getPaymentStatus(booking.status).label}
           </Badge>
         </div>
 
@@ -580,12 +620,26 @@ function BookingCard({ booking }: { booking: Booking }) {
             </div>
           </div>
 
-          {/* Duration and Price */}
+          {/* Payment Status */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="text-sm text-gray-600 font-instrument">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-gray-500" />
+              <span className="text-sm text-gray-600 font-instrument">Payment Status:</span>
+              <Badge
+                variant="outline"
+                className={`${getPaymentStatus(booking.status).color} text-xs`}
+              >
+                {getPaymentStatus(booking.status).label}
+              </Badge>
+            </div>
+            <div className="text-xs text-gray-500 font-instrument">
               {booking.travelPlan.noOfDays} days
             </div>
-            <div className="text-right">
+          </div>
+
+          {/* Price and Booking Info */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="text-right flex-1">
               <div className="text-lg font-bold text-gray-900 font-instrument">
                 {formatCurrency(booking.totalPrice)}
               </div>

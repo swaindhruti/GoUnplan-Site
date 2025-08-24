@@ -6,6 +6,7 @@ export interface UserProfile {
   bio: string | null;
   image: string | null;
   role: string;
+  isEmailVerified: boolean;
   createdAt: Date;
   bookingCounts: {
     total: number;
