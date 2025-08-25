@@ -2,15 +2,22 @@
 
 import Image from "next/image";
 import { PrimaryButton, SectionLabel } from "./common";
+import { useRouter } from "next/navigation";
 
 export default function AboutUs() {
+  const router = useRouter();
   return (
     <section
       id="about"
       className="relative overflow-hidden bg-purple-100 min-h-screen flex flex-col items-center px-6 md:px-20 py-16"
     >
       {/* Section Header */}
-      <div className="w-full text-center mb-12">
+      <div
+        onClick={() => {
+          router.push("/contact");
+        }}
+        className="w-full text-center mb-12"
+      >
         <SectionLabel label="About Us" />
       </div>
 
@@ -52,7 +59,7 @@ export default function AboutUs() {
           </p>
 
           <div className="pt-8 max-md:flex max-md:justify-center">
-            <PrimaryButton label="Find Packages" />
+            <PrimaryButton label="Contact Us" />
           </div>
         </div>
       </div>
