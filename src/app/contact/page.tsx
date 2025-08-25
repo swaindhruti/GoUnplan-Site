@@ -67,7 +67,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-20">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -82,7 +82,8 @@ export default function ContactPage() {
                 Get in <span className="text-purple-600">Touch</span>
               </h1>
               <p className="text-lg text-gray-600 font-instrument mt-2">
-                Ready to start your next adventure? Our travel experts are here to help you plan the perfect trip.
+                Ready to start your next adventure? Our travel experts are here
+                to help you plan the perfect trip.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -96,7 +97,6 @@ export default function ContactPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Information */}
@@ -203,128 +203,132 @@ export default function ContactPage() {
                 </h2>
               </div>
 
-                  {isSubmitted ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-center py-12"
+              {isSubmitted ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-12"
+                >
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle
+                      className="w-8 h-8 text-green-600"
+                      strokeWidth={2}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bricolage font-bold text-gray-900 mb-2">
+                    Message Sent!
+                  </h3>
+                  <p className="text-gray-600 font-instrument">
+                    Thank you for reaching out. We&apos;ll get back to you
+                    within 24 hours.
+                  </p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
+                      >
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
+                      >
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
+                        placeholder="Enter your email address"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
                     >
-                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="w-8 h-8 text-green-600" strokeWidth={2} />
-                      </div>
-                      <h3 className="text-2xl font-bricolage font-bold text-gray-900 mb-2">
-                        Message Sent!
-                      </h3>
-                      <p className="text-gray-600 font-instrument">
-                        Thank you for reaching out. We&apos;ll get back to you within 24 hours.
-                      </p>
-                    </motion.div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label
-                            htmlFor="name"
-                            className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
-                          >
-                            Full Name *
-                          </label>
-                          <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
-                            placeholder="Enter your full name"
-                          />
-                        </div>
+                      Subject *
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
+                    >
+                      <option value="">Select a subject</option>
+                      <option value="general">General Inquiry</option>
+                      <option value="booking">Booking Assistance</option>
+                      <option value="custom">Custom Travel Plan</option>
+                      <option value="support">Customer Support</option>
+                      <option value="partnership">Partnership</option>
+                    </select>
+                  </div>
 
-                        <div>
-                          <label
-                            htmlFor="email"
-                            className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
-                          >
-                            Email Address *
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
-                            placeholder="Enter your email address"
-                          />
-                        </div>
-                      </div>
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
+                    >
+                      Message *
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 resize-none font-instrument"
+                      placeholder="Tell us about your travel plans or questions..."
+                    />
+                  </div>
 
-                      <div>
-                        <label
-                          htmlFor="subject"
-                          className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
-                        >
-                          Subject *
-                        </label>
-                        <select
-                          id="subject"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full h-11 px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 font-instrument"
-                        >
-                          <option value="">Select a subject</option>
-                          <option value="general">General Inquiry</option>
-                          <option value="booking">Booking Assistance</option>
-                          <option value="custom">Custom Travel Plan</option>
-                          <option value="support">Customer Support</option>
-                          <option value="partnership">Partnership</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="message"
-                          className="block text-sm font-semibold text-gray-700 mb-2 font-instrument"
-                        >
-                          Message *
-                        </label>
-                        <textarea
-                          id="message"
-                          name="message"
-                          value={formData.message}
-                          onChange={handleInputChange}
-                          required
-                          rows={4}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-purple-100 focus:ring-2 transition-all duration-200 resize-none font-instrument"
-                          placeholder="Tell us about your travel plans or questions..."
-                        />
-                      </div>
-
-                      <div className="flex justify-end">
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              Sending Message...
-                            </>
-                          ) : (
-                            <>
-                              Send Message
-                              <Send className="w-4 h-4" strokeWidth={2} />
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </form>
-                  )}
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Sending Message...
+                        </>
+                      ) : (
+                        <>
+                          Send Message
+                          <Send className="w-4 h-4" strokeWidth={2} />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </motion.div>
         </div>
