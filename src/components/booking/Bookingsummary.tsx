@@ -558,42 +558,75 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             <>
                               {(booking.paymentStatus === "PENDING" ||
                                 booking.paymentStatus === "OVERDUE") && (
-                                <button
-                                  onClick={() => handleContinueToPayment(true)}
-                                  className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
-         border border-gray-200 rounded-xl py-4 px-6
-         active:scale-[0.98]
-         transition-all duration-200
-         disabled:opacity-50 disabled:cursor-not-allowed
-         flex flex-col items-center justify-center gap-3 font-instrument
-         shadow-md"
-                                  disabled={loading}
-                                  type="button"
-                                >
-                                  <div className="flex justify-center text-xl items-center gap-2 font-bold">
-                                    <CreditCard className="w-5 h-5" />
-                                    Book a Seat
-                                  </div>
-                                  <span
-                                    className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
-           px-3 py-1 rounded-full border border-white/30
-           shadow-sm"
+                                <>
+                                  {/* Pay Partial Button */}
+                                  <button
+                                    onClick={() =>
+                                      handleContinueToPayment(true)
+                                    }
+                                    className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
+               border border-gray-200 rounded-xl py-4 px-6
+               active:scale-[0.98]
+               transition-all duration-200
+               disabled:opacity-50 disabled:cursor-not-allowed
+               flex flex-col items-center justify-center gap-3 font-instrument
+               shadow-md"
+                                    disabled={loading}
+                                    type="button"
                                   >
-                                    Pay Partial ${booking.minPaymentAmount}
-                                  </span>
-                                </button>
+                                    <div className="flex justify-center text-xl items-center gap-2 font-bold">
+                                      <CreditCard className="w-5 h-5" />
+                                      Book a Seat (Partial)
+                                    </div>
+                                    <span
+                                      className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+                 px-3 py-1 rounded-full border border-white/30
+                 shadow-sm"
+                                    >
+                                      Pay Partial ${booking.minPaymentAmount}
+                                    </span>
+                                  </button>
+
+                                  {/* Pay Complete Button */}
+                                  <button
+                                    onClick={() =>
+                                      handleContinueToPayment(false)
+                                    }
+                                    className="w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
+               border border-gray-200 rounded-xl py-4 px-6
+               active:scale-[0.98]
+               transition-all duration-200
+               disabled:opacity-50 disabled:cursor-not-allowed
+               flex flex-col items-center justify-center gap-3 font-instrument
+               shadow-md mt-3"
+                                    disabled={loading}
+                                    type="button"
+                                  >
+                                    <div className="flex justify-center text-xl items-center gap-2 font-bold">
+                                      <CreditCard className="w-5 h-5" />
+                                      Pay Complete Amount
+                                    </div>
+                                    <span
+                                      className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+                 px-3 py-1 rounded-full border border-white/30
+                 shadow-sm"
+                                    >
+                                      Pay Full ${booking.totalPrice}
+                                    </span>
+                                  </button>
+                                </>
                               )}
 
                               {booking.paymentStatus === "PARTIALLY_PAID" && (
                                 <button
                                   onClick={() => handleContinueToPayment(false)}
                                   className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
-         border border-gray-200 rounded-xl py-4 px-6
-         active:scale-[0.98]
-         transition-all duration-200
-         disabled:opacity-50 disabled:cursor-not-allowed
-         flex flex-col items-center justify-center gap-3 font-instrument
-         shadow-md"
+             border border-gray-200 rounded-xl py-4 px-6
+             active:scale-[0.98]
+             transition-all duration-200
+             disabled:opacity-50 disabled:cursor-not-allowed
+             flex flex-col items-center justify-center gap-3 font-instrument
+             shadow-md"
                                   disabled={loading}
                                   type="button"
                                 >
@@ -603,8 +636,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   </div>
                                   <span
                                     className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
-           px-3 py-1 rounded-full border border-white/30
-           shadow-sm"
+               px-3 py-1 rounded-full border border-white/30
+               shadow-sm"
                                   >
                                     Pay Remaining ${booking.remainingAmount}
                                   </span>
