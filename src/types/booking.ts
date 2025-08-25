@@ -4,7 +4,16 @@ export type BookingStatus =
   | "PENDING"
   | "CONFIRMED"
   | "CANCELLED"
+  | "NOTPAID"
   // | "COMPLETED"
+  | "REFUNDED";
+
+export type PaymentSt =
+  | "PENDING"
+  | "PARTIALLY_PAID"
+  | "FULLY_PAID"
+  | "OVERDUE"
+  | "CANCELLED"
   | "REFUNDED";
 export type TravelPlanStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
 
@@ -39,6 +48,18 @@ export interface BookingData {
   submissionType?: "individual" | "team";
   updatedAt?: Date;
   createdAt?: Date;
+  paymentStatus?:
+    | PaymentStatus
+    | "PENDING"
+    | "PARTIALLY_PAID"
+    | "FULLY_PAID"
+    | "OVERDUE"
+    | "REFUNDED"
+    | "CANCELLED";
+  paymentDeadline?: Date | null;
+  minPaymentAmount?: number | null;
+  amountPaid?: number | null;
+  remainingAmount?: number | null;
 }
 
 export interface User {
@@ -115,4 +136,13 @@ export interface GuestInfoUpdate {
 export interface PaymentUpdate {
   totalPrice: number;
   status: BookingStatus;
+}
+
+export enum PaymentStatus {
+  "PENDING",
+  "PARTIALLY_PAID",
+  "FULLY_PAID",
+  "OVERDUE",
+  "REFUNDED",
+  "CANCELLED"
 }

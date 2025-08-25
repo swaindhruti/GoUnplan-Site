@@ -191,7 +191,9 @@ export const getTotalRevenue = async (
 
     const totalSales = await prisma.booking.aggregate({
       where: {
-        status: "CONFIRMED",
+        paymentStatus: {
+          in: ["CANCELLED", "REFUNDED", "FULLY_PAID", "PARTIALLY_PAID"]
+        },
         ...dateFilter
       },
       _sum: { totalPrice: true },
@@ -200,7 +202,7 @@ export const getTotalRevenue = async (
 
     const refundAmount = await prisma.booking.aggregate({
       where: {
-        status: { in: ["CANCELLED", "REFUNDED"] },
+        paymentStatus: { in: ["CANCELLED", "REFUNDED"] },
         ...dateFilter
       },
       _sum: { refundAmount: true },
@@ -273,7 +275,7 @@ export const getAllBookings = async (statusFilter?: string) => {
 
     // Get booking counts by status
     const bookingCounts = await prisma.booking.groupBy({
-      by: ["status"],
+      by: ["paymentStatus"],
       _count: {
         id: true
       }
@@ -281,14 +283,16 @@ export const getAllBookings = async (statusFilter?: string) => {
 
     const counts = {
       ALL: 0,
-      PENDING: 0,
-      CONFIRMED: 0,
+      FULLY_PAID: 0,
+      PARTIALLY_PAID: 0,
       CANCELLED: 0,
-      REFUNDED: 0
+      REFUNDED: 0,
+      PENDING: 0,
+      OVERDUE: 0
     };
 
     bookingCounts.forEach((count) => {
-      counts[count.status] = count._count.id;
+      counts[count.paymentStatus] = count._count.id;
       counts.ALL += count._count.id;
     });
 
@@ -687,11 +691,11 @@ export const getAnalyticsData = async (
 
       const monthStats = monthlyData.get(monthKey);
 
-      if (booking.status === "CONFIRMED") {
+      if (booking.paymentStatus === "FULLY_PAID") {
         monthStats.sales += booking.totalPrice;
       } else if (
-        booking.status === "CANCELLED" ||
-        booking.status === "REFUNDED"
+        booking.paymentStatus === "CANCELLED" ||
+        booking.paymentStatus === "REFUNDED"
       ) {
         monthStats.refunds += booking.refundAmount || booking.totalPrice;
       }
@@ -706,26 +710,37 @@ export const getAnalyticsData = async (
 
     // Status Distribution
     const statusCounts = {
-      CONFIRMED: 0,
+      FULLY_PAID: 0,
+      PARTIALLY_PAID: 0,
       CANCELLED: 0,
       REFUNDED: 0,
-      PENDING: 0
+      PENDING: 0,
+      OVERDUE: 0
     };
 
     allBookings.forEach((booking) => {
-      statusCounts[booking.status]++;
+      statusCounts[booking.paymentStatus]++;
     });
 
     const totalBookings = allBookings.length;
     const statusDistribution = [
       {
-        name: "Confirmed",
+        name: "Fully Paid",
         value:
           totalBookings > 0
-            ? Math.round((statusCounts.CONFIRMED / totalBookings) * 100)
+            ? Math.round((statusCounts.FULLY_PAID / totalBookings) * 100)
             : 0,
         color: "#10B981",
-        count: statusCounts.CONFIRMED
+        count: statusCounts.FULLY_PAID
+      },
+      {
+        name: "Partially Paid",
+        value:
+          totalBookings > 0
+            ? Math.round((statusCounts.PARTIALLY_PAID / totalBookings) * 100)
+            : 0,
+        color: "#10B981",
+        count: statusCounts.PARTIALLY_PAID
       },
       {
         name: "Cancelled",
@@ -756,7 +771,6 @@ export const getAnalyticsData = async (
       }
     ];
 
-    // Daily Transactions for Last 30 Days
     const last30Days = [];
     const now = endDate ? new Date(endDate) : new Date();
 
@@ -770,7 +784,7 @@ export const getAnalyticsData = async (
       );
 
       const dayRevenue = dayBookings
-        .filter((b) => b.status === "CONFIRMED")
+        .filter((b) => b.paymentStatus === "FULLY_PAID")
         .reduce((sum, b) => sum + b.totalPrice, 0);
 
       last30Days.push({
@@ -787,7 +801,7 @@ export const getAnalyticsData = async (
     const destinationData = new Map();
 
     allBookings
-      .filter((b) => b.status === "CONFIRMED")
+      .filter((b) => b.paymentStatus === "FULLY_PAID")
       .forEach((booking) => {
         const dest = booking.travelPlan.destination || "Unknown";
 
@@ -812,7 +826,7 @@ export const getAnalyticsData = async (
     const travelPlanRevenue = new Map();
 
     allBookings
-      .filter((b) => b.status === "CONFIRMED")
+      .filter((b) => b.paymentStatus === "FULLY_PAID")
       .forEach((booking) => {
         const planTitle = booking.travelPlan.title;
 
@@ -833,12 +847,14 @@ export const getAnalyticsData = async (
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 8); // Top 8 travel plans
 
-    // Calculate summary statistics
     const confirmedBookings = allBookings.filter(
-      (b) => b.status === "CONFIRMED"
+      (b) =>
+        b.paymentStatus === "FULLY_PAID" ||
+        b.paymentStatus === "CANCELLED" ||
+        b.paymentStatus === "REFUNDED"
     );
     const refundedBookings = allBookings.filter(
-      (b) => b.status === "CANCELLED" || b.status === "REFUNDED"
+      (b) => b.paymentStatus === "CANCELLED" || b.paymentStatus === "REFUNDED"
     );
 
     const totalSales = confirmedBookings.reduce(
@@ -850,7 +866,6 @@ export const getAnalyticsData = async (
       0
     );
 
-    // Growth calculations (compare with previous period)
     const periodDays =
       startDate && endDate
         ? Math.ceil(
@@ -882,14 +897,17 @@ export const getAnalyticsData = async (
     });
 
     const prevConfirmedBookings = previousBookings.filter(
-      (b) => b.status === "CONFIRMED"
+      (b) =>
+        b.paymentStatus === "FULLY_PAID" ||
+        b.paymentStatus === "CANCELLED" ||
+        b.paymentStatus === "REFUNDED"
     );
     const prevTotalSales = prevConfirmedBookings.reduce(
       (sum, b) => sum + b.totalPrice,
       0
     );
     const prevRefundedBookings = previousBookings.filter(
-      (b) => b.status === "CANCELLED" || b.status === "REFUNDED"
+      (b) => b.paymentStatus === "CANCELLED" || b.paymentStatus === "REFUNDED"
     );
     /*   const prevTotalRefunds = prevRefundedBookings.reduce(
       (sum, b) => sum + (b.refundAmount || b.totalPrice),

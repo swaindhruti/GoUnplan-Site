@@ -16,10 +16,13 @@ import {
   Info,
   ArrowRight
 } from "lucide-react";
-import { completePaymentAction } from "@/actions/booking/actions";
 import { BookingData } from "@/types/booking";
 import Image from "next/image";
 import GreenConfirmationLoader from "../global/Loaders";
+import {
+  completeRemainingPayment,
+  processPartialPayment
+} from "@/actions/booking/actions";
 
 interface PaymentFormProps {
   tripData: {
@@ -40,9 +43,18 @@ interface PaymentFormProps {
   };
   booking: Partial<BookingData>;
   bookingId: string;
+  paymentType?: string;
+  isPartialPayment?: boolean;
+  isRemainingPayment?: boolean;
 }
 
-export function PaymentForm({ tripData, bookingId }: PaymentFormProps) {
+export function PaymentForm({
+  tripData,
+  bookingId,
+  booking,
+  isPartialPayment,
+  isRemainingPayment
+}: PaymentFormProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -53,10 +65,18 @@ export function PaymentForm({ tripData, bookingId }: PaymentFormProps) {
   >(null);
   const [countdown, setCountdown] = useState(10);
 
-  const subtotal = useMemo(
-    () => tripData.numberOfGuests * tripData.pricePerPerson,
-    [tripData.numberOfGuests, tripData.pricePerPerson]
-  );
+  const subtotal = useMemo(() => {
+    if (isPartialPayment) return booking.minPaymentAmount || 0;
+    if (isRemainingPayment) return booking.remainingAmount || 0;
+    else return tripData.numberOfGuests * tripData.pricePerPerson;
+  }, [
+    tripData.numberOfGuests,
+    tripData.pricePerPerson,
+    isPartialPayment,
+    isRemainingPayment,
+    booking.remainingAmount,
+    booking.minPaymentAmount
+  ]);
 
   const platformFee = useMemo(() => Math.round(subtotal * 0.025), [subtotal]);
   const serviceFee = useMemo(() => Math.round(subtotal * 0.075), [subtotal]);
@@ -117,11 +137,9 @@ export function PaymentForm({ tripData, bookingId }: PaymentFormProps) {
     setShowLoader(true);
 
     try {
-      const result = await completePaymentAction(
-        bookingId,
-        total,
-        tripData.numberOfGuests
-      );
+      const result = isPartialPayment
+        ? await processPartialPayment(bookingId, total)
+        : await completeRemainingPayment(bookingId);
 
       if (result.success) {
       } else {
@@ -134,7 +152,7 @@ export function PaymentForm({ tripData, bookingId }: PaymentFormProps) {
       setShowPaymentModal(true);
       setIsProcessing(false);
     }
-  }, [bookingId, total, tripData.numberOfGuests]);
+  }, [bookingId, total, isPartialPayment]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);

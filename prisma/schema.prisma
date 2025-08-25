@@ -138,12 +138,34 @@ model Booking {
   cancelledAt         DateTime?
   pricePerPerson      Int
   refundAmount        Int           @default(0)
+  
+  // New fields for partial payment
+  amountPaid          Int           @default(0)
+  remainingAmount     Int           @default(0)
+  paymentStatus       PaymentStatus @default(PENDING)
+  partialPayments     PartialPayment[]
+  minPaymentAmount    Int?          
+  paymentDeadline     DateTime?   
+  
   travelPlan          TravelPlans   @relation(fields: [travelPlanId], references: [travelPlanId])
   user                User          @relation(fields: [userId], references: [id])
   isReviewed          Boolean       @default(false)
   review              Review?
 
   @@map("bookings")
+}
+
+// New model to track individual partial payments
+model PartialPayment {
+  id          String   @id @default(cuid())
+  bookingId   String
+  amount      Int
+  paymentDate DateTime @default(now())
+  paymentType PaymentType @default(PARTIAL)
+  
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  @@map("partial_payments")
 }
 
 model WaitingList {
@@ -242,6 +264,7 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  NOTPAID
   REFUNDED
 }
 
@@ -283,4 +306,19 @@ model Contact {
   updatedAt DateTime       @updatedAt
 
   @@map("contacts")
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIALLY_PAID
+  FULLY_PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentType {
+  PARTIAL
+  FULL
+  REFUND
 }

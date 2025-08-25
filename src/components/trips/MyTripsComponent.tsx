@@ -10,7 +10,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  RotateCcw,
   Plane,
   ChevronRight,
   Eye,
@@ -39,8 +38,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { PaymentSt } from "@/types/booking";
 
-// Types based on the existing booking structure
 interface TravelPlan {
   travelPlanId: string;
   title: string;
@@ -66,6 +65,13 @@ interface Booking {
   createdAt: Date | string;
   updatedAt: Date | string;
   travelPlan: TravelPlan;
+  paymentStatus:
+    | "PARTIALLY_PAID"
+    | "FULLY_PAID"
+    | "OVERDUE"
+    | "CANCELLED"
+    | "PENDING"
+    | "REFUNDED";
 }
 
 interface User {
@@ -79,20 +85,33 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type DateFilter = "ALL" | "UPCOMING" | "PAST";
+type FilterStatus = "ALL" | PaymentSt;
+
 
 const statusConfig = {
   PENDING: {
     label: "Pending",
-    icon: Clock,
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    bgColor: "bg-yellow-50"
-  },
-  CONFIRMED: {
-    label: "Confirmed",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
     bgColor: "bg-green-50"
+  },
+  FULLY_PAID: {
+    label: "Fully Paid",
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
+  },
+  PARTIALLY_PAID: {
+    label: "Partially Paid",
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
+  },
+  OVERDUE: {
+    label: "Overdue",
+    icon: XCircle,
+    color: "bg-red-100 text-red-800 border-red-200",
+    bgColor: "bg-red-50"
   },
   CANCELLED: {
     label: "Cancelled",
@@ -102,9 +121,9 @@ const statusConfig = {
   },
   REFUNDED: {
     label: "Refunded",
-    icon: RotateCcw,
-    color: "bg-blue-100 text-blue-800 border-blue-200",
-    bgColor: "bg-blue-50"
+    icon: CheckCircle2,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50"
   }
 };
 
@@ -140,45 +159,45 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
 
-      // Date filter logic
-      const now = new Date();
-      const startDate = new Date(booking.startDate);
-      let matchesDate = true;
-      
-      if (dateFilter === "UPCOMING") {
-        matchesDate = startDate > now;
-      } else if (dateFilter === "PAST") {
-        matchesDate = startDate <= now;
-      }
+
+      const matchesStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "CANCELLED"
+          ? booking.status
+          : booking.paymentStatus) === statusFilter;
+
+
 
       return matchesSearch && matchesDate;
     });
 
-    // Sort/Filter bookings
-    if (sortBy === "confirmed" || sortBy === "pending" || sortBy === "cancelled" || sortBy === "refunded") {
-      // Filter by status and then sort by date
-      filtered = filtered.filter(booking => booking.status.toLowerCase() === sortBy);
-      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } else {
-      // Regular sorting
-      filtered.sort((a, b) => {
-        switch (sortBy) {
-          case "date":
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          case "price":
-            return b.totalPrice - a.totalPrice;
-          case "status":
-            return a.status.localeCompare(b.status);
-          default:
-            return 0;
-        }
-      });
-    }
+    console.log(filtered);
+    // Sort bookings
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "date":
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        case "price":
+          return b.totalPrice - a.totalPrice;
+        case "status":
+          return a.status.localeCompare(b.status);
+        default:
+          return 0;
+      }
+    });
+
 
     return filtered;
   }, [bookings, searchTerm, dateFilter, sortBy]);
+
+  // Get status counts for filter buttons
+  const statusCounts = useMemo(() => {
+    const counts = bookings.reduce((acc, booking) => {
+      acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
+      return acc;
+    }, {} as Record<PaymentSt, number>);
 
 
   // Get date filter counts
@@ -296,7 +315,18 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                     Filter by Time
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(["ALL", "UPCOMING", "PAST"] as DateFilter[]).map((filter) => (
+
+                    {(
+                      [
+                        "ALL",
+                        "FULLY_PAID",
+                        "PARTIALLY_PAID",
+                        "CANCELLED",
+                        "OVERDUE",
+                        "PENDING"
+                      ] as FilterStatus[]
+                    ).map((status) => (
+
                       <Button
                         key={filter}
                         variant={dateFilter === filter ? "default" : "outline"}
@@ -311,7 +341,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                           rounded-lg font-instrument transition-all duration-200 hover:scale-105
                         `}
                       >
-                        {filter === "ALL" ? "All Times" : filter === "UPCOMING" ? "Upcoming" : "Past"}
+
+                        {status === "ALL"
+                          ? "All Trips"
+                          : statusConfig[status as PaymentSt]?.label || status}
+
                         <span
                           className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
                             dateFilter === filter
@@ -380,14 +414,12 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                         Search: &quot;{searchTerm}&quot;
                       </span>
                     )}
-                    {dateFilter !== "ALL" && (
-                      <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-md text-xs">
-                        Time: {dateFilter === "UPCOMING" ? "Upcoming" : "Past"}
-                      </span>
-                    )}
-                    {(sortBy === "confirmed" || sortBy === "pending" || sortBy === "cancelled" || sortBy === "refunded") && (
-                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded-md text-xs">
-                        Status: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
+                    {statusFilter !== "ALL" && (
+                      <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
+                        Status:{" "}
+                        {statusConfig[statusFilter as PaymentSt]?.label ||
+                          statusFilter}
+
                       </span>
                     )}
                   </div>
@@ -485,12 +517,13 @@ function BookingCard({ booking }: { booking: Booking }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const statusConfig = getStatusConfig(booking.status);
+  const statusConfig = getStatusConfig(booking.paymentStatus);
   const StatusIcon = statusConfig.icon;
   const isUpcomingTrip = isUpcoming(booking);
 
   const canCancelBooking = () => {
-    if (booking.status !== "CONFIRMED") return false;
+    if (booking.paymentStatus !== "FULLY_PAID") return false;
+    console.log("hii");
     const now = new Date();
     const startDate = new Date(booking.startDate);
     const daysUntilTrip = Math.ceil(
@@ -523,7 +556,7 @@ function BookingCard({ booking }: { booking: Booking }) {
     setIsLoading(true);
     try {
       const result = await cancelBooking(booking.id);
-
+      console.log("hloooo");
       if (result.success) {
         toast.success(
           "Booking cancelled successfully. Refund will be processed shortly."
@@ -532,6 +565,7 @@ function BookingCard({ booking }: { booking: Booking }) {
         router.refresh();
       } else {
         toast.error(result.error || "Failed to cancel booking");
+        console.log(result.error);
       }
     } catch (error) {
       console.error("Frontend: Cancellation error:", error);
@@ -786,9 +820,8 @@ function BookingCard({ booking }: { booking: Booking }) {
   );
 }
 
-// Helper functions (moved outside component to avoid re-creation)
-function getStatusConfig(status: BookingStatus) {
-  return statusConfig[status] || statusConfig.PENDING;
+function getStatusConfig(status: PaymentSt) {
+  return statusConfig[status] || "";
 }
 
 function formatCurrency(amount: number) {
@@ -801,7 +834,7 @@ function formatCurrency(amount: number) {
 function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
-  return booking.status === "CONFIRMED" && startDate > now;
+  return booking.paymentStatus === "FULLY_PAID" && startDate > now;
 }
 
 // Empty State Component for My Trips

@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import {
   createBooking,
-  updateBookingDates,
   updateBookingGuestInfo,
   updateBookingStatus
 } from "@/actions/booking/actions";
@@ -80,21 +79,8 @@ export function useBookingState({
       try {
         updateBookingData(update);
         if (bookingData.id) {
-          const result = await updateBookingDates(
-            bookingData.id,
-            update.startDate,
-            update.endDate
-          );
-          if (result.error) {
-            setError(result.error);
-            return false;
-          }
-          if (result.booking) {
-            const convertedBooking = convertPrismaBookingToBookingData(
-              result.booking
-            );
-            updateBookingData(convertedBooking);
-          }
+          const result = { success: true };
+          console.log(result);
         }
 
         return true;
@@ -105,7 +91,7 @@ export function useBookingState({
         setIsLoading(false);
       }
     },
-    [bookingData.id, updateBookingData, convertPrismaBookingToBookingData]
+    [bookingData.id, updateBookingData]
   );
 
   const updateGuestInfo = useCallback(

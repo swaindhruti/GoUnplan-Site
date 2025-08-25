@@ -8,7 +8,7 @@ import {
   CheckCircle,
   CreditCard,
   XCircle,
-  AlertTriangle,
+  AlertTriangle
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import // editBookingAction,
@@ -24,7 +24,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious,
+  CarouselPrevious
 } from "../ui/carousel";
 
 export interface BookingSummaryProps {
@@ -38,7 +38,7 @@ export interface BookingSummaryProps {
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
   ({ booking, travelPlan, loading = false, allTrips }) => {
     const router = useRouter();
-    const isCancelled = booking?.status === "CANCELLED";
+    const isCancelled = booking?.paymentStatus === "CANCELLED";
 
     const formatDate = useCallback(
       (dateString: Date | string | undefined | null): string => {
@@ -46,7 +46,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         return new Date(dateString).toLocaleDateString("en-IN", {
           year: "numeric",
           month: "short",
-          day: "numeric",
+          day: "numeric"
         });
       },
       []
@@ -57,7 +57,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         if (!amount) return "₹0";
         return new Intl.NumberFormat("en-IN", {
           style: "currency",
-          currency: "INR",
+          currency: "INR"
         }).format(amount);
       },
       []
@@ -76,7 +76,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       return {
         subtotal,
         tax,
-        total,
+        total
       };
     }, [booking]);
 
@@ -121,15 +121,23 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       return `${diffDays}`;
     }, [booking?.startDate, booking?.endDate]);
 
-    const handleContinueToPayment = () => {
+    const handleContinueToPayment = (isPartialPay?: boolean) => {
       router.push(
-        `/trips/booking/${booking?.travelPlanId}/payment-form/${booking?.id}`
+        `/trips/booking/${booking?.travelPlanId}/payment-form/${
+          booking?.id
+        }?payment-type=${
+          isPartialPay
+            ? "partial-pay"
+            : booking?.paymentStatus === "PARTIALLY_PAID"
+            ? "remaining-amount"
+            : ""
+        }`
       );
     };
 
     if (loading) {
       return (
-        <div className="min-h-screen bg-gray-50 py-16 px-6">
+        <div className="min-h-spurple bg-gray-50 py-16 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="bg-white border border-gray-200 rounded-2xl p-10 shadow-sm">
               <div className="animate-pulse space-y-8">
@@ -150,7 +158,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     // Error state
     if (!booking) {
       return (
-        <div className="min-h-screen bg-gray-50 py-16 px-6">
+        <div className="min-h-spurple bg-gray-50 py-16 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="bg-white border border-gray-200 rounded-2xl p-10 shadow-sm text-center">
               <h2 className="text-3xl font-bold text-gray-900 mb-6 font-bricolage">
@@ -166,14 +174,14 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 font-instrument">
+      <div className="min-h-spurple bg-gray-50 font-instrument">
         <div
           className="relative bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
               travelPlan?.tripImage ||
               "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-            }')`,
+            }')`
           }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -389,7 +397,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   filters: trip.filters || [],
                                   languages: trip.languages || [],
                                   averageRating: trip.averageRating ?? 0,
-                                  bookedSeats: trip.bookedSeats ?? 0,
+                                  bookedSeats: trip.bookedSeats ?? 0
                                 }}
                               />
                             </CarouselItem>
@@ -545,25 +553,65 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             </div>
                           </div>
                         </div>
+                        {booking.paymentStatus !== "FULLY_PAID" &&
+                          booking.paymentStatus !== "REFUNDED" && (
+                            <>
+                              {(booking.paymentStatus === "PENDING" ||
+                                booking.paymentStatus === "OVERDUE") && (
+                                <button
+                                  onClick={() => handleContinueToPayment(true)}
+                                  className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
+         border border-gray-200 rounded-xl py-4 px-6
+         active:scale-[0.98]
+         transition-all duration-200
+         disabled:opacity-50 disabled:cursor-not-allowed
+         flex flex-col items-center justify-center gap-3 font-instrument
+         shadow-md"
+                                  disabled={loading}
+                                  type="button"
+                                >
+                                  <div className="flex justify-center text-xl items-center gap-2 font-bold">
+                                    <CreditCard className="w-5 h-5" />
+                                    Book a Seat
+                                  </div>
+                                  <span
+                                    className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+           px-3 py-1 rounded-full border border-white/30
+           shadow-sm"
+                                  >
+                                    Pay Partial ${booking.minPaymentAmount}
+                                  </span>
+                                </button>
+                              )}
 
-                        {/* Proceed to Pay Button - Only show if not cancelled and not confirmed */}
-                        {booking.status !== "CONFIRMED" && (
-                          <button
-                            onClick={handleContinueToPayment}
-                            className="w-full bg-purple-600 text-white font-semibold
-                                 border border-purple-600 rounded-xl py-3 px-6
-                                 hover:bg-purple-700 hover:border-purple-700
-                                 transition-all duration-200
-                                 disabled:opacity-50 disabled:cursor-not-allowed
-                                 flex items-center justify-center gap-2 font-instrument"
-                            disabled={loading}
-                            type="button"
-                          >
-                            <CreditCard className="w-4 h-4" />
-                            Proceed to Pay
-                          </button>
-                        )}
-
+                              {booking.paymentStatus === "PARTIALLY_PAID" && (
+                                <button
+                                  onClick={() => handleContinueToPayment(false)}
+                                  className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
+         border border-gray-200 rounded-xl py-4 px-6
+         active:scale-[0.98]
+         transition-all duration-200
+         disabled:opacity-50 disabled:cursor-not-allowed
+         flex flex-col items-center justify-center gap-3 font-instrument
+         shadow-md"
+                                  disabled={loading}
+                                  type="button"
+                                >
+                                  <div className="flex justify-center text-xl items-center gap-2 font-bold">
+                                    <CreditCard className="w-5 h-5" />
+                                    Complete Payment
+                                  </div>
+                                  <span
+                                    className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+           px-3 py-1 rounded-full border border-white/30
+           shadow-sm"
+                                  >
+                                    Pay Remaining ${booking.remainingAmount}
+                                  </span>
+                                </button>
+                              )}
+                            </>
+                          )}
                         <p className="text-xs text-gray-500 font-instrument mt-2 text-center">
                           By proceeding, you agree to our
                           <a

@@ -23,7 +23,7 @@ interface Transaction {
   travelPlanId: string;
   amount: number;
   type: "SALE" | "REFUND";
-  status: "CONFIRMED" | "CANCELLED" | "REFUNDED" | "PENDING";
+  status: "CONFIRMED" | "CANCELLED" | "REFUNDED" | "PENDING" | "NOTPAID";
   createdAt: Date;
   user: {
     name: string;
