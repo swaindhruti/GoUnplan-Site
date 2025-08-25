@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { PrimaryButton } from "./common";
+import { useRouter } from "next/navigation";
 
 export const ReadyToStart = () => {
+  const router = useRouter();
   return (
     <div className="relative max-w-6xl bg-white py-12 sm:py-16 md:py-20 lg:py-28 xl:py-36 px-6 md:px-20 mx-auto text-center">
       <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 lg:gap-16 xl:gap-20 max-w-6xl mx-auto">
@@ -19,7 +21,12 @@ export const ReadyToStart = () => {
             ready to craft your dream vacation.
           </p>
 
-          <div className="flex justify-center lg:justify-start">
+          <div
+            onClick={() => {
+              router.push("/trips");
+            }}
+            className="flex justify-center lg:justify-start"
+          >
             <PrimaryButton label="Start Planning" />
           </div>
         </div>

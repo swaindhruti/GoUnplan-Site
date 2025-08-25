@@ -85,7 +85,7 @@ export const FindMyVibe = () => {
             className={`w-full cursor-pointer ${
               myVibes
                 ? "flex-1 min-h-[400px]"
-                : "h-[190px] sm:h-[240px] md:h-[290px]"
+                : "h-[140px] sm:h-[190px] md:h-[240px] "
             } relative group`}
           >
             <Image
