@@ -282,16 +282,19 @@ export default function Header() {
         </div>
 
         <DropdownMenuGroup className="p-2">
+
           <DropdownMenuItem
             onClick={() => router.push("/profile")}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">Profile</span>
+            <span className="font-medium text-gray-900">My Profile</span>
+
             <DropdownMenuShortcut className="text-gray-400">
               ⌘P
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+
 
           <div className="relative">
             <DropdownMenuItem
@@ -656,22 +659,28 @@ export default function Header() {
                       <>
                         <div className="border-t overflow-auto border-gray-200/60 my-6"></div>
 
+
                         <button
                           onClick={() => {
                             setIsOpen(false);
                             router.push("/profile");
                           }}
-                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
+
+                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg w-full"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
                               <User className="mr-3 h-5 w-5 text-purple-600" />
-                              Profile
+
+
+                              My Profile
+
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
                           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
+
 
                         <div className="space-y-2">
                           <button

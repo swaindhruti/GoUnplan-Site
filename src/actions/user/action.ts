@@ -19,6 +19,7 @@ export const getUserProfile = async (email: string) => {
         phone: true,
         bio: true,
         image: true,
+        isEmailVerified: true,
         createdAt: true,
         _count: {
           select: {
