@@ -174,7 +174,8 @@ export const createTravelPlan = async (data: {
       statusToSet = TravelPlanStatus.INACTIVE;
     }
     console.log("🔍 DEBUG ACTION: statusToSet =", statusToSet);
-
+    const price = Number(data.price);
+    console.log(price);
     // Create the travel plan first (without transaction)
     const travelPlan = await prisma.travelPlans.create({
       data: {
@@ -187,8 +188,8 @@ export const createTravelPlan = async (data: {
         restrictions: data.restrictions || [],
         noOfDays: data.noOfDays,
         hostId: hostProfile.hostId,
-        price: data.price,
-        maxParticipants: data.maxParticipants,
+        price: price,
+        maxParticipants: Number(data.maxParticipants),
         country: data.country,
         state: data.state,
         city: data.city,
