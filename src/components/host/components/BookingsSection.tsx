@@ -13,6 +13,8 @@ import {
   ChevronDown,
   ChevronRight,
   MapPin,
+  AlertCircle,
+  TrendingUp,
 } from "lucide-react";
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
@@ -27,6 +29,16 @@ type Booking = {
   totalPrice: number;
   participants: number;
   status: BookingStatus;
+  paymentStatus:
+    | "PENDING"
+    | "PARTIALLY_PAID"
+    | "FULLY_PAID"
+    | "OVERDUE"
+    | "CANCELLED"
+    | "REFUNDED";
+  amountPaid?: number;
+  remainingAmount?: number;
+  paymentDeadline?: Date | null;
   createdAt: Date;
   updatedAt: Date;
   specialRequirements: string | null;
@@ -89,6 +101,7 @@ export const BookingsSection = () => {
     CANCELLED: 0,
     REFUNDED: 0,
   });
+  const [showUpcoming, setShowUpcoming] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -165,6 +178,44 @@ export const BookingsSection = () => {
     }
   };
 
+  const getPaymentStatusIcon = (status: string) => {
+    switch (status) {
+      case "FULLY_PAID":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "PARTIALLY_PAID":
+        return <Clock className="h-4 w-4 text-orange-500" />;
+      case "PENDING":
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case "OVERDUE":
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case "CANCELLED":
+        return <XCircle className="h-4 w-4 text-gray-500" />;
+      case "REFUNDED":
+        return <RefreshCw className="h-4 w-4 text-purple-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getPaymentStatusColor = (status: string) => {
+    switch (status) {
+      case "FULLY_PAID":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "PARTIALLY_PAID":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "OVERDUE":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "CANCELLED":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      case "REFUNDED":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
       case "CONFIRMED":
@@ -189,12 +240,19 @@ export const BookingsSection = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       minimumFractionDigits: 0,
     }).format(amount);
   };
+
+  // Get upcoming trips based on bookings
+  const upcomingTrips = bookings.filter((booking) => {
+    const startDate = new Date(booking.startDate);
+    const now = new Date();
+    return startDate > now && booking.paymentStatus === "FULLY_PAID";
+  });
 
   if (loading) {
     return (
@@ -245,6 +303,66 @@ export const BookingsSection = () => {
         <p className="text-gray-600 font-medium">
           Select a trip to view and manage its bookings
         </p>
+      </div>
+
+      {/* Upcoming Trips Toggle */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl shadow-sm border border-purple-200 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-100 p-2 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Upcoming Trips
+              </h3>
+              <p className="text-sm text-gray-600">
+                View all upcoming confirmed bookings
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowUpcoming(!showUpcoming)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+          >
+            {showUpcoming ? "Hide" : "Show"} Upcoming ({upcomingTrips.length})
+          </button>
+        </div>
+
+        {/* Upcoming Trips List */}
+        {showUpcoming && upcomingTrips.length > 0 && (
+          <div className="mt-6 space-y-3">
+            {upcomingTrips.map((booking) => (
+              <div
+                key={booking.id}
+                className="bg-white rounded-lg border border-purple-200 p-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      {booking.travelPlan.title}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(booking.startDate)} • {booking.participants}{" "}
+                      guests • {booking.user.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                      Upcoming
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {showUpcoming && upcomingTrips.length === 0 && (
+          <div className="mt-6 text-center py-4">
+            <p className="text-gray-600">No upcoming trips found</p>
+          </div>
+        )}
       </div>
 
       {/* Active Trips Selector */}
@@ -414,6 +532,16 @@ export const BookingsSection = () => {
                           {getStatusIcon(booking.status)}
                           {booking.status}
                         </span>
+                        <span
+                          className={`px-3 py-1 rounded-full border text-xs font-semibold flex items-center gap-1 ${getPaymentStatusColor(
+                            booking.paymentStatus || "PENDING"
+                          )}`}
+                        >
+                          {getPaymentStatusIcon(
+                            booking.paymentStatus || "PENDING"
+                          )}
+                          {booking.paymentStatus || "PENDING"}
+                        </span>
                         {expandedBookings.has(booking.id) ? (
                           <ChevronDown className="h-5 w-5 text-gray-400" />
                         ) : (
@@ -457,6 +585,45 @@ export const BookingsSection = () => {
                                   {formatCurrency(booking.totalPrice)}
                                 </span>
                               </div>
+                              {booking.amountPaid !== undefined &&
+                                booking.amountPaid > 0 && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                      Amount Paid:
+                                    </span>
+                                    <span className="text-green-600 font-semibold">
+                                      {formatCurrency(booking.amountPaid)}
+                                    </span>
+                                  </div>
+                                )}
+                              {booking.remainingAmount !== undefined &&
+                                booking.remainingAmount > 0 && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                      Remaining:
+                                    </span>
+                                    <span className="text-orange-600 font-semibold">
+                                      {formatCurrency(booking.remainingAmount)}
+                                    </span>
+                                  </div>
+                                )}
+                              {booking.paymentDeadline && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">
+                                    Payment Due:
+                                  </span>
+                                  <span
+                                    className={
+                                      new Date(booking.paymentDeadline) <
+                                      new Date()
+                                        ? "text-red-600"
+                                        : ""
+                                    }
+                                  >
+                                    {formatDate(booking.paymentDeadline)}
+                                  </span>
+                                </div>
+                              )}
                               {booking.refundAmount > 0 && (
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">

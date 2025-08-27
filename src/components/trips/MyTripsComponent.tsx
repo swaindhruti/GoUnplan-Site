@@ -14,7 +14,7 @@ import {
   ChevronRight,
   Eye,
   AlertTriangle,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { PaymentSt } from "@/types/booking";
 
@@ -60,6 +60,8 @@ interface Booking {
   status: BookingStatus;
   pricePerPerson: number;
   refundAmount?: number;
+  amountPaid?: number;
+  remainingAmount?: number;
   specialRequirements?: string | null;
   createdAt: Date | string;
   updatedAt: Date | string;
@@ -84,55 +86,64 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type FilterStatus = "ALL" | PaymentSt;
+type FilterStatus = "ALL" | "UPCOMING" | "PAST" | PaymentSt;
+type SortBy =
+  | "ALL_TRIPS"
+  | "FULLY_PAID"
+  | "PARTIALLY_PAID"
+  | "CANCELLED"
+  | "OVERDUE"
+  | "PENDING";
 
 const statusConfig = {
   PENDING: {
     label: "Pending",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50"
+    bgColor: "bg-green-50",
   },
   FULLY_PAID: {
     label: "Fully Paid",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50"
+    bgColor: "bg-green-50",
   },
   PARTIALLY_PAID: {
     label: "Partially Paid",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50"
+    bgColor: "bg-green-50",
   },
   OVERDUE: {
     label: "Overdue",
     icon: XCircle,
     color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50"
+    bgColor: "bg-red-50",
   },
   CANCELLED: {
     label: "Cancelled",
     icon: XCircle,
     color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50"
+    bgColor: "bg-red-50",
   },
   REFUNDED: {
     label: "Refunded",
     icon: CheckCircle2,
     color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50"
-  }
+    bgColor: "bg-green-50",
+  },
 };
 
 export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
-  const [sortBy, setSortBy] = useState<"date" | "price" | "status">("date");
+  const [sortBy, setSortBy] = useState<SortBy>("ALL_TRIPS");
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
-    const filtered = bookings.filter((booking) => {
+    const now = new Date();
+
+    let filtered = bookings.filter((booking) => {
       const matchesSearch =
         booking.travelPlan.title
           .toLowerCase()
@@ -141,29 +152,37 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "ALL" ||
-        (statusFilter === "CANCELLED"
-          ? booking.status
-          : booking.paymentStatus) === statusFilter;
+      if (!matchesSearch) return false;
 
-      return matchesSearch && matchesStatus;
-    });
-    console.log(filtered);
-    // Sort bookings
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "date":
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        case "price":
-          return b.totalPrice - a.totalPrice;
-        case "status":
-          return a.status.localeCompare(b.status);
-        default:
-          return 0;
+      // Filter by status
+      if (statusFilter === "ALL") return true;
+
+      const startDate = new Date(booking.startDate);
+
+      if (statusFilter === "UPCOMING") {
+        return startDate > now && booking.paymentStatus === "FULLY_PAID";
       }
+
+      if (statusFilter === "PAST") {
+        return (
+          startDate <= now ||
+          booking.paymentStatus === "CANCELLED" ||
+          booking.paymentStatus === "REFUNDED"
+        );
+      }
+
+      // Payment status filters
+      return booking.paymentStatus === statusFilter;
+    });
+
+    // Apply sort filter
+    if (sortBy !== "ALL_TRIPS") {
+      filtered = filtered.filter((booking) => booking.paymentStatus === sortBy);
+    }
+
+    // Sort by date (most recent first)
+    filtered.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
     return filtered;
@@ -171,15 +190,34 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
   // Get status counts for filter buttons
   const statusCounts = useMemo(() => {
+    const now = new Date();
     const counts = bookings.reduce((acc, booking) => {
+      const startDate = new Date(booking.startDate);
+
+      // Count payment statuses
       acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
+
+      // Count upcoming trips
+      if (startDate > now && booking.paymentStatus === "FULLY_PAID") {
+        acc.UPCOMING = (acc.UPCOMING || 0) + 1;
+      }
+
+      // Count past trips
+      if (
+        startDate <= now ||
+        booking.paymentStatus === "CANCELLED" ||
+        booking.paymentStatus === "REFUNDED"
+      ) {
+        acc.PAST = (acc.PAST || 0) + 1;
+      }
+
       return acc;
-    }, {} as Record<PaymentSt, number>);
+    }, {} as Record<string, number>);
 
     return {
       ALL: bookings.length,
-      ...counts
-    };
+      ...counts,
+    } as Record<FilterStatus, number>;
   }, [bookings]);
 
   // Categorize bookings for better organization
@@ -202,7 +240,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       {
         upcoming: [] as Booking[],
         completed: [] as Booking[],
-        other: [] as Booking[]
+        other: [] as Booking[],
       }
     );
   }, [filteredAndSortedBookings]);
@@ -213,7 +251,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       <div
         className="relative bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -281,27 +319,19 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                 {/* Status Filter */}
                 <div className="flex-1">
                   <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
-                    Filter by Status
+                    Filter Trips
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(
-                      [
-                        "ALL",
-                        "FULLY_PAID",
-                        "PARTIALLY_PAID",
-                        "CANCELLED",
-                        "OVERDUE",
-                        "PENDING"
-                      ] as FilterStatus[]
-                    ).map((status) => (
-                      <Button
-                        key={status}
-                        variant={
-                          statusFilter === status ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => setStatusFilter(status)}
-                        className={`
+                    {(["ALL", "UPCOMING", "PAST"] as FilterStatus[]).map(
+                      (status) => (
+                        <Button
+                          key={status}
+                          variant={
+                            statusFilter === status ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => setStatusFilter(status)}
+                          className={`
                           ${
                             statusFilter === status
                               ? "bg-purple-600 text-white border-purple-600 shadow-sm"
@@ -309,40 +339,44 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                           } 
                           rounded-lg font-instrument transition-all duration-200 hover:scale-105
                         `}
-                      >
-                        {status === "ALL"
-                          ? "All Trips"
-                          : statusConfig[status as PaymentSt]?.label || status}
-                        <span
-                          className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                            statusFilter === status
-                              ? "bg-white/20 text-white"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
                         >
-                          {statusCounts[status] || 0}
-                        </span>
-                      </Button>
-                    ))}
+                          {status === "ALL"
+                            ? "All Trips"
+                            : status === "UPCOMING"
+                            ? "Upcoming"
+                            : "Past"}
+                          <span
+                            className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                              statusFilter === status
+                                ? "bg-white/20 text-white"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {statusCounts[status] || 0}
+                          </span>
+                        </Button>
+                      )
+                    )}
                   </div>
                 </div>
 
                 {/* Sort Options */}
                 <div className="lg:w-64">
                   <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
-                    Sort by
+                    Sort by Payment Status
                   </label>
                   <div className="relative">
                     <select
                       value={sortBy}
-                      onChange={(e) =>
-                        setSortBy(e.target.value as "date" | "price" | "status")
-                      }
+                      onChange={(e) => setSortBy(e.target.value as SortBy)}
                       className="w-full h-10 border border-gray-300 rounded-lg px-4 pr-10 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500 bg-white appearance-none cursor-pointer"
                     >
-                      <option value="date">Most Recent</option>
-                      <option value="price">Highest Price</option>
-                      <option value="status">Status</option>
+                      <option value="ALL_TRIPS">All Trips</option>
+                      <option value="FULLY_PAID">Fully Paid</option>
+                      <option value="PARTIALLY_PAID">Partially Paid</option>
+                      <option value="CANCELLED">Cancelled</option>
+                      <option value="OVERDUE">Overdue</option>
+                      <option value="PENDING">Pending</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                       <svg
@@ -456,7 +490,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
                     ...categorizedBookings.completed,
-                    ...categorizedBookings.other
+                    ...categorizedBookings.other,
                   ].map((booking) => (
                     <BookingCard key={booking.id} booking={booking} />
                   ))}
@@ -552,7 +586,7 @@ function BookingCard({ booking }: { booking: Booking }) {
         />
         <div className="absolute inset-0 bg-black/30" />
 
-        {/* Status Badge */}
+        {/* Status Badge - Payment Status */}
         <div className="absolute top-4 right-4">
           <Badge
             className={`${statusConfig.color} font-instrument flex items-center gap-1`}
@@ -603,6 +637,20 @@ function BookingCard({ booking }: { booking: Booking }) {
             </div>
           </div>
 
+          {/* Payment Status Info */}
+          {booking.paymentStatus === "PARTIALLY_PAID" && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-orange-700 font-medium font-instrument">
+                  Remaining Amount:
+                </span>
+                <span className="text-orange-900 font-bold font-instrument">
+                  {formatCurrency(booking.remainingAmount || 0)}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Duration and Price */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
             <div className="text-sm text-gray-600 font-instrument">
@@ -613,7 +661,11 @@ function BookingCard({ booking }: { booking: Booking }) {
                 {formatCurrency(booking.totalPrice)}
               </div>
               <div className="text-xs text-gray-600 font-instrument">
-                Booked on {format(new Date(booking.createdAt), "MMM dd, yyyy")}
+                {booking.paymentStatus === "FULLY_PAID"
+                  ? "Paid"
+                  : booking.paymentStatus === "PARTIALLY_PAID"
+                  ? `Paid: ${formatCurrency(booking.amountPaid || 0)}`
+                  : "Payment Status: " + statusConfig.label}
               </div>
             </div>
           </div>
@@ -762,7 +814,7 @@ function getStatusConfig(status: PaymentSt) {
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "INR"
+    currency: "INR",
   }).format(amount);
 }
 
@@ -775,7 +827,7 @@ function isUpcoming(booking: Booking) {
 // Empty State Component for My Trips
 function EmptyTripState({
   hasFilters,
-  searchTerm
+  searchTerm,
 }: {
   hasFilters: boolean;
   searchTerm: string;
@@ -803,7 +855,7 @@ function EmptyTripState({
             createdAt:
               typeof trip.createdAt === "string"
                 ? trip.createdAt
-                : trip.createdAt.toISOString()
+                : trip.createdAt.toISOString(),
           }));
           setSuggestedTrips(transformedTrips);
         }
