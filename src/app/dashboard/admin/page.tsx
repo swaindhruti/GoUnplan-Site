@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,8 @@ import {
   XCircle,
   Mail,
   Phone,
-  EyeIcon
+  EyeIcon,
+  AlertTriangle,
 } from "lucide-react";
 import {
   getAllUsers,
@@ -40,7 +41,7 @@ import {
   updateUserRole,
   getAlltravelPlanApplications,
   approveTravelPlan,
-  getAllBookings
+  getAllBookings,
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
@@ -51,10 +52,10 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { processRefund } from "@/actions/booking/actions";
-import { PaymentStatus } from "@/types/booking";
+import { PaymentStatus } from "@prisma/client";
 
 // Define interfaces for your data types
 interface User {
@@ -110,14 +111,11 @@ interface Booking {
   specialRequirements: string | null;
   pricePerPerson: number;
   refundAmount: number;
-  paymentStatus?:
-    | PaymentStatus
-    | "PENDING"
-    | "PARTIALLY_PAID"
-    | "FULLY_PAID"
-    | "OVERDUE"
-    | "REFUNDED"
-    | "CANCELLED";
+  paymentStatus: PaymentStatus;
+  minPaymentAmount?: number | null;
+  amountPaid?: number | null;
+  remainingAmount?: number | null;
+  paymentDeadline?: Date | null;
   user: {
     id: string;
     name: string;
@@ -177,6 +175,43 @@ interface RevenueData {
 }
 
 export default function AdminDashboard() {
+  // Helper function to get payment status display info
+  const getPaymentStatusInfo = (status: PaymentStatus) => {
+    const statusMap = {
+      FULLY_PAID: {
+        icon: CheckCircle,
+        color: "bg-green-100 text-green-800 border-green-200",
+        label: "Fully Paid",
+      },
+      PARTIALLY_PAID: {
+        icon: CheckCircle,
+        color: "bg-blue-100 text-blue-800 border-blue-200",
+        label: "Partially Paid",
+      },
+      PENDING: {
+        icon: Clock,
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        label: "Pending",
+      },
+      OVERDUE: {
+        icon: AlertTriangle,
+        color: "bg-red-100 text-red-800 border-red-200",
+        label: "Overdue",
+      },
+      CANCELLED: {
+        icon: XCircle,
+        color: "bg-gray-100 text-gray-800 border-gray-200",
+        label: "Cancelled",
+      },
+      REFUNDED: {
+        icon: RefreshCw,
+        color: "bg-purple-100 text-purple-800 border-purple-200",
+        label: "Refunded",
+      },
+    };
+    return statusMap[status] || statusMap.PENDING;
+  };
+
   // State for all data
   const [users, setUsers] = useState<User[]>([]);
   const [analyticsModal, setAnalyticsModal] = useState(false);
@@ -192,16 +227,16 @@ export default function AdminDashboard() {
     CANCELLED: 0,
     REFUNDED: 0,
     PENDING: 0,
-    OVERDUE: 0
+    OVERDUE: 0,
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
   });
 
   const [totalRevenue, setTotalRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -233,7 +268,7 @@ export default function AdminDashboard() {
 
   const [dateRange, setDateRange] = useState({
     startDate: "",
-    endDate: ""
+    endDate: "",
   });
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
 
@@ -244,7 +279,7 @@ export default function AdminDashboard() {
     hostApplicants: 0,
     totalBookings: 0,
     totalSales: 0,
-    pendingRefunds: 0
+    pendingRefunds: 0,
   });
 
   // NEW: Set default dates (last 30 days)
@@ -255,7 +290,7 @@ export default function AdminDashboard() {
 
     setDateRange({
       startDate: thirtyDaysAgo.toISOString().split("T")[0],
-      endDate: today.toISOString().split("T")[0]
+      endDate: today.toISOString().split("T")[0],
     });
   }, []);
   const handleAnalyticsModal = () => {
@@ -276,7 +311,7 @@ export default function AdminDashboard() {
       setStatsData((prev) => ({
         ...prev,
         totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
+        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
       }));
     } catch (err) {
       setError("Failed to fetch revenue data");
@@ -357,7 +392,7 @@ export default function AdminDashboard() {
               CANCELLED: 0,
               REFUNDED: 0,
               PENDING: 0,
-              OVERDUE: 0
+              OVERDUE: 0,
             }
           );
         }
@@ -379,7 +414,7 @@ export default function AdminDashboard() {
             (travelPlansResponse.travelPlans?.length || 0),
           totalBookings: bookingsResponse.counts?.ALL || 0,
           totalSales: totalRevenue.totalSales._sum.totalPrice || 0, // This will be updated by fetchRevenueData
-          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0 // This will be updated by fetchRevenueData
+          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0, // This will be updated by fetchRevenueData
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -392,7 +427,7 @@ export default function AdminDashboard() {
     fetchAdminData();
   }, [
     totalRevenue.refundAmount._sum.refundAmount,
-    totalRevenue.totalSales._sum.totalPrice
+    totalRevenue.totalSales._sum.totalPrice,
   ]);
 
   const handleApproveHost = async (email: string) => {
@@ -412,7 +447,7 @@ export default function AdminDashboard() {
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
-        totalHosts: statsData.totalHosts + 1
+        totalHosts: statsData.totalHosts + 1,
       });
     } catch (err) {
       setError("Failed to approve host application");
@@ -430,7 +465,7 @@ export default function AdminDashboard() {
       setApplicants(applicants.filter((app) => app.email !== email));
       setStatsData({
         ...statsData,
-        hostApplicants: statsData.hostApplicants - 1
+        hostApplicants: statsData.hostApplicants - 1,
       });
     } catch (err) {
       setError("Failed to reject host application");
@@ -501,7 +536,7 @@ export default function AdminDashboard() {
         setBookingCounts((prev) => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
-          REFUNDED: prev.REFUNDED + 1
+          REFUNDED: prev.REFUNDED + 1,
         }));
       } else {
         setError(result.error || "Failed to mark booking as refunded");
@@ -519,7 +554,7 @@ export default function AdminDashboard() {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
   const formatDateRange = () => {
@@ -528,12 +563,12 @@ export default function AdminDashboard() {
     const start = new Date(dateRange.startDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     });
     const end = new Date(dateRange.endDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     });
 
     return `${start} - ${end}`;
@@ -555,33 +590,33 @@ export default function AdminDashboard() {
       id: "users",
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
-      description: "User Management"
+      description: "User Management",
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management"
+      description: "Host Management",
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews"
+      description: "Pending Reviews",
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics"
+      description: "Financial Analytics",
     },
 
     {
       id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
-      description: "Booking Management"
-    }
+      description: "Booking Management",
+    },
   ];
 
   if (loading) {
@@ -750,6 +785,136 @@ export default function AdminDashboard() {
             <p className="text-gray-600 text-sm mt-1 font-instrument">
               Refunds
             </p>
+          </div>
+        </div>
+
+        {/* Payment Status Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div className="text-green-600 text-sm font-medium">
+                {bookingCounts.FULLY_PAID} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Fully Paid
+            </h3>
+            <div className="text-2xl font-bold text-green-600">
+              {(
+                (bookingCounts.FULLY_PAID / Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="text-blue-600 text-sm font-medium">
+                {bookingCounts.PARTIALLY_PAID} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Partially Paid
+            </h3>
+            <div className="text-2xl font-bold text-blue-600">
+              {(
+                (bookingCounts.PARTIALLY_PAID /
+                  Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Clock className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div className="text-yellow-600 text-sm font-medium">
+                {bookingCounts.PENDING} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Pending
+            </h3>
+            <div className="text-2xl font-bold text-yellow-600">
+              {(
+                (bookingCounts.PENDING / Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="text-red-600 text-sm font-medium">
+                {bookingCounts.OVERDUE} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Overdue
+            </h3>
+            <div className="text-2xl font-bold text-red-600">
+              {(
+                (bookingCounts.OVERDUE / Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <XCircle className="h-5 w-5 text-gray-600" />
+              </div>
+              <div className="text-gray-600 text-sm font-medium">
+                {bookingCounts.CANCELLED} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Cancelled
+            </h3>
+            <div className="text-2xl font-bold text-gray-600">
+              {(
+                (bookingCounts.CANCELLED / Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <RefreshCw className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="text-purple-600 text-sm font-medium">
+                {bookingCounts.REFUNDED} bookings
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Refunded
+            </h3>
+            <div className="text-2xl font-bold text-purple-600">
+              {(
+                (bookingCounts.REFUNDED / Math.max(bookingCounts.ALL, 1)) *
+                100
+              ).toFixed(1)}
+              %
+            </div>
           </div>
         </div>
 
@@ -1597,7 +1762,7 @@ export default function AdminDashboard() {
                       "CANCELLED",
                       "REFUNDED",
                       "PENDING",
-                      "OVERDUE"
+                      "OVERDUE",
                     ].map((status) => (
                       <button
                         key={status}
@@ -1682,44 +1847,55 @@ export default function AdminDashboard() {
                               </div>
 
                               <div className="flex flex-col items-start sm:items-end gap-2">
-                                <span
-                                  className={`px-3 py-1 rounded-full border text-xs font-semibold flex items-center gap-1 ${
-                                    booking.status === "CONFIRMED"
-                                      ? "bg-green-100 text-green-800 border-green-200"
-                                      : booking.status === "PENDING"
-                                      ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-                                      : booking.status === "CANCELLED"
-                                      ? "bg-red-100 text-red-800 border-red-200"
-                                      : "bg-purple-100 text-purple-800 border-purple-200"
-                                  }`}
-                                >
-                                  {booking.paymentStatus === "FULLY_PAID" && (
-                                    <CheckCircle className="h-4 w-4" />
-                                  )}
-                                  {booking.paymentStatus ===
-                                    "PARTIALLY_PAID" && (
-                                    <CheckCircle className="h-4 w-4" />
-                                  )}
-                                  {booking.paymentStatus === "PENDING" && (
-                                    <Clock className="h-4 w-4" />
-                                  )}
-                                  {booking.paymentStatus === "CANCELLED" && (
-                                    <XCircle className="h-4 w-4" />
-                                  )}
-                                  {booking.paymentStatus === "REFUNDED" && (
-                                    <RefreshCw className="h-4 w-4" />
-                                  )}
-                                  {booking.paymentStatus}
-                                </span>
-                                <p className="text-xl font-bold text-gray-900">
-                                  ${booking.totalPrice.toLocaleString()}
-                                </p>
-                                {booking.refundAmount > 0 && (
-                                  <p className="text-sm text-red-600">
-                                    Refunded: $
-                                    {booking.refundAmount.toLocaleString()}
+                                {(() => {
+                                  const statusInfo = getPaymentStatusInfo(
+                                    booking.paymentStatus
+                                  );
+                                  const IconComponent = statusInfo.icon;
+                                  return (
+                                    <span
+                                      className={`px-3 py-1 rounded-full border text-xs font-semibold flex items-center gap-1 ${statusInfo.color}`}
+                                    >
+                                      <IconComponent className="h-4 w-4" />
+                                      {statusInfo.label}
+                                    </span>
+                                  );
+                                })()}
+                                <div className="text-right">
+                                  <p className="text-xl font-bold text-gray-900">
+                                    ${booking.totalPrice.toLocaleString()}
                                   </p>
-                                )}
+                                  {booking.paymentStatus === "PARTIALLY_PAID" &&
+                                    booking.amountPaid && (
+                                      <p className="text-sm text-blue-600">
+                                        Paid: $
+                                        {booking.amountPaid.toLocaleString()}
+                                      </p>
+                                    )}
+                                  {booking.paymentStatus === "PARTIALLY_PAID" &&
+                                    booking.remainingAmount && (
+                                      <p className="text-sm text-orange-600">
+                                        Remaining: $
+                                        {booking.remainingAmount.toLocaleString()}
+                                      </p>
+                                    )}
+                                  {(booking.paymentStatus === "PENDING" ||
+                                    booking.paymentStatus === "OVERDUE") &&
+                                    booking.paymentDeadline && (
+                                      <p className="text-xs text-gray-500">
+                                        Due:{" "}
+                                        {new Date(
+                                          booking.paymentDeadline
+                                        ).toLocaleDateString()}
+                                      </p>
+                                    )}
+                                  {booking.refundAmount > 0 && (
+                                    <p className="text-sm text-red-600">
+                                      Refunded: $
+                                      {booking.refundAmount.toLocaleString()}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             </div>
 

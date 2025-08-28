@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { format } from "date-fns";
-import { BookingStatus } from "@prisma/client";
+import { BookingStatus, PaymentStatus } from "@prisma/client";
 import Image from "next/image";
 import { cancelBooking } from "@/actions/booking/actions";
 import { getSuggestedTripsWrapper } from "@/actions/trips/getSuggestedTripsWrapper";
@@ -37,7 +37,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PaymentSt } from "@/types/booking";
 
 interface TravelPlan {
   travelPlanId: string;
@@ -66,13 +65,7 @@ interface Booking {
   createdAt: Date | string;
   updatedAt: Date | string;
   travelPlan: TravelPlan;
-  paymentStatus:
-    | "PARTIALLY_PAID"
-    | "FULLY_PAID"
-    | "OVERDUE"
-    | "CANCELLED"
-    | "PENDING"
-    | "REFUNDED";
+  paymentStatus: PaymentStatus;
 }
 
 interface User {
@@ -86,14 +79,8 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type FilterStatus = "ALL" | "UPCOMING" | "PAST" | PaymentSt;
-type SortBy =
-  | "ALL_TRIPS"
-  | "FULLY_PAID"
-  | "PARTIALLY_PAID"
-  | "CANCELLED"
-  | "OVERDUE"
-  | "PENDING";
+type FilterStatus = "ALL" | "UPCOMING" | "PAST" | PaymentStatus;
+type SortBy = "ALL_TRIPS" | PaymentStatus;
 
 const statusConfig = {
   PENDING: {
@@ -410,7 +397,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                     {statusFilter !== "ALL" && (
                       <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
                         Status:{" "}
-                        {statusConfig[statusFilter as PaymentSt]?.label ||
+                        {statusConfig[statusFilter as PaymentStatus]?.label ||
                           statusFilter}
                       </span>
                     )}
@@ -807,7 +794,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   );
 }
 
-function getStatusConfig(status: PaymentSt) {
+function getStatusConfig(status: PaymentStatus) {
   return statusConfig[status] || "";
 }
 

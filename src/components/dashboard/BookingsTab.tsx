@@ -8,11 +8,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  XCircle,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
 import { Booking } from "@/types/dashboard";
 import { formatDateRange } from "@/utils/dateUtils";
 import { useRouter } from "next/navigation";
+import { PaymentStatus } from "@prisma/client";
 
 interface BookingsTabProps {
   bookings: Booking[];
@@ -27,10 +35,51 @@ export function BookingsTab({
 }: BookingsTabProps) {
   const router = useRouter();
 
+  // Helper function to get payment status display info
+  const getPaymentStatusInfo = (status: PaymentStatus) => {
+    const statusMap = {
+      FULLY_PAID: {
+        icon: CheckCircle,
+        color: "bg-green-100 text-green-800 border-green-200",
+        label: "Fully Paid",
+      },
+      PARTIALLY_PAID: {
+        icon: CheckCircle,
+        color: "bg-blue-100 text-blue-800 border-blue-200",
+        label: "Partially Paid",
+      },
+      PENDING: {
+        icon: Clock,
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        label: "Payment Pending",
+      },
+      OVERDUE: {
+        icon: AlertTriangle,
+        color: "bg-red-100 text-red-800 border-red-200",
+        label: "Overdue",
+      },
+      CANCELLED: {
+        icon: XCircle,
+        color: "bg-gray-100 text-gray-800 border-gray-200",
+        label: "Cancelled",
+      },
+      REFUNDED: {
+        icon: RefreshCw,
+        color: "bg-purple-100 text-purple-800 border-purple-200",
+        label: "Refunded",
+      },
+    };
+    return statusMap[status] || statusMap.PENDING;
+  };
+
   // Filter bookings based on selected filter
   const filteredBookings = bookings.filter((booking) => {
     if (bookingFilter === "all") return true;
-    return booking.status.toLowerCase() === bookingFilter.toLowerCase();
+    // Check both booking status and payment status
+    return (
+      booking.status.toLowerCase() === bookingFilter.toLowerCase() ||
+      booking.paymentStatus === bookingFilter.toUpperCase()
+    );
   });
 
   // Get badge class for booking status
@@ -81,7 +130,8 @@ export function BookingsTab({
             Manage your travel bookings
           </p>
         </div>
-        <div className="flex gap-2 mt-2 md:mt-0">
+        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+          {/* Booking Status Filters */}
           <button
             onClick={() => setBookingFilter("all")}
             className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
@@ -112,6 +162,39 @@ export function BookingsTab({
           >
             Pending
           </button>
+
+          {/* Payment Status Filters */}
+          <div className="w-px h-8 bg-gray-300 mx-2"></div>
+          <button
+            onClick={() => setBookingFilter("FULLY_PAID")}
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
+              bookingFilter === "FULLY_PAID"
+                ? "bg-green-600 text-white"
+                : "bg-green-100 text-green-600 hover:bg-green-200"
+            }`}
+          >
+            Fully Paid
+          </button>
+          <button
+            onClick={() => setBookingFilter("PARTIALLY_PAID")}
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
+              bookingFilter === "PARTIALLY_PAID"
+                ? "bg-blue-600 text-white"
+                : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+            }`}
+          >
+            Partial Payment
+          </button>
+          <button
+            onClick={() => setBookingFilter("PENDING")}
+            className={`px-4 py-2 rounded-full text-sm font-instrument font-semibold transition-all duration-200 ${
+              bookingFilter === "PENDING"
+                ? "bg-yellow-600 text-white"
+                : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+            }`}
+          >
+            Payment Due
+          </button>
         </div>
       </div>
 
@@ -137,6 +220,9 @@ export function BookingsTab({
                 </TableHead>
                 <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Status
+                </TableHead>
+                <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                  Payment Status
                 </TableHead>
                 <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                   Actions
@@ -172,8 +258,21 @@ export function BookingsTab({
                     {formatDateRange(booking.startDate, booking.endDate)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <div className="font-semibold text-gray-900 font-bricolage">
-                      ${booking.totalPrice.toLocaleString()}
+                    <div className="space-y-1">
+                      <div className="font-semibold text-gray-900 font-bricolage">
+                        ${booking.totalPrice.toLocaleString()}
+                      </div>
+                      {booking.paymentStatus === "PARTIALLY_PAID" &&
+                        booking.amountPaid && (
+                          <p className="text-xs text-blue-600">
+                            Paid: ${booking.amountPaid.toLocaleString()}
+                          </p>
+                        )}
+                      {booking.refundAmount && booking.refundAmount > 0 && (
+                        <p className="text-xs text-red-600">
+                          Refunded: ${booking.refundAmount.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
@@ -183,6 +282,41 @@ export function BookingsTab({
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     {getStatusBadge(booking.status)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    {(() => {
+                      const statusInfo = getPaymentStatusInfo(
+                        booking.paymentStatus
+                      );
+                      const IconComponent = statusInfo.icon;
+                      return (
+                        <div className="space-y-1">
+                          <Badge
+                            className={`flex items-center gap-1 w-fit px-3 py-1 rounded-full border text-xs font-semibold ${statusInfo.color}`}
+                          >
+                            <IconComponent className="h-3 w-3" />
+                            {statusInfo.label}
+                          </Badge>
+                          {booking.paymentStatus === "PARTIALLY_PAID" &&
+                            booking.remainingAmount && (
+                              <p className="text-xs text-orange-600">
+                                Remaining: $
+                                {booking.remainingAmount.toLocaleString()}
+                              </p>
+                            )}
+                          {(booking.paymentStatus === "PENDING" ||
+                            booking.paymentStatus === "OVERDUE") &&
+                            booking.paymentDeadline && (
+                              <p className="text-xs text-gray-500">
+                                Due:{" "}
+                                {new Date(
+                                  booking.paymentDeadline
+                                ).toLocaleDateString()}
+                              </p>
+                            )}
+                        </div>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     <Button

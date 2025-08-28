@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Calendar,
   Users,
@@ -19,6 +19,7 @@ import {
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
 import { BookingStatus, TeamMemberInput } from "@/types/booking";
+import { PaymentStatus } from "@prisma/client";
 
 type Booking = {
   id: string;
@@ -29,13 +30,7 @@ type Booking = {
   totalPrice: number;
   participants: number;
   status: BookingStatus;
-  paymentStatus:
-    | "PENDING"
-    | "PARTIALLY_PAID"
-    | "FULLY_PAID"
-    | "OVERDUE"
-    | "CANCELLED"
-    | "REFUNDED";
+  paymentStatus: PaymentStatus;
   amountPaid?: number;
   remainingAmount?: number;
   paymentDeadline?: Date | null;
@@ -79,7 +74,9 @@ type Trip = {
 type BookingCounts = {
   ALL: number;
   PENDING: number;
-  CONFIRMED: number;
+  PARTIALLY_PAID: number;
+  FULLY_PAID: number;
+  OVERDUE: number;
   CANCELLED: number;
   REFUNDED: number;
 };
@@ -97,30 +94,23 @@ export const BookingsSection = () => {
   const [counts, setCounts] = useState<BookingCounts>({
     ALL: 0,
     PENDING: 0,
-    CONFIRMED: 0,
+    PARTIALLY_PAID: 0,
+    FULLY_PAID: 0,
+    OVERDUE: 0,
     CANCELLED: 0,
     REFUNDED: 0,
   });
   const [showUpcoming, setShowUpcoming] = useState(false);
 
-  useEffect(() => {
-    fetchBookings();
-  });
-
-  useEffect(() => {
-    if (selectedTrip || selectedStatus !== "ALL") {
-      fetchBookings();
-    }
-  });
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
       const response = await getHostBookings(
         selectedStatus,
-        selectedTrip || undefined
+        selectedTrip || undefined,
+        "payment"
       );
 
       if ("error" in response) {
@@ -128,15 +118,29 @@ export const BookingsSection = () => {
       } else if (response.success) {
         setBookings(response.bookings || []);
         setTrips(response.trips || []);
-        setCounts(
-          response.counts || {
+        // Calculate payment status counts from the bookings data
+        const paymentCounts = (response.bookings || []).reduce(
+          (acc: BookingCounts, booking: Booking) => {
+            acc.ALL++;
+            if (
+              booking.paymentStatus &&
+              acc[booking.paymentStatus as keyof BookingCounts] !== undefined
+            ) {
+              acc[booking.paymentStatus as keyof BookingCounts]++;
+            }
+            return acc;
+          },
+          {
             ALL: 0,
             PENDING: 0,
-            CONFIRMED: 0,
+            PARTIALLY_PAID: 0,
+            FULLY_PAID: 0,
+            OVERDUE: 0,
             CANCELLED: 0,
             REFUNDED: 0,
           }
         );
+        setCounts(paymentCounts);
       }
     } catch (err) {
       console.error("Error fetching bookings:", err);
@@ -144,7 +148,17 @@ export const BookingsSection = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus, selectedTrip]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  useEffect(() => {
+    if (selectedTrip || selectedStatus !== "ALL") {
+      fetchBookings();
+    }
+  }, [selectedTrip, selectedStatus, fetchBookings]);
 
   const toggleBookingExpansion = (bookingId: string) => {
     setExpandedBookings((prev) => {

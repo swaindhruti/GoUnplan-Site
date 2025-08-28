@@ -1,6 +1,21 @@
 export type RevenueAnalytics = {
-  confirmed: {
+  // Payment Status Based Data
+  fullyPaid: {
     revenue: number;
+    bookingCount: number;
+  };
+  partiallyPaid: {
+    revenue: number;
+    amountReceived: number;
+    remainingAmount: number;
+    bookingCount: number;
+  };
+  pending: {
+    bookingValue: number;
+    bookingCount: number;
+  };
+  overdue: {
+    bookingValue: number;
     bookingCount: number;
   };
   cancelled: {
@@ -8,21 +23,25 @@ export type RevenueAnalytics = {
     refundAmount: number;
     bookingCount: number;
   };
-  pending: {
-    bookingValue: number;
+  refunded: {
+    refundAmount: number;
     bookingCount: number;
   };
   summary: {
-    netRevenue: number;
-    revenueAtRisk: number;
-    cancellationRate: number;
+    totalRevenue: number; // All fully paid + partially paid amounts
+    receivedRevenue: number; // Actual money received
+    pendingRevenue: number; // Money still to be collected
+    revenueAtRisk: number; // Overdue + cancelled bookings
+    collectionEfficiency: number; // Percentage of money collected vs expected
   };
   monthlyTrend: Array<{
     month: string;
     year: number;
     monthNum: number;
-    revenue: number;
-    bookingCount: number;
+    fullyPaidRevenue: number;
+    partiallyPaidRevenue: number;
+    pendingRevenue: number;
+    totalBookings: number;
   }>;
 };
 

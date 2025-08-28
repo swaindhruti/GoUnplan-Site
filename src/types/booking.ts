@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Role, PaymentStatus } from "@prisma/client";
 
 export type BookingStatus =
   | "PENDING"
@@ -8,13 +8,8 @@ export type BookingStatus =
   // | "COMPLETED"
   | "REFUNDED";
 
-export type PaymentSt =
-  | "PENDING"
-  | "PARTIALLY_PAID"
-  | "FULLY_PAID"
-  | "OVERDUE"
-  | "CANCELLED"
-  | "REFUNDED";
+// Use the PaymentStatus enum from Prisma
+export type PaymentSt = PaymentStatus;
 export type TravelPlanStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
 
 export interface TeamMemberInput {
@@ -136,13 +131,4 @@ export interface GuestInfoUpdate {
 export interface PaymentUpdate {
   totalPrice: number;
   status: BookingStatus;
-}
-
-export enum PaymentStatus {
-  "PENDING",
-  "PARTIALLY_PAID",
-  "FULLY_PAID",
-  "OVERDUE",
-  "REFUNDED",
-  "CANCELLED"
 }
