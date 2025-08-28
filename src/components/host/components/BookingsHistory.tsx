@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Calendar,
   Users,
@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
 import { BookingStatus, TeamMemberInput } from "@/types/booking";
+import { PaymentStatus } from "@prisma/client";
 
 type Booking = {
   id: string;
@@ -24,6 +25,7 @@ type Booking = {
   totalPrice: number;
   participants: number;
   status: BookingStatus;
+  paymentStatus: PaymentStatus;
   createdAt: Date;
   updatedAt: Date;
   specialRequirements: string | null;
@@ -52,7 +54,9 @@ type Booking = {
 type BookingCounts = {
   ALL: number;
   PENDING: number;
-  CONFIRMED: number;
+  PARTIALLY_PAID: number;
+  FULLY_PAID: number;
+  OVERDUE: number;
   CANCELLED: number;
   REFUNDED: number;
 };
@@ -68,40 +72,48 @@ export const BookingsHistory = () => {
   const [counts, setCounts] = useState<BookingCounts>({
     ALL: 0,
     PENDING: 0,
-    CONFIRMED: 0,
+    PARTIALLY_PAID: 0,
+    FULLY_PAID: 0,
+    OVERDUE: 0,
     CANCELLED: 0,
     REFUNDED: 0,
   });
 
-  useEffect(() => {
-    fetchAllBookings();
-  }, []);
-
-  useEffect(() => {
-    filterBookings();
-  });
-
-  const fetchAllBookings = async () => {
+  const fetchAllBookings = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Fetch all bookings without trip filter
-      const response = await getHostBookings();
+      // Fetch all bookings without trip filter, using payment status filtering
+      const response = await getHostBookings(undefined, undefined, "payment");
 
       if ("error" in response) {
         setError(response.error as string);
       } else if (response.success) {
         setBookings(response.bookings || []);
-        setCounts(
-          response.counts || {
+        // Calculate payment status counts from the bookings data
+        const paymentCounts = (response.bookings || []).reduce(
+          (acc: BookingCounts, booking: Booking) => {
+            acc.ALL++;
+            if (
+              booking.paymentStatus &&
+              acc[booking.paymentStatus as keyof BookingCounts] !== undefined
+            ) {
+              acc[booking.paymentStatus as keyof BookingCounts]++;
+            }
+            return acc;
+          },
+          {
             ALL: 0,
             PENDING: 0,
-            CONFIRMED: 0,
+            PARTIALLY_PAID: 0,
+            FULLY_PAID: 0,
+            OVERDUE: 0,
             CANCELLED: 0,
             REFUNDED: 0,
           }
         );
+        setCounts(paymentCounts);
       }
     } catch (err) {
       console.error("Error fetching bookings:", err);
@@ -109,15 +121,15 @@ export const BookingsHistory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterBookings = () => {
+  const filterBookings = useCallback(() => {
     let filtered = bookings;
 
-    // Filter by status
+    // Filter by payment status
     if (selectedStatus !== "ALL") {
       filtered = filtered.filter(
-        (booking) => booking.status === selectedStatus
+        (booking) => booking.paymentStatus === selectedStatus
       );
     }
 
@@ -135,7 +147,15 @@ export const BookingsHistory = () => {
     }
 
     setFilteredBookings(filtered);
-  };
+  }, [bookings, selectedStatus, searchTerm]);
+
+  useEffect(() => {
+    fetchAllBookings();
+  }, [fetchAllBookings]);
+
+  useEffect(() => {
+    filterBookings();
+  }, [filterBookings]);
 
   const copyBookingId = async (bookingId: string) => {
     try {
@@ -162,6 +182,25 @@ export const BookingsHistory = () => {
     }
   };
 
+  const getPaymentStatusIcon = (status: PaymentStatus) => {
+    switch (status) {
+      case "FULLY_PAID":
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case "PARTIALLY_PAID":
+        return <Clock className="h-5 w-5 text-orange-500" />;
+      case "PENDING":
+        return <Clock className="h-5 w-5 text-yellow-500" />;
+      case "OVERDUE":
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      case "CANCELLED":
+        return <XCircle className="h-5 w-5 text-gray-500" />;
+      case "REFUNDED":
+        return <RefreshCw className="h-5 w-5 text-purple-500" />;
+      default:
+        return <Clock className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
       case "CONFIRMED":
@@ -170,6 +209,25 @@ export const BookingsHistory = () => {
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "CANCELLED":
         return "bg-red-100 text-red-800 border-red-200";
+      case "REFUNDED":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getPaymentStatusColor = (status: PaymentStatus) => {
+    switch (status) {
+      case "FULLY_PAID":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "PARTIALLY_PAID":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "OVERDUE":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "CANCELLED":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "REFUNDED":
         return "bg-purple-100 text-purple-800 border-purple-200";
       default:
@@ -264,26 +322,32 @@ export const BookingsHistory = () => {
           />
         </div>
 
-        {/* Status Filter Tabs */}
+        {/* Payment Status Filter Tabs */}
         <div className="flex flex-wrap gap-3">
-          {["ALL", "CONFIRMED", "PENDING", "REFUNDED", "CANCELLED"].map(
-            (status) => (
-              <button
-                key={status}
-                onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                  selectedStatus === status
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                <span>{status}</span>
-                <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
-                  {counts[status as keyof BookingCounts]}
-                </span>
-              </button>
-            )
-          )}
+          {[
+            "ALL",
+            "FULLY_PAID",
+            "PARTIALLY_PAID",
+            "PENDING",
+            "OVERDUE",
+            "CANCELLED",
+            "REFUNDED",
+          ].map((status) => (
+            <button
+              key={status}
+              onClick={() => setSelectedStatus(status)}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                selectedStatus === status
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              <span>{status.replace("_", " ")}</span>
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
+                {counts[status as keyof BookingCounts]}
+              </span>
+            </button>
+          ))}
         </div>
 
         {/* Results Summary */}
@@ -332,7 +396,10 @@ export const BookingsHistory = () => {
                     Amount
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Booking Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Payment Status
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Booked On
@@ -408,6 +475,16 @@ export const BookingsHistory = () => {
                       >
                         {getStatusIcon(booking.status)}
                         {booking.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getPaymentStatusColor(
+                          booking.paymentStatus
+                        )}`}
+                      >
+                        {getPaymentStatusIcon(booking.paymentStatus)}
+                        {booking.paymentStatus.replace("_", " ")}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

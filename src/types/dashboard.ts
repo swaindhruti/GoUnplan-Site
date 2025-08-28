@@ -1,3 +1,5 @@
+import { PaymentStatus } from "@prisma/client";
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -15,6 +17,14 @@ export interface UserProfile {
     cancelled: number;
     completed: number;
   };
+  paymentCounts: {
+    fullyPaid: number;
+    partiallyPaid: number;
+    paymentPending: number;
+    overdue: number;
+    cancelled: number;
+    refunded: number;
+  };
 }
 
 export interface Booking {
@@ -26,6 +36,12 @@ export interface Booking {
   totalPrice: number;
   status: string;
   createdAt: Date;
+  paymentStatus: PaymentStatus;
+  minPaymentAmount?: number | null;
+  amountPaid?: number | null;
+  remainingAmount?: number | null;
+  paymentDeadline?: Date | null;
+  refundAmount?: number;
   travelPlan: {
     title: string;
     description: string;

@@ -2,11 +2,11 @@
 import { RevenueAnalytics } from "../types";
 import {
   DollarSign,
-  TrendingDown,
   AlertCircle,
   BarChart3,
   TrendingUp,
-  Target,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 import {
   AreaChart,
@@ -72,94 +72,129 @@ export const EarningsSection = ({
         </div>
       ) : revenueData ? (
         <>
-          {/* Revenue Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100 shadow-sm hover:shadow-lg transition-all duration-300">
+          {/* Detailed Payment Status Breakdown */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-emerald-600" />
+                <div className="h-10 w-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-5 w-5 text-emerald-600" />
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-emerald-600">
-                    ₹{revenueData.confirmed.revenue.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-emerald-500 font-medium">
-                    Confirmed
-                  </div>
+                <div className="text-emerald-600 text-sm font-medium">
+                  {revenueData.fullyPaid.bookingCount} bookings
                 </div>
               </div>
-              <h3 className="text-slate-700 font-semibold text-lg mb-1">
-                Net Revenue
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Fully Paid
               </h3>
-              <p className="text-slate-500 text-base">
-                Sum of confirmed bookings
+              <div className="text-2xl font-bold text-emerald-600 mb-2">
+                ₹{revenueData.fullyPaid.revenue.toLocaleString()}
+              </div>
+              <p className="text-sm text-slate-600">
+                Complete payments received
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-purple-600" />
+                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-blue-600" />
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-purple-600">
-                    {revenueData.confirmed.bookingCount}
-                  </div>
-                  <div className="text-sm text-purple-500 font-medium">
-                    +8.2%
-                  </div>
+                <div className="text-blue-600 text-sm font-medium">
+                  {revenueData.partiallyPaid.bookingCount} bookings
                 </div>
               </div>
-              <h3 className="text-slate-700 font-semibold text-lg mb-1">
-                Confirmed Bookings
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Partially Paid
               </h3>
-              <p className="text-slate-500 text-base">
-                Successful reservations
-              </p>
+              <div className="space-y-1">
+                <div className="text-lg font-bold text-blue-600">
+                  ₹{revenueData.partiallyPaid.amountReceived.toLocaleString()}{" "}
+                  received
+                </div>
+                <div className="text-sm text-orange-600 font-medium">
+                  ₹{revenueData.partiallyPaid.remainingAmount.toLocaleString()}{" "}
+                  pending
+                </div>
+              </div>
+              <p className="text-sm text-slate-600">Partial payments made</p>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <Target className="h-6 w-6 text-orange-600" />
+                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-orange-600" />
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-orange-600">
-                    {revenueData.cancelled.bookingCount}
-                  </div>
-                  <div className="text-sm text-orange-500 font-medium">
-                    {revenueData.summary.cancellationRate}% rate
-                  </div>
+                <div className="text-orange-600 text-sm font-medium">
+                  {revenueData.pending.bookingCount} pending
                 </div>
               </div>
-              <h3 className="text-slate-700 font-semibold text-lg mb-1">
-                Cancelled Trips
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Payment Pending
               </h3>
-              <p className="text-slate-500 text-base">
-                Number of cancellations
-              </p>
+              <div className="text-2xl font-bold text-orange-600 mb-2">
+                ₹{revenueData.pending.bookingValue.toLocaleString()}
+              </div>
+              <p className="text-sm text-slate-600">Awaiting initial payment</p>
             </div>
 
-            <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-red-100 rounded-xl flex items-center justify-center">
-                  <TrendingDown className="h-6 w-6 text-red-600" />
+                <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-red-600">
-                    ₹{revenueData.pending.bookingValue.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-red-500 font-medium">
-                    {revenueData.pending.bookingCount} pending
-                  </div>
+                <div className="text-red-600 text-sm font-medium">
+                  {revenueData.overdue.bookingCount} overdue
                 </div>
               </div>
-              <h3 className="text-slate-700 font-semibold text-lg mb-1">
-                Revenue at Risk
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Overdue Payments
               </h3>
-              <p className="text-slate-500 text-base">
-                Bookings pending payment
-              </p>
+              <div className="text-2xl font-bold text-red-600 mb-2">
+                ₹{revenueData.overdue.bookingValue.toLocaleString()}
+              </div>
+              <p className="text-sm text-slate-600">Past payment deadline</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-gray-600" />
+                </div>
+                <div className="text-gray-600 text-sm font-medium">
+                  {revenueData.cancelled.bookingCount} cancelled
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Cancelled
+              </h3>
+              <div className="space-y-1">
+                <div className="text-lg font-bold text-gray-600">
+                  ₹{revenueData.cancelled.bookingValue.toLocaleString()} lost
+                </div>
+                <div className="text-sm text-purple-600 font-medium">
+                  ₹{revenueData.cancelled.refundAmount.toLocaleString()}{" "}
+                  refunded
+                </div>
+              </div>
+              <p className="text-sm text-slate-600">Booking cancellations</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                </div>
+                <div className="text-purple-600 text-sm font-medium">
+                  {revenueData.summary.collectionEfficiency}% efficiency
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                Collection Rate
+              </h3>
+              <div className="text-2xl font-bold text-purple-600 mb-2">
+                ₹{revenueData.summary.receivedRevenue.toLocaleString()}
+              </div>
+              <p className="text-sm text-slate-600">Total collected so far</p>
             </div>
           </div>
 
@@ -205,8 +240,14 @@ export const EarningsSection = ({
                         month: `${monthNames[item.monthNum]} ${item.year
                           .toString()
                           .slice(-2)}`,
-                        revenue: item.revenue,
-                        bookings: item.bookingCount,
+                        fullyPaid: item.fullyPaidRevenue,
+                        partiallyPaid: item.partiallyPaidRevenue,
+                        pending: item.pendingRevenue,
+                        totalRevenue:
+                          item.fullyPaidRevenue +
+                          item.partiallyPaidRevenue +
+                          item.pendingRevenue,
+                        bookings: item.totalBookings,
                       }))
                     : // Fallback to generated data if no actual data
                       (() => {
@@ -225,12 +266,22 @@ export const EarningsSection = ({
                             month: `${monthNames[monthIndex]} ${year
                               .toString()
                               .slice(-2)}`,
-                            revenue: 0,
+                            fullyPaid: 0,
+                            partiallyPaid: 0,
+                            pending: 0,
+                            totalRevenue: 0,
                             bookings: 0,
                           });
                         }
                         return data;
                       })();
+
+                // Calculate dynamic Y-axis domain
+                const maxValue = Math.max(
+                  ...chartData.map((item) => item.totalRevenue)
+                );
+                const dynamicDomain =
+                  maxValue > 0 ? [0, Math.ceil(maxValue * 1.1)] : [0, 100000];
 
                 // Custom tooltip
                 const CustomTooltip = ({
@@ -241,23 +292,46 @@ export const EarningsSection = ({
                   active?: boolean;
                   payload?: Array<{
                     value: number;
-                    payload: { bookings: number };
+                    dataKey?: string;
+                    color?: string;
+                    payload: {
+                      bookings: number;
+                      fullyPaid: number;
+                      partiallyPaid: number;
+                      pending: number;
+                      totalRevenue: number;
+                    };
                   }>;
                   label?: string;
                 }) => {
                   if (active && payload && payload.length) {
+                    const data = payload[0]?.payload;
                     return (
                       <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
                         <p className="text-sm font-semibold text-gray-800 mb-2">
                           {label}
                         </p>
                         <div className="space-y-1">
-                          <p className="text-sm text-purple-600 font-medium">
-                            Revenue: ₹{payload[0]?.value?.toLocaleString() || 0}
+                          <p className="text-sm text-emerald-600 font-medium">
+                            Fully Paid: ₹
+                            {data?.fullyPaid?.toLocaleString() || 0}
                           </p>
-                          <p className="text-sm text-indigo-600 font-medium">
-                            Bookings: {payload[0]?.payload?.bookings || 0}
+                          <p className="text-sm text-blue-600 font-medium">
+                            Partially Paid: ₹
+                            {data?.partiallyPaid?.toLocaleString() || 0}
                           </p>
+                          <p className="text-sm text-orange-600 font-medium">
+                            Pending: ₹{data?.pending?.toLocaleString() || 0}
+                          </p>
+                          <div className="border-t border-gray-200 mt-2 pt-2">
+                            <p className="text-sm text-purple-600 font-medium">
+                              Total: ₹
+                              {data?.totalRevenue?.toLocaleString() || 0}
+                            </p>
+                            <p className="text-sm text-indigo-600 font-medium">
+                              Bookings: {data?.bookings || 0}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     );
@@ -276,7 +350,7 @@ export const EarningsSection = ({
                         >
                           <defs>
                             <linearGradient
-                              id="colorRevenue"
+                              id="colorFullyPaid"
                               x1="0"
                               y1="0"
                               x2="0"
@@ -284,12 +358,48 @@ export const EarningsSection = ({
                             >
                               <stop
                                 offset="5%"
-                                stopColor="#8b5cf6"
+                                stopColor="#10b981"
                                 stopOpacity={0.4}
                               />
                               <stop
                                 offset="95%"
-                                stopColor="#8b5cf6"
+                                stopColor="#10b981"
+                                stopOpacity={0.05}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="colorPartiallyPaid"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.4}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.05}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="colorPending"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="#f59e0b"
+                                stopOpacity={0.4}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="#f59e0b"
                                 stopOpacity={0.05}
                               />
                             </linearGradient>
@@ -306,32 +416,50 @@ export const EarningsSection = ({
                           <YAxis
                             stroke="#6b7280"
                             style={{ fontSize: "12px" }}
-                            domain={[0, 200000]}
-                            ticks={[0, 50000, 100000, 150000, 200000]}
+                            domain={dynamicDomain}
                             tickFormatter={(value) => {
                               if (value === 0) return "₹0";
-                              return `₹${(value / 1000).toFixed(0)}k`;
+                              if (value >= 100000)
+                                return `₹${(value / 100000).toFixed(1)}L`;
+                              if (value >= 1000)
+                                return `₹${(value / 1000).toFixed(0)}k`;
+                              return `₹${value}`;
                             }}
                           />
                           <Tooltip content={<CustomTooltip />} />
                           <Legend
                             wrapperStyle={{ fontSize: "14px" }}
-                            iconType="line"
+                            iconType="rect"
                           />
                           <Area
                             type="monotone"
-                            dataKey="revenue"
-                            stroke="#8b5cf6"
+                            dataKey="fullyPaid"
+                            stackId="1"
+                            stroke="#10b981"
                             strokeWidth={3}
-                            fillOpacity={1}
-                            fill="url(#colorRevenue)"
-                            name="Sales Revenue (₹)"
-                            dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 5 }}
-                            activeDot={{
-                              r: 7,
-                              stroke: "#8b5cf6",
-                              strokeWidth: 2,
-                            }}
+                            fillOpacity={0.8}
+                            fill="url(#colorFullyPaid)"
+                            name="Fully Paid (₹)"
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="partiallyPaid"
+                            stackId="1"
+                            stroke="#3b82f6"
+                            strokeWidth={3}
+                            fillOpacity={0.8}
+                            fill="url(#colorPartiallyPaid)"
+                            name="Partially Paid (₹)"
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="pending"
+                            stackId="1"
+                            stroke="#f59e0b"
+                            strokeWidth={3}
+                            fillOpacity={0.8}
+                            fill="url(#colorPending)"
+                            name="Pending (₹)"
                           />
                         </AreaChart>
                       </ResponsiveContainer>

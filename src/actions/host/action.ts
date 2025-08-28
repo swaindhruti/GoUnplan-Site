@@ -3,7 +3,12 @@
 import prisma from "@/lib/prisma";
 import { requireHost } from "@/lib/roleGaurd";
 import { TravelPlanStatuses } from "@/types/travel";
-import { TravelPlanStatus, BookingStatus, Prisma } from "@prisma/client";
+import {
+  TravelPlanStatus,
+  BookingStatus,
+  PaymentStatus,
+  Prisma,
+} from "@prisma/client";
 
 export const getHostDetails = async () => {
   const session = await requireHost();
@@ -21,10 +26,10 @@ export const getHostDetails = async () => {
             id: true,
             name: true,
             email: true,
-            phone: true
-          }
-        }
-      }
+            phone: true,
+          },
+        },
+      },
     });
 
     if (!host) {
@@ -48,14 +53,14 @@ export const getHostTravelPlansByStatus = async (
     const travelPlans = await prisma.travelPlans.findMany({
       where: {
         hostId: session.user.id,
-        status: status
+        status: status,
       },
       select: {
         title: true,
         description: true,
         price: true,
-        maxParticipants: true
-      }
+        maxParticipants: true,
+      },
     });
 
     if (!travelPlans || travelPlans.length === 0) {
@@ -86,8 +91,8 @@ export const updateHostProfile = async (data: {
         description: data.description,
         image: data.image,
         hostEmail: data.hostEmail,
-        hostMobile: data.hostMobile
-      }
+        hostMobile: data.hostMobile,
+      },
     });
 
     return { success: true, host: updatedHost };
@@ -130,7 +135,7 @@ export const createTravelPlan = async (data: {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -144,7 +149,9 @@ export const createTravelPlan = async (data: {
       noOfDays: data.noOfDays,
       filters: data.filters,
       languages: data.languages,
-      dayWiseData: data.dayWiseData ? `${data.dayWiseData.length} days` : "none"
+      dayWiseData: data.dayWiseData
+        ? `${data.dayWiseData.length} days`
+        : "none",
     });
 
     // Debug - Full day-wise data
@@ -162,7 +169,7 @@ export const createTravelPlan = async (data: {
     console.log("🔍 DEBUG ACTION: TravelPlanStatus enum values:", {
       DRAFT: TravelPlanStatus.DRAFT,
       ACTIVE: TravelPlanStatus.ACTIVE,
-      INACTIVE: TravelPlanStatus.INACTIVE
+      INACTIVE: TravelPlanStatus.INACTIVE,
     });
 
     let statusToSet;
@@ -196,8 +203,8 @@ export const createTravelPlan = async (data: {
         languages: data.languages || [],
         filters: data.filters || [],
         tripImage: data.tripImage || "https://avatar.iran.liara.run/public",
-        status: statusToSet
-      }
+        status: statusToSet,
+      },
     });
 
     console.log(
@@ -227,8 +234,8 @@ export const createTravelPlan = async (data: {
               meals: dayData.meals || "",
               accommodation: dayData.accommodation || "",
               dayWiseImage:
-                dayData.dayWiseImage || "https://avatar.iran.liara.run/public"
-            }
+                dayData.dayWiseImage || "https://avatar.iran.liara.run/public",
+            },
           });
 
           console.log(
@@ -244,7 +251,7 @@ export const createTravelPlan = async (data: {
         // Since we're not using transactions, we should handle cleanup here
         // Delete the travel plan if day-wise itinerary creation fails
         await prisma.travelPlans.delete({
-          where: { travelPlanId: travelPlan.travelPlanId }
+          where: { travelPlanId: travelPlan.travelPlanId },
         });
 
         throw dayError;
@@ -257,7 +264,7 @@ export const createTravelPlan = async (data: {
       success: true,
       travelPlan: travelPlan,
       message:
-        "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings."
+        "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
     };
   } catch (error) {
     console.error("Error creating travel plan:", error);
@@ -271,7 +278,7 @@ export const getAllTrips = async () => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -280,18 +287,18 @@ export const getAllTrips = async () => {
 
     const trips = await prisma.travelPlans.findMany({
       where: {
-        hostId: hostProfile.hostId
+        hostId: hostProfile.hostId,
       },
       include: {
         dayWiseItinerary: {
           orderBy: {
-            dayNumber: "asc"
-          }
-        }
+            dayNumber: "asc",
+          },
+        },
       },
       orderBy: {
-        createdAt: "desc"
-      }
+        createdAt: "desc",
+      },
     });
 
     // Transform the data to match our Trip type
@@ -305,8 +312,8 @@ export const getAllTrips = async () => {
           activities: day.activities,
           meals: day.meals,
           accommodation: day.accommodation,
-          dayWiseImage: day.dayWiseImage
-        })) || []
+          dayWiseImage: day.dayWiseImage,
+        })) || [],
     }));
 
     return { success: true, trips: transformedTrips };
@@ -352,7 +359,7 @@ export const updateTravelPlan = async (
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -360,7 +367,7 @@ export const updateTravelPlan = async (
     }
 
     const existingPlan = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: id }
+      where: { travelPlanId: id },
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
@@ -374,30 +381,30 @@ export const updateTravelPlan = async (
     const updatedPlan = await prisma.travelPlans.update({
       where: { travelPlanId: id },
       data: {
-        ...travelPlanData
-      }
+        ...travelPlanData,
+      },
     });
 
     // Handle day-wise data update if provided
     if (dayWiseData && dayWiseData.length > 0) {
       // Delete existing day-wise data
       await prisma.dayWiseItinerary.deleteMany({
-        where: { travelPlanId: id }
+        where: { travelPlanId: id },
       });
 
       // Create new day-wise data
       await prisma.dayWiseItinerary.createMany({
         data: dayWiseData.map((day) => ({
           ...day,
-          travelPlanId: id
-        }))
+          travelPlanId: id,
+        })),
       });
     }
 
     return {
       success: true,
       updatedPlan,
-      message: "Travel plan updated successfully!"
+      message: "Travel plan updated successfully!",
     };
   } catch (error) {
     console.error("Error updating travel plan:", error);
@@ -431,7 +438,7 @@ export const saveDraftTrip = async (
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -441,7 +448,7 @@ export const saveDraftTrip = async (
     // Check if the travel plan exists and belongs to the host
     const existingPlan = await prisma.travelPlans.findUnique({
       where: { travelPlanId: id },
-      select: { hostId: true, status: true }
+      select: { hostId: true, status: true },
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
@@ -453,14 +460,14 @@ export const saveDraftTrip = async (
       where: { travelPlanId: id },
       data: {
         ...data,
-        status: "DRAFT" // Keep as draft
-      }
+        status: "DRAFT", // Keep as draft
+      },
     });
 
     return {
       success: true,
       updatedPlan,
-      message: "Draft saved successfully"
+      message: "Draft saved successfully",
     };
   } catch (error) {
     console.error("Error saving draft trip:", error);
@@ -495,7 +502,7 @@ export const submitTripForVerification = async (
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -507,10 +514,10 @@ export const submitTripForVerification = async (
       include: {
         bookings: {
           where: {
-            status: { in: ["CONFIRMED", "PENDING"] }
-          }
-        }
-      }
+            status: { in: ["CONFIRMED", "PENDING"] },
+          },
+        },
+      },
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
@@ -519,7 +526,7 @@ export const submitTripForVerification = async (
 
     // Get the current trip to check its status
     const currentTrip = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: id }
+      where: { travelPlanId: id },
     });
 
     if (!currentTrip) {
@@ -545,8 +552,8 @@ export const submitTripForVerification = async (
       where: { travelPlanId: id },
       data: {
         ...data,
-        status: newStatus
-      }
+        status: newStatus,
+      },
     });
 
     const message =
@@ -558,7 +565,7 @@ export const submitTripForVerification = async (
       success: true,
       updatedPlan,
       message,
-      existingBookingsCount: existingPlan.bookings.length
+      existingBookingsCount: existingPlan.bookings.length,
     };
   } catch (error) {
     console.error("Error submitting travel plan for verification:", error);
@@ -572,7 +579,7 @@ export const getTripById = async (tripId: string) => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -580,7 +587,7 @@ export const getTripById = async (tripId: string) => {
     }
 
     const trip = await prisma.travelPlans.findUnique({
-      where: { travelPlanId: tripId }
+      where: { travelPlanId: tripId },
     });
 
     if (!trip || trip.hostId !== hostProfile.hostId) {
@@ -596,14 +603,15 @@ export const getTripById = async (tripId: string) => {
 
 export const getHostBookings = async (
   statusFilter?: string,
-  selectedTripId?: string
+  selectedTripId?: string,
+  filterType: "booking" | "payment" = "booking"
 ) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -614,7 +622,7 @@ export const getHostBookings = async (
     const travelPlans = await prisma.travelPlans.findMany({
       where: {
         hostId: hostProfile.hostId,
-        status: "ACTIVE"
+        status: "ACTIVE",
       },
       select: {
         travelPlanId: true,
@@ -623,18 +631,18 @@ export const getHostBookings = async (
         endDate: true,
         maxParticipants: true,
         destination: true,
-        tripImage: true
+        tripImage: true,
       },
       orderBy: {
-        startDate: "asc"
-      }
+        startDate: "asc",
+      },
     });
 
     const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
 
     // Build where clause for bookings
     const whereClause: Prisma.BookingWhereInput = {
-      travelPlanId: { in: travelPlanIds }
+      travelPlanId: { in: travelPlanIds },
     };
 
     // Add trip filter if provided
@@ -644,7 +652,11 @@ export const getHostBookings = async (
 
     // Add status filter if provided
     if (statusFilter && statusFilter !== "ALL") {
-      whereClause.status = statusFilter as BookingStatus;
+      if (filterType === "payment") {
+        whereClause.paymentStatus = statusFilter as PaymentStatus;
+      } else {
+        whereClause.status = statusFilter as BookingStatus;
+      }
     }
 
     // Fetch bookings with related data
@@ -657,8 +669,8 @@ export const getHostBookings = async (
             name: true,
             email: true,
             phone: true,
-            image: true
-          }
+            image: true,
+          },
         },
         travelPlan: {
           select: {
@@ -669,14 +681,14 @@ export const getHostBookings = async (
             endDate: true,
             price: true,
             tripImage: true,
-            maxParticipants: true
-          }
+            maxParticipants: true,
+          },
         },
-        guests: true
+        guests: true,
       },
       orderBy: {
-        createdAt: "desc"
-      }
+        createdAt: "desc",
+      },
     });
 
     // Get booking counts by status (for selected trip if specified)
@@ -687,9 +699,9 @@ export const getHostBookings = async (
     const bookingCounts = await prisma.booking.groupBy({
       by: ["status"],
       _count: {
-        id: true
+        id: true,
       },
-      where: bookingCountsWhere
+      where: bookingCountsWhere,
     });
 
     const counts = {
@@ -698,7 +710,7 @@ export const getHostBookings = async (
       CONFIRMED: 0,
       CANCELLED: 0,
       REFUNDED: 0,
-      NOTPAID: 0
+      NOTPAID: 0,
     };
 
     bookingCounts.forEach((count) => {
@@ -712,11 +724,11 @@ export const getHostBookings = async (
         const confirmedBookings = await prisma.booking.findMany({
           where: {
             travelPlanId: trip.travelPlanId,
-            status: "CONFIRMED"
+            status: "CONFIRMED",
           },
           select: {
-            participants: true
-          }
+            participants: true,
+          },
         });
 
         const confirmedParticipants = confirmedBookings.reduce(
@@ -731,7 +743,7 @@ export const getHostBookings = async (
         return {
           ...trip,
           confirmedParticipants,
-          remainingSeats
+          remainingSeats,
         };
       })
     );
@@ -740,7 +752,7 @@ export const getHostBookings = async (
       success: true,
       bookings,
       counts,
-      trips: tripsWithBookingData
+      trips: tripsWithBookingData,
     };
   } catch (error) {
     console.error("Error fetching host bookings:", error);
@@ -754,7 +766,7 @@ export const getRevenueAnalytics = async () => {
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
-      where: { hostId: session.user.id }
+      where: { hostId: session.user.id },
     });
 
     if (!hostProfile) {
@@ -764,83 +776,132 @@ export const getRevenueAnalytics = async () => {
     // Get all travel plans by this host
     const travelPlans = await prisma.travelPlans.findMany({
       where: { hostId: hostProfile.hostId },
-      select: { travelPlanId: true }
+      select: { travelPlanId: true },
     });
 
     const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
 
-    // Get confirmed bookings revenue
-    const confirmedBookings = await prisma.booking.aggregate({
+    // Get bookings by payment status
+    const fullyPaidBookings = await prisma.booking.aggregate({
       _sum: {
-        totalPrice: true
+        totalPrice: true,
+        amountPaid: true,
       },
       _count: {
-        id: true
+        id: true,
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: "CONFIRMED"
-      }
+        paymentStatus: "FULLY_PAID",
+      },
     });
 
-    // Get cancelled bookings data
+    const partiallyPaidBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+        amountPaid: true,
+        remainingAmount: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        paymentStatus: "PARTIALLY_PAID",
+      },
+    });
+
+    const pendingPaymentBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        paymentStatus: "PENDING",
+      },
+    });
+
+    const overdueBookings = await prisma.booking.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        travelPlanId: { in: travelPlanIds },
+        paymentStatus: "OVERDUE",
+      },
+    });
+
     const cancelledBookings = await prisma.booking.aggregate({
       _sum: {
         totalPrice: true,
-        refundAmount: true
+        refundAmount: true,
       },
       _count: {
-        id: true
+        id: true,
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: { in: ["CANCELLED", "REFUNDED"] }
-      }
+        paymentStatus: "CANCELLED",
+      },
     });
 
-    // Get pending bookings value
-    const pendingBookings = await prisma.booking.aggregate({
+    const refundedBookings = await prisma.booking.aggregate({
       _sum: {
-        totalPrice: true
+        refundAmount: true,
       },
       _count: {
-        id: true
+        id: true,
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        status: "PENDING"
-      }
+        paymentStatus: "REFUNDED",
+      },
     });
 
-    // Get monthly revenue trend (last 6 months)
+    // Get monthly revenue trend (last 6 months) based on payment status
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     sixMonthsAgo.setDate(1);
     sixMonthsAgo.setHours(0, 0, 0, 0);
 
-    // Get all confirmed bookings from last 6 months
+    // Get all bookings from last 6 months with payment status
     const monthlyBookings = await prisma.booking.findMany({
       where: {
         travelPlanId: { in: travelPlanIds },
         createdAt: { gte: sixMonthsAgo },
-        status: "CONFIRMED"
       },
       select: {
         totalPrice: true,
-        createdAt: true
-      }
+        amountPaid: true,
+        paymentStatus: true,
+        createdAt: true,
+      },
     });
 
-    // Group bookings by month
+    // Group bookings by month and payment status
     const monthlyRevenue: Array<{
       month: string;
       year: number;
       monthNum: number;
-      revenue: number;
-      bookingCount: number;
+      fullyPaidRevenue: number;
+      partiallyPaidRevenue: number;
+      pendingRevenue: number;
+      totalBookings: number;
     }> = [];
-    const monthlyData: { [key: string]: { revenue: number; count: number } } =
-      {};
+    const monthlyData: {
+      [key: string]: {
+        fullyPaidRevenue: number;
+        partiallyPaidRevenue: number;
+        pendingRevenue: number;
+        totalBookings: number;
+      };
+    } = {};
 
     monthlyBookings.forEach((booking) => {
       const date = new Date(booking.createdAt);
@@ -849,11 +910,23 @@ export const getRevenueAnalytics = async () => {
       ).padStart(2, "0")}`;
 
       if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { revenue: 0, count: 0 };
+        monthlyData[monthKey] = {
+          fullyPaidRevenue: 0,
+          partiallyPaidRevenue: 0,
+          pendingRevenue: 0,
+          totalBookings: 0,
+        };
       }
 
-      monthlyData[monthKey].revenue += booking.totalPrice || 0;
-      monthlyData[monthKey].count += 1;
+      monthlyData[monthKey].totalBookings += 1;
+
+      if (booking.paymentStatus === "FULLY_PAID") {
+        monthlyData[monthKey].fullyPaidRevenue += booking.totalPrice || 0;
+      } else if (booking.paymentStatus === "PARTIALLY_PAID") {
+        monthlyData[monthKey].partiallyPaidRevenue += booking.amountPaid || 0;
+      } else if (booking.paymentStatus === "PENDING") {
+        monthlyData[monthKey].pendingRevenue += booking.totalPrice || 0;
+      }
     });
 
     // Convert to array format for the last 6 months
@@ -868,57 +941,84 @@ export const getRevenueAnalytics = async () => {
         month: monthKey,
         year: date.getFullYear(),
         monthNum: date.getMonth(),
-        revenue: monthlyData[monthKey]?.revenue || 0,
-        bookingCount: monthlyData[monthKey]?.count || 0
+        fullyPaidRevenue: monthlyData[monthKey]?.fullyPaidRevenue || 0,
+        partiallyPaidRevenue: monthlyData[monthKey]?.partiallyPaidRevenue || 0,
+        pendingRevenue: monthlyData[monthKey]?.pendingRevenue || 0,
+        totalBookings: monthlyData[monthKey]?.totalBookings || 0,
       });
     }
 
-    // Calculate metrics
-    const totalConfirmedRevenue = confirmedBookings._sum.totalPrice || 0;
+    // Calculate metrics based on payment status
+    const totalFullyPaidRevenue = fullyPaidBookings._sum.totalPrice || 0;
+    const totalPartiallyPaidValue = partiallyPaidBookings._sum.totalPrice || 0;
+    const totalAmountReceived =
+      (fullyPaidBookings._sum.amountPaid || 0) +
+      (partiallyPaidBookings._sum.amountPaid || 0);
+    const totalPendingAmount = partiallyPaidBookings._sum.remainingAmount || 0;
+    const totalPendingValue = pendingPaymentBookings._sum.totalPrice || 0;
+    const totalOverdueValue = overdueBookings._sum.totalPrice || 0;
     const totalCancelledValue = cancelledBookings._sum.totalPrice || 0;
-    const totalRefundAmount = cancelledBookings._sum.refundAmount || 0;
-    const totalPendingValue = pendingBookings._sum.totalPrice || 0;
 
-    // Net revenue = Confirmed revenue - refunds
-    const netRevenue = totalConfirmedRevenue - totalRefundAmount;
+    // Total revenue = All money from bookings regardless of payment status
+    const totalRevenue =
+      totalFullyPaidRevenue +
+      totalPartiallyPaidValue +
+      totalPendingValue +
+      totalOverdueValue +
+      totalCancelledValue;
 
-    // Revenue at risk = Pending bookings that might cancel
-    const revenueAtRisk = totalPendingValue;
+    // Received revenue = Actual money in hand
+    const receivedRevenue = totalAmountReceived;
 
-    // Cancellation rate
-    const totalBookings =
-      (confirmedBookings._count.id || 0) +
-      (cancelledBookings._count.id || 0) +
-      (pendingBookings._count.id || 0);
+    // Pending revenue = Money still to be collected from partially paid + pending
+    const pendingRevenue = totalPendingAmount + totalPendingValue;
 
-    const cancellationRate =
-      totalBookings > 0
-        ? ((cancelledBookings._count.id || 0) / totalBookings) * 100
-        : 0;
+    // Revenue at risk = Overdue + cancelled bookings (money we might never collect)
+    const revenueAtRisk = totalOverdueValue + totalCancelledValue;
+
+    // Collection efficiency = How much we've collected vs total expected
+    const collectionEfficiency =
+      totalRevenue > 0 ? (receivedRevenue / totalRevenue) * 100 : 0;
 
     return {
       success: true,
       revenueData: {
-        confirmed: {
-          revenue: totalConfirmedRevenue,
-          bookingCount: confirmedBookings._count.id || 0
+        fullyPaid: {
+          revenue: totalFullyPaidRevenue,
+          bookingCount: fullyPaidBookings._count.id || 0,
         },
-        cancelled: {
-          bookingValue: totalCancelledValue,
-          refundAmount: totalRefundAmount,
-          bookingCount: cancelledBookings._count.id || 0
+        partiallyPaid: {
+          revenue: totalPartiallyPaidValue,
+          amountReceived: partiallyPaidBookings._sum.amountPaid || 0,
+          remainingAmount: totalPendingAmount,
+          bookingCount: partiallyPaidBookings._count.id || 0,
         },
         pending: {
           bookingValue: totalPendingValue,
-          bookingCount: pendingBookings._count.id || 0
+          bookingCount: pendingPaymentBookings._count.id || 0,
+        },
+        overdue: {
+          bookingValue: totalOverdueValue,
+          bookingCount: overdueBookings._count.id || 0,
+        },
+        cancelled: {
+          bookingValue: totalCancelledValue,
+          refundAmount: cancelledBookings._sum.refundAmount || 0,
+          bookingCount: cancelledBookings._count.id || 0,
+        },
+        refunded: {
+          refundAmount: refundedBookings._sum.refundAmount || 0,
+          bookingCount: refundedBookings._count.id || 0,
         },
         summary: {
-          netRevenue,
-          revenueAtRisk,
-          cancellationRate: Math.round(cancellationRate * 10) / 10 // Round to 1 decimal place
+          totalRevenue: Math.round(totalRevenue),
+          receivedRevenue: Math.round(receivedRevenue),
+          pendingRevenue: Math.round(pendingRevenue),
+          revenueAtRisk: Math.round(revenueAtRisk),
+          collectionEfficiency: Math.round(collectionEfficiency * 10) / 10, // Round to 1 decimal place
         },
-        monthlyTrend: monthlyRevenue
-      }
+        monthlyTrend: monthlyRevenue,
+      },
     };
   } catch (error) {
     console.error("Error calculating revenue analytics:", error);
