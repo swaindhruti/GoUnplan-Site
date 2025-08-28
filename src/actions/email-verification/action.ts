@@ -45,7 +45,7 @@ export async function sendVerificationEmail() {
   `;
 
   const { data, error } = await resend.emails.send({
-    from: "Gounplan <onboarding@resend.dev>",
+    from: "Gounplan <noreply@gounplan.com>",
     to: [user.email],
     subject: "Verify Your Email - GoUnplan",
     html: emailHtml,
