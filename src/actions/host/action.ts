@@ -137,7 +137,6 @@ export const createTravelPlan = async (data: {
       return { error: "Host profile not found" };
     }
 
-    // Debug - Log all incoming data
     console.log("Received travel plan data:", {
       title: data.title,
       description: data.description.slice(0, 30) + "...",
@@ -147,7 +146,6 @@ export const createTravelPlan = async (data: {
       dayWiseData: data.dayWiseData ? `${data.dayWiseData.length} days` : "none"
     });
 
-    // Debug - Full day-wise data
     if (data.dayWiseData && data.dayWiseData.length > 0) {
       console.log(
         "Received day-wise data details:",
@@ -157,7 +155,6 @@ export const createTravelPlan = async (data: {
       console.log("WARNING: No day-wise data received or the array is empty");
     }
 
-    // Determine the status to set
     console.log("🔍 DEBUG ACTION: Received status =", data.status);
     console.log("🔍 DEBUG ACTION: TravelPlanStatus enum values:", {
       DRAFT: TravelPlanStatus.DRAFT,
@@ -176,7 +173,6 @@ export const createTravelPlan = async (data: {
     console.log("🔍 DEBUG ACTION: statusToSet =", statusToSet);
     const price = Number(data.price);
     console.log(price);
-    // Create the travel plan first (without transaction)
     const travelPlan = await prisma.travelPlans.create({
       data: {
         title: data.title,
@@ -241,8 +237,6 @@ export const createTravelPlan = async (data: {
       } catch (dayError) {
         console.error("Error creating day-wise data:", dayError);
 
-        // Since we're not using transactions, we should handle cleanup here
-        // Delete the travel plan if day-wise itinerary creation fails
         await prisma.travelPlans.delete({
           where: { travelPlanId: travelPlan.travelPlanId }
         });

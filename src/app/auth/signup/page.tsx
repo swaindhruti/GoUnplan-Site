@@ -6,6 +6,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 import {
   AlertCircle,
   User,
@@ -117,25 +118,68 @@ function SignUpForm() {
                   type: "server",
                   message: error.message
                 });
+                // Show error toast with purple theme
+                toast.error(error.message, {
+                  style: {
+                    background: "rgba(147, 51, 234, 0.95)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(196, 181, 253, 0.3)",
+                    color: "white",
+                    fontFamily: "var(--font-instrument)"
+                  },
+                  duration: 4000
+                });
               }
             }
           );
         } else {
-          setServerError(
-            data.error || "Something went wrong. Please try again."
-          );
+          const errorMessage =
+            data.error || "Something went wrong. Please try again.";
+          setServerError(errorMessage);
+          toast.error(errorMessage, {
+            style: {
+              background: "rgba(147, 51, 234, 0.95)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(196, 181, 253, 0.3)",
+              color: "white",
+              fontFamily: "var(--font-instrument)"
+            },
+            duration: 4000
+          });
         }
         return;
       }
+
+      // Show success toast
+      toast.success("Account created successfully! 🎉", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 3000
+      });
 
       router.push(
         "/auth/signin?message=Account created successfully! Please sign in."
       );
     } catch (error) {
       console.error("Signup error:", error);
-      setServerError(
-        "Network error. Please check your connection and try again."
-      );
+      const networkError =
+        "Network error. Please check your connection and try again.";
+      setServerError(networkError);
+      toast.error(networkError, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -371,7 +415,16 @@ function SignUpForm() {
               variant="outline"
               className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
               onClick={() => {
-                // TODO: Implement Google OAuth
+                toast.info("Google OAuth coming soon! 🚀", {
+                  style: {
+                    background: "rgba(147, 51, 234, 0.95)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(196, 181, 253, 0.3)",
+                    color: "white",
+                    fontFamily: "var(--font-instrument)"
+                  },
+                  duration: 3000
+                });
               }}
             >
               <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">

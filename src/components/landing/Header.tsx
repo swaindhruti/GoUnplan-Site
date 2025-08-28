@@ -34,7 +34,8 @@ import {
   UserCog,
   FileText,
   MapPin,
-  HelpCircle
+  HelpCircle,
+  UserPlus
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -160,6 +161,11 @@ export default function Header() {
     return items;
   };
 
+  const handleApplyForHost = () => {
+    router.push("/dashboard/host");
+    setIsDashboardMenuOpen(false);
+  };
+
   const generateBreadcrumbs = () => {
     const pathSegments = pathname
       .split("/")
@@ -209,7 +215,8 @@ export default function Header() {
     bg-white backdrop-blur-xl border-b border-gray-200 shadow-sm
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
-
+  const isRegularUser = session?.user?.role === "USER";
+  console.log(isRegularUser);
   const isUserHost = session?.user?.role === "HOST";
   const isUserAdmin = session?.user?.role === "ADMIN";
 
@@ -282,7 +289,6 @@ export default function Header() {
         </div>
 
         <DropdownMenuGroup className="p-2">
-
           <DropdownMenuItem
             onClick={() => router.push("/profile")}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
@@ -294,7 +300,6 @@ export default function Header() {
               ⌘P
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-
 
           <div className="relative">
             <DropdownMenuItem
@@ -498,6 +503,15 @@ export default function Header() {
             <div className="flex items-center">
               {status === "authenticated" ? (
                 <div className="flex items-center space-x-4">
+                  {isHomePage && isRegularUser && (
+                    <Button
+                      onClick={handleApplyForHost}
+                      className="bg-orange-600 hover:bg-orange-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Apply for Host
+                    </Button>
+                  )}
                   {isUserHost && (
                     <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
                       <Crown className="h-4 w-4 text-purple-600" />
@@ -598,6 +612,15 @@ export default function Header() {
                     />
                   </div>
                 )}
+                {isRegularUser && (
+                  <Button
+                    onClick={handleApplyForHost}
+                    className="bg-orange-600 hover:bg-orange-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Apply for Host
+                  </Button>
+                )}
 
                 {isUserAdmin && (
                   <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
@@ -659,28 +682,22 @@ export default function Header() {
                       <>
                         <div className="border-t overflow-auto border-gray-200/60 my-6"></div>
 
-
                         <button
                           onClick={() => {
                             setIsOpen(false);
                             router.push("/profile");
                           }}
-
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg w-full"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
                               <User className="mr-3 h-5 w-5 text-purple-600" />
-
-
                               My Profile
-
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
                           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
                         </button>
-
 
                         <div className="space-y-2">
                           <button

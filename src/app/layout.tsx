@@ -14,6 +14,7 @@ import SessionProvider from "@/components/providers/sessionProviders";
 import "./globals.css";
 import { PostHogProvider } from "./providers";
 import Header from "@/components/landing/Header";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -93,6 +94,7 @@ export default function RootLayout({
           <SessionProvider>
             <Header />
             {children}
+            <Toaster />
           </SessionProvider>
         </PostHogProvider>
       </body>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -55,29 +56,95 @@ export default function PhoneAuthPage() {
   // Send OTP
   const handleSendOtp = async () => {
     if (!phoneNumber) {
-      setErrors({ phone: "Please enter a phone number" });
+      const errorMessage = "Please enter a phone number";
+      setErrors({ phone: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       return;
     }
 
     const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
     if (cleanPhone.length < 7) {
-      setErrors({ phone: "Please enter a valid phone number" });
+      const errorMessage = "Please enter a valid phone number";
+      setErrors({ phone: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       return;
     }
 
     setIsLoading(true);
     setErrors({});
+
+    toast.loading("Sending verification code...", {
+      style: {
+        background: "rgba(147, 51, 234, 0.95)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(196, 181, 253, 0.3)",
+        color: "white",
+        fontFamily: "var(--font-instrument)"
+      },
+      duration: 2000
+    });
+
     try {
       const result = await sendOtp(`${countryCode}${cleanPhone}`);
 
       if (result.success) {
         setStep("otp");
         setCountdown(30);
+        toast.success(`Code sent to ${countryCode}${cleanPhone}`, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
       } else {
-        setErrors({ phone: result.error || "Failed to send OTP" });
+        const errorMessage = result.error || "Failed to send OTP";
+        setErrors({ phone: errorMessage });
+        toast.error(errorMessage, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 4000
+        });
       }
     } catch (error) {
-      setErrors({ phone: "Unexpected error. Please try again." });
+      const errorMessage = "Unexpected error. Please try again.";
+      setErrors({ phone: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       console.error("Error sending OTP:", error);
     } finally {
       setIsLoading(false);
@@ -86,12 +153,34 @@ export default function PhoneAuthPage() {
 
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== 6) {
-      setErrors({ otp: "Please enter a valid 6-digit OTP" });
+      const errorMessage = "Please enter a valid 6-digit OTP";
+      setErrors({ otp: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       return;
     }
 
     setIsLoading(true);
     setErrors({});
+
+    toast.loading("Verifying code...", {
+      style: {
+        background: "rgba(147, 51, 234, 0.95)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(196, 181, 253, 0.3)",
+        color: "white",
+        fontFamily: "var(--font-instrument)"
+      },
+      duration: 2000
+    });
 
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
@@ -104,13 +193,45 @@ export default function PhoneAuthPage() {
       });
 
       if (authResult?.ok) {
+        toast.success("Phone verified successfully! Welcome!", {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
         router.push("/");
         router.refresh();
       } else {
-        setErrors({ otp: "Authentication failed" });
+        const errorMessage = "Invalid verification code. Please try again.";
+        setErrors({ otp: errorMessage });
+        toast.error(errorMessage, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 4000
+        });
       }
     } catch (error) {
-      setErrors({ otp: "Unexpected error. Please try again." });
+      const errorMessage = "Verification failed. Please try again.";
+      setErrors({ otp: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       console.error("Error verifying OTP:", error);
     } finally {
       setIsLoading(false);
@@ -122,21 +243,81 @@ export default function PhoneAuthPage() {
 
     setIsLoading(true);
     setErrors({});
+
+    toast.loading("Resending verification code...", {
+      style: {
+        background: "rgba(147, 51, 234, 0.95)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(196, 181, 253, 0.3)",
+        color: "white",
+        fontFamily: "var(--font-instrument)"
+      },
+      duration: 2000
+    });
+
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
       const result = await sendOtp(`${countryCode}${cleanPhone}`);
 
       if (result.success) {
         setCountdown(30);
+        toast.success("New code sent successfully!", {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
       } else {
-        setErrors({ otp: result.error || "Failed to resend OTP" });
+        const errorMessage = result.error || "Failed to resend OTP";
+        setErrors({ otp: errorMessage });
+        toast.error(errorMessage, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 4000
+        });
       }
     } catch (error) {
-      setErrors({ otp: "Unexpected error. Please try again." });
+      const errorMessage = "Failed to resend code. Please try again.";
+      setErrors({ otp: errorMessage });
+      toast.error(errorMessage, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
       console.error("Error resending OTP:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleUseifferentNumber = () => {
+    setStep("phone");
+    setOtp("");
+    setErrors({});
+    toast.info("Enter a different phone number", {
+      style: {
+        background: "rgba(147, 51, 234, 0.95)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(196, 181, 253, 0.3)",
+        color: "white",
+        fontFamily: "var(--font-instrument)"
+      },
+      duration: 2000
+    });
   };
 
   return (
@@ -210,6 +391,11 @@ export default function PhoneAuthPage() {
                       }
                       placeholder="Enter phone number"
                       className="flex-1 h-12"
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter" && phoneNumber) {
+                          handleSendOtp();
+                        }
+                      }}
                     />
                   </div>
                   {errors.phone && (
@@ -283,11 +469,7 @@ export default function PhoneAuthPage() {
 
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    setStep("phone");
-                    setOtp("");
-                    setErrors({});
-                  }}
+                  onClick={handleUseifferentNumber}
                   className="w-full"
                 >
                   Use Different Number
