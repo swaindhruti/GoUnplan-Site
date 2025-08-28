@@ -5,6 +5,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   AlertCircle,
   CheckCircle2,
@@ -33,7 +34,6 @@ interface FormErrors {
   general?: string;
 }
 
-// Component that uses useSearchParams
 function SignInForm() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -51,6 +51,16 @@ function SignInForm() {
     const message = searchParams.get("message");
     if (message) {
       setSuccessMessage(message);
+      toast.success(message, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
     }
   }, [searchParams]);
 
@@ -68,16 +78,39 @@ function SignInForm() {
       }));
     }
   };
+
   const handleGoogleSignIn = async () => {
     try {
+      toast.loading("Redirecting to Google...", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 2000
+      });
+
       await signIn("google", {
         callbackUrl: "/",
         redirect: true
       });
     } catch (error) {
       console.error("Google signin error:", error);
+      toast.error("Failed to sign in with Google. Please try again.", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
     }
   };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -92,6 +125,20 @@ function SignInForm() {
     }
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      const firstError = Object.values(newErrors)[0];
+      toast.error(firstError, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -112,8 +159,30 @@ function SignInForm() {
       });
 
       if (result?.error) {
-        setErrors({ general: "Invalid email or password" });
+        const errorMessage = "Invalid email or password";
+        setErrors({ general: errorMessage });
+        toast.error(errorMessage, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 4000
+        });
       } else if (result?.ok) {
+        toast.success("Welcome back! Signing you in...", {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
+
         const session = await getSession();
         if (session) {
           router.push("/");
@@ -122,7 +191,18 @@ function SignInForm() {
       }
     } catch (error) {
       console.error("Signin error:", error);
-      setErrors({ general: "Network error. Please try again." });
+      const networkError = "Network error. Please try again.";
+      setErrors({ general: networkError });
+      toast.error(networkError, {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 4000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -241,8 +321,20 @@ function SignInForm() {
             </div>
             <div className="text-sm">
               <Link
-                href="/auth/forgot-password"
+                href=""
                 className="font-semibold text-purple-600 hover:text-purple-700 transition-colors font-instrument"
+                onClick={() => {
+                  toast.info("Password reset feature coming soon! 🔑", {
+                    style: {
+                      background: "rgba(147, 51, 234, 0.95)",
+                      backdropFilter: "blur(12px)",
+                      border: "1px solid rgba(196, 181, 253, 0.3)",
+                      color: "white",
+                      fontFamily: "var(--font-instrument)"
+                    },
+                    duration: 3000
+                  });
+                }}
               >
                 Forgot password?
               </Link>
@@ -310,6 +402,16 @@ function SignInForm() {
             variant="outline"
             className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
             onClick={() => {
+              toast.info("redirecting to registering through phone 📱", {
+                style: {
+                  background: "rgba(147, 51, 234, 0.95)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(196, 181, 253, 0.3)",
+                  color: "white",
+                  fontFamily: "var(--font-instrument)"
+                },
+                duration: 3000
+              });
               router.push("/auth/phone");
             }}
           >

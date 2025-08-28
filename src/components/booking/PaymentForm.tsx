@@ -23,6 +23,7 @@ import {
   completeRemainingPayment,
   processPartialPayment
 } from "@/actions/booking/actions";
+import { toast } from "sonner";
 
 interface PaymentFormProps {
   tripData: {
@@ -142,10 +143,40 @@ export function PaymentForm({
         : await completeRemainingPayment(bookingId);
 
       if (result.success) {
+        toast.success(result.message, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
       } else {
+        toast.error(result.message, {
+          style: {
+            background: "rgba(147, 51, 234, 0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(196, 181, 253, 0.3)",
+            color: "white",
+            fontFamily: "var(--font-instrument)"
+          },
+          duration: 3000
+        });
         throw new Error(result.error || "Payment failed");
       }
     } catch (error) {
+      toast.success("Some payment error occured during the payment", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 3000
+      });
       console.error("Payment error:", error);
       setShowLoader(false);
       setPaymentStatus("failed");
