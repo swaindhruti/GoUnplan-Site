@@ -1,23 +1,25 @@
 import { z } from "zod";
 
-// Full validation schema for trip submission
 export const CreateDestinationSchema = z.object({
   tripName: z.string().min(3, "Trip name must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   destination: z.string().min(3, "Destination is required"),
   country: z.string().min(2, "Country is required"),
   state: z.string().min(2, "State is required"),
+  activities: z.array(z.string()).optional().default([]),
   city: z.string().min(2, "City is required"),
   price: z.coerce.number().positive("Price must be a positive number"),
   maxLimit: z.coerce
     .number()
     .positive("Participant limit must be a positive number"),
+
   startDate: z.string().or(z.date()),
   endDate: z.string().or(z.date()),
   filters: z.array(z.string()).optional().default([]),
   languages: z.array(z.string()).optional().default([]),
   includedActivities: z.array(z.string()).optional().default([]),
   restrictions: z.array(z.string()).optional().default([]),
+  special: z.array(z.string()).optional().default([]),
   tripImage: z
     .string()
     .min(1, "Trip cover image is required")
@@ -35,13 +37,12 @@ export const CreateDestinationSchema = z.object({
         dayWiseImage: z
           .string()
           .min(1, "Day image is required")
-          .url("Must be a valid image URL"),
+          .url("Must be a valid image URL")
       })
     )
-    .nonempty("At least one day must be added"),
+    .nonempty("At least one day must be added")
 });
 
-// Minimal validation schema for drafts - only basic structure validation
 export const CreateDestinationDraftSchema = z.object({
   tripName: z.string().optional().default(""),
   description: z.string().optional().default(""),
@@ -57,6 +58,7 @@ export const CreateDestinationDraftSchema = z.object({
   languages: z.array(z.string()).optional().default([]),
   includedActivities: z.array(z.string()).optional().default([]),
   restrictions: z.array(z.string()).optional().default([]),
+  special: z.array(z.string()).optional().default([]),
   tripImage: z.string().optional().default(""),
 
   dayWiseData: z
@@ -68,7 +70,7 @@ export const CreateDestinationDraftSchema = z.object({
         activities: z.array(z.string()).optional().default([]),
         meals: z.string().optional().default(""),
         accommodation: z.string().optional().default(""),
-        dayWiseImage: z.string().optional().default(""),
+        dayWiseImage: z.string().optional().default("")
       })
     )
     .optional()
@@ -80,9 +82,9 @@ export const CreateDestinationDraftSchema = z.object({
         activities: [],
         meals: "",
         accommodation: "",
-        dayWiseImage: "",
-      },
-    ]),
+        dayWiseImage: ""
+      }
+    ])
 });
 
 // Function to get appropriate schema based on mode

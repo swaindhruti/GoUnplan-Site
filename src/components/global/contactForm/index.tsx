@@ -1,7 +1,7 @@
 "use client";
 import {
   CldUploadWidget,
-  CloudinaryUploadWidgetResults,
+  CloudinaryUploadWidgetResults
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
   getValidationSchema,
-  CreateDestinationSchema,
+  CreateDestinationSchema
 } from "@/config/form/formSchemaData/CreateDestinationSchema";
 import { z } from "zod";
 
@@ -38,7 +38,7 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight,
+  ChevronRight
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
@@ -46,13 +46,15 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Dynamically import ReactSelect to prevent hydration issues
 const ReactSelect = dynamic(() => import("react-select"), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
-  ),
+  )
 });
 
 type SelectOption = {
@@ -67,7 +69,7 @@ const getSelectOptions = (options?: string[]) => {
 export const CreateDestinationForm = ({
   FormData,
   initialData,
-  isEditMode = false,
+  isEditMode = false
 }: FormComponentProps) => {
   // Use full schema by default, but we'll validate dynamically
   const router = useRouter();
@@ -93,12 +95,14 @@ export const CreateDestinationForm = ({
         maxLimit: initialData.maxParticipants || 0,
         minLimit: initialData.minParticipants || 0,
         description: initialData.description || "",
+        activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
         languages: initialData.languages || [],
         includedActivities: initialData.includedActivities || [],
         restrictions: initialData.restrictions || [],
+        special: initialData.special || [],
         tripImage: initialData.tripImage || "",
         dayWiseData:
           initialData.dayWiseData?.length > 0
@@ -111,9 +115,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: "",
-                },
-              ],
+                  dayWiseImage: ""
+                }
+              ]
       }
     : {
         ...FormData.reduce(
@@ -126,7 +130,7 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
-                : "",
+                : ""
           }),
           {}
         ),
@@ -138,21 +142,21 @@ export const CreateDestinationForm = ({
             activities: [],
             meals: "",
             accommodation: "",
-            dayWiseImage: "",
-          },
+            dayWiseImage: ""
+          }
         ],
         // Add tripImage field
-        tripImage: "",
+        tripImage: ""
       };
 
   const form = useForm({
     resolver: undefined, // We'll handle validation manually
     defaultValues,
-    mode: "onChange", // Enable real-time validation feedback
+    mode: "onChange" // Enable real-time validation feedback
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData",
+    name: "dayWiseData"
   });
 
   const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
@@ -167,6 +171,8 @@ export const CreateDestinationForm = ({
   }>({});
   const [customIncludedInput, setCustomIncludedInput] = useState<string>("");
   const [customExcludedInput, setCustomExcludedInput] = useState<string>("");
+
+  const [customSpecialInput, setCustomSpecialInput] = useState<string>("");
   const totalSteps = 3;
 
   console.log(dayWiseImages);
@@ -193,7 +199,7 @@ export const CreateDestinationForm = ({
       "startDate",
       "endDate",
       "filters",
-      "tripImage",
+      "tripImage"
     ];
     const step2Fields = [
       "destination",
@@ -201,7 +207,7 @@ export const CreateDestinationForm = ({
       "state",
       "city",
       "price",
-      "maxLimit",
+      "maxLimit"
     ];
     // Step 3: everything else (description, languages, includedActivities, restrictions, etc.)
 
@@ -226,7 +232,7 @@ export const CreateDestinationForm = ({
       activities: [],
       meals: "",
       accommodation: "",
-      dayWiseImage: "",
+      dayWiseImage: ""
     });
   };
 
@@ -272,7 +278,7 @@ export const CreateDestinationForm = ({
   const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
     setDayWiseImages((prev) => ({
       ...prev,
-      [dayIndex]: imageUrl,
+      [dayIndex]: imageUrl
     }));
     form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, imageUrl);
   };
@@ -333,7 +339,7 @@ export const CreateDestinationForm = ({
       console.log("Raw form data:", {
         tripName: data.tripName,
         status: isDraft ? "DRAFT" : "ACTIVE",
-        dayWiseDataLength: data.dayWiseData?.length || 0,
+        dayWiseDataLength: data.dayWiseData?.length || 0
       });
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
@@ -349,7 +355,7 @@ export const CreateDestinationForm = ({
               day: idx + 1,
               title: day.title || `Day ${idx + 1}`,
               hasActivities:
-                Array.isArray(day.activities) && day.activities.length > 0,
+                Array.isArray(day.activities) && day.activities.length > 0
             })
           )
         );
@@ -444,7 +450,7 @@ export const CreateDestinationForm = ({
             activities: Array.isArray(day.activities) ? day.activities : [],
             meals: day.meals || "",
             accommodation: day.accommodation || "",
-            dayWiseImage: day.dayWiseImage || "",
+            dayWiseImage: day.dayWiseImage || ""
           })
         );
       } catch (processingError) {
@@ -462,9 +468,11 @@ export const CreateDestinationForm = ({
         includedActivities: data.includedActivities || [],
         restrictions: data.restrictions || [],
         noOfDays,
+        activities: data.activities || [],
         price: data.price || 0,
         startDate: start,
         endDate: end,
+        special: data.special || [],
         maxParticipants: data.maxLimit || 0,
         country: data.country || "",
         state: data.state || "",
@@ -473,7 +481,7 @@ export const CreateDestinationForm = ({
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
-        status: statusToSend,
+        status: statusToSend
       };
 
       let result;
@@ -490,9 +498,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)",
+            fontFamily: "var(--font-instrument)"
           },
-          duration: 3000,
+          duration: 3000
         });
         console.error(
           `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
@@ -505,9 +513,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)",
+            fontFamily: "var(--font-instrument)"
           },
-          duration: 3000,
+          duration: 3000
         });
         router.push("/dashboard/host");
       }
@@ -519,9 +527,9 @@ export const CreateDestinationForm = ({
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)",
+          fontFamily: "var(--font-instrument)"
         },
-        duration: 3000,
+        duration: 3000
       });
     } finally {
       setIsSubmitting(false);
@@ -549,7 +557,7 @@ export const CreateDestinationForm = ({
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
             type: "manual",
-            message: errorMessage[0],
+            message: errorMessage[0]
           });
         }
       });
@@ -571,23 +579,22 @@ export const CreateDestinationForm = ({
         return {
           title: "Basic Trip Information",
           description:
-            "Let's start with the essentials - trip name, dates, and preferences",
+            "Let's start with the essentials - trip name, dates, and preferences"
         };
       case 2:
         return {
           title: "Location & Pricing",
-          description:
-            "Tell us where you're going and set your pricing details",
+          description: "Tell us where you're going and set your pricing details"
         };
       case 3:
         return {
           title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out",
+          description: "Add the finishing touches to make your trip stand out"
         };
       default:
         return {
           title: "Create Trip",
-          description: "Fill in your trip details",
+          description: "Fill in your trip details"
         };
     }
   };
@@ -823,7 +830,7 @@ export const CreateDestinationForm = ({
                                     value={(field.value as string[])?.map(
                                       (val) => ({
                                         value: val,
-                                        label: val,
+                                        label: val
                                       })
                                     )}
                                     onChange={(newValue) => {
@@ -842,31 +849,31 @@ export const CreateDestinationForm = ({
                                         borderRadius: "0.375rem",
                                         boxShadow: "none",
                                         "&:hover": {
-                                          borderColor: "#a855f7",
+                                          borderColor: "#a855f7"
                                         },
                                         "&:focus-within": {
                                           borderColor: "#a855f7",
                                           boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
-                                        },
+                                            "0 0 0 3px rgba(168, 85, 247, 0.1)"
+                                        }
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
                                         backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem",
+                                        borderRadius: "0.25rem"
                                       }),
                                       multiValueLabel: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
-                                        fontWeight: "500",
+                                        fontWeight: "500"
                                       }),
                                       multiValueRemove: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
                                         "&:hover": {
                                           backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9",
-                                        },
+                                          color: "#6d28d9"
+                                        }
                                       }),
                                       option: (base, state) => ({
                                         ...base,
@@ -877,12 +884,12 @@ export const CreateDestinationForm = ({
                                           : "white",
                                         color: state.isSelected
                                           ? "white"
-                                          : "#374151",
+                                          : "#374151"
                                       }),
                                       placeholder: (base) => ({
                                         ...base,
-                                        color: "#9ca3af",
-                                      }),
+                                        color: "#9ca3af"
+                                      })
                                     }}
                                     placeholder={data.placeholder}
                                     className="font-instrument"
@@ -955,7 +962,7 @@ export const CreateDestinationForm = ({
                                                         [];
                                                       const newValue = [
                                                         ...currentValue,
-                                                        option,
+                                                        option
                                                       ];
                                                       field.onChange(newValue);
                                                     }}
@@ -1027,10 +1034,14 @@ export const CreateDestinationForm = ({
                         const isIncluded = data.id === "includedActivities";
                         const customInput = isIncluded
                           ? customIncludedInput
-                          : customExcludedInput;
+                          : data.label === "Not Included"
+                          ? customExcludedInput
+                          : customSpecialInput;
                         const setCustomInput = isIncluded
                           ? setCustomIncludedInput
-                          : setCustomExcludedInput;
+                          : data.label === "Not Included"
+                          ? setCustomExcludedInput
+                          : setCustomSpecialInput;
 
                         return (
                           <FormField
@@ -1042,13 +1053,19 @@ export const CreateDestinationForm = ({
                                 <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
                                   <div
                                     className={`w-5 h-5 rounded flex items-center justify-center ${
-                                      isIncluded ? "bg-green-100" : "bg-red-100"
+                                      isIncluded
+                                        ? "bg-green-100"
+                                        : data.label === "Not Included"
+                                        ? "bg-red-100"
+                                        : "bg-blue-100"
                                     }`}
                                   >
                                     {isIncluded ? (
                                       <Plus className="h-3 w-3 text-green-600" />
-                                    ) : (
+                                    ) : data.label === "Not Included" ? (
                                       <Minus className="h-3 w-3 text-red-600" />
+                                    ) : (
+                                      <Plus className="h-3 w-3 text-blue-600" />
                                     )}
                                   </div>
                                   <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
@@ -1063,7 +1080,9 @@ export const CreateDestinationForm = ({
                                         className={`flex-1 border-gray-200 font-instrument ${
                                           isIncluded
                                             ? "focus:border-green-400 focus:ring-green-100"
-                                            : "focus:border-red-400 focus:ring-red-100"
+                                            : data.label === "Not Included"
+                                            ? "focus:border-red-400 focus:ring-red-100"
+                                            : "focus:border-blue-400 focus:ring-blue-100"
                                         }`}
                                         value={customInput}
                                         onChange={(e) =>
@@ -1081,7 +1100,7 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                item,
+                                                item
                                               ]);
                                               setCustomInput("");
                                             }
@@ -1099,7 +1118,7 @@ export const CreateDestinationForm = ({
                                           ) {
                                             field.onChange([
                                               ...(field.value || []),
-                                              item,
+                                              item
                                             ]);
                                             setCustomInput("");
                                           }
@@ -1107,7 +1126,9 @@ export const CreateDestinationForm = ({
                                         className={`px-3 text-white ${
                                           isIncluded
                                             ? "bg-green-500 hover:bg-green-600"
-                                            : "bg-red-500 hover:bg-red-600"
+                                            : data.label === "Not Included"
+                                            ? "bg-red-500 hover:bg-red-600"
+                                            : "bg-blue-500 hover:bg-blue-600"
                                         }`}
                                       >
                                         <Plus className="h-4 w-4" />
@@ -1122,7 +1143,10 @@ export const CreateDestinationForm = ({
                                               className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                                                 isIncluded
                                                   ? "bg-green-100 text-green-800"
-                                                  : "bg-red-100 text-red-800"
+                                                  : data.label ===
+                                                    "Not Included"
+                                                  ? "bg-red-100 text-red-800"
+                                                  : "bg-blue-100 text-blue-800"
                                               }`}
                                             >
                                               {item}
@@ -1140,7 +1164,10 @@ export const CreateDestinationForm = ({
                                                 className={`ml-1 rounded-full p-0.5 transition-colors ${
                                                   isIncluded
                                                     ? "hover:bg-green-200"
-                                                    : "hover:bg-red-200"
+                                                    : data.label ===
+                                                      "Not Included"
+                                                    ? "hover:bg-red-200"
+                                                    : "hover:bg-blue-200"
                                                 }`}
                                               >
                                                 <Minus className="h-3 w-3" />
@@ -1187,42 +1214,53 @@ export const CreateDestinationForm = ({
                           <FormControl>
                             <div className="space-y-4">
                               {!field.value ? (
-                                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all">
-                                  <Camera className="h-12 w-12 text-gray-400 mb-4" />
-                                  <p className="text-sm text-gray-500 mb-4 text-center">
-                                    Upload a stunning image that showcases your
-                                    trip destination
-                                  </p>
-                                  <UploadButton label="Choose Image" />
-                                </div>
+                                <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                                  <CardContent className="flex flex-col items-center justify-center p-8">
+                                    <Camera className="h-12 w-12 text-muted-foreground mb-4" />
+                                    <p className="text-sm text-muted-foreground mb-4 text-center">
+                                      Upload a stunning image that showcases
+                                      your trip destination
+                                    </p>
+                                    <UploadButton label="Choose Image" />
+                                  </CardContent>
+                                </Card>
                               ) : (
-                                <div className="relative group">
-                                  <Image
-                                    width={500}
-                                    height={500}
-                                    src={field.value}
-                                    alt="Trip cover"
-                                    className="w-full h-48 object-cover rounded-xl border border-gray-200 shadow-sm"
-                                  />
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                                    <div className="flex gap-2">
-                                      <UploadButton label="Change Image" />
-                                      <button
-                                        type="button"
-                                        onClick={removeImage}
-                                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
-                                      >
-                                        <X className="h-4 w-4 mr-2" />
-                                        Remove
-                                      </button>
+                                <Card className="overflow-hidden">
+                                  <div className="relative group">
+                                    <AspectRatio
+                                      ratio={16 / 9}
+                                      className="bg-muted"
+                                    >
+                                      <Image
+                                        fill
+                                        src={field.value}
+                                        alt="Trip cover"
+                                        className="object-cover rounded-lg"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                      />
+                                    </AspectRatio>
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                      <div className="flex gap-2">
+                                        <UploadButton label="Change Image" />
+                                        <Button
+                                          type="button"
+                                          onClick={removeImage}
+                                          variant="destructive"
+                                          size="sm"
+                                          className="font-instrument"
+                                        >
+                                          <X className="h-4 w-4 mr-2" />
+                                          Remove
+                                        </Button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                </Card>
                               )}
                             </div>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             Upload a high-quality image (JPG, PNG, or WEBP) that
                             represents your trip destination.
                           </p>
@@ -1374,7 +1412,7 @@ export const CreateDestinationForm = ({
                                           onChange={(e) =>
                                             setCustomActivityInput((prev) => ({
                                               ...prev,
-                                              [index]: e.target.value,
+                                              [index]: e.target.value
                                             }))
                                           }
                                           onKeyDown={(e) => {
@@ -1392,12 +1430,12 @@ export const CreateDestinationForm = ({
                                               ) {
                                                 field.onChange([
                                                   ...(field.value || []),
-                                                  activity,
+                                                  activity
                                                 ]);
                                                 setCustomActivityInput(
                                                   (prev) => ({
                                                     ...prev,
-                                                    [index]: "",
+                                                    [index]: ""
                                                   })
                                                 );
                                               }
@@ -1420,12 +1458,12 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                activity,
+                                                activity
                                               ]);
                                               setCustomActivityInput(
                                                 (prev) => ({
                                                   ...prev,
-                                                  [index]: "",
+                                                  [index]: ""
                                                 })
                                               );
                                             }
@@ -1499,45 +1537,56 @@ export const CreateDestinationForm = ({
                                   <FormControl>
                                     <div className="space-y-4">
                                       {!field.value ? (
-                                        <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
-                                          <Camera className="h-8 w-8 text-gray-400 mb-2" />
-                                          <p className="text-xs text-gray-500 mb-3 text-center font-instrument">
-                                            Add an image for this day&apos;s
-                                            activities
-                                          </p>
-                                          {createDayWiseUploadButton(
-                                            index,
-                                            "Choose Image"
-                                          )}
-                                        </div>
+                                        <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                                          <CardContent className="flex flex-col items-center justify-center p-6">
+                                            <Camera className="h-8 w-8 text-muted-foreground mb-2" />
+                                            <p className="text-xs text-muted-foreground mb-3 text-center font-instrument">
+                                              Add an image for this day&apos;s
+                                              activities
+                                            </p>
+                                            {createDayWiseUploadButton(
+                                              index,
+                                              "Choose Image"
+                                            )}
+                                          </CardContent>
+                                        </Card>
                                       ) : (
-                                        <div className="relative group">
-                                          <Image
-                                            width={400}
-                                            height={300}
-                                            src={field.value}
-                                            alt={`Day ${index + 1} image`}
-                                            className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
-                                          />
-                                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                            <div className="flex gap-2">
-                                              {createDayWiseUploadButton(
-                                                index,
-                                                "Change Image"
-                                              )}
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  removeDayWiseImage(index)
-                                                }
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
-                                              >
-                                                <X className="h-3 w-3 mr-1" />
-                                                Remove
-                                              </button>
+                                        <Card className="overflow-hidden">
+                                          <div className="relative group">
+                                            <AspectRatio
+                                              ratio={4 / 3}
+                                              className="bg-muted"
+                                            >
+                                              <Image
+                                                fill
+                                                src={field.value}
+                                                alt={`Day ${index + 1} image`}
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                              />
+                                            </AspectRatio>
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                              <div className="flex gap-2">
+                                                {createDayWiseUploadButton(
+                                                  index,
+                                                  "Change Image"
+                                                )}
+                                                <Button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    removeDayWiseImage(index)
+                                                  }
+                                                  variant="destructive"
+                                                  size="sm"
+                                                  className="font-instrument"
+                                                >
+                                                  <X className="h-3 w-3 mr-1" />
+                                                  Remove
+                                                </Button>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
+                                        </Card>
                                       )}
                                     </div>
                                   </FormControl>

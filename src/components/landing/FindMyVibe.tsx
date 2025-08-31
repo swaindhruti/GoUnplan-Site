@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { PrimaryButton, SectionLabel } from "./common";
 import { useState } from "react";
+import { Button } from "../ui/button";
+import { ArrowRight } from "lucide-react";
 
 const vibeDescriptions: Record<string, string> = {
   Cultural:
@@ -44,7 +46,7 @@ export const FindMyVibe = () => {
   };
 
   return (
-    <div className="bg-purple-500/[0.05] min-h-screen w-full ">
+    <div className="bg-purple-500/[0.05] relative min-h-screen w-full ">
       {myVibes && (
         <div className="w-screen flex justify-center -mt-3 lg:-mt-6 pt-6 lg:pt-12">
           <SectionLabel label="Choose Your Vibe!" />
@@ -137,6 +139,14 @@ export const FindMyVibe = () => {
             </div>
           ))}
         </div>
+        <Button
+          variant="outline"
+          onClick={() => router.push("/trips")}
+          className="flex mb-4 items-center group rounded-full  font-poppins absolute bottom-0 gap-2 px-6 py-5 text-lg font-medium text-purple-500 hover:text-purple-600 hover:bg-purple-50 border-purple-500 cursor-pointer  transition-all duration-200"
+        >
+          View All Vibes
+          <ArrowRight className="w-5 group-hover:translate-x-1 -ml-1 h-5" />
+        </Button>
       </div>
     </div>
   );

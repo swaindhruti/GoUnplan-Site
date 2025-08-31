@@ -74,9 +74,11 @@ model TravelPlans {
   description           String
   includedActivities    String[]
   restrictions          String[]
+  special               String[]
   noOfDays              Int
   hostId                String
   price                 Int
+  activities            String[]           @default([])
   country               String
   state                 String
   city                  String

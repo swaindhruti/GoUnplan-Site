@@ -58,7 +58,10 @@ export default function AboutUs() {
             </span> */}
           </p>
 
-          <div className="pt-8 max-md:flex max-md:justify-center">
+          <div
+            onClick={() => router.push("/contact")}
+            className="pt-8 max-md:flex max-md:justify-center"
+          >
             <PrimaryButton label="Contact Us" />
           </div>
         </div>
