@@ -1,7 +1,7 @@
 "use client";
 import {
   CldUploadWidget,
-  CloudinaryUploadWidgetResults
+  CloudinaryUploadWidgetResults,
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
   getValidationSchema,
-  CreateDestinationSchema
+  CreateDestinationSchema,
 } from "@/config/form/formSchemaData/CreateDestinationSchema";
 import { z } from "zod";
 
@@ -38,7 +38,7 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
@@ -52,7 +52,7 @@ const ReactSelect = dynamic(() => import("react-select"), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
-  )
+  ),
 });
 
 type SelectOption = {
@@ -67,7 +67,7 @@ const getSelectOptions = (options?: string[]) => {
 export const CreateDestinationForm = ({
   FormData,
   initialData,
-  isEditMode = false
+  isEditMode = false,
 }: FormComponentProps) => {
   // Use full schema by default, but we'll validate dynamically
   const router = useRouter();
@@ -111,9 +111,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: ""
-                }
-              ]
+                  dayWiseImage: "",
+                },
+              ],
       }
     : {
         ...FormData.reduce(
@@ -126,7 +126,7 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
-                : ""
+                : "",
           }),
           {}
         ),
@@ -138,21 +138,21 @@ export const CreateDestinationForm = ({
             activities: [],
             meals: "",
             accommodation: "",
-            dayWiseImage: ""
-          }
+            dayWiseImage: "",
+          },
         ],
         // Add tripImage field
-        tripImage: ""
+        tripImage: "",
       };
 
   const form = useForm({
     resolver: undefined, // We'll handle validation manually
     defaultValues,
-    mode: "onChange" // Enable real-time validation feedback
+    mode: "onChange", // Enable real-time validation feedback
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData"
+    name: "dayWiseData",
   });
 
   const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
@@ -161,6 +161,12 @@ export const CreateDestinationForm = ({
 
   // Step management state
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [customActivityInput, setCustomActivityInput] = useState<{
+    [key: number]: string;
+  }>({});
+  const [customIncludedInput, setCustomIncludedInput] = useState<string>("");
+  const [customExcludedInput, setCustomExcludedInput] = useState<string>("");
   const totalSteps = 3;
 
   console.log(dayWiseImages);
@@ -187,7 +193,7 @@ export const CreateDestinationForm = ({
       "startDate",
       "endDate",
       "filters",
-      "tripImage"
+      "tripImage",
     ];
     const step2Fields = [
       "destination",
@@ -195,7 +201,7 @@ export const CreateDestinationForm = ({
       "state",
       "city",
       "price",
-      "maxLimit"
+      "maxLimit",
     ];
     // Step 3: everything else (description, languages, includedActivities, restrictions, etc.)
 
@@ -220,7 +226,7 @@ export const CreateDestinationForm = ({
       activities: [],
       meals: "",
       accommodation: "",
-      dayWiseImage: ""
+      dayWiseImage: "",
     });
   };
 
@@ -266,7 +272,7 @@ export const CreateDestinationForm = ({
   const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
     setDayWiseImages((prev) => ({
       ...prev,
-      [dayIndex]: imageUrl
+      [dayIndex]: imageUrl,
     }));
     form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, imageUrl);
   };
@@ -318,12 +324,39 @@ export const CreateDestinationForm = ({
     data: Partial<FormDataType>,
     isDraft: boolean = false
   ) => {
-    // Log the raw form data to check what we're working with
-    console.log("Raw form data:", JSON.stringify(data, null, 2));
-    console.log(
-      "Day-wise data from form:",
-      JSON.stringify(data.dayWiseData, null, 2)
-    );
+    if (isSubmitting) return; // Prevent multiple submissions
+
+    setIsSubmitting(true);
+
+    // Log the raw form data to check what we're working with (safely)
+    try {
+      console.log("Raw form data:", {
+        tripName: data.tripName,
+        status: isDraft ? "DRAFT" : "ACTIVE",
+        dayWiseDataLength: data.dayWiseData?.length || 0,
+      });
+      if (data.dayWiseData && data.dayWiseData.length > 0) {
+        console.log(
+          "Day-wise data summary:",
+          data.dayWiseData.map(
+            (
+              day: {
+                title?: string;
+                activities?: string[];
+              },
+              idx: number
+            ) => ({
+              day: idx + 1,
+              title: day.title || `Day ${idx + 1}`,
+              hasActivities:
+                Array.isArray(day.activities) && day.activities.length > 0,
+            })
+          )
+        );
+      }
+    } catch {
+      console.log("Form data logging error, continuing with submission");
+    }
     console.log("Saving as draft:", isDraft);
 
     // Perform dynamic validation
@@ -333,6 +366,7 @@ export const CreateDestinationForm = ({
       console.error("Validation failed:", validationResult.error);
       // If it's not a draft, show validation errors
       if (!isDraft) {
+        setIsSubmitting(false);
         // The form will handle showing the validation errors
         return;
       }
@@ -340,35 +374,84 @@ export const CreateDestinationForm = ({
     }
 
     try {
-      const start = new Date(data.startDate || "");
-      const end = new Date(data.endDate || "");
-      const noOfDays =
-        Math.ceil(
-          Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
-        ) + 1;
+      // Handle dates properly for drafts
+      let start: Date | null = null;
+      let end: Date | null = null;
+      let noOfDays = 1;
+
+      if (data.startDate && data.endDate && !isDraft) {
+        start = new Date(data.startDate);
+        end = new Date(data.endDate);
+
+        // Only calculate noOfDays if we have valid dates
+        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          noOfDays =
+            Math.ceil(
+              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
+            ) + 1;
+        }
+      } else if (data.startDate && data.endDate) {
+        // For drafts, still try to set dates if provided
+        const tempStart = new Date(data.startDate);
+        const tempEnd = new Date(data.endDate);
+
+        if (!isNaN(tempStart.getTime())) {
+          start = tempStart;
+        }
+        if (!isNaN(tempEnd.getTime())) {
+          end = tempEnd;
+        }
+
+        if (start && end) {
+          noOfDays =
+            Math.ceil(
+              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
+            ) + 1;
+        }
+      }
+
+      // For drafts, we can have minimal data
+      if (isDraft) {
+        noOfDays = Math.max(noOfDays, 1); // Ensure at least 1 day for drafts
+      }
 
       // Process dayWiseData to ensure all fields are properly formatted
-      const processedDayWiseData = (data.dayWiseData || []).map(
-        (
-          day: {
-            title?: string;
-            description?: string;
-            activities?: string[];
-            meals?: string;
-            accommodation?: string;
-            dayWiseImage?: string;
-          },
-          index: number
-        ) => ({
-          dayNumber: index + 1,
-          title: day.title || `Day ${index + 1}`,
-          description: day.description || "",
-          activities: Array.isArray(day.activities) ? day.activities : [],
-          meals: day.meals || "",
-          accommodation: day.accommodation || "",
-          dayWiseImage: day.dayWiseImage || ""
-        })
-      );
+      let processedDayWiseData: Array<{
+        dayNumber: number;
+        title: string;
+        description: string;
+        activities: string[];
+        meals: string;
+        accommodation: string;
+        dayWiseImage: string;
+      }> = [];
+      try {
+        processedDayWiseData = (data.dayWiseData || []).map(
+          (
+            day: {
+              title?: string;
+              description?: string;
+              activities?: string[];
+              meals?: string;
+              accommodation?: string;
+              dayWiseImage?: string;
+            },
+            index: number
+          ) => ({
+            dayNumber: index + 1,
+            title: day.title || `Day ${index + 1}`,
+            description: day.description || "",
+            activities: Array.isArray(day.activities) ? day.activities : [],
+            meals: day.meals || "",
+            accommodation: day.accommodation || "",
+            dayWiseImage: day.dayWiseImage || "",
+          })
+        );
+      } catch (processingError) {
+        console.error("Error processing day-wise data:", processingError);
+        // Fallback to empty array if processing fails
+        processedDayWiseData = [];
+      }
 
       const statusToSend: "DRAFT" | "INACTIVE" = isDraft ? "DRAFT" : "INACTIVE";
 
@@ -390,7 +473,7 @@ export const CreateDestinationForm = ({
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
-        status: statusToSend
+        status: statusToSend,
       };
 
       let result;
@@ -401,44 +484,60 @@ export const CreateDestinationForm = ({
       }
 
       if (result?.error) {
-        toast.error(result.message, {
+        toast.error(result.message || result.error, {
           style: {
             background: "rgba(147, 51, 234, 0.95)",
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         console.error(
           `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
           result.error
         );
       } else {
-        toast.success(result.message, {
+        toast.success(result.message || "Operation completed successfully!", {
           style: {
             background: "rgba(147, 51, 234, 0.95)",
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         router.push("/dashboard/host");
       }
     } catch (err) {
       console.error("Unexpected error:", err);
+      toast.error("An unexpected error occurred. Please try again.", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)",
+        },
+        duration: 3000,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDraftSubmit = async () => {
+    if (isSubmitting) return;
+
     const formData = form.getValues();
     await onSubmit(formData, true);
   };
 
   const handleFullSubmit = async () => {
+    if (isSubmitting) return;
+
     const formData = form.getValues();
 
     const validationResult = validateFormData(formData, false);
@@ -450,7 +549,7 @@ export const CreateDestinationForm = ({
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
             type: "manual",
-            message: errorMessage[0]
+            message: errorMessage[0],
           });
         }
       });
@@ -472,22 +571,23 @@ export const CreateDestinationForm = ({
         return {
           title: "Basic Trip Information",
           description:
-            "Let's start with the essentials - trip name, dates, and preferences"
+            "Let's start with the essentials - trip name, dates, and preferences",
         };
       case 2:
         return {
           title: "Location & Pricing",
-          description: "Tell us where you're going and set your pricing details"
+          description:
+            "Tell us where you're going and set your pricing details",
         };
       case 3:
         return {
           title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out"
+          description: "Add the finishing touches to make your trip stand out",
         };
       default:
         return {
           title: "Create Trip",
-          description: "Fill in your trip details"
+          description: "Fill in your trip details",
         };
     }
   };
@@ -723,7 +823,7 @@ export const CreateDestinationForm = ({
                                     value={(field.value as string[])?.map(
                                       (val) => ({
                                         value: val,
-                                        label: val
+                                        label: val,
                                       })
                                     )}
                                     onChange={(newValue) => {
@@ -742,31 +842,31 @@ export const CreateDestinationForm = ({
                                         borderRadius: "0.375rem",
                                         boxShadow: "none",
                                         "&:hover": {
-                                          borderColor: "#a855f7"
+                                          borderColor: "#a855f7",
                                         },
                                         "&:focus-within": {
                                           borderColor: "#a855f7",
                                           boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)"
-                                        }
+                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
+                                        },
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
                                         backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem"
+                                        borderRadius: "0.25rem",
                                       }),
                                       multiValueLabel: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
-                                        fontWeight: "500"
+                                        fontWeight: "500",
                                       }),
                                       multiValueRemove: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
                                         "&:hover": {
                                           backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9"
-                                        }
+                                          color: "#6d28d9",
+                                        },
                                       }),
                                       option: (base, state) => ({
                                         ...base,
@@ -777,16 +877,280 @@ export const CreateDestinationForm = ({
                                           : "white",
                                         color: state.isSelected
                                           ? "white"
-                                          : "#374151"
+                                          : "#374151",
                                       }),
                                       placeholder: (base) => ({
                                         ...base,
-                                        color: "#9ca3af"
-                                      })
+                                        color: "#9ca3af",
+                                      }),
                                     }}
                                     placeholder={data.placeholder}
                                     className="font-instrument"
                                   />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
+
+                      // Inclusion List Component
+                      if (
+                        (data.type === "inclusion-list" ||
+                          data.type === "exclusion-list") &&
+                        "options" in data &&
+                        Array.isArray(data.options)
+                      ) {
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                  {data.label}
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="space-y-2">
+                                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                      {(data.options || []).map(
+                                        (option, index) => {
+                                          const isSelected = (
+                                            (field.value as string[]) || []
+                                          ).includes(option);
+                                          return (
+                                            <div
+                                              key={index}
+                                              className="flex items-center justify-between p-2 hover:bg-white rounded transition-colors"
+                                            >
+                                              <span className="text-sm text-gray-700 font-instrument">
+                                                {option}
+                                              </span>
+                                              <div className="flex items-center gap-2">
+                                                {isSelected ? (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const newValue = (
+                                                        (field.value as string[]) ||
+                                                        []
+                                                      ).filter(
+                                                        (item) =>
+                                                          item !== option
+                                                      );
+                                                      field.onChange(newValue);
+                                                    }}
+                                                    className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                                  >
+                                                    −
+                                                  </button>
+                                                ) : (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const currentValue =
+                                                        (field.value as string[]) ||
+                                                        [];
+                                                      const newValue = [
+                                                        ...currentValue,
+                                                        option,
+                                                      ];
+                                                      field.onChange(newValue);
+                                                    }}
+                                                    className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                                  >
+                                                    +
+                                                  </button>
+                                                )}
+                                              </div>
+                                            </div>
+                                          );
+                                        }
+                                      )}
+                                    </div>
+                                    {((field.value as string[]) || []).length >
+                                      0 && (
+                                      <div className="mt-3">
+                                        <p className="text-xs text-gray-600 font-instrument mb-2">
+                                          Selected{" "}
+                                          {data.type === "inclusion-list"
+                                            ? "inclusions"
+                                            : "exclusions"}
+                                          :
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                          {(
+                                            (field.value as string[]) || []
+                                          ).map((item, index) => (
+                                            <span
+                                              key={index}
+                                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                                data.type === "inclusion-list"
+                                                  ? "bg-green-100 text-green-800"
+                                                  : "bg-red-100 text-red-800"
+                                              }`}
+                                            >
+                                              {item}
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newValue = (
+                                                    (field.value as string[]) ||
+                                                    []
+                                                  ).filter(
+                                                    (val) => val !== item
+                                                  );
+                                                  field.onChange(newValue);
+                                                }}
+                                                className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                                              >
+                                                ×
+                                              </button>
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
+
+                      // Custom Input List Component (for What's Included/Excluded with user input)
+                      if (data.type === "custom-input-list") {
+                        const isIncluded = data.id === "includedActivities";
+                        const customInput = isIncluded
+                          ? customIncludedInput
+                          : customExcludedInput;
+                        const setCustomInput = isIncluded
+                          ? setCustomIncludedInput
+                          : setCustomExcludedInput;
+
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                                  <div
+                                    className={`w-5 h-5 rounded flex items-center justify-center ${
+                                      isIncluded ? "bg-green-100" : "bg-red-100"
+                                    }`}
+                                  >
+                                    {isIncluded ? (
+                                      <Plus className="h-3 w-3 text-green-600" />
+                                    ) : (
+                                      <Minus className="h-3 w-3 text-red-600" />
+                                    )}
+                                  </div>
+                                  <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                    {data.label}
+                                  </FormLabel>
+                                </div>
+                                <FormControl>
+                                  <div className="space-y-3 mt-3">
+                                    <div className="flex gap-2">
+                                      <Input
+                                        placeholder={data.placeholder}
+                                        className={`flex-1 border-gray-200 font-instrument ${
+                                          isIncluded
+                                            ? "focus:border-green-400 focus:ring-green-100"
+                                            : "focus:border-red-400 focus:ring-red-100"
+                                        }`}
+                                        value={customInput}
+                                        onChange={(e) =>
+                                          setCustomInput(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const item = customInput.trim();
+                                            if (
+                                              item &&
+                                              !(field.value || []).includes(
+                                                item
+                                              )
+                                            ) {
+                                              field.onChange([
+                                                ...(field.value || []),
+                                                item,
+                                              ]);
+                                              setCustomInput("");
+                                            }
+                                          }
+                                        }}
+                                      />
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => {
+                                          const item = customInput.trim();
+                                          if (
+                                            item &&
+                                            !(field.value || []).includes(item)
+                                          ) {
+                                            field.onChange([
+                                              ...(field.value || []),
+                                              item,
+                                            ]);
+                                            setCustomInput("");
+                                          }
+                                        }}
+                                        className={`px-3 text-white ${
+                                          isIncluded
+                                            ? "bg-green-500 hover:bg-green-600"
+                                            : "bg-red-500 hover:bg-red-600"
+                                        }`}
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    {(field.value || []).length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {(field.value || []).map(
+                                          (item: string, itemIndex: number) => (
+                                            <span
+                                              key={itemIndex}
+                                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                                isIncluded
+                                                  ? "bg-green-100 text-green-800"
+                                                  : "bg-red-100 text-red-800"
+                                              }`}
+                                            >
+                                              {item}
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newItems = (
+                                                    field.value || []
+                                                  ).filter(
+                                                    (_: string, i: number) =>
+                                                      i !== itemIndex
+                                                  );
+                                                  field.onChange(newItems);
+                                                }}
+                                                className={`ml-1 rounded-full p-0.5 transition-colors ${
+                                                  isIncluded
+                                                    ? "hover:bg-green-200"
+                                                    : "hover:bg-red-200"
+                                                }`}
+                                              >
+                                                <Minus className="h-3 w-3" />
+                                              </button>
+                                            </span>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -999,76 +1363,113 @@ export const CreateDestinationForm = ({
                                     Activities
                                   </FormLabel>
                                   <FormControl>
-                                    <ReactSelect
-                                      isMulti
-                                      placeholder="Add activities..."
-                                      options={[]} // You can add predefined options here
-                                      value={
-                                        field.value?.map((act: string) => ({
-                                          value: act,
-                                          label: act
-                                        })) || []
-                                      }
-                                      onChange={(newValue) => {
-                                        const selected =
-                                          newValue as MultiValue<SelectOption>;
-                                        field.onChange(
-                                          selected?.map((opt) => opt.value) ||
-                                            []
-                                        );
-                                      }}
-                                      styles={{
-                                        control: (base) => ({
-                                          ...base,
-                                          minHeight: "44px",
-                                          backgroundColor: "white",
-                                          border: "1px solid #e5e7eb",
-                                          borderRadius: "0.375rem",
-                                          boxShadow: "none",
-                                          "&:hover": {
-                                            borderColor: "#a855f7"
-                                          },
-                                          "&:focus-within": {
-                                            borderColor: "#a855f7",
-                                            boxShadow:
-                                              "0 0 0 3px rgba(168, 85, 247, 0.1)"
+                                    <div className="space-y-3">
+                                      <div className="flex gap-2">
+                                        <Input
+                                          placeholder="Add an activity..."
+                                          className="flex-1 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                                          value={
+                                            customActivityInput[index] || ""
                                           }
-                                        }),
-                                        multiValue: (base) => ({
-                                          ...base,
-                                          backgroundColor: "#f3e8ff",
-                                          borderRadius: "0.25rem"
-                                        }),
-                                        multiValueLabel: (base) => ({
-                                          ...base,
-                                          color: "#7c3aed",
-                                          fontWeight: "500"
-                                        }),
-                                        multiValueRemove: (base) => ({
-                                          ...base,
-                                          color: "#7c3aed",
-                                          "&:hover": {
-                                            backgroundColor: "#e9d5ff",
-                                            color: "#6d28d9"
+                                          onChange={(e) =>
+                                            setCustomActivityInput((prev) => ({
+                                              ...prev,
+                                              [index]: e.target.value,
+                                            }))
                                           }
-                                        }),
-                                        option: (base, state) => ({
-                                          ...base,
-                                          backgroundColor: state.isSelected
-                                            ? "#a855f7"
-                                            : state.isFocused
-                                            ? "#f3e8ff"
-                                            : "white",
-                                          color: state.isSelected
-                                            ? "white"
-                                            : "#374151"
-                                        }),
-                                        placeholder: (base) => ({
-                                          ...base,
-                                          color: "#9ca3af"
-                                        })
-                                      }}
-                                    />
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                              e.preventDefault();
+                                              const activity =
+                                                customActivityInput[
+                                                  index
+                                                ]?.trim();
+                                              if (
+                                                activity &&
+                                                !(field.value || []).includes(
+                                                  activity
+                                                )
+                                              ) {
+                                                field.onChange([
+                                                  ...(field.value || []),
+                                                  activity,
+                                                ]);
+                                                setCustomActivityInput(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [index]: "",
+                                                  })
+                                                );
+                                              }
+                                            }
+                                          }}
+                                        />
+                                        <Button
+                                          type="button"
+                                          size="sm"
+                                          onClick={() => {
+                                            const activity =
+                                              customActivityInput[
+                                                index
+                                              ]?.trim();
+                                            if (
+                                              activity &&
+                                              !(field.value || []).includes(
+                                                activity
+                                              )
+                                            ) {
+                                              field.onChange([
+                                                ...(field.value || []),
+                                                activity,
+                                              ]);
+                                              setCustomActivityInput(
+                                                (prev) => ({
+                                                  ...prev,
+                                                  [index]: "",
+                                                })
+                                              );
+                                            }
+                                          }}
+                                          className="bg-purple-600 hover:bg-purple-700 text-white px-3"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                      {(field.value || []).length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                          {(field.value || []).map(
+                                            (
+                                              activity: string,
+                                              actIndex: number
+                                            ) => (
+                                              <span
+                                                key={actIndex}
+                                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                              >
+                                                {activity}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const newActivities = (
+                                                      field.value || []
+                                                    ).filter(
+                                                      (_: string, i: number) =>
+                                                        i !== actIndex
+                                                    );
+                                                    field.onChange(
+                                                      newActivities
+                                                    );
+                                                  }}
+                                                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                                                >
+                                                  <Minus className="h-3 w-3" />
+                                                </button>
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -1226,8 +1627,9 @@ export const CreateDestinationForm = ({
                       <Button
                         type="button"
                         onClick={handleDraftSubmit}
+                        disabled={isSubmitting}
                         variant="outline"
-                        className="px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
+                        className="px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1245,7 +1647,13 @@ export const CreateDestinationForm = ({
                           <polyline points="17 21 17 13 7 13 7 21" />
                           <polyline points="7 3 7 8 15 8" />
                         </svg>
-                        {isEditMode ? "Update as Draft" : "Save as Draft"}
+                        {isSubmitting
+                          ? isEditMode
+                            ? "Updating..."
+                            : "Saving..."
+                          : isEditMode
+                          ? "Update as Draft"
+                          : "Save as Draft"}
                       </Button>
                     )}
 
@@ -1262,9 +1670,14 @@ export const CreateDestinationForm = ({
                       <Button
                         type="button"
                         onClick={handleFullSubmit}
-                        className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
+                        disabled={isSubmitting}
+                        className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isEditMode
+                        {isSubmitting
+                          ? isEditMode
+                            ? "Updating..."
+                            : "Creating..."
+                          : isEditMode
                           ? "Update Travel Experience"
                           : "Create Travel Experience"}
                         <svg

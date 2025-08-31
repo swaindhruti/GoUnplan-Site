@@ -35,10 +35,10 @@ export const CreateDestinationSchema = z.object({
         dayWiseImage: z
           .string()
           .min(1, "Day image is required")
-          .url("Must be a valid image URL")
+          .url("Must be a valid image URL"),
       })
     )
-    .nonempty("At least one day must be added")
+    .nonempty("At least one day must be added"),
 });
 
 // Minimal validation schema for drafts - only basic structure validation
@@ -68,19 +68,21 @@ export const CreateDestinationDraftSchema = z.object({
         activities: z.array(z.string()).optional().default([]),
         meals: z.string().optional().default(""),
         accommodation: z.string().optional().default(""),
-        dayWiseImage: z.string().optional().default("")
+        dayWiseImage: z.string().optional().default(""),
       })
     )
     .optional()
-    .default([{
-      dayNumber: 1,
-      title: "",
-      description: "",
-      activities: [],
-      meals: "",
-      accommodation: "",
-      dayWiseImage: ""
-    }])
+    .default([
+      {
+        dayNumber: 1,
+        title: "",
+        description: "",
+        activities: [],
+        meals: "",
+        accommodation: "",
+        dayWiseImage: "",
+      },
+    ]),
 });
 
 // Function to get appropriate schema based on mode

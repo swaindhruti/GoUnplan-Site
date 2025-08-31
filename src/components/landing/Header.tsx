@@ -8,7 +8,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -17,7 +17,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuShortcut,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Menu,
@@ -32,10 +32,9 @@ import {
   Crown,
   Shield,
   UserCog,
-  FileText,
   MapPin,
   HelpCircle,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -68,7 +67,7 @@ export default function Header() {
     { name: "Home", href: "/", section: "#home" },
     { name: "Vibes", href: "/vibes", section: "#vibes" },
     { name: "About", href: "/about", section: "#about" },
-    { name: "Contact", href: "/contact", section: "#contact" }
+    { name: "Contact", href: "/contact", section: "#contact" },
   ];
 
   useEffect(() => {
@@ -139,14 +138,14 @@ export default function Header() {
       items.push({
         label: "User Dashboard",
         href: "/dashboard/user",
-        icon: User
+        icon: User,
       });
     }
     if (userRole === "HOST") {
       items.push({
         label: "Host Dashboard",
         href: "/dashboard/host",
-        icon: Crown
+        icon: Crown,
       });
     }
 
@@ -154,7 +153,7 @@ export default function Header() {
       items.push({
         label: "Admin Dashboard",
         href: "/dashboard/admin",
-        icon: Shield
+        icon: Shield,
       });
     }
 
@@ -176,7 +175,7 @@ export default function Header() {
     breadcrumbs.push({
       label: "Home",
       href: "/",
-      isActive: pathname === "/"
+      isActive: pathname === "/",
     });
 
     let currentPath = "";
@@ -197,7 +196,7 @@ export default function Header() {
       breadcrumbs.push({
         label,
         href: currentPath,
-        isActive: isLast
+        isActive: isLast,
       });
     });
 
@@ -398,32 +397,6 @@ export default function Header() {
             <DropdownMenuShortcut className="text-gray-400">
               ⌘E
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => window.open("/privacy-policy.pdf", "_blank")}
-            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-          >
-            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">Privacy Policy</span>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => window.open("/terms-and-conditions.pdf", "_blank")}
-            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-          >
-            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">Terms of Service</span>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => window.open("/cancellation-policy.pdf", "_blank")}
-            className="flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 cursor-pointer group"
-          >
-            <FileText className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">
-              Cancellation Policy
-            </span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -668,7 +641,7 @@ export default function Header() {
                           animationDelay: `${index * 100}ms`,
                           animation: isOpen
                             ? "slideInRight 0.6s ease-out forwards"
-                            : "none"
+                            : "none",
                         }}
                       >
                         <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
@@ -747,7 +720,7 @@ export default function Header() {
                                       animationDelay: `${(index + 1) * 100}ms`,
                                       animation: isMobileDashboardOpen
                                         ? "slideInRight 0.4s ease-out forwards"
-                                        : "none"
+                                        : "none",
                                     }}
                                   >
                                     <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
@@ -826,57 +799,6 @@ export default function Header() {
                             <div className="flex items-center">
                               <MapPin className="mr-3 h-5 w-5 text-purple-600" />
                               Explore Trips
-                            </div>
-                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            window.open("/privacy-policy.pdf", "_blank");
-                          }}
-                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
-                        >
-                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
-                            <div className="flex items-center">
-                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
-                              Privacy Policy
-                            </div>
-                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            window.open("/terms-and-conditions.pdf", "_blank");
-                          }}
-                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
-                        >
-                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
-                            <div className="flex items-center">
-                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
-                              Terms of Service
-                            </div>
-                            <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            window.open("/cancellation-policy.pdf", "_blank");
-                          }}
-                          className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
-                        >
-                          <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
-                            <div className="flex items-center">
-                              <FileText className="mr-3 h-5 w-5 text-purple-600" />
-                              Cancellation Policy
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>

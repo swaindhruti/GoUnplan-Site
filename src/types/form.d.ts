@@ -28,6 +28,9 @@ type InputType =
   | "textarea"
   | "date"
   | "multi-select"
+  | "inclusion-list"
+  | "exclusion-list"
+  | "custom-input-list"
   | "sectionHead"
   | "dynamic-group";
 

@@ -110,8 +110,8 @@ export const createTravelPlan = async (data: {
   restrictions: string[];
   noOfDays: number;
   price: number;
-  startDate: Date;
-  endDate: Date;
+  startDate: Date | null;
+  endDate: Date | null;
   filters: string[];
   maxParticipants?: number;
   country: string;
@@ -131,7 +131,8 @@ export const createTravelPlan = async (data: {
   }>;
 }) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session)
+    return { error: "Unauthorized", message: "Please login to continue" };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -139,15 +140,19 @@ export const createTravelPlan = async (data: {
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return {
+        error: "Host profile not found",
+        message: "Please complete your host profile first",
+      };
     }
 
     console.log("Received travel plan data:", {
       title: data.title,
-      description: data.description.slice(0, 30) + "...",
+      description: data.description?.slice(0, 30) + "..." || "",
       noOfDays: data.noOfDays,
       filters: data.filters,
       languages: data.languages,
+      status: data.status,
       dayWiseData: data.dayWiseData
         ? `${data.dayWiseData.length} days`
         : "none",
@@ -178,28 +183,45 @@ export const createTravelPlan = async (data: {
       statusToSet = TravelPlanStatus.INACTIVE;
     }
     console.log("🔍 DEBUG ACTION: statusToSet =", statusToSet);
-    const price = Number(data.price);
-    console.log(price);
+
+    // Handle price conversion with fallback for drafts
+    const price = isNaN(Number(data.price)) ? 0 : Number(data.price);
+    console.log("Processed price:", price);
+
+    // Handle noOfDays with fallback for drafts
+    const noOfDays =
+      isNaN(data.noOfDays) || data.noOfDays <= 0 ? 1 : data.noOfDays;
+    console.log("Processed noOfDays:", noOfDays);
+
+    // Handle maxParticipants with fallback for drafts
+    const maxParticipants = isNaN(Number(data.maxParticipants))
+      ? 0
+      : Number(data.maxParticipants);
+    console.log("Processed maxParticipants:", maxParticipants);
+
     const travelPlan = await prisma.travelPlans.create({
       data: {
-        title: data.title,
-        description: data.description,
+        title: data.title || "Untitled Trip",
+        description: data.description || "",
         includedActivities: data.includedActivities || [],
-        destination: data.destination,
+        notIncludedActivities: [], // Required field that was missing
+        destination: data.destination || "",
         startDate: data.startDate,
         endDate: data.endDate,
         restrictions: data.restrictions || [],
-        noOfDays: data.noOfDays,
-        hostId: hostProfile.hostId,
+        noOfDays: noOfDays,
         price: price,
-        maxParticipants: Number(data.maxParticipants),
-        country: data.country,
-        state: data.state,
-        city: data.city,
+        maxParticipants: maxParticipants,
+        country: data.country || "",
+        state: data.state || "",
+        city: data.city || "",
         languages: data.languages || [],
         filters: data.filters || [],
         tripImage: data.tripImage || "https://avatar.iran.liara.run/public",
         status: statusToSet,
+        host: {
+          connect: { hostId: hostProfile.hostId },
+        },
       },
     });
 
@@ -258,11 +280,32 @@ export const createTravelPlan = async (data: {
       success: true,
       travelPlan: travelPlan,
       message:
-        "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
+        data.status === "DRAFT"
+          ? "Trip saved as draft successfully! You can continue editing it later."
+          : "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
     };
   } catch (error) {
     console.error("Error creating travel plan:", error);
-    return { error: `Failed to create travel plan` };
+
+    // Provide more specific error messages
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      return {
+        error: "Validation error",
+        message: "Please check all required fields and try again.",
+      };
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return {
+        error: "Database error",
+        message: "There was a problem saving your trip. Please try again.",
+      };
+    }
+
+    return {
+      error: "Failed to create travel plan",
+      message: "An unexpected error occurred. Please try again.",
+    };
   }
 };
 
@@ -326,8 +369,8 @@ export const updateTravelPlan = async (
     restrictions?: string[];
     noOfDays?: number;
     price?: number;
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: Date | null;
+    endDate?: Date | null;
     maxParticipants?: number;
     country?: string;
     state?: string;
@@ -371,12 +414,55 @@ export const updateTravelPlan = async (
     // Extract dayWiseData from the data object
     const { dayWiseData, ...travelPlanData } = data;
 
+    // Prepare the update data with proper handling of all fields
+    const updateData: Prisma.TravelPlansUpdateInput = {};
+
+    if (travelPlanData.title !== undefined)
+      updateData.title = travelPlanData.title;
+    if (travelPlanData.description !== undefined)
+      updateData.description = travelPlanData.description;
+    if (travelPlanData.includedActivities !== undefined)
+      updateData.includedActivities = travelPlanData.includedActivities;
+    if (travelPlanData.restrictions !== undefined)
+      updateData.restrictions = travelPlanData.restrictions;
+    if (travelPlanData.noOfDays !== undefined)
+      updateData.noOfDays = Number(travelPlanData.noOfDays);
+    if (travelPlanData.price !== undefined)
+      updateData.price = Number(travelPlanData.price);
+    if (travelPlanData.startDate !== undefined)
+      updateData.startDate = travelPlanData.startDate;
+    if (travelPlanData.endDate !== undefined)
+      updateData.endDate = travelPlanData.endDate;
+    if (travelPlanData.maxParticipants !== undefined)
+      updateData.maxParticipants = Number(travelPlanData.maxParticipants);
+    if (travelPlanData.country !== undefined)
+      updateData.country = travelPlanData.country;
+    if (travelPlanData.state !== undefined)
+      updateData.state = travelPlanData.state;
+    if (travelPlanData.city !== undefined)
+      updateData.city = travelPlanData.city;
+    if (travelPlanData.filters !== undefined)
+      updateData.filters = travelPlanData.filters;
+    if (travelPlanData.languages !== undefined)
+      updateData.languages = travelPlanData.languages;
+    if (travelPlanData.destination !== undefined)
+      updateData.destination = travelPlanData.destination;
+    if (travelPlanData.tripImage !== undefined)
+      updateData.tripImage = travelPlanData.tripImage;
+    if (travelPlanData.status !== undefined) {
+      if (travelPlanData.status === "DRAFT") {
+        updateData.status = TravelPlanStatus.DRAFT;
+      } else if (travelPlanData.status === "ACTIVE") {
+        updateData.status = TravelPlanStatus.ACTIVE;
+      } else {
+        updateData.status = TravelPlanStatus.INACTIVE;
+      }
+    }
+
     // Update the travel plan
     const updatedPlan = await prisma.travelPlans.update({
       where: { travelPlanId: id },
-      data: {
-        ...travelPlanData,
-      },
+      data: updateData,
     });
 
     // Handle day-wise data update if provided
@@ -389,8 +475,15 @@ export const updateTravelPlan = async (
       // Create new day-wise data
       await prisma.dayWiseItinerary.createMany({
         data: dayWiseData.map((day) => ({
-          ...day,
           travelPlanId: id,
+          dayNumber: day.dayNumber,
+          title: day.title || `Day ${day.dayNumber}`,
+          description: day.description || "",
+          activities: Array.isArray(day.activities) ? day.activities : [],
+          meals: day.meals || "",
+          accommodation: day.accommodation || "",
+          dayWiseImage:
+            day.dayWiseImage || "https://avatar.iran.liara.run/public",
         })),
       });
     }
@@ -398,11 +491,33 @@ export const updateTravelPlan = async (
     return {
       success: true,
       updatedPlan,
-      message: "Travel plan updated successfully!",
+      message:
+        data.status === "DRAFT"
+          ? "Trip draft updated successfully!"
+          : "Travel plan updated successfully!",
     };
   } catch (error) {
     console.error("Error updating travel plan:", error);
-    return { error: "Failed to update travel plan" };
+
+    // Provide more specific error messages
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      return {
+        error: "Validation error",
+        message: "Please check all required fields and try again.",
+      };
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return {
+        error: "Database error",
+        message: "There was a problem updating your trip. Please try again.",
+      };
+    }
+
+    return {
+      error: "Failed to update travel plan",
+      message: "An unexpected error occurred while updating. Please try again.",
+    };
   }
 };
 
