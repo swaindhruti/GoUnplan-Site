@@ -46,6 +46,8 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Dynamically import ReactSelect to prevent hydration issues
 const ReactSelect = dynamic(() => import("react-select"), {
@@ -93,12 +95,14 @@ export const CreateDestinationForm = ({
         maxLimit: initialData.maxParticipants || 0,
         minLimit: initialData.minParticipants || 0,
         description: initialData.description || "",
+        activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
         languages: initialData.languages || [],
         includedActivities: initialData.includedActivities || [],
         restrictions: initialData.restrictions || [],
+        special: initialData.special || [],
         tripImage: initialData.tripImage || "",
         dayWiseData:
           initialData.dayWiseData?.length > 0
@@ -161,6 +165,14 @@ export const CreateDestinationForm = ({
 
   // Step management state
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [customActivityInput, setCustomActivityInput] = useState<{
+    [key: number]: string;
+  }>({});
+  const [customIncludedInput, setCustomIncludedInput] = useState<string>("");
+  const [customExcludedInput, setCustomExcludedInput] = useState<string>("");
+
+  const [customSpecialInput, setCustomSpecialInput] = useState<string>("");
   const totalSteps = 3;
 
   console.log(dayWiseImages);
@@ -318,12 +330,39 @@ export const CreateDestinationForm = ({
     data: Partial<FormDataType>,
     isDraft: boolean = false
   ) => {
-    // Log the raw form data to check what we're working with
-    console.log("Raw form data:", JSON.stringify(data, null, 2));
-    console.log(
-      "Day-wise data from form:",
-      JSON.stringify(data.dayWiseData, null, 2)
-    );
+    if (isSubmitting) return; // Prevent multiple submissions
+
+    setIsSubmitting(true);
+
+    // Log the raw form data to check what we're working with (safely)
+    try {
+      console.log("Raw form data:", {
+        tripName: data.tripName,
+        status: isDraft ? "DRAFT" : "ACTIVE",
+        dayWiseDataLength: data.dayWiseData?.length || 0
+      });
+      if (data.dayWiseData && data.dayWiseData.length > 0) {
+        console.log(
+          "Day-wise data summary:",
+          data.dayWiseData.map(
+            (
+              day: {
+                title?: string;
+                activities?: string[];
+              },
+              idx: number
+            ) => ({
+              day: idx + 1,
+              title: day.title || `Day ${idx + 1}`,
+              hasActivities:
+                Array.isArray(day.activities) && day.activities.length > 0
+            })
+          )
+        );
+      }
+    } catch {
+      console.log("Form data logging error, continuing with submission");
+    }
     console.log("Saving as draft:", isDraft);
 
     // Perform dynamic validation
@@ -333,6 +372,7 @@ export const CreateDestinationForm = ({
       console.error("Validation failed:", validationResult.error);
       // If it's not a draft, show validation errors
       if (!isDraft) {
+        setIsSubmitting(false);
         // The form will handle showing the validation errors
         return;
       }
@@ -340,35 +380,84 @@ export const CreateDestinationForm = ({
     }
 
     try {
-      const start = new Date(data.startDate || "");
-      const end = new Date(data.endDate || "");
-      const noOfDays =
-        Math.ceil(
-          Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
-        ) + 1;
+      // Handle dates properly for drafts
+      let start: Date | null = null;
+      let end: Date | null = null;
+      let noOfDays = 1;
+
+      if (data.startDate && data.endDate && !isDraft) {
+        start = new Date(data.startDate);
+        end = new Date(data.endDate);
+
+        // Only calculate noOfDays if we have valid dates
+        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          noOfDays =
+            Math.ceil(
+              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
+            ) + 1;
+        }
+      } else if (data.startDate && data.endDate) {
+        // For drafts, still try to set dates if provided
+        const tempStart = new Date(data.startDate);
+        const tempEnd = new Date(data.endDate);
+
+        if (!isNaN(tempStart.getTime())) {
+          start = tempStart;
+        }
+        if (!isNaN(tempEnd.getTime())) {
+          end = tempEnd;
+        }
+
+        if (start && end) {
+          noOfDays =
+            Math.ceil(
+              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
+            ) + 1;
+        }
+      }
+
+      // For drafts, we can have minimal data
+      if (isDraft) {
+        noOfDays = Math.max(noOfDays, 1); // Ensure at least 1 day for drafts
+      }
 
       // Process dayWiseData to ensure all fields are properly formatted
-      const processedDayWiseData = (data.dayWiseData || []).map(
-        (
-          day: {
-            title?: string;
-            description?: string;
-            activities?: string[];
-            meals?: string;
-            accommodation?: string;
-            dayWiseImage?: string;
-          },
-          index: number
-        ) => ({
-          dayNumber: index + 1,
-          title: day.title || `Day ${index + 1}`,
-          description: day.description || "",
-          activities: Array.isArray(day.activities) ? day.activities : [],
-          meals: day.meals || "",
-          accommodation: day.accommodation || "",
-          dayWiseImage: day.dayWiseImage || ""
-        })
-      );
+      let processedDayWiseData: Array<{
+        dayNumber: number;
+        title: string;
+        description: string;
+        activities: string[];
+        meals: string;
+        accommodation: string;
+        dayWiseImage: string;
+      }> = [];
+      try {
+        processedDayWiseData = (data.dayWiseData || []).map(
+          (
+            day: {
+              title?: string;
+              description?: string;
+              activities?: string[];
+              meals?: string;
+              accommodation?: string;
+              dayWiseImage?: string;
+            },
+            index: number
+          ) => ({
+            dayNumber: index + 1,
+            title: day.title || `Day ${index + 1}`,
+            description: day.description || "",
+            activities: Array.isArray(day.activities) ? day.activities : [],
+            meals: day.meals || "",
+            accommodation: day.accommodation || "",
+            dayWiseImage: day.dayWiseImage || ""
+          })
+        );
+      } catch (processingError) {
+        console.error("Error processing day-wise data:", processingError);
+        // Fallback to empty array if processing fails
+        processedDayWiseData = [];
+      }
 
       const statusToSend: "DRAFT" | "INACTIVE" = isDraft ? "DRAFT" : "INACTIVE";
 
@@ -379,9 +468,11 @@ export const CreateDestinationForm = ({
         includedActivities: data.includedActivities || [],
         restrictions: data.restrictions || [],
         noOfDays,
+        activities: data.activities || [],
         price: data.price || 0,
         startDate: start,
         endDate: end,
+        special: data.special || [],
         maxParticipants: data.maxLimit || 0,
         country: data.country || "",
         state: data.state || "",
@@ -401,7 +492,7 @@ export const CreateDestinationForm = ({
       }
 
       if (result?.error) {
-        toast.error(result.message, {
+        toast.error(result.message || result.error, {
           style: {
             background: "rgba(147, 51, 234, 0.95)",
             backdropFilter: "blur(12px)",
@@ -416,7 +507,7 @@ export const CreateDestinationForm = ({
           result.error
         );
       } else {
-        toast.success(result.message, {
+        toast.success(result.message || "Operation completed successfully!", {
           style: {
             background: "rgba(147, 51, 234, 0.95)",
             backdropFilter: "blur(12px)",
@@ -430,15 +521,31 @@ export const CreateDestinationForm = ({
       }
     } catch (err) {
       console.error("Unexpected error:", err);
+      toast.error("An unexpected error occurred. Please try again.", {
+        style: {
+          background: "rgba(147, 51, 234, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(196, 181, 253, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)"
+        },
+        duration: 3000
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDraftSubmit = async () => {
+    if (isSubmitting) return;
+
     const formData = form.getValues();
     await onSubmit(formData, true);
   };
 
   const handleFullSubmit = async () => {
+    if (isSubmitting) return;
+
     const formData = form.getValues();
 
     const validationResult = validateFormData(formData, false);
@@ -795,6 +902,290 @@ export const CreateDestinationForm = ({
                         );
                       }
 
+                      // Inclusion List Component
+                      if (
+                        (data.type === "inclusion-list" ||
+                          data.type === "exclusion-list") &&
+                        "options" in data &&
+                        Array.isArray(data.options)
+                      ) {
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                  {data.label}
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="space-y-2">
+                                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                      {(data.options || []).map(
+                                        (option, index) => {
+                                          const isSelected = (
+                                            (field.value as string[]) || []
+                                          ).includes(option);
+                                          return (
+                                            <div
+                                              key={index}
+                                              className="flex items-center justify-between p-2 hover:bg-white rounded transition-colors"
+                                            >
+                                              <span className="text-sm text-gray-700 font-instrument">
+                                                {option}
+                                              </span>
+                                              <div className="flex items-center gap-2">
+                                                {isSelected ? (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const newValue = (
+                                                        (field.value as string[]) ||
+                                                        []
+                                                      ).filter(
+                                                        (item) =>
+                                                          item !== option
+                                                      );
+                                                      field.onChange(newValue);
+                                                    }}
+                                                    className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                                  >
+                                                    −
+                                                  </button>
+                                                ) : (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const currentValue =
+                                                        (field.value as string[]) ||
+                                                        [];
+                                                      const newValue = [
+                                                        ...currentValue,
+                                                        option
+                                                      ];
+                                                      field.onChange(newValue);
+                                                    }}
+                                                    className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                                  >
+                                                    +
+                                                  </button>
+                                                )}
+                                              </div>
+                                            </div>
+                                          );
+                                        }
+                                      )}
+                                    </div>
+                                    {((field.value as string[]) || []).length >
+                                      0 && (
+                                      <div className="mt-3">
+                                        <p className="text-xs text-gray-600 font-instrument mb-2">
+                                          Selected{" "}
+                                          {data.type === "inclusion-list"
+                                            ? "inclusions"
+                                            : "exclusions"}
+                                          :
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                          {(
+                                            (field.value as string[]) || []
+                                          ).map((item, index) => (
+                                            <span
+                                              key={index}
+                                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                                data.type === "inclusion-list"
+                                                  ? "bg-green-100 text-green-800"
+                                                  : "bg-red-100 text-red-800"
+                                              }`}
+                                            >
+                                              {item}
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newValue = (
+                                                    (field.value as string[]) ||
+                                                    []
+                                                  ).filter(
+                                                    (val) => val !== item
+                                                  );
+                                                  field.onChange(newValue);
+                                                }}
+                                                className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                                              >
+                                                ×
+                                              </button>
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
+
+                      // Custom Input List Component (for What's Included/Excluded with user input)
+                      if (data.type === "custom-input-list") {
+                        const isIncluded = data.id === "includedActivities";
+                        const customInput = isIncluded
+                          ? customIncludedInput
+                          : data.label === "Not Included"
+                          ? customExcludedInput
+                          : customSpecialInput;
+                        const setCustomInput = isIncluded
+                          ? setCustomIncludedInput
+                          : data.label === "Not Included"
+                          ? setCustomExcludedInput
+                          : setCustomSpecialInput;
+
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                                  <div
+                                    className={`w-5 h-5 rounded flex items-center justify-center ${
+                                      isIncluded
+                                        ? "bg-green-100"
+                                        : data.label === "Not Included"
+                                        ? "bg-red-100"
+                                        : "bg-blue-100"
+                                    }`}
+                                  >
+                                    {isIncluded ? (
+                                      <Plus className="h-3 w-3 text-green-600" />
+                                    ) : data.label === "Not Included" ? (
+                                      <Minus className="h-3 w-3 text-red-600" />
+                                    ) : (
+                                      <Plus className="h-3 w-3 text-blue-600" />
+                                    )}
+                                  </div>
+                                  <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                    {data.label}
+                                  </FormLabel>
+                                </div>
+                                <FormControl>
+                                  <div className="space-y-3 mt-3">
+                                    <div className="flex gap-2">
+                                      <Input
+                                        placeholder={data.placeholder}
+                                        className={`flex-1 border-gray-200 font-instrument ${
+                                          isIncluded
+                                            ? "focus:border-green-400 focus:ring-green-100"
+                                            : data.label === "Not Included"
+                                            ? "focus:border-red-400 focus:ring-red-100"
+                                            : "focus:border-blue-400 focus:ring-blue-100"
+                                        }`}
+                                        value={customInput}
+                                        onChange={(e) =>
+                                          setCustomInput(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const item = customInput.trim();
+                                            if (
+                                              item &&
+                                              !(field.value || []).includes(
+                                                item
+                                              )
+                                            ) {
+                                              field.onChange([
+                                                ...(field.value || []),
+                                                item
+                                              ]);
+                                              setCustomInput("");
+                                            }
+                                          }
+                                        }}
+                                      />
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => {
+                                          const item = customInput.trim();
+                                          if (
+                                            item &&
+                                            !(field.value || []).includes(item)
+                                          ) {
+                                            field.onChange([
+                                              ...(field.value || []),
+                                              item
+                                            ]);
+                                            setCustomInput("");
+                                          }
+                                        }}
+                                        className={`px-3 text-white ${
+                                          isIncluded
+                                            ? "bg-green-500 hover:bg-green-600"
+                                            : data.label === "Not Included"
+                                            ? "bg-red-500 hover:bg-red-600"
+                                            : "bg-blue-500 hover:bg-blue-600"
+                                        }`}
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    {(field.value || []).length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {(field.value || []).map(
+                                          (item: string, itemIndex: number) => (
+                                            <span
+                                              key={itemIndex}
+                                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                                isIncluded
+                                                  ? "bg-green-100 text-green-800"
+                                                  : data.label ===
+                                                    "Not Included"
+                                                  ? "bg-red-100 text-red-800"
+                                                  : "bg-blue-100 text-blue-800"
+                                              }`}
+                                            >
+                                              {item}
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newItems = (
+                                                    field.value || []
+                                                  ).filter(
+                                                    (_: string, i: number) =>
+                                                      i !== itemIndex
+                                                  );
+                                                  field.onChange(newItems);
+                                                }}
+                                                className={`ml-1 rounded-full p-0.5 transition-colors ${
+                                                  isIncluded
+                                                    ? "hover:bg-green-200"
+                                                    : data.label ===
+                                                      "Not Included"
+                                                    ? "hover:bg-red-200"
+                                                    : "hover:bg-blue-200"
+                                                }`}
+                                              >
+                                                <Minus className="h-3 w-3" />
+                                              </button>
+                                            </span>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
+
                       return null;
                     }
                   )}
@@ -823,42 +1214,53 @@ export const CreateDestinationForm = ({
                           <FormControl>
                             <div className="space-y-4">
                               {!field.value ? (
-                                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all">
-                                  <Camera className="h-12 w-12 text-gray-400 mb-4" />
-                                  <p className="text-sm text-gray-500 mb-4 text-center">
-                                    Upload a stunning image that showcases your
-                                    trip destination
-                                  </p>
-                                  <UploadButton label="Choose Image" />
-                                </div>
+                                <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                                  <CardContent className="flex flex-col items-center justify-center p-8">
+                                    <Camera className="h-12 w-12 text-muted-foreground mb-4" />
+                                    <p className="text-sm text-muted-foreground mb-4 text-center">
+                                      Upload a stunning image that showcases
+                                      your trip destination
+                                    </p>
+                                    <UploadButton label="Choose Image" />
+                                  </CardContent>
+                                </Card>
                               ) : (
-                                <div className="relative group">
-                                  <Image
-                                    width={500}
-                                    height={500}
-                                    src={field.value}
-                                    alt="Trip cover"
-                                    className="w-full h-48 object-cover rounded-xl border border-gray-200 shadow-sm"
-                                  />
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                                    <div className="flex gap-2">
-                                      <UploadButton label="Change Image" />
-                                      <button
-                                        type="button"
-                                        onClick={removeImage}
-                                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
-                                      >
-                                        <X className="h-4 w-4 mr-2" />
-                                        Remove
-                                      </button>
+                                <Card className="overflow-hidden">
+                                  <div className="relative group">
+                                    <AspectRatio
+                                      ratio={16 / 9}
+                                      className="bg-muted"
+                                    >
+                                      <Image
+                                        fill
+                                        src={field.value}
+                                        alt="Trip cover"
+                                        className="object-cover rounded-lg"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                      />
+                                    </AspectRatio>
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                      <div className="flex gap-2">
+                                        <UploadButton label="Change Image" />
+                                        <Button
+                                          type="button"
+                                          onClick={removeImage}
+                                          variant="destructive"
+                                          size="sm"
+                                          className="font-instrument"
+                                        >
+                                          <X className="h-4 w-4 mr-2" />
+                                          Remove
+                                        </Button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                </Card>
                               )}
                             </div>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             Upload a high-quality image (JPG, PNG, or WEBP) that
                             represents your trip destination.
                           </p>
@@ -999,76 +1401,113 @@ export const CreateDestinationForm = ({
                                     Activities
                                   </FormLabel>
                                   <FormControl>
-                                    <ReactSelect
-                                      isMulti
-                                      placeholder="Add activities..."
-                                      options={[]} // You can add predefined options here
-                                      value={
-                                        field.value?.map((act: string) => ({
-                                          value: act,
-                                          label: act
-                                        })) || []
-                                      }
-                                      onChange={(newValue) => {
-                                        const selected =
-                                          newValue as MultiValue<SelectOption>;
-                                        field.onChange(
-                                          selected?.map((opt) => opt.value) ||
-                                            []
-                                        );
-                                      }}
-                                      styles={{
-                                        control: (base) => ({
-                                          ...base,
-                                          minHeight: "44px",
-                                          backgroundColor: "white",
-                                          border: "1px solid #e5e7eb",
-                                          borderRadius: "0.375rem",
-                                          boxShadow: "none",
-                                          "&:hover": {
-                                            borderColor: "#a855f7"
-                                          },
-                                          "&:focus-within": {
-                                            borderColor: "#a855f7",
-                                            boxShadow:
-                                              "0 0 0 3px rgba(168, 85, 247, 0.1)"
+                                    <div className="space-y-3">
+                                      <div className="flex gap-2">
+                                        <Input
+                                          placeholder="Add an activity..."
+                                          className="flex-1 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                                          value={
+                                            customActivityInput[index] || ""
                                           }
-                                        }),
-                                        multiValue: (base) => ({
-                                          ...base,
-                                          backgroundColor: "#f3e8ff",
-                                          borderRadius: "0.25rem"
-                                        }),
-                                        multiValueLabel: (base) => ({
-                                          ...base,
-                                          color: "#7c3aed",
-                                          fontWeight: "500"
-                                        }),
-                                        multiValueRemove: (base) => ({
-                                          ...base,
-                                          color: "#7c3aed",
-                                          "&:hover": {
-                                            backgroundColor: "#e9d5ff",
-                                            color: "#6d28d9"
+                                          onChange={(e) =>
+                                            setCustomActivityInput((prev) => ({
+                                              ...prev,
+                                              [index]: e.target.value
+                                            }))
                                           }
-                                        }),
-                                        option: (base, state) => ({
-                                          ...base,
-                                          backgroundColor: state.isSelected
-                                            ? "#a855f7"
-                                            : state.isFocused
-                                            ? "#f3e8ff"
-                                            : "white",
-                                          color: state.isSelected
-                                            ? "white"
-                                            : "#374151"
-                                        }),
-                                        placeholder: (base) => ({
-                                          ...base,
-                                          color: "#9ca3af"
-                                        })
-                                      }}
-                                    />
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                              e.preventDefault();
+                                              const activity =
+                                                customActivityInput[
+                                                  index
+                                                ]?.trim();
+                                              if (
+                                                activity &&
+                                                !(field.value || []).includes(
+                                                  activity
+                                                )
+                                              ) {
+                                                field.onChange([
+                                                  ...(field.value || []),
+                                                  activity
+                                                ]);
+                                                setCustomActivityInput(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [index]: ""
+                                                  })
+                                                );
+                                              }
+                                            }
+                                          }}
+                                        />
+                                        <Button
+                                          type="button"
+                                          size="sm"
+                                          onClick={() => {
+                                            const activity =
+                                              customActivityInput[
+                                                index
+                                              ]?.trim();
+                                            if (
+                                              activity &&
+                                              !(field.value || []).includes(
+                                                activity
+                                              )
+                                            ) {
+                                              field.onChange([
+                                                ...(field.value || []),
+                                                activity
+                                              ]);
+                                              setCustomActivityInput(
+                                                (prev) => ({
+                                                  ...prev,
+                                                  [index]: ""
+                                                })
+                                              );
+                                            }
+                                          }}
+                                          className="bg-purple-600 hover:bg-purple-700 text-white px-3"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                      {(field.value || []).length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                          {(field.value || []).map(
+                                            (
+                                              activity: string,
+                                              actIndex: number
+                                            ) => (
+                                              <span
+                                                key={actIndex}
+                                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                              >
+                                                {activity}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const newActivities = (
+                                                      field.value || []
+                                                    ).filter(
+                                                      (_: string, i: number) =>
+                                                        i !== actIndex
+                                                    );
+                                                    field.onChange(
+                                                      newActivities
+                                                    );
+                                                  }}
+                                                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                                                >
+                                                  <Minus className="h-3 w-3" />
+                                                </button>
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -1098,45 +1537,56 @@ export const CreateDestinationForm = ({
                                   <FormControl>
                                     <div className="space-y-4">
                                       {!field.value ? (
-                                        <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
-                                          <Camera className="h-8 w-8 text-gray-400 mb-2" />
-                                          <p className="text-xs text-gray-500 mb-3 text-center font-instrument">
-                                            Add an image for this day&apos;s
-                                            activities
-                                          </p>
-                                          {createDayWiseUploadButton(
-                                            index,
-                                            "Choose Image"
-                                          )}
-                                        </div>
+                                        <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                                          <CardContent className="flex flex-col items-center justify-center p-6">
+                                            <Camera className="h-8 w-8 text-muted-foreground mb-2" />
+                                            <p className="text-xs text-muted-foreground mb-3 text-center font-instrument">
+                                              Add an image for this day&apos;s
+                                              activities
+                                            </p>
+                                            {createDayWiseUploadButton(
+                                              index,
+                                              "Choose Image"
+                                            )}
+                                          </CardContent>
+                                        </Card>
                                       ) : (
-                                        <div className="relative group">
-                                          <Image
-                                            width={400}
-                                            height={300}
-                                            src={field.value}
-                                            alt={`Day ${index + 1} image`}
-                                            className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
-                                          />
-                                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                            <div className="flex gap-2">
-                                              {createDayWiseUploadButton(
-                                                index,
-                                                "Change Image"
-                                              )}
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  removeDayWiseImage(index)
-                                                }
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-instrument"
-                                              >
-                                                <X className="h-3 w-3 mr-1" />
-                                                Remove
-                                              </button>
+                                        <Card className="overflow-hidden">
+                                          <div className="relative group">
+                                            <AspectRatio
+                                              ratio={4 / 3}
+                                              className="bg-muted"
+                                            >
+                                              <Image
+                                                fill
+                                                src={field.value}
+                                                alt={`Day ${index + 1} image`}
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                              />
+                                            </AspectRatio>
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                              <div className="flex gap-2">
+                                                {createDayWiseUploadButton(
+                                                  index,
+                                                  "Change Image"
+                                                )}
+                                                <Button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    removeDayWiseImage(index)
+                                                  }
+                                                  variant="destructive"
+                                                  size="sm"
+                                                  className="font-instrument"
+                                                >
+                                                  <X className="h-3 w-3 mr-1" />
+                                                  Remove
+                                                </Button>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
+                                        </Card>
                                       )}
                                     </div>
                                   </FormControl>
@@ -1226,8 +1676,9 @@ export const CreateDestinationForm = ({
                       <Button
                         type="button"
                         onClick={handleDraftSubmit}
+                        disabled={isSubmitting}
                         variant="outline"
-                        className="px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
+                        className="px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1245,7 +1696,13 @@ export const CreateDestinationForm = ({
                           <polyline points="17 21 17 13 7 13 7 21" />
                           <polyline points="7 3 7 8 15 8" />
                         </svg>
-                        {isEditMode ? "Update as Draft" : "Save as Draft"}
+                        {isSubmitting
+                          ? isEditMode
+                            ? "Updating..."
+                            : "Saving..."
+                          : isEditMode
+                          ? "Update as Draft"
+                          : "Save as Draft"}
                       </Button>
                     )}
 
@@ -1262,9 +1719,14 @@ export const CreateDestinationForm = ({
                       <Button
                         type="button"
                         onClick={handleFullSubmit}
-                        className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
+                        disabled={isSubmitting}
+                        className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isEditMode
+                        {isSubmitting
+                          ? isEditMode
+                            ? "Updating..."
+                            : "Creating..."
+                          : isEditMode
                           ? "Update Travel Experience"
                           : "Create Travel Experience"}
                         <svg

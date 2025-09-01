@@ -313,31 +313,49 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             </span>
                           </div>
                         </div>
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider font-instrument">
+                            Booking ID:{" "}
+                            <span className="text-gray-800 font-medium">
+                              {booking.id}
+                            </span>
+                          </h3>
 
-                        <div>
-                          <h4 className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider font-instrument">
-                            Guest Details ({booking.participants || 0}{" "}
-                            travelers)
+                          <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider font-instrument">
+                            Guest Details{" "}
+                            <span className="ml-1 text-gray-500 font-normal">
+                              ({booking.participants || 0} Travelers)
+                            </span>
                           </h4>
+
                           <div className="flex flex-wrap gap-2">
                             {booking.guests && booking.guests.length > 0 ? (
                               booking.guests.map((member, index) => (
                                 <span
                                   key={member.memberEmail + index}
-                                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition-colors duration-200 ${
                                     member.isteamLead
                                       ? isCancelled
-                                        ? "bg-red-100 text-red-800 border border-red-200"
-                                        : "bg-purple-100 text-purple-800 border border-purple-200"
-                                      : "bg-gray-100 text-gray-700 border border-gray-200"
+                                        ? "bg-red-50 text-red-700 border border-red-200"
+                                        : "bg-purple-50 text-purple-700 border border-purple-200"
+                                      : "bg-gray-50 text-gray-700 border border-gray-200"
                                   }`}
                                 >
-                                  {member.firstName} {member.lastName}
-                                  {member.isteamLead && " (Lead)"}
+                                  <span className="mr-1.5 font-semibold">
+                                    {member.firstName} {member.lastName}
+                                  </span>
+                                  <span className="text-gray-500">
+                                    {member.phone}
+                                  </span>
+                                  {member.isteamLead && (
+                                    <span className="ml-2 text-[10px] uppercase tracking-wide font-bold">
+                                      Lead
+                                    </span>
+                                  )}
                                 </span>
                               ))
                             ) : (
-                              <span className="text-gray-500 text-xs font-instrument">
+                              <span className="text-gray-500 text-xs font-instrument italic">
                                 No guest details available
                               </span>
                             )}

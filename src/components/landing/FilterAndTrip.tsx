@@ -305,9 +305,9 @@ export const FilterAndTrip = () => {
           </form>
 
           <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
-            <p className="text-black/80 text-xs font-instrument px-2">
+            <p className="text-black/80 text-base font-normal font-instrument px-2">
               Need inspiration?{" "}
-              <button className="text-purple-300 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
+              <button className="text-purple-500 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
                 Browse by vibe
               </button>
             </p>

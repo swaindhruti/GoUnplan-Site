@@ -8,12 +8,12 @@ type FieldId =
   | "filters"
   | "startDate"
   | "endDate"
-  | "minLimit"
   | "maxLimit"
   | "description"
   | "languages"
   | "includedActivities"
   | "restrictions"
+  | "special"
   | "sectionhead"
   | "dayWiseData";
 
@@ -28,6 +28,9 @@ type InputType =
   | "textarea"
   | "date"
   | "multi-select"
+  | "inclusion-list"
+  | "exclusion-list"
+  | "custom-input-list"
   | "sectionHead"
   | "dynamic-group";
 
@@ -54,11 +57,16 @@ type BaseFormField = {
 export type FormFields = BaseFormField;
 
 export type FormDataShape = {
-  [K in FieldId]?: K extends "price" | "minLimit" | "maxLimit"
+  [K in FieldId]?: K extends "price" | "maxLimit"
     ? number
     : K extends "startDate" | "endDate"
     ? Date
-    : K extends "filters" | "languages" | "includedActivities" | "restrictions"
+    : K extends
+        | "filters"
+        | "languages"
+        | "includedActivities"
+        | "restrictions"
+        | "special"
     ? string[]
     : K extends "tripImage"
     ? string // tripImage is now required
@@ -78,11 +86,16 @@ export type FormDataShape = {
 };
 
 export type FormInputShape = {
-  [K in FieldId]?: K extends "price" | "minLimit" | "maxLimit"
+  [K in FieldId]?: K extends "price" | "maxLimit"
     ? string | number
     : K extends "startDate" | "endDate"
     ? string | Date
-    : K extends "filters" | "languages" | "includedActivities" | "restrictions"
+    : K extends
+        | "filters"
+        | "languages"
+        | "includedActivities"
+        | "restrictions"
+        | "special"
     ? string[]
     : K extends "tripImage"
     ? string

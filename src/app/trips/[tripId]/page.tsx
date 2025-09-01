@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import { ChatButton } from "@/components/chat/ChatButton";
 import { requireUser } from "@/lib/roleGaurd";
-import TripItinerary from "@/components/trips/Itenary";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { v4 as uuidv4 } from "uuid";
+import TripItinerary from "@/components/trips/Itenary";
 
 type Props = {
   params: Promise<{
@@ -58,12 +58,6 @@ export default async function TripDetailsPage({ params }: Props) {
 
     result.push(tripHighlights);
 
-    result.push([
-      `Discover ${trip.country}'s hidden gems`,
-      `Experience local culture and traditions`,
-      `Comfortable accommodation throughout`
-    ]);
-
     return result;
   })();
 
@@ -80,11 +74,21 @@ export default async function TripDetailsPage({ params }: Props) {
 
     result.push(tripRestrictions);
 
-    result.push([
-      "Follow local safety guidelines",
-      "Respect cultural norms",
-      "Carry valid identification"
-    ]);
+    return result;
+  })();
+
+  const specials = (() => {
+    const result: string[][] = [];
+
+    const tripSpecials: string[] = trip.special?.length
+      ? trip.special.slice(0, 3)
+      : [
+          "Exclusive local experiences",
+          "Personalized guided tours",
+          "Scenic hidden spots included"
+        ];
+
+    result.push(tripSpecials);
 
     return result;
   })();
@@ -105,6 +109,12 @@ export default async function TripDetailsPage({ params }: Props) {
   };
 
   const sections = [
+    {
+      title: "What's Special",
+      items: specials,
+      icon: "★",
+      iconColor: "text-yellow-400"
+    },
     {
       title: "What's Included",
       items: highlights,

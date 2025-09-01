@@ -8,49 +8,45 @@ datasource db {
 }
 
 model User {
-  id              String       @id @default(cuid())
-  email           String       @unique
-  name            String
-  bio             String?      @default("Travelling with vibe")
-  phone           String?      @unique
-  password        String?
-  role            Role         @default(USER)
-  image           String?      @default("https://avatar.iran.liara.run/public")
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  appliedForHost  Boolean      @default(false)
-  isEmailVerified Boolean      @default(false)
-  bookings        Booking[]
-  hostProfile     HostProfile?
-  reviews         Review[]
-
-  sentMessages     Message[]         @relation("SentMessages")
-  receivedMessages Message[]         @relation("ReceivedMessages")
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String
+  bio              String?           @default("Travelling with vibe")
+  phone            String?           @unique
+  password         String?
+  role             Role              @default(USER)
+  image            String?           @default("https://avatar.iran.liara.run/public")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  appliedForHost   Boolean           @default(false)
+  isEmailVerified  Boolean           @default(false)
+  bookings         Booking[]
   chatParticipants ChatParticipant[]
+  hostProfile      HostProfile?
+  receivedMessages Message[]         @relation("ReceivedMessages")
+  sentMessages     Message[]         @relation("SentMessages")
+  reviews          Review[]
 
   @@map("users")
 }
 
 model HostProfile {
-  hostId        String   @id @default(cuid())
+  hostId        String        @id @default(cuid())
   description   String?
-  image         String?  @default("https://avatar.iran.liara.run/public")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  hostEmail     String   @unique
+  image         String?       @default("https://avatar.iran.liara.run/public")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  hostEmail     String        @unique
   hostMobile    String
-  reviewCount   Int      @default(0)
-  averageRating Float    @default(0)
+  averageRating Float         @default(0)
+  reviewCount   Int           @default(0)
+  instagramUrl  String?
+  linkedinUrl   String?
+  twitterUrl    String?
+  websiteUrl    String?
+  user          User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
   reviews       Review[]
-
-  // Social Media Fields
-  instagramUrl String?
-  twitterUrl   String?
-  linkedinUrl  String?
-  websiteUrl   String?
-
-  user        User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  travelPlans TravelPlans[]
+  travelPlans   TravelPlans[]
 
   @@map("host_profiles")
 }
@@ -64,10 +60,10 @@ model DayWiseItinerary {
   meals         String?
   accommodation String?
   travelPlanId  String
-  dayWiseImage  String?     @default("https://avatar.iran.liara.run/public")
-  travelPlan    TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  dayWiseImage  String?     @default("https://avatar.iran.liara.run/public")
+  travelPlan    TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
 
   @@map("day_wise_itineraries")
 }
@@ -77,11 +73,12 @@ model TravelPlans {
   title                 String
   description           String
   includedActivities    String[]
-  notIncludedActivities String[]
   restrictions          String[]
+  special               String[]
   noOfDays              Int
   hostId                String
   price                 Int
+  activities            String[]           @default([])
   country               String
   state                 String
   city                  String
@@ -94,13 +91,14 @@ model TravelPlans {
   languages             String[]           @default([])
   endDate               DateTime?
   startDate             DateTime?
-  bookings              Booking[]
-  host                  HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
-  dayWiseItinerary      DayWiseItinerary[]
-  tripImage             String?            @default("https://avatar.iran.liara.run/public")
-  reviewCount           Int                @default(0)
   averageRating         Float              @default(0)
+  reviewCount           Int                @default(0)
+  tripImage             String?            @default("https://avatar.iran.liara.run/public")
+  notIncludedActivities String[]
+  bookings              Booking[]
+  dayWiseItinerary      DayWiseItinerary[]
   reviews               Review[]
+  host                  HostProfile        @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
 
   @@map("travel_plans")
 }
@@ -122,49 +120,44 @@ model TeamMember {
 }
 
 model Booking {
-  id                  String        @id @default(cuid())
+  id                  String           @id @default(cuid())
   userId              String
   travelPlanId        String
   startDate           DateTime
   endDate             DateTime
   totalPrice          Int
-  participants        Int           @default(1)
-  status              BookingStatus @default(PENDING)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  guests              TeamMember[]
-  specialRequirements String?
-  formSubmitted       Boolean       @default(false)
+  participants        Int              @default(1)
+  status              BookingStatus    @default(PENDING)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
   cancelledAt         DateTime?
   pricePerPerson      Int
-  refundAmount        Int           @default(0)
-  
-  // New fields for partial payment
-  amountPaid          Int           @default(0)
-  remainingAmount     Int           @default(0)
-  paymentStatus       PaymentStatus @default(PENDING)
+  refundAmount        Int              @default(0)
+  specialRequirements String?
+  formSubmitted       Boolean          @default(false)
+  isReviewed          Boolean          @default(false)
+  amountPaid          Int              @default(0)
+  minPaymentAmount    Int?
+  paymentDeadline     DateTime?
+  paymentStatus       PaymentStatus    @default(PENDING)
+  remainingAmount     Int              @default(0)
+  travelPlan          TravelPlans      @relation(fields: [travelPlanId], references: [travelPlanId])
+  user                User             @relation(fields: [userId], references: [id])
   partialPayments     PartialPayment[]
-  minPaymentAmount    Int?          
-  paymentDeadline     DateTime?   
-  
-  travelPlan          TravelPlans   @relation(fields: [travelPlanId], references: [travelPlanId])
-  user                User          @relation(fields: [userId], references: [id])
-  isReviewed          Boolean       @default(false)
   review              Review?
+  guests              TeamMember[]
 
   @@map("bookings")
 }
 
-// New model to track individual partial payments
 model PartialPayment {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   bookingId   String
   amount      Int
-  paymentDate DateTime @default(now())
+  paymentDate DateTime    @default(now())
   paymentType PaymentType @default(PARTIAL)
-  
-  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  
+  booking     Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
   @@map("partial_payments")
 }
 
@@ -177,34 +170,31 @@ model WaitingList {
 }
 
 model Review {
-  id           String   @id @default(cuid())
+  id           String      @id @default(cuid())
   userId       String
-  bookingId    String   @unique
+  bookingId    String      @unique
   travelPlanId String
   hostId       String
-  rating       Int      @default(0)
+  rating       Int         @default(0)
   comment      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  booking    Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  travelPlan TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
-  host       HostProfile @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  booking      Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  host         HostProfile @relation(fields: [hostId], references: [hostId], onDelete: Cascade)
+  travelPlan   TravelPlans @relation(fields: [travelPlanId], references: [travelPlanId], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
 }
 
 model Chat {
-  id            String    @id @default(cuid())
-  travelPlanId  String? // Optional: link to specific travel plan
+  id            String            @id @default(cuid())
+  travelPlanId  String?
   lastMessageAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  participants ChatParticipant[]
-  messages     Message[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  participants  ChatParticipant[]
+  messages      Message[]
 
   @@map("chats")
 }
@@ -216,9 +206,8 @@ model ChatParticipant {
   joinedAt   DateTime @default(now())
   lastReadAt DateTime @default(now())
   isActive   Boolean  @default(true)
-
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([chatId, userId])
   @@map("chat_participants")
@@ -233,10 +222,9 @@ model Message {
   type       MessageType @default(TEXT)
   isRead     Boolean     @default(false)
   createdAt  DateTime    @default(now())
-
-  chat     Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  receiver   User        @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User        @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([chatId, createdAt])
   @@index([receiverId, isRead])
@@ -254,6 +242,19 @@ model Otp {
   @@index([phone, code])
 }
 
+model Contact {
+  id        String         @id @default(cuid())
+  name      String
+  email     String
+  subject   ContactSubject
+  message   String
+  status    ContactStatus  @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("contacts")
+}
+
 enum Role {
   USER
   HOST
@@ -264,8 +265,8 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
-  NOTPAID
   REFUNDED
+  NOTPAID
 }
 
 enum TravelPlanStatus {
@@ -295,26 +296,13 @@ enum ContactStatus {
   CLOSED
 }
 
-model Contact {
-  id        String         @id @default(cuid())
-  name      String
-  email     String
-  subject   ContactSubject
-  message   String
-  status    ContactStatus  @default(PENDING)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  @@map("contacts")
-}
-
 enum PaymentStatus {
   PENDING
   PARTIALLY_PAID
   FULLY_PAID
   OVERDUE
-  CANCELLED
   REFUNDED
+  CANCELLED
 }
 
 enum PaymentType {
