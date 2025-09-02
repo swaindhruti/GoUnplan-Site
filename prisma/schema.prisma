@@ -20,6 +20,8 @@ model User {
   updatedAt        DateTime          @updatedAt
   appliedForHost   Boolean           @default(false)
   isEmailVerified  Boolean           @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
   bookings         Booking[]
   chatParticipants ChatParticipant[]
   hostProfile      HostProfile?

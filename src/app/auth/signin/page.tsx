@@ -17,7 +17,7 @@ import {
   Compass,
   Sparkles,
   MapPin,
-  User
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +37,7 @@ interface FormErrors {
 function SignInForm() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
-    password: ""
+    password: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +57,9 @@ function SignInForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
     }
   }, [searchParams]);
@@ -68,13 +68,13 @@ function SignInForm() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
@@ -87,14 +87,14 @@ function SignInForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 2000
+        duration: 2000,
       });
 
       await signIn("google", {
         callbackUrl: "/",
-        redirect: true
+        redirect: true,
       });
     } catch (error) {
       console.error("Google signin error:", error);
@@ -104,9 +104,9 @@ function SignInForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
     }
   };
@@ -133,9 +133,9 @@ function SignInForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
     }
 
@@ -155,7 +155,7 @@ function SignInForm() {
       const result = await signIn("credentials", {
         email: formData.email.trim(),
         password: formData.password,
-        redirect: false
+        redirect: false,
       });
 
       if (result?.error) {
@@ -167,9 +167,9 @@ function SignInForm() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       } else if (result?.ok) {
         toast.success("Welcome back! Signing you in...", {
@@ -178,9 +178,9 @@ function SignInForm() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
 
         const session = await getSession();
@@ -199,9 +199,9 @@ function SignInForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
     } finally {
       setIsLoading(false);
@@ -321,20 +321,8 @@ function SignInForm() {
             </div>
             <div className="text-sm">
               <Link
-                href=""
+                href="/auth/forgot-password"
                 className="font-semibold text-purple-600 hover:text-purple-700 transition-colors font-instrument"
-                onClick={() => {
-                  toast.info("Password reset feature coming soon! 🔑", {
-                    style: {
-                      background: "rgba(147, 51, 234, 0.95)",
-                      backdropFilter: "blur(12px)",
-                      border: "1px solid rgba(196, 181, 253, 0.3)",
-                      color: "white",
-                      fontFamily: "var(--font-instrument)"
-                    },
-                    duration: 3000
-                  });
-                }}
               >
                 Forgot password?
               </Link>
@@ -408,9 +396,9 @@ function SignInForm() {
                   backdropFilter: "blur(12px)",
                   border: "1px solid rgba(196, 181, 253, 0.3)",
                   color: "white",
-                  fontFamily: "var(--font-instrument)"
+                  fontFamily: "var(--font-instrument)",
                 },
-                duration: 3000
+                duration: 3000,
               });
               router.push("/auth/phone");
             }}

@@ -147,7 +147,10 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       const startDate = new Date(booking.startDate);
 
       if (statusFilter === "UPCOMING") {
-        return startDate > now && booking.paymentStatus === "FULLY_PAID";
+        return (
+          (startDate > now && booking.paymentStatus === "FULLY_PAID") ||
+          (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
+        );
       }
 
       if (statusFilter === "PAST") {
@@ -185,7 +188,10 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
 
       // Count upcoming trips
-      if (startDate > now && booking.paymentStatus === "FULLY_PAID") {
+      if (
+        (startDate > now && booking.paymentStatus === "FULLY_PAID") ||
+        (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
+      ) {
         acc.UPCOMING = (acc.UPCOMING || 0) + 1;
       }
 
@@ -214,7 +220,10 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
       (acc, booking) => {
         const startDate = new Date(booking.startDate);
 
-        if (booking.status === "CONFIRMED" && startDate > now) {
+        if (
+          (booking.status === "CONFIRMED" && startDate > now) ||
+          (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
+        ) {
           acc.upcoming.push(booking);
         } else if (booking.status === "CONFIRMED" && startDate <= now) {
           acc.completed.push(booking);
