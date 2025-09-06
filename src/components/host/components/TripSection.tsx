@@ -118,7 +118,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
           className="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors font-instrument"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Create New
+          Create New Trip
         </Link>
       </div>
 

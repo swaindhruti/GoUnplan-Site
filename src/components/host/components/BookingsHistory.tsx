@@ -53,6 +53,7 @@ type Booking = {
 
 type BookingCounts = {
   ALL: number;
+  CONFIRMED: number;
   PENDING: number;
   PARTIALLY_PAID: number;
   FULLY_PAID: number;
@@ -71,6 +72,7 @@ export const BookingsHistory = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [counts, setCounts] = useState<BookingCounts>({
     ALL: 0,
+    CONFIRMED: 0,
     PENDING: 0,
     PARTIALLY_PAID: 0,
     FULLY_PAID: 0,
@@ -95,16 +97,32 @@ export const BookingsHistory = () => {
         const paymentCounts = (response.bookings || []).reduce(
           (acc: BookingCounts, booking: Booking) => {
             acc.ALL++;
-            if (
-              booking.paymentStatus &&
-              acc[booking.paymentStatus as keyof BookingCounts] !== undefined
-            ) {
-              acc[booking.paymentStatus as keyof BookingCounts]++;
+
+            // Count by booking status
+            if (booking.status === "CONFIRMED") {
+              acc.CONFIRMED++;
+            } else if (booking.status === "PENDING") {
+              acc.PENDING++;
+            } else if (booking.status === "CANCELLED") {
+              acc.CANCELLED++;
             }
+
+            // Count by payment status
+            if (booking.paymentStatus === "PARTIALLY_PAID") {
+              acc.PARTIALLY_PAID++;
+            } else if (booking.paymentStatus === "FULLY_PAID") {
+              acc.FULLY_PAID++;
+            } else if (booking.paymentStatus === "OVERDUE") {
+              acc.OVERDUE++;
+            } else if (booking.paymentStatus === "REFUNDED") {
+              acc.REFUNDED++;
+            }
+
             return acc;
           },
           {
             ALL: 0,
+            CONFIRMED: 0,
             PENDING: 0,
             PARTIALLY_PAID: 0,
             FULLY_PAID: 0,
@@ -126,11 +144,17 @@ export const BookingsHistory = () => {
   const filterBookings = useCallback(() => {
     let filtered = bookings;
 
-    // Filter by payment status
+    // Filter by status (both booking status and payment status)
     if (selectedStatus !== "ALL") {
-      filtered = filtered.filter(
-        (booking) => booking.paymentStatus === selectedStatus
-      );
+      if (selectedStatus === "CONFIRMED") {
+        // Filter for confirmed bookings (booking status = CONFIRMED)
+        filtered = filtered.filter((booking) => booking.status === "CONFIRMED");
+      } else {
+        // Filter by payment status for other filters
+        filtered = filtered.filter(
+          (booking) => booking.paymentStatus === selectedStatus
+        );
+      }
     }
 
     // Filter by search term
@@ -322,32 +346,63 @@ export const BookingsHistory = () => {
           />
         </div>
 
-        {/* Payment Status Filter Tabs */}
-        <div className="flex flex-wrap gap-3">
-          {[
-            "ALL",
-            "FULLY_PAID",
-            "PARTIALLY_PAID",
-            "PENDING",
-            "OVERDUE",
-            "CANCELLED",
-            "REFUNDED",
-          ].map((status) => (
-            <button
-              key={status}
-              onClick={() => setSelectedStatus(status)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                selectedStatus === status
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              <span>{status.replace("_", " ")}</span>
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
-                {counts[status as keyof BookingCounts]}
-              </span>
-            </button>
-          ))}
+        {/* Payment Status Filter Tabs - Updated to match user dashboard style */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-3 font-instrument">
+            Filter by Status
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "ALL", label: "All", color: "purple" },
+              { key: "CONFIRMED", label: "Confirmed", color: "blue" },
+              { key: "PENDING", label: "Pending", color: "yellow" },
+              { key: "FULLY_PAID", label: "Fully Paid", color: "green" },
+              {
+                key: "PARTIALLY_PAID",
+                label: "Partial Payment",
+                color: "orange",
+              },
+              { key: "OVERDUE", label: "Payment Due", color: "red" },
+            ].map((status) => (
+              <button
+                key={status.key}
+                onClick={() => setSelectedStatus(status.key)}
+                className={`
+                  inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 font-instrument
+                  ${
+                    selectedStatus === status.key
+                      ? status.color === "purple"
+                        ? "bg-purple-600 text-white shadow-sm"
+                        : status.color === "green"
+                        ? "bg-green-500 text-white shadow-sm"
+                        : status.color === "orange"
+                        ? "bg-orange-500 text-white shadow-sm"
+                        : status.color === "blue"
+                        ? "bg-blue-500 text-white shadow-sm"
+                        : status.color === "yellow"
+                        ? "bg-yellow-500 text-white shadow-sm"
+                        : "bg-red-500 text-white shadow-sm"
+                      : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                  }
+                `}
+              >
+                {status.label}
+                <span
+                  className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                    selectedStatus === status.key
+                      ? "bg-white/20 text-white"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {status.key === "ALL"
+                    ? counts.ALL
+                    : status.key === "CONFIRMED"
+                    ? counts.PENDING || 0 // Assuming PENDING represents confirmed bookings in this context
+                    : counts[status.key as keyof BookingCounts] || 0}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Results Summary */}
