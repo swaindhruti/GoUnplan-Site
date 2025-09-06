@@ -24,7 +24,7 @@ export const useCloudinaryUpload = () => {
         setUploadedFile({
           secure_url: resultsInfo.secure_url,
           display_name: resultsInfo.original_filename ?? "",
-          isCopied: false
+          isCopied: false,
         });
         console.log("Upload successful:", resultsInfo);
       } else {
@@ -34,47 +34,65 @@ export const useCloudinaryUpload = () => {
     []
   );
 
-  const UploadButton = ({ label }: { label: string }) => (
-    <CldUploadWidget
-      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!}
-      onSuccess={handleSuccess}
-      onError={(error) => {
-        console.error("Upload error:", error);
-      }}
-    >
-      {({ open }) => {
-        // Add null check for the open function
-        if (!open) {
-          console.warn("Cloudinary upload widget not ready");
+  const UploadButton = ({ label }: { label: string }) => {
+    // Debug: Check if upload preset is available
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!uploadPreset) {
+      console.error("NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET is not defined");
+      return (
+        <button
+          type="button"
+          className="bg-red-300 text-red-700 border-2 border-red-400 rounded-xl px-4 py-2 font-bold cursor-not-allowed"
+          disabled
+        >
+          Config Error
+        </button>
+      );
+    }
+
+    return (
+      <CldUploadWidget
+        uploadPreset={uploadPreset}
+        onSuccess={handleSuccess}
+        onError={(error) => {
+          console.error("Upload error:", error);
+        }}
+      >
+        {({ open }) => {
+          const isReady = open && typeof open === "function";
+
           return (
             <button
               type="button"
-              className="bg-gray-300 text-gray-500 border-2 border-gray-400 rounded-xl px-4 py-2 font-bold cursor-not-allowed"
-              disabled
+              className={`border-2 rounded-xl px-4 py-2 font-bold transition-all ${
+                isReady
+                  ? "bg-white text-purple-700 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-purple-100 cursor-pointer"
+                  : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (isReady) {
+                  try {
+                    open();
+                  } catch (error) {
+                    console.error("Error opening upload widget:", error);
+                  }
+                } else {
+                  console.warn("Upload widget not ready");
+                }
+              }}
+              disabled={!isReady}
             >
-              Loading...
+              {isReady ? label : "Loading..."}
             </button>
           );
-        }
-
-        return (
-          <button
-            type="button"
-            className="bg-white text-purple-700 border-2 border-black rounded-xl px-4 py-2 font-bold shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-purple-100 transition-all"
-            onClick={() => {
-              try {
-                open();
-              } catch (error) {
-                console.error("Error opening upload widget:", error);
-              }
-            }}
-          >
-            {label}
-          </button>
-        );
-      }}
-    </CldUploadWidget>
-  );
+        }}
+      </CldUploadWidget>
+    );
+  };
 
   return { uploadedFile, UploadButton };
 };

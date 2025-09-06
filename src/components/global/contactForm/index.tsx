@@ -1,7 +1,7 @@
 "use client";
 import {
   CldUploadWidget,
-  CloudinaryUploadWidgetResults
+  CloudinaryUploadWidgetResults,
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
   getValidationSchema,
-  CreateDestinationSchema
+  CreateDestinationSchema,
 } from "@/config/form/formSchemaData/CreateDestinationSchema";
 import { z } from "zod";
 
@@ -38,7 +38,7 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
@@ -54,7 +54,7 @@ const ReactSelect = dynamic(() => import("react-select"), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
-  )
+  ),
 });
 
 type SelectOption = {
@@ -69,7 +69,7 @@ const getSelectOptions = (options?: string[]) => {
 export const CreateDestinationForm = ({
   FormData,
   initialData,
-  isEditMode = false
+  isEditMode = false,
 }: FormComponentProps) => {
   // Use full schema by default, but we'll validate dynamically
   const router = useRouter();
@@ -115,9 +115,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: ""
-                }
-              ]
+                  dayWiseImage: "",
+                },
+              ],
       }
     : {
         ...FormData.reduce(
@@ -130,7 +130,7 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
-                : ""
+                : "",
           }),
           {}
         ),
@@ -142,21 +142,21 @@ export const CreateDestinationForm = ({
             activities: [],
             meals: "",
             accommodation: "",
-            dayWiseImage: ""
-          }
+            dayWiseImage: "",
+          },
         ],
         // Add tripImage field
-        tripImage: ""
+        tripImage: "",
       };
 
   const form = useForm({
     resolver: undefined, // We'll handle validation manually
     defaultValues,
-    mode: "onChange" // Enable real-time validation feedback
+    mode: "onChange", // Enable real-time validation feedback
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData"
+    name: "dayWiseData",
   });
 
   const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
@@ -171,11 +171,102 @@ export const CreateDestinationForm = ({
   }>({});
   const [customIncludedInput, setCustomIncludedInput] = useState<string>("");
   const [customExcludedInput, setCustomExcludedInput] = useState<string>("");
-
   const [customSpecialInput, setCustomSpecialInput] = useState<string>("");
+  const [customFilterInput, setCustomFilterInput] = useState<string>("");
   const totalSteps = 3;
 
   console.log(dayWiseImages);
+
+  // Reset form when initialData changes (for both edit mode and draft editing)
+  useEffect(() => {
+    if (initialData) {
+      console.log("Resetting form with initialData:", initialData);
+
+      // Reset all form values
+      const formData = {
+        tripName: initialData.title || "",
+        destination: initialData.destination || "",
+        country: initialData.country || "",
+        state: initialData.state || "",
+        city: initialData.city || "",
+        price: initialData.price || 0,
+        maxLimit: initialData.maxParticipants || 0,
+        minLimit: initialData.minParticipants || 0,
+        description: initialData.description || "",
+        activities: initialData.activities || [],
+        startDate: formatDateForFormInput(initialData.startDate),
+        endDate: formatDateForFormInput(initialData.endDate),
+        filters: initialData.filters || [],
+        languages: initialData.languages || [],
+        includedActivities: initialData.includedActivities || [],
+        restrictions: initialData.restrictions || [],
+        special: initialData.special || [],
+        tripImage: initialData.tripImage || "",
+        dayWiseData:
+          initialData.dayWiseData?.length > 0
+            ? initialData.dayWiseData.map(
+                (day: {
+                  dayNumber?: number;
+                  title?: string;
+                  description?: string;
+                  activities?: string[] | unknown;
+                  meals?: string;
+                  accommodation?: string;
+                  dayWiseImage?: string;
+                }) => ({
+                  dayNumber: day.dayNumber || 1,
+                  title: day.title || "",
+                  description: day.description || "",
+                  activities: Array.isArray(day.activities)
+                    ? day.activities
+                    : [],
+                  meals: day.meals || "",
+                  accommodation: day.accommodation || "",
+                  dayWiseImage: day.dayWiseImage || "",
+                })
+              )
+            : [
+                {
+                  dayNumber: 1,
+                  title: "",
+                  description: "",
+                  activities: [],
+                  meals: "",
+                  accommodation: "",
+                  dayWiseImage: "",
+                },
+              ],
+      };
+
+      console.log("Form data to reset:", formData);
+      form.reset(formData);
+
+      // Initialize day-wise images state
+      if (initialData.dayWiseData?.length > 0) {
+        const imageMap: { [key: number]: string } = {};
+        initialData.dayWiseData.forEach(
+          (
+            day: {
+              dayNumber?: number;
+              title?: string;
+              description?: string;
+              activities?: string[] | unknown;
+              meals?: string;
+              accommodation?: string;
+              dayWiseImage?: string;
+            },
+            index: number
+          ) => {
+            if (day.dayWiseImage) {
+              imageMap[index] = day.dayWiseImage;
+            }
+          }
+        );
+        console.log("Setting dayWiseImages:", imageMap);
+        setDayWiseImages(imageMap);
+      }
+    }
+  }, [initialData, form]);
 
   // Step navigation functions
   const nextStep = () => {
@@ -199,7 +290,7 @@ export const CreateDestinationForm = ({
       "startDate",
       "endDate",
       "filters",
-      "tripImage"
+      "tripImage",
     ];
     const step2Fields = [
       "destination",
@@ -207,7 +298,7 @@ export const CreateDestinationForm = ({
       "state",
       "city",
       "price",
-      "maxLimit"
+      "maxLimit",
     ];
     // Step 3: everything else (description, languages, includedActivities, restrictions, etc.)
 
@@ -232,7 +323,7 @@ export const CreateDestinationForm = ({
       activities: [],
       meals: "",
       accommodation: "",
-      dayWiseImage: ""
+      dayWiseImage: "",
     });
   };
 
@@ -278,7 +369,7 @@ export const CreateDestinationForm = ({
   const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
     setDayWiseImages((prev) => ({
       ...prev,
-      [dayIndex]: imageUrl
+      [dayIndex]: imageUrl,
     }));
     form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, imageUrl);
   };
@@ -300,23 +391,39 @@ export const CreateDestinationForm = ({
         console.error("Cloudinary upload error:", error);
       }}
     >
-      {({ open }: { open?: () => void }) => (
-        <button
-          type="button"
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors font-instrument disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => {
-            if (open) {
-              open();
-            } else {
-              console.error("Cloudinary widget not initialized properly");
-            }
-          }}
-          disabled={!open}
-        >
-          <Camera className="h-4 w-4 mr-2" />
-          {label}
-        </button>
-      )}
+      {({ open }) => {
+        // Add null check for the open function
+        if (!open) {
+          console.warn("Cloudinary upload widget not ready");
+          return (
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed font-instrument"
+              disabled
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Loading...
+            </button>
+          );
+        }
+
+        return (
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors font-instrument"
+            onClick={() => {
+              try {
+                open();
+              } catch (error) {
+                console.error("Error opening upload widget:", error);
+              }
+            }}
+          >
+            <Camera className="h-4 w-4 mr-2" />
+            {label}
+          </button>
+        );
+      }}
     </CldUploadWidget>
   );
 
@@ -339,7 +446,7 @@ export const CreateDestinationForm = ({
       console.log("Raw form data:", {
         tripName: data.tripName,
         status: isDraft ? "DRAFT" : "ACTIVE",
-        dayWiseDataLength: data.dayWiseData?.length || 0
+        dayWiseDataLength: data.dayWiseData?.length || 0,
       });
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
@@ -355,7 +462,7 @@ export const CreateDestinationForm = ({
               day: idx + 1,
               title: day.title || `Day ${idx + 1}`,
               hasActivities:
-                Array.isArray(day.activities) && day.activities.length > 0
+                Array.isArray(day.activities) && day.activities.length > 0,
             })
           )
         );
@@ -450,7 +557,7 @@ export const CreateDestinationForm = ({
             activities: Array.isArray(day.activities) ? day.activities : [],
             meals: day.meals || "",
             accommodation: day.accommodation || "",
-            dayWiseImage: day.dayWiseImage || ""
+            dayWiseImage: day.dayWiseImage || "",
           })
         );
       } catch (processingError) {
@@ -481,7 +588,7 @@ export const CreateDestinationForm = ({
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
-        status: statusToSend
+        status: statusToSend,
       };
 
       let result;
@@ -498,9 +605,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         console.error(
           `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
@@ -513,9 +620,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         router.push("/dashboard/host");
       }
@@ -527,9 +634,9 @@ export const CreateDestinationForm = ({
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 3000
+        duration: 3000,
       });
     } finally {
       setIsSubmitting(false);
@@ -557,7 +664,7 @@ export const CreateDestinationForm = ({
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
             type: "manual",
-            message: errorMessage[0]
+            message: errorMessage[0],
           });
         }
       });
@@ -579,22 +686,23 @@ export const CreateDestinationForm = ({
         return {
           title: "Basic Trip Information",
           description:
-            "Let's start with the essentials - trip name, dates, and preferences"
+            "Let's start with the essentials - trip name, dates, and preferences",
         };
       case 2:
         return {
           title: "Location & Pricing",
-          description: "Tell us where you're going and set your pricing details"
+          description:
+            "Tell us where you're going and set your pricing details",
         };
       case 3:
         return {
           title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out"
+          description: "Add the finishing touches to make your trip stand out",
         };
       default:
         return {
           title: "Create Trip",
-          description: "Fill in your trip details"
+          description: "Fill in your trip details",
         };
     }
   };
@@ -830,7 +938,7 @@ export const CreateDestinationForm = ({
                                     value={(field.value as string[])?.map(
                                       (val) => ({
                                         value: val,
-                                        label: val
+                                        label: val,
                                       })
                                     )}
                                     onChange={(newValue) => {
@@ -849,31 +957,31 @@ export const CreateDestinationForm = ({
                                         borderRadius: "0.375rem",
                                         boxShadow: "none",
                                         "&:hover": {
-                                          borderColor: "#a855f7"
+                                          borderColor: "#a855f7",
                                         },
                                         "&:focus-within": {
                                           borderColor: "#a855f7",
                                           boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)"
-                                        }
+                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
+                                        },
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
                                         backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem"
+                                        borderRadius: "0.25rem",
                                       }),
                                       multiValueLabel: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
-                                        fontWeight: "500"
+                                        fontWeight: "500",
                                       }),
                                       multiValueRemove: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
                                         "&:hover": {
                                           backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9"
-                                        }
+                                          color: "#6d28d9",
+                                        },
                                       }),
                                       option: (base, state) => ({
                                         ...base,
@@ -884,12 +992,12 @@ export const CreateDestinationForm = ({
                                           : "white",
                                         color: state.isSelected
                                           ? "white"
-                                          : "#374151"
+                                          : "#374151",
                                       }),
                                       placeholder: (base) => ({
                                         ...base,
-                                        color: "#9ca3af"
-                                      })
+                                        color: "#9ca3af",
+                                      }),
                                     }}
                                     placeholder={data.placeholder}
                                     className="font-instrument"
@@ -962,7 +1070,7 @@ export const CreateDestinationForm = ({
                                                         [];
                                                       const newValue = [
                                                         ...currentValue,
-                                                        option
+                                                        option,
                                                       ];
                                                       field.onChange(newValue);
                                                     }}
@@ -1032,15 +1140,20 @@ export const CreateDestinationForm = ({
                       // Custom Input List Component (for What's Included/Excluded with user input)
                       if (data.type === "custom-input-list") {
                         const isIncluded = data.id === "includedActivities";
+                        const isFilters = data.id === "filters";
                         const customInput = isIncluded
                           ? customIncludedInput
                           : data.label === "Not Included"
                           ? customExcludedInput
+                          : isFilters
+                          ? customFilterInput
                           : customSpecialInput;
                         const setCustomInput = isIncluded
                           ? setCustomIncludedInput
                           : data.label === "Not Included"
                           ? setCustomExcludedInput
+                          : isFilters
+                          ? setCustomFilterInput
                           : setCustomSpecialInput;
 
                         return (
@@ -1057,6 +1170,8 @@ export const CreateDestinationForm = ({
                                         ? "bg-green-100"
                                         : data.label === "Not Included"
                                         ? "bg-red-100"
+                                        : isFilters
+                                        ? "bg-purple-100"
                                         : "bg-blue-100"
                                     }`}
                                   >
@@ -1064,6 +1179,8 @@ export const CreateDestinationForm = ({
                                       <Plus className="h-3 w-3 text-green-600" />
                                     ) : data.label === "Not Included" ? (
                                       <Minus className="h-3 w-3 text-red-600" />
+                                    ) : isFilters ? (
+                                      <Plus className="h-3 w-3 text-purple-600" />
                                     ) : (
                                       <Plus className="h-3 w-3 text-blue-600" />
                                     )}
@@ -1082,6 +1199,8 @@ export const CreateDestinationForm = ({
                                             ? "focus:border-green-400 focus:ring-green-100"
                                             : data.label === "Not Included"
                                             ? "focus:border-red-400 focus:ring-red-100"
+                                            : isFilters
+                                            ? "focus:border-purple-400 focus:ring-purple-100"
                                             : "focus:border-blue-400 focus:ring-blue-100"
                                         }`}
                                         value={customInput}
@@ -1100,7 +1219,7 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                item
+                                                item,
                                               ]);
                                               setCustomInput("");
                                             }
@@ -1118,7 +1237,7 @@ export const CreateDestinationForm = ({
                                           ) {
                                             field.onChange([
                                               ...(field.value || []),
-                                              item
+                                              item,
                                             ]);
                                             setCustomInput("");
                                           }
@@ -1128,6 +1247,8 @@ export const CreateDestinationForm = ({
                                             ? "bg-green-500 hover:bg-green-600"
                                             : data.label === "Not Included"
                                             ? "bg-red-500 hover:bg-red-600"
+                                            : isFilters
+                                            ? "bg-purple-500 hover:bg-purple-600"
                                             : "bg-blue-500 hover:bg-blue-600"
                                         }`}
                                       >
@@ -1146,6 +1267,8 @@ export const CreateDestinationForm = ({
                                                   : data.label ===
                                                     "Not Included"
                                                   ? "bg-red-100 text-red-800"
+                                                  : isFilters
+                                                  ? "bg-purple-100 text-purple-800"
                                                   : "bg-blue-100 text-blue-800"
                                               }`}
                                             >
@@ -1167,6 +1290,8 @@ export const CreateDestinationForm = ({
                                                     : data.label ===
                                                       "Not Included"
                                                     ? "hover:bg-red-200"
+                                                    : isFilters
+                                                    ? "hover:bg-purple-200"
                                                     : "hover:bg-blue-200"
                                                 }`}
                                               >
@@ -1412,7 +1537,7 @@ export const CreateDestinationForm = ({
                                           onChange={(e) =>
                                             setCustomActivityInput((prev) => ({
                                               ...prev,
-                                              [index]: e.target.value
+                                              [index]: e.target.value,
                                             }))
                                           }
                                           onKeyDown={(e) => {
@@ -1430,12 +1555,12 @@ export const CreateDestinationForm = ({
                                               ) {
                                                 field.onChange([
                                                   ...(field.value || []),
-                                                  activity
+                                                  activity,
                                                 ]);
                                                 setCustomActivityInput(
                                                   (prev) => ({
                                                     ...prev,
-                                                    [index]: ""
+                                                    [index]: "",
                                                   })
                                                 );
                                               }
@@ -1458,12 +1583,12 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                activity
+                                                activity,
                                               ]);
                                               setCustomActivityInput(
                                                 (prev) => ({
                                                   ...prev,
-                                                  [index]: ""
+                                                  [index]: "",
                                                 })
                                               );
                                             }

@@ -72,129 +72,108 @@ export const EarningsSection = ({
         </div>
       ) : revenueData ? (
         <>
-          {/* Detailed Payment Status Breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-5 w-5 text-emerald-600" />
+          {/* Simplified Earnings Overview Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-emerald-100 rounded flex items-center justify-center">
+                  <DollarSign className="h-3 w-3 text-emerald-600" />
                 </div>
-                <div className="text-emerald-600 text-sm font-medium">
-                  {revenueData.fullyPaid.bookingCount} bookings
-                </div>
+                <span className="text-xs font-medium text-emerald-600">
+                  Fully Paid
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Fully Paid
-              </h3>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">
+              <div className="text-lg font-bold text-emerald-600">
                 ₹{revenueData.fullyPaid.revenue.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">
-                Complete payments received
-              </p>
+              <div className="text-xs text-slate-500">
+                {revenueData.fullyPaid.bookingCount} bookings
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-blue-100 rounded flex items-center justify-center">
+                  <BarChart3 className="h-3 w-3 text-blue-600" />
                 </div>
-                <div className="text-blue-600 text-sm font-medium">
-                  {revenueData.partiallyPaid.bookingCount} bookings
-                </div>
+                <span className="text-xs font-medium text-blue-600">
+                  Partial
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Partially Paid
-              </h3>
-              <div className="space-y-1">
-                <div className="text-lg font-bold text-blue-600">
-                  ₹{revenueData.partiallyPaid.amountReceived.toLocaleString()}{" "}
-                  received
-                </div>
-                <div className="text-sm text-orange-600 font-medium">
-                  ₹{revenueData.partiallyPaid.remainingAmount.toLocaleString()}{" "}
-                  pending
-                </div>
+              <div className="text-lg font-bold text-blue-600">
+                ₹{revenueData.partiallyPaid.amountReceived.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">Partial payments made</p>
+              <div className="text-xs text-slate-500">
+                {revenueData.partiallyPaid.bookingCount} bookings
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-orange-600" />
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-orange-100 rounded flex items-center justify-center">
+                  <Clock className="h-3 w-3 text-orange-600" />
                 </div>
-                <div className="text-orange-600 text-sm font-medium">
-                  {revenueData.pending.bookingCount} pending
-                </div>
+                <span className="text-xs font-medium text-orange-600">
+                  Pending
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Payment Pending
-              </h3>
-              <div className="text-2xl font-bold text-orange-600 mb-2">
+              <div className="text-lg font-bold text-orange-600">
                 ₹{revenueData.pending.bookingValue.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">Awaiting initial payment</p>
+              <div className="text-xs text-slate-500">
+                {revenueData.pending.bookingCount} bookings
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-red-100 rounded flex items-center justify-center">
+                  <AlertTriangle className="h-3 w-3 text-red-600" />
                 </div>
-                <div className="text-red-600 text-sm font-medium">
-                  {revenueData.overdue.bookingCount} overdue
-                </div>
+                <span className="text-xs font-medium text-red-600">
+                  Overdue
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Overdue Payments
-              </h3>
-              <div className="text-2xl font-bold text-red-600 mb-2">
+              <div className="text-lg font-bold text-red-600">
                 ₹{revenueData.overdue.bookingValue.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">Past payment deadline</p>
+              <div className="text-xs text-slate-500">
+                {revenueData.overdue.bookingCount} bookings
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-5 w-5 text-gray-600" />
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-gray-100 rounded flex items-center justify-center">
+                  <AlertCircle className="h-3 w-3 text-gray-600" />
                 </div>
-                <div className="text-gray-600 text-sm font-medium">
-                  {revenueData.cancelled.bookingCount} cancelled
-                </div>
+                <span className="text-xs font-medium text-gray-600">
+                  Cancelled
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Cancelled
-              </h3>
-              <div className="space-y-1">
-                <div className="text-lg font-bold text-gray-600">
-                  ₹{revenueData.cancelled.bookingValue.toLocaleString()} lost
-                </div>
-                <div className="text-sm text-purple-600 font-medium">
-                  ₹{revenueData.cancelled.refundAmount.toLocaleString()}{" "}
-                  refunded
-                </div>
+              <div className="text-lg font-bold text-gray-600">
+                ₹{revenueData.cancelled.bookingValue.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">Booking cancellations</p>
+              <div className="text-xs text-slate-500">
+                {revenueData.cancelled.bookingCount} bookings
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 bg-purple-100 rounded flex items-center justify-center">
+                  <TrendingUp className="h-3 w-3 text-purple-600" />
                 </div>
-                <div className="text-purple-600 text-sm font-medium">
-                  {revenueData.summary.collectionEfficiency}% efficiency
-                </div>
+                <span className="text-xs font-medium text-purple-600">
+                  Total Collected
+                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                Collection Rate
-              </h3>
-              <div className="text-2xl font-bold text-purple-600 mb-2">
+              <div className="text-lg font-bold text-purple-600">
                 ₹{revenueData.summary.receivedRevenue.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600">Total collected so far</p>
+              <div className="text-xs text-slate-500">
+                {revenueData.summary.collectionEfficiency}% efficiency
+              </div>
             </div>
           </div>
 
