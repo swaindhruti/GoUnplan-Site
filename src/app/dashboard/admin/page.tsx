@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import {
   Mail,
   Phone,
   EyeIcon,
-  AlertTriangle,
+  AlertTriangle
 } from "lucide-react";
 import {
   getAllUsers,
@@ -41,7 +41,7 @@ import {
   updateUserRole,
   getAlltravelPlanApplications,
   approveTravelPlan,
-  getAllBookings,
+  getAllBookings
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
@@ -52,7 +52,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { processRefund } from "@/actions/booking/actions";
 import { PaymentStatus } from "@prisma/client";
@@ -61,7 +61,7 @@ import { PaymentStatus } from "@prisma/client";
 interface User {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   role: Role;
   createdAt: Date;
@@ -70,7 +70,7 @@ interface User {
 interface Host {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   createdAt: Date;
 }
@@ -78,7 +78,7 @@ interface Host {
 interface Applicant {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   createdAt: Date;
   role: Role;
@@ -119,7 +119,7 @@ interface Booking {
   user: {
     id: string;
     name: string;
-    email: string;
+    email: string | null;
     phone: string | null;
     image: string | null;
   };
@@ -135,7 +135,7 @@ interface Booking {
       hostId: string;
       user: {
         name: string;
-        email: string;
+        email: string | null;
       };
     };
   };
@@ -181,33 +181,33 @@ export default function AdminDashboard() {
       FULLY_PAID: {
         icon: CheckCircle,
         color: "bg-green-100 text-green-800 border-green-200",
-        label: "Fully Paid",
+        label: "Fully Paid"
       },
       PARTIALLY_PAID: {
         icon: CheckCircle,
         color: "bg-blue-100 text-blue-800 border-blue-200",
-        label: "Partially Paid",
+        label: "Partially Paid"
       },
       PENDING: {
         icon: Clock,
         color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        label: "Pending",
+        label: "Pending"
       },
       OVERDUE: {
         icon: AlertTriangle,
         color: "bg-red-100 text-red-800 border-red-200",
-        label: "Overdue",
+        label: "Overdue"
       },
       CANCELLED: {
         icon: XCircle,
         color: "bg-gray-100 text-gray-800 border-gray-200",
-        label: "Cancelled",
+        label: "Cancelled"
       },
       REFUNDED: {
         icon: RefreshCw,
         color: "bg-purple-100 text-purple-800 border-purple-200",
-        label: "Refunded",
-      },
+        label: "Refunded"
+      }
     };
     return statusMap[status] || statusMap.PENDING;
   };
@@ -227,16 +227,16 @@ export default function AdminDashboard() {
     CANCELLED: 0,
     REFUNDED: 0,
     PENDING: 0,
-    OVERDUE: 0,
+    OVERDUE: 0
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
   });
 
   const [totalRevenue, setTotalRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
 
   const [dateRange, setDateRange] = useState({
     startDate: "",
-    endDate: "",
+    endDate: ""
   });
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
 
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
     hostApplicants: 0,
     totalBookings: 0,
     totalSales: 0,
-    pendingRefunds: 0,
+    pendingRefunds: 0
   });
 
   // NEW: Set default dates (last 30 days)
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
 
     setDateRange({
       startDate: thirtyDaysAgo.toISOString().split("T")[0],
-      endDate: today.toISOString().split("T")[0],
+      endDate: today.toISOString().split("T")[0]
     });
   }, []);
   const handleAnalyticsModal = () => {
@@ -311,7 +311,7 @@ export default function AdminDashboard() {
       setStatsData((prev) => ({
         ...prev,
         totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
+        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
       }));
     } catch (err) {
       setError("Failed to fetch revenue data");
@@ -392,7 +392,7 @@ export default function AdminDashboard() {
               CANCELLED: 0,
               REFUNDED: 0,
               PENDING: 0,
-              OVERDUE: 0,
+              OVERDUE: 0
             }
           );
         }
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
             (travelPlansResponse.travelPlans?.length || 0),
           totalBookings: bookingsResponse.counts?.ALL || 0,
           totalSales: totalRevenue.totalSales._sum.totalPrice || 0, // This will be updated by fetchRevenueData
-          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0, // This will be updated by fetchRevenueData
+          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0 // This will be updated by fetchRevenueData
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
     fetchAdminData();
   }, [
     totalRevenue.refundAmount._sum.refundAmount,
-    totalRevenue.totalSales._sum.totalPrice,
+    totalRevenue.totalSales._sum.totalPrice
   ]);
 
   const handleApproveHost = async (email: string) => {
@@ -447,7 +447,7 @@ export default function AdminDashboard() {
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
-        totalHosts: statsData.totalHosts + 1,
+        totalHosts: statsData.totalHosts + 1
       });
     } catch (err) {
       setError("Failed to approve host application");
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
       setApplicants(applicants.filter((app) => app.email !== email));
       setStatsData({
         ...statsData,
-        hostApplicants: statsData.hostApplicants - 1,
+        hostApplicants: statsData.hostApplicants - 1
       });
     } catch (err) {
       setError("Failed to reject host application");
@@ -536,7 +536,7 @@ export default function AdminDashboard() {
         setBookingCounts((prev) => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
-          REFUNDED: prev.REFUNDED + 1,
+          REFUNDED: prev.REFUNDED + 1
         }));
       } else {
         setError(result.error || "Failed to mark booking as refunded");
@@ -554,7 +554,7 @@ export default function AdminDashboard() {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(amount);
   };
   const formatDateRange = () => {
@@ -563,12 +563,12 @@ export default function AdminDashboard() {
     const start = new Date(dateRange.startDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
     const end = new Date(dateRange.endDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
 
     return `${start} - ${end}`;
@@ -590,33 +590,33 @@ export default function AdminDashboard() {
       id: "users",
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
-      description: "User Management",
+      description: "User Management"
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management",
+      description: "Host Management"
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews",
+      description: "Pending Reviews"
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics",
+      description: "Financial Analytics"
     },
 
     {
       id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
-      description: "Booking Management",
-    },
+      description: "Booking Management"
+    }
   ];
 
   if (loading) {
@@ -1049,7 +1049,7 @@ export default function AdminDashboard() {
                                     className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                     onClick={() =>
                                       handleUpdateRole(
-                                        user.email,
+                                        user.email || "",
                                         user.role === "USER" ? "HOST" : "USER"
                                       )
                                     }
@@ -1063,7 +1063,10 @@ export default function AdminDashboard() {
                                     size="sm"
                                     className="bg-amber-600 text-white hover:bg-amber-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                     onClick={() =>
-                                      handleUpdateRole(user.email, "ADMIN")
+                                      handleUpdateRole(
+                                        user.email || "",
+                                        "ADMIN"
+                                      )
                                     }
                                   >
                                     Make Admin
@@ -1076,7 +1079,7 @@ export default function AdminDashboard() {
                                   size="sm"
                                   className="bg-gray-600 text-white hover:bg-gray-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
-                                    handleUpdateRole(user.email, "USER")
+                                    handleUpdateRole(user.email || "", "USER")
                                   }
                                 >
                                   Make User
@@ -1370,7 +1373,7 @@ export default function AdminDashboard() {
                                   size="sm"
                                   className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
-                                    handleApproveHost(applicant.email)
+                                    handleApproveHost(applicant.email || "")
                                   }
                                 >
                                   Approve
@@ -1380,7 +1383,7 @@ export default function AdminDashboard() {
                                   size="sm"
                                   className="bg-red-600 text-white hover:bg-red-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
-                                    handleRejectHost(applicant.email)
+                                    handleRejectHost(applicant.email || "")
                                   }
                                 >
                                   Reject
@@ -1519,7 +1522,6 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* Empty state when no applications match filter */}
               {applicationFilter === "all" &&
                 applicants.length === 0 &&
                 travelPlans.length === 0 && (
@@ -1541,7 +1543,6 @@ export default function AdminDashboard() {
 
           {activeTab === "revenue" && (
             <div className="space-y-6">
-              {/* Header with Date Selector */}
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
@@ -1556,8 +1557,6 @@ export default function AdminDashboard() {
                     )}
                   </p>
                 </div>
-
-                {/* Date Range Selector */}
                 <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-gray-500" />
@@ -1762,7 +1761,7 @@ export default function AdminDashboard() {
                       "CANCELLED",
                       "REFUNDED",
                       "PENDING",
-                      "OVERDUE",
+                      "OVERDUE"
                     ].map((status) => (
                       <button
                         key={status}

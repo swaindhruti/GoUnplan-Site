@@ -12,14 +12,14 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
-  Compass,
+  Compass
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   resetPassword,
-  verifyResetToken,
+  verifyResetToken
 } from "@/actions/password-reset/actions";
 
 interface FormData {
@@ -35,14 +35,14 @@ interface FormErrors {
 
 interface User {
   id: string;
-  email: string;
+  email?: string | null;
   name: string;
 }
 
 function ResetPasswordForm() {
   const [formData, setFormData] = useState<FormData>({
     password: "",
-    confirmPassword: "",
+    confirmPassword: ""
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -76,9 +76,9 @@ function ResetPasswordForm() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)",
+            fontFamily: "var(--font-instrument)"
           },
-          duration: 4000,
+          duration: 4000
         });
       }
     };
@@ -90,13 +90,13 @@ function ResetPasswordForm() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
 
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: undefined,
+        [name]: undefined
       }));
     }
   };
@@ -134,9 +134,9 @@ function ResetPasswordForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)",
+          fontFamily: "var(--font-instrument)"
         },
-        duration: 4000,
+        duration: 4000
       });
     }
 
@@ -161,9 +161,9 @@ function ResetPasswordForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)",
+          fontFamily: "var(--font-instrument)"
         },
-        duration: 5000,
+        duration: 5000
       });
 
       // Redirect to signin page after a delay
@@ -183,9 +183,9 @@ function ResetPasswordForm() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)",
+          fontFamily: "var(--font-instrument)"
         },
-        duration: 4000,
+        duration: 4000
       });
     } finally {
       setIsLoading(false);

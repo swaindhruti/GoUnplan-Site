@@ -9,7 +9,7 @@ import {
   RefreshCw,
   Search,
   Copy,
-  Check,
+  Check
 } from "lucide-react";
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
@@ -34,7 +34,7 @@ type Booking = {
   user: {
     id: string;
     name: string;
-    email: string;
+    email: string | null;
     phone: string | null;
     image: string | null;
   };
@@ -78,7 +78,7 @@ export const BookingsHistory = () => {
     FULLY_PAID: 0,
     OVERDUE: 0,
     CANCELLED: 0,
-    REFUNDED: 0,
+    REFUNDED: 0
   });
 
   const fetchAllBookings = useCallback(async () => {
@@ -128,7 +128,7 @@ export const BookingsHistory = () => {
             FULLY_PAID: 0,
             OVERDUE: 0,
             CANCELLED: 0,
-            REFUNDED: 0,
+            REFUNDED: 0
           }
         );
         setCounts(paymentCounts);
@@ -163,7 +163,8 @@ export const BookingsHistory = () => {
       filtered = filtered.filter(
         (booking) =>
           booking.user.name.toLowerCase().includes(term) ||
-          booking.user.email.toLowerCase().includes(term) ||
+          booking.user.email ||
+          "".toLowerCase().includes(term) ||
           booking.travelPlan.title.toLowerCase().includes(term) ||
           booking.travelPlan.destination?.toLowerCase().includes(term) ||
           booking.id.toLowerCase().includes(term)
@@ -263,7 +264,7 @@ export const BookingsHistory = () => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
@@ -271,7 +272,7 @@ export const BookingsHistory = () => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 0
     }).format(amount);
   };
 
@@ -360,9 +361,9 @@ export const BookingsHistory = () => {
               {
                 key: "PARTIALLY_PAID",
                 label: "Partial Payment",
-                color: "orange",
+                color: "orange"
               },
-              { key: "OVERDUE", label: "Payment Due", color: "red" },
+              { key: "OVERDUE", label: "Payment Due", color: "red" }
             ].map((status) => (
               <button
                 key={status.key}

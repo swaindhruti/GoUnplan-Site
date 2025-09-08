@@ -23,7 +23,7 @@ import {
   Activity,
   Briefcase,
   Globe,
-  X,
+  X
 } from "lucide-react";
 import { sendVerificationEmail } from "@/actions/email-verification/action";
 import { getUserProfile, updateUserProfile } from "@/actions/user/action";
@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<{
     id: string;
     name: string;
-    email: string;
+    email: string | null;
     role: string;
     phone: string | null;
     bio: string | null;
@@ -63,7 +63,7 @@ export default function ProfilePage() {
   const [editForm, setEditForm] = useState({
     name: "",
     phone: "",
-    bio: "",
+    bio: ""
   });
 
   const fetchUserProfile = useCallback(async () => {
@@ -76,7 +76,7 @@ export default function ProfilePage() {
         setEditForm({
           name: result.user.name || "",
           phone: result.user.phone || "",
-          bio: result.user.bio || "",
+          bio: result.user.bio || ""
         });
       }
     } catch {
@@ -126,7 +126,7 @@ export default function ProfilePage() {
         name: editForm.name,
         phone: editForm.phone || undefined,
         bio: editForm.bio || undefined,
-        image: imagePreview || undefined,
+        image: imagePreview || undefined
       });
 
       if (result.success) {
@@ -151,7 +151,7 @@ export default function ProfilePage() {
       setEditForm({
         name: profile.name || "",
         phone: profile.phone || "",
-        bio: profile.bio || "",
+        bio: profile.bio || ""
       });
     }
   };
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                     <div className="relative">
                       <Input
                         id="email"
-                        value={profile.email}
+                        value={profile.email || ""}
                         disabled
                         className="h-12 rounded-xl bg-gray-50 border-gray-300"
                       />
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                           "en-US",
                           {
                             month: "long",
-                            year: "numeric",
+                            year: "numeric"
                           }
                         )}
                       </div>

@@ -10,7 +10,7 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 export async function sendPasswordResetEmail(email: string) {
   try {
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email }
     });
 
     if (!user) {
@@ -18,7 +18,7 @@ export async function sendPasswordResetEmail(email: string) {
       return {
         success: true,
         message:
-          "If an account with this email exists, a password reset link has been sent.",
+          "If an account with this email exists, a password reset link has been sent."
       };
     }
 
@@ -31,8 +31,8 @@ export async function sendPasswordResetEmail(email: string) {
       where: { id: user.id },
       data: {
         resetToken,
-        resetTokenExpiry,
-      },
+        resetTokenExpiry
+      }
     });
 
     // Create the reset link
@@ -62,9 +62,9 @@ export async function sendPasswordResetEmail(email: string) {
 
     const { error } = await resend.emails.send({
       from: "Gounplan <noreply@gounplan.com>",
-      to: [user.email],
+      to: [user.email || ""],
       subject: "Reset Your Password - GoUnplan",
-      html: emailHtml,
+      html: emailHtml
     });
 
     if (error) {
@@ -74,7 +74,7 @@ export async function sendPasswordResetEmail(email: string) {
     return {
       success: true,
       message:
-        "If an account with this email exists, a password reset link has been sent.",
+        "If an account with this email exists, a password reset link has been sent."
     };
   } catch (error) {
     console.error("Password reset error:", error);
@@ -97,9 +97,9 @@ export async function resetPassword(token: string, newPassword: string) {
       where: {
         resetToken: token,
         resetTokenExpiry: {
-          gt: new Date(),
-        },
-      },
+          gt: new Date()
+        }
+      }
     });
 
     if (!user) {
@@ -115,14 +115,14 @@ export async function resetPassword(token: string, newPassword: string) {
       data: {
         password: hashedPassword,
         resetToken: null,
-        resetTokenExpiry: null,
-      },
+        resetTokenExpiry: null
+      }
     });
 
     return {
       success: true,
       message:
-        "Password has been reset successfully. You can now sign in with your new password.",
+        "Password has been reset successfully. You can now sign in with your new password."
     };
   } catch (error) {
     console.error("Password reset confirmation error:", error);
@@ -144,14 +144,14 @@ export async function verifyResetToken(token: string) {
       where: {
         resetToken: token,
         resetTokenExpiry: {
-          gt: new Date(),
-        },
+          gt: new Date()
+        }
       },
       select: {
         id: true,
         email: true,
-        name: true,
-      },
+        name: true
+      }
     });
 
     if (!user) {

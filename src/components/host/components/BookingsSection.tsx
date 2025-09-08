@@ -14,7 +14,7 @@ import {
   ChevronRight,
   MapPin,
   AlertCircle,
-  TrendingUp,
+  TrendingUp
 } from "lucide-react";
 import Image from "next/image";
 import { getHostBookings } from "@/actions/host/action";
@@ -42,7 +42,7 @@ type Booking = {
   user: {
     id: string;
     name: string;
-    email: string;
+    email: string | null;
     phone: string | null;
     image: string | null;
   };
@@ -98,7 +98,7 @@ export const BookingsSection = () => {
     FULLY_PAID: 0,
     OVERDUE: 0,
     CANCELLED: 0,
-    REFUNDED: 0,
+    REFUNDED: 0
   });
   const [showUpcoming, setShowUpcoming] = useState(false);
 
@@ -137,7 +137,7 @@ export const BookingsSection = () => {
             FULLY_PAID: 0,
             OVERDUE: 0,
             CANCELLED: 0,
-            REFUNDED: 0,
+            REFUNDED: 0
           }
         );
         setCounts(paymentCounts);
@@ -249,7 +249,7 @@ export const BookingsSection = () => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
@@ -257,7 +257,7 @@ export const BookingsSection = () => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 0
     }).format(amount);
   };
 
