@@ -66,7 +66,7 @@ export const updateUserRole = async (email: string, role: Role) => {
     if (host) return;
     await prisma.hostProfile.create({
       data: {
-        hostEmail: user.email,
+        hostEmail: user.email || "",
         hostMobile: user.phone || "",
         hostId: user.id,
         image: user.image,

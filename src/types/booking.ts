@@ -59,7 +59,7 @@ export interface BookingData {
 
 export interface User {
   id: string;
-  email?: string;
+  email?: string | null;
   name: string;
   bio?: string | null;
   phone?: string | null;
@@ -77,7 +77,7 @@ export interface HostProfile {
   image?: string | null;
   createdAt: Date;
   updatedAt: Date;
-  hostEmail: string;
+  hostEmail: string | null;
   hostMobile: string | null;
   user: User;
 }

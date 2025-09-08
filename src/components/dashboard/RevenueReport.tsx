@@ -27,7 +27,7 @@ interface Transaction {
   createdAt: Date;
   user: {
     name: string;
-    email: string;
+    email: string | null;
     phone?: string | null;
   };
   travelPlan: {
@@ -90,9 +90,8 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
         transaction.user.name
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        transaction.user.email
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        transaction.user.email ||
+        "".toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.travelPlan.title
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||

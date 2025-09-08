@@ -3,7 +3,7 @@ import { PaymentStatus } from "@prisma/client";
 export interface UserProfile {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   bio: string | null;
   image: string | null;
@@ -53,7 +53,7 @@ export interface Booking {
     host: {
       user: {
         name: string;
-        email: string;
+        email: string | null;
         image: string | null;
       };
     };

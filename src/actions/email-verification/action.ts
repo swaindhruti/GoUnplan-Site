@@ -9,7 +9,7 @@ export async function sendVerificationEmail() {
   const session = await requireAuth();
   const userId = session.user.id;
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: userId }
   });
 
   console.log("User details:", user);
@@ -46,9 +46,9 @@ export async function sendVerificationEmail() {
 
   const { data, error } = await resend.emails.send({
     from: "Gounplan <noreply@gounplan.com>",
-    to: [user.email],
+    to: [user.email || ""],
     subject: "Verify Your Email - GoUnplan",
-    html: emailHtml,
+    html: emailHtml
   });
 
   if (error) {
@@ -57,7 +57,7 @@ export async function sendVerificationEmail() {
 
   return {
     success: true,
-    message: `Verification email sent successfully ${data}`,
+    message: `Verification email sent successfully ${data}`
   };
 }
 
@@ -65,7 +65,7 @@ export async function verifyEmail() {
   const session = await requireAuth();
   const userId = session.user.id;
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: userId }
   });
 
   if (!user) {
@@ -74,17 +74,17 @@ export async function verifyEmail() {
   if (user.isEmailVerified) {
     return {
       success: true,
-      message: "Email is already verified",
+      message: "Email is already verified"
     };
   }
 
   await prisma.user.update({
     where: { id: userId },
-    data: { isEmailVerified: true },
+    data: { isEmailVerified: true }
   });
 
   return {
     success: true,
-    message: "Email verified successfully",
+    message: "Email verified successfully"
   };
 }
