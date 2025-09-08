@@ -78,7 +78,7 @@ export const createBooking = async (bookingData: {
         participants,
         pricePerPerson,
         totalPrice,
-        remainingAmount: totalPrice - minPaymentAmount,
+        remainingAmount: totalPrice,
         minPaymentAmount: minPaymentAmount,
         paymentDeadline: bookingData.allowPartialPayment
           ? paymentDeadline
@@ -155,7 +155,7 @@ export const processPartialPayment = async (
       });
 
       const newAmountPaid = booking.amountPaid + amount;
-      const newRemainingAmount = booking.totalPrice - newAmountPaid;
+      const newRemainingAmount = booking.remainingAmount - newAmountPaid;
 
       // Determine new payment status
       let newPaymentStatus: PaymentStatus;

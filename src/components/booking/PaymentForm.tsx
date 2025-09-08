@@ -66,28 +66,64 @@ export function PaymentForm({
   >(null);
   const [countdown, setCountdown] = useState(10);
 
-  const subtotal = useMemo(() => {
-    if (isPartialPayment) return booking.minPaymentAmount || 0;
-    if (isRemainingPayment) return booking.remainingAmount || 0;
-    else return tripData.numberOfGuests * tripData.pricePerPerson;
-  }, [
-    tripData.numberOfGuests,
-    tripData.pricePerPerson,
-    isPartialPayment,
-    isRemainingPayment,
-    booking.remainingAmount,
-    booking.minPaymentAmount
-  ]);
+  const formatCurrency = useCallback(
+    (amount: number | undefined | null): string => {
+      if (!amount) return "₹0";
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR"
+      }).format(amount);
+    },
+    []
+  );
 
-  const platformFee = useMemo(() => Math.round(subtotal * 0.025), [subtotal]);
-  const serviceFee = useMemo(() => Math.round(subtotal * 0.075), [subtotal]);
+  const calculatePaymentBreakdown = useCallback(() => {
+    if (!booking) return { subtotal: 0, tax: 0, total: 0 };
+
+    let subtotal = 0;
+
+    if (isPartialPayment) {
+      subtotal = booking.minPaymentAmount || 0;
+    } else if (isRemainingPayment) {
+      subtotal = booking.remainingAmount || 0;
+    } else {
+      subtotal =
+        (booking.pricePerPerson || tripData.pricePerPerson || 0) *
+        (booking.participants || tripData.numberOfGuests || 0);
+    }
+
+    const taxRate = 0.18;
+    const tax = subtotal * taxRate;
+    const total = subtotal + tax;
+
+    return {
+      subtotal,
+      tax,
+      total
+    };
+  }, [booking, tripData, isPartialPayment, isRemainingPayment]);
+
+  const paymentBreakdown = useMemo(
+    () => calculatePaymentBreakdown(),
+    [calculatePaymentBreakdown]
+  );
+
+  const platformFee = useMemo(
+    () => Math.round(paymentBreakdown.subtotal * 0.025),
+    [paymentBreakdown.subtotal]
+  );
+  const serviceFee = useMemo(
+    () => Math.round(paymentBreakdown.subtotal * 0.075),
+    [paymentBreakdown.subtotal]
+  );
   const gstAmount = useMemo(
-    () => Math.round((subtotal + platformFee + serviceFee) * 0.18),
-    [subtotal, platformFee, serviceFee]
+    () =>
+      Math.round((paymentBreakdown.subtotal + platformFee + serviceFee) * 0.18),
+    [paymentBreakdown.subtotal, platformFee, serviceFee]
   );
   const total = useMemo(
-    () => subtotal + platformFee + serviceFee + gstAmount,
-    [subtotal, platformFee, serviceFee, gstAmount]
+    () => paymentBreakdown.subtotal + platformFee + serviceFee + gstAmount,
+    [paymentBreakdown.subtotal, platformFee, serviceFee, gstAmount]
   );
 
   // Countdown effect for payment completion
@@ -117,17 +153,6 @@ export function PaymentForm({
         month: "short",
         day: "numeric"
       });
-    },
-    []
-  );
-
-  const formatCurrency = useCallback(
-    (amount: number | undefined | null): string => {
-      if (!amount) return "₹0";
-      return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR"
-      }).format(amount);
     },
     []
   );
@@ -289,7 +314,6 @@ export function PaymentForm({
                 </div>
               </div>
 
-              {/* Additional Information */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -365,8 +389,6 @@ export function PaymentForm({
             </div>
           </div>
 
-          {/* Rest of your existing component JSX continues here... */}
-          {/* I'm keeping all the existing content exactly as it was */}
           <div className="max-w-7xl -mt-24 relative z-20 mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -387,13 +409,19 @@ export function PaymentForm({
                           Trip Cost
                         </span>
                         <p className="text-sm text-gray-500">
-                          ₹{tripData.pricePerPerson.toLocaleString()} ×{" "}
-                          {tripData.numberOfGuests}
-                          {tripData.numberOfGuests === 1 ? "person" : "people"}
+                          ₹
+                          {(
+                            booking.pricePerPerson || tripData.pricePerPerson
+                          ).toLocaleString()}{" "}
+                          × {booking.participants || tripData.numberOfGuests}
+                          {(booking.participants || tripData.numberOfGuests) ===
+                          1
+                            ? " person"
+                            : " people"}
                         </p>
                       </div>
                       <span className="font-semibold text-gray-900">
-                        {formatCurrency(subtotal)}
+                        {formatCurrency(paymentBreakdown.subtotal)}
                       </span>
                     </div>
 
@@ -515,7 +543,6 @@ export function PaymentForm({
                   </Button>
                 </div>
 
-                {/* Important Information */}
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 shadow-xl transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -545,7 +572,6 @@ export function PaymentForm({
                 </div>
               </div>
 
-              {/* Sticky Trip Summary Sidebar */}
               <div className="lg:col-span-1">
                 <div className="sticky top-8 space-y-6">
                   {/* Trip Summary Card */}
@@ -598,7 +624,9 @@ export function PaymentForm({
                             Price per person:
                           </span>
                           <span className="font-semibold">
-                            {formatCurrency(tripData.pricePerPerson)}
+                            {formatCurrency(
+                              booking.pricePerPerson || tripData.pricePerPerson
+                            )}
                           </span>
                         </div>
                       </div>

@@ -425,8 +425,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         <CarouselNext />
                       </Carousel>
                     </div>
-
-                    {/* Special Requirements */}
                     {booking.specialRequirements && (
                       <div className="bg-gray-50 rounded-xl p-5">
                         <div className="flex items-center gap-3 mb-3">
@@ -629,7 +627,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                  px-3 py-1 rounded-full border border-white/30
                  shadow-sm"
                                     >
-                                      Pay Full ${booking.totalPrice}
+                                      Pay Full $
+                                      {formatCurrency(paymentBreakdown.total)}
                                     </span>
                                   </button>
                                 </>
