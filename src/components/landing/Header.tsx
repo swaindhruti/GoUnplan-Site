@@ -8,7 +8,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -17,7 +17,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuShortcut,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   Menu,
@@ -34,7 +34,7 @@ import {
   UserCog,
   MapPin,
   HelpCircle,
-  UserPlus,
+  UserPlus
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -62,12 +62,13 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  console.log("ll", session);
 
   const navigationItems: NavigationItem[] = [
     { name: "Home", href: "/", section: "#home" },
     { name: "Vibes", href: "/vibes", section: "#vibes" },
     { name: "About", href: "/about", section: "#about" },
-    { name: "Contact", href: "/contact", section: "#contact" },
+    { name: "Contact", href: "/contact", section: "#contact" }
   ];
 
   useEffect(() => {
@@ -138,14 +139,14 @@ export default function Header() {
       items.push({
         label: "User Dashboard",
         href: "/dashboard/user",
-        icon: User,
+        icon: User
       });
     }
     if (userRole === "HOST") {
       items.push({
         label: "Host Dashboard",
         href: "/dashboard/host",
-        icon: Crown,
+        icon: Crown
       });
     }
 
@@ -153,7 +154,7 @@ export default function Header() {
       items.push({
         label: "Admin Dashboard",
         href: "/dashboard/admin",
-        icon: Shield,
+        icon: Shield
       });
     }
 
@@ -175,7 +176,7 @@ export default function Header() {
     breadcrumbs.push({
       label: "Home",
       href: "/",
-      isActive: pathname === "/",
+      isActive: pathname === "/"
     });
 
     let currentPath = "";
@@ -196,7 +197,7 @@ export default function Header() {
       breadcrumbs.push({
         label,
         href: currentPath,
-        isActive: isLast,
+        isActive: isLast
       });
     });
 
@@ -641,7 +642,7 @@ export default function Header() {
                           animationDelay: `${index * 100}ms`,
                           animation: isOpen
                             ? "slideInRight 0.6s ease-out forwards"
-                            : "none",
+                            : "none"
                         }}
                       >
                         <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
@@ -720,7 +721,7 @@ export default function Header() {
                                       animationDelay: `${(index + 1) * 100}ms`,
                                       animation: isMobileDashboardOpen
                                         ? "slideInRight 0.4s ease-out forwards"
-                                        : "none",
+                                        : "none"
                                     }}
                                   >
                                     <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
