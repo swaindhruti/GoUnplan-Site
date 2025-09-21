@@ -207,7 +207,8 @@ export function BookingPage({
     image: tripData.host?.image || "https://via.placeholder.com/60",
     email: tripData.host?.hostEmail || "",
     description: tripData.host?.description || "",
-    createdYear
+    createdYear,
+    averageRating: tripData.host?.averageRating || 0
   };
 
   const tripStats = {
@@ -403,17 +404,23 @@ export function BookingPage({
                       <p className="font-bold text-gray-900 font-instrument">
                         {hostInfo.name}
                       </p>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-1 mb-1">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className="h-3 w-3 text-yellow-400 fill-yellow-400"
+                              className={`h-3 w-3 ${
+                                i < Math.round(hostInfo.averageRating)
+                                  ? "text-yellow-400 fill-yellow-400"
+                                  : "text-gray-300"
+                              }`}
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-600 font-instrument">
-                          4.9 (124 reviews)
+                        <span className="text-xs text-gray-600">
+                          {hostInfo.averageRating > 0
+                            ? hostInfo.averageRating.toFixed(1)
+                            : "No ratings"}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 font-instrument">

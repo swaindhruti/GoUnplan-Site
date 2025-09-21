@@ -46,7 +46,10 @@ export const FindMyVibe = () => {
   };
 
   return (
-    <div className="bg-purple-500/[0.05] relative min-h-screen w-full ">
+    <div
+      id="find-my-vibe"
+      className="bg-purple-500/[0.05] relative min-h-screen w-full "
+    >
       {myVibes && (
         <div className="w-screen flex justify-center -mt-3 lg:-mt-6 pt-6 lg:pt-12">
           <SectionLabel label="Choose Your Vibe!" />

@@ -24,6 +24,7 @@ export const getTripById = async (tripId: string, bookingId: string) => {
     if (!trip) {
       return { error: "Trip not found" };
     }
+    console.log("Booking ID:", trip);
 
     const booking = await prisma.booking.findFirst({
       where: {

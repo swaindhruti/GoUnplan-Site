@@ -15,6 +15,7 @@ type FieldId =
   | "restrictions"
   | "special"
   | "sectionhead"
+  | "noofdays"
   | "dayWiseData";
 
 type ZodType = "string" | "number" | "enum" | "date" | "enum[]";

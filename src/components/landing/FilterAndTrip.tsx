@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { PrimaryButton } from "./common";
+import { handleScroll } from "../global/Handlescroll";
 
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState("");
@@ -307,7 +308,12 @@ export const FilterAndTrip = () => {
           <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
             <p className="text-black/80 text-base font-normal font-instrument px-2">
               Need inspiration?{" "}
-              <button className="text-purple-500 hover:text-purple-200 font-medium underline transition-colors font-instrument duration-200">
+              <button
+                onClick={() => {
+                  handleScroll({ location: "#find-my-vibe" });
+                }}
+                className="text-purple-500 hover:text-purple-600 font-medium underline transition-colors font-instrument duration-200"
+              >
                 Browse by vibe
               </button>
             </p>

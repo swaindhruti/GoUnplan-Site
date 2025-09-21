@@ -16,6 +16,7 @@ type DayWiseItinerary = {
   accommodation?: string | null;
   travelPlanId: string;
   dayWiseImage?: string | null;
+  startDate?: Date | null;
 };
 
 export default function TripItinerary({
@@ -26,6 +27,39 @@ export default function TripItinerary({
   const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>(
     {}
   );
+
+  // Calculate consecutive dates based on Day 1's start date
+  const calculateDate = (dayNumber: number, baseStartDate?: Date | null) => {
+    if (!baseStartDate) return null;
+
+    const date = new Date(baseStartDate);
+    date.setDate(date.getDate() + (dayNumber - 1));
+    return date;
+  };
+
+  // Format date for display
+  const formatDate = (date: Date | null) => {
+    if (!date) return null;
+
+    return {
+      dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
+      dayMonth: date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short"
+      }),
+      fullDate: date.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      })
+    };
+  };
+
+  // Get the base start date from Day 1
+  const baseStartDate = itinerary.find(
+    (item) => item.dayNumber === 1
+  )?.startDate;
 
   const nextImage = (itemId: string, totalImages: number) => {
     setImageIndexes((prev) => ({
@@ -57,6 +91,11 @@ export default function TripItinerary({
               <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                 Your curated travel schedule at a glance
               </p>
+              {baseStartDate && (
+                <p className="text-purple-600 font-medium text-sm mt-1">
+                  Starts {formatDate(new Date(baseStartDate))?.fullDate}
+                </p>
+              )}
             </div>
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <MapPin className="w-4 h-4 mr-2" />
@@ -76,6 +115,9 @@ export default function TripItinerary({
             ? item.dayWiseImage
             : [item.dayWiseImage || "https://avatar.iran.liara.run/public"];
 
+          const currentDate = calculateDate(item.dayNumber, baseStartDate);
+          const formattedDate = formatDate(currentDate);
+
           return (
             <div
               key={item.id}
@@ -86,23 +128,48 @@ export default function TripItinerary({
               <div className="sm:ml-20 flex-1">
                 <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
                   <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-slate-100">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm bg-purple-500">
-                        {item.dayNumber}
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm bg-purple-500">
+                          {item.dayNumber}
+                        </div>
+                        <div>
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
+                            <MapPin className="w-5 h-5 text-gray-500" />
+                            {item.title}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge
+                              variant="outline"
+                              className="text-xs sm:text-sm"
+                            >
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Day {item.dayNumber}
+                            </Badge>
+                            {formattedDate && (
+                              <Badge
+                                variant="secondary"
+                                className="text-xs sm:text-sm bg-purple-50 text-purple-700 border-purple-200"
+                              >
+                                {formattedDate.dayName},{" "}
+                                {formattedDate.dayMonth}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                          <MapPin className="w-5 h-5 text-gray-500" />
-                          {item.title}
-                        </h3>
-                        <Badge
-                          variant="outline"
-                          className="mt-1 text-xs sm:text-sm"
-                        >
-                          <Calendar className="w-3 h-3 mr-1" />
-                          Day {item.dayNumber}
-                        </Badge>
-                      </div>
+
+                      {/* Date display for mobile */}
+                      {formattedDate && (
+                        <div className="sm:hidden text-right">
+                          <div className="text-xs text-gray-500 font-medium">
+                            {formattedDate.dayName}
+                          </div>
+                          <div className="text-sm font-semibold text-purple-600">
+                            {formattedDate.dayMonth}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -151,10 +218,33 @@ export default function TripItinerary({
                         </div>
                       </>
                     )}
+
+                    {formattedDate && (
+                      <div className="hidden sm:block absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                        <div className="text-xs text-gray-600 font-medium">
+                          {formattedDate.dayName}
+                        </div>
+                        <div className="text-sm font-bold text-purple-600">
+                          {formattedDate.dayMonth}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Content */}
                   <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+                    {/* Full date display */}
+                    {formattedDate && (
+                      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-3 border border-purple-100">
+                        <div className="flex items-center gap-2 text-purple-700">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-medium text-sm">
+                            {formattedDate.fullDate}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
                       {item.description}
                     </p>
