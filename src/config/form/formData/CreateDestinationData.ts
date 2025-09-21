@@ -7,7 +7,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "tripName",
     placeholder: "Enter the Trip Title",
     className: "col-span-1",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "Destination",
@@ -15,7 +15,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "destination",
     placeholder: "nilgri waterfall",
     className: "col-span-1",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "country",
@@ -23,7 +23,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "country",
     placeholder: "india",
     className: "col-span-1",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "state",
@@ -31,7 +31,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "state",
     placeholder: "odisha",
     className: "col-span-1",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "city",
@@ -39,7 +39,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "city",
     placeholder: "sambalpur",
     className: "col-span-1",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "Price Per Person (INR)",
@@ -47,15 +47,28 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "price",
     placeholder: "14999",
     className: "col-span-1",
-    zod: "number",
+    zod: "number"
   },
+
   {
     label: "Pick Trip Vibe",
-    type: "custom-input-list",
+    type: "multi-select",
     id: "filters",
-    placeholder: "Add vibes - you can pick multiple vibes",
+    placeholder: "Select a filter",
+    options: [
+      "Adventure",
+      "Relaxation",
+      "Culture",
+      "Nature",
+      "Nightlife",
+      "Foodie",
+      "Luxury",
+      "Budget",
+      "Wellness",
+      "Family"
+    ],
     className: "col-span-1",
-    zod: "enum[]",
+    zod: "enum[]"
   },
   {
     label: "Start Date",
@@ -63,15 +76,15 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "startDate",
     placeholder: "Select Start Date",
     className: "col-span-1",
-    zod: "date",
+    zod: "date"
   },
   {
-    label: "End Date",
-    type: "date",
-    id: "endDate",
-    placeholder: "Select End Date",
+    label: "Number of Trip Days",
+    type: "number",
+    id: "noofdays",
+    placeholder: "Enter Number of Days",
     className: "col-span-1",
-    zod: "date",
+    zod: "number"
   },
   {
     label: "Max Limit (People)",
@@ -79,7 +92,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "maxLimit",
     placeholder: "Select maximum",
     className: "col-span-1",
-    zod: "number",
+    zod: "number"
   },
   {
     label: "Description",
@@ -87,7 +100,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "description",
     placeholder: "Describe the trip details, highlights, and more...",
     className: "col-span-2",
-    zod: "string",
+    zod: "string"
   },
   {
     label: "Languages Offered",
@@ -96,7 +109,7 @@ export const CreateDestinationFormData: FormFields[] = [
     placeholder: "Select a language",
     options: ["English", "Hindi", "Spanish", "French"],
     className: "col-span-1",
-    zod: "enum[]",
+    zod: "enum[]"
   },
   {
     label: "What's Included",
@@ -104,7 +117,7 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "includedActivities",
     placeholder: "Add what's included (e.g., All meals, Transportation...)",
     className: "col-span-1",
-    zod: "enum[]",
+    zod: "enum[]"
   },
   {
     label: "Not Included",
@@ -113,7 +126,7 @@ export const CreateDestinationFormData: FormFields[] = [
     placeholder:
       "Add what's not included (e.g., International flights, Personal expenses...)",
     className: "col-span-1",
-    zod: "enum[]",
+    zod: "enum[]"
   },
   {
     label: "What's Special",
@@ -121,6 +134,6 @@ export const CreateDestinationFormData: FormFields[] = [
     id: "special",
     placeholder: "Add what's Special ",
     className: "col-span-1",
-    zod: "enum[]",
-  },
+    zod: "enum[]"
+  }
 ];

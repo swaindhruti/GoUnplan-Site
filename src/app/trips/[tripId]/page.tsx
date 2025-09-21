@@ -93,6 +93,32 @@ export default async function TripDetailsPage({ params }: Props) {
     return result;
   })();
 
+  /*   const calculateDate = (dayNumber: number, baseStartDate?: Date | null) => {
+    if (!baseStartDate) return null;
+
+    const date = new Date(baseStartDate);
+    date.setDate(date.getDate() + (dayNumber - 1));
+    return date;
+  };
+ */
+  /*   const mapItinerary = trip.dayWiseItinerary.map((day) => {
+    const currentDate = calculateDate(day.dayNumber, trip.startDate);
+    const odishaCoordinates = [
+      { lat: 20.296059, lng: 85.824539 },
+      { lat: 19.817743, lng: 85.828629 },
+      { lat: 22.125401, lng: 84.045067 },
+      { lat: 20.462519, lng: 85.882989 },
+      { lat: 22.249377, lng: 84.882798 }
+    ];
+    return {
+      latitude:
+        odishaCoordinates[(day.dayNumber - 1) % odishaCoordinates.length].lat,
+      longitude:
+        odishaCoordinates[(day.dayNumber - 1) % odishaCoordinates.length].lng,
+      destination: "delhi",
+      date: formatDate(currentDate?.toString() || "").toString() || ""
+    };
+  }); */
   const hostInfo = {
     name: trip.host.user.name,
     image: trip.host.image || "https://via.placeholder.com/60",
@@ -133,29 +159,34 @@ export default async function TripDetailsPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 font-instrument">
-      {/* Hero Image - Responsive Heights */}
-      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px]">
-        <Image
-          src={trip.tripImage || ""}
-          alt="Trip Experience"
-          fill
-          className="object-cover"
-          priority
-        />
+      <div className="relative w-full h-screen overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src={trip.tripImage || ""}
+            alt="Trip Background"
+            fill
+            className="object-cover opacity-40 blur-sm scale-110"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/20"></div>
+        </div>
+        <div className="relative bg-transparent z-10 h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="relative w-full bg-transparent  max-w-6xl h-[100vh]">
+            <Image
+              src={trip.tripImage || ""}
+              alt="Trip Experience"
+              fill
+              className="object-contain rounded-xl shadow-2xl bg-transparent"
+              priority
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Main Content Container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Desktop Layout: Side-by-side, Mobile: Stacked */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Main Content - Left Side on Desktop, Full Width on Mobile */}
           <div className="flex-1 lg:w-2/3 space-y-8 lg:space-y-12">
-            {/* Title and Host Section */}
             <div className="space-y-4">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bricolage font-bold text-gray-900 leading-tight">
-                {trip.title}
-              </h1>
-
               <div className="flex items-center gap-3">
                 <Image
                   src={trip.host.image || "https://via.placeholder.com/48"}
@@ -241,11 +272,14 @@ export default async function TripDetailsPage({ params }: Props) {
                 {trip.description}
               </p>
             </div>
+            {/* 
+            <TripMap locations={mapItinerary} /> */}
 
             {/* Itinerary */}
             <TripItinerary
               itinerary={trip.dayWiseItinerary.map((day) => ({
                 ...day,
+                startDate: trip.startDate ?? null,
                 accommodation: day.accommodation ?? undefined
               }))}
             />

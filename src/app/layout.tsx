@@ -92,9 +92,14 @@ export default function RootLayout({
       >
         <PostHogProvider>
           <SessionProvider>
-            <Header />
+            <Header />{" "}
+            <Toaster
+              richColors
+              closeButton
+              expand={true}
+              position="bottom-right"
+            />
             {children}
-            <Toaster />
           </SessionProvider>
         </PostHogProvider>
       </body>

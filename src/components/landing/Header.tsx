@@ -170,8 +170,7 @@ export default function Header() {
     const pathSegments = pathname
       .split("/")
       .filter((segment) => segment !== "");
-    const breadcrumbs: { label: string; href: string; isActive: boolean }[] =
-      [];
+    const breadcrumbs = [];
 
     breadcrumbs.push({
       label: "Home",
@@ -180,28 +179,62 @@ export default function Header() {
     });
 
     let currentPath = "";
+
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;
 
-      let label = segment.charAt(0).toUpperCase() + segment.slice(1);
-      if (label === "Dashboard") {
-        label =
-          session?.user?.role === "ADMIN"
-            ? "Admin Dashboard"
-            : session?.user?.role === "HOST"
-            ? "Host Dashboard"
-            : "Dashboard";
+      let label = segment;
+      const shouldShow = true;
+
+      if (isUUID(segment) || isLongId(segment)) {
+        const prevSegment = pathSegments[index - 1];
+        const prevtoprevSegment = pathSegments[index - 2];
+        if (prevSegment === "booking") {
+          label = "Booking Details";
+        } else if (prevtoprevSegment === "booking") {
+          label = "Guest Details";
+        } else if (prevSegment === "trips" || prevSegment === "trip") {
+          label = "Trip Details";
+        } else if (prevSegment === "user") {
+          label = "Profile";
+        } else {
+          label = ">>";
+        }
+      } else {
+        label = segment.charAt(0).toUpperCase() + segment.slice(1);
+
+        if (label === "Dashboard") {
+          label =
+            session?.user?.role === "ADMIN"
+              ? "Admin Dashboard"
+              : session?.user?.role === "HOST"
+              ? "Host Dashboard"
+              : "Dashboard";
+        }
       }
 
-      breadcrumbs.push({
-        label,
-        href: currentPath,
-        isActive: isLast
-      });
+      if (shouldShow) {
+        breadcrumbs.push({
+          label,
+          href: currentPath,
+          isActive: isLast
+        });
+      }
     });
 
     return breadcrumbs;
+  };
+
+  const isUUID = (str: string) => {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
+
+  const isLongId = (str: string) => {
+    // Detect long alphanumeric IDs (like your cmeuamlv50007dmflif3lams5)
+    return /^[a-zA-Z0-9]{20,}$/.test(str) && !/^[a-zA-Z]+$/.test(str);
   };
 
   const breadcrumbs = generateBreadcrumbs();

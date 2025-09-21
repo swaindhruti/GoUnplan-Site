@@ -1,7 +1,7 @@
 "use client";
 import {
   CldUploadWidget,
-  CloudinaryUploadWidgetResults,
+  CloudinaryUploadWidgetResults
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
   getValidationSchema,
-  CreateDestinationSchema,
+  CreateDestinationSchema
 } from "@/config/form/formSchemaData/CreateDestinationSchema";
 import { z } from "zod";
 
@@ -38,7 +38,7 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight,
+  ChevronRight
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
@@ -54,7 +54,7 @@ const ReactSelect = dynamic(() => import("react-select"), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
-  ),
+  )
 });
 
 type SelectOption = {
@@ -69,9 +69,8 @@ const getSelectOptions = (options?: string[]) => {
 export const CreateDestinationForm = ({
   FormData,
   initialData,
-  isEditMode = false,
+  isEditMode = false
 }: FormComponentProps) => {
-  // Use full schema by default, but we'll validate dynamically
   const router = useRouter();
   const { uploadedFile, UploadButton } = useCloudinaryUpload();
   const { data: session } = useSession();
@@ -83,7 +82,6 @@ export const CreateDestinationForm = ({
     return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
   };
 
-  // Initialize form with proper defaultValues
   const defaultValues = initialData
     ? {
         tripName: initialData.title || "",
@@ -97,6 +95,7 @@ export const CreateDestinationForm = ({
         description: initialData.description || "",
         activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
+
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
         languages: initialData.languages || [],
@@ -115,9 +114,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: "",
-                },
-              ],
+                  dayWiseImage: ""
+                }
+              ]
       }
     : {
         ...FormData.reduce(
@@ -130,7 +129,7 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
-                : "",
+                : ""
           }),
           {}
         ),
@@ -142,28 +141,27 @@ export const CreateDestinationForm = ({
             activities: [],
             meals: "",
             accommodation: "",
-            dayWiseImage: "",
-          },
+            dayWiseImage: ""
+          }
         ],
         // Add tripImage field
-        tripImage: "",
+        tripImage: ""
       };
 
   const form = useForm({
-    resolver: undefined, // We'll handle validation manually
+    resolver: undefined,
     defaultValues,
-    mode: "onChange", // Enable real-time validation feedback
+    mode: "onChange"
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData",
+    name: "dayWiseData"
   });
 
   const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
     {}
   );
 
-  // Step management state
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customActivityInput, setCustomActivityInput] = useState<{
@@ -182,7 +180,6 @@ export const CreateDestinationForm = ({
     if (initialData) {
       console.log("Resetting form with initialData:", initialData);
 
-      // Reset all form values
       const formData = {
         tripName: initialData.title || "",
         destination: initialData.destination || "",
@@ -195,6 +192,7 @@ export const CreateDestinationForm = ({
         description: initialData.description || "",
         activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
+        noofdays: initialData.noOfDays || 1,
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
         languages: initialData.languages || [],
@@ -222,7 +220,7 @@ export const CreateDestinationForm = ({
                     : [],
                   meals: day.meals || "",
                   accommodation: day.accommodation || "",
-                  dayWiseImage: day.dayWiseImage || "",
+                  dayWiseImage: day.dayWiseImage || ""
                 })
               )
             : [
@@ -233,9 +231,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: "",
-                },
-              ],
+                  dayWiseImage: ""
+                }
+              ]
       };
 
       console.log("Form data to reset:", formData);
@@ -291,6 +289,7 @@ export const CreateDestinationForm = ({
       "endDate",
       "filters",
       "tripImage",
+      "noofdays"
     ];
     const step2Fields = [
       "destination",
@@ -298,7 +297,7 @@ export const CreateDestinationForm = ({
       "state",
       "city",
       "price",
-      "maxLimit",
+      "maxLimit"
     ];
     // Step 3: everything else (description, languages, includedActivities, restrictions, etc.)
 
@@ -323,7 +322,7 @@ export const CreateDestinationForm = ({
       activities: [],
       meals: "",
       accommodation: "",
-      dayWiseImage: "",
+      dayWiseImage: ""
     });
   };
 
@@ -369,7 +368,7 @@ export const CreateDestinationForm = ({
   const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
     setDayWiseImages((prev) => ({
       ...prev,
-      [dayIndex]: imageUrl,
+      [dayIndex]: imageUrl
     }));
     form.setValue(`dayWiseData.${dayIndex}.dayWiseImage`, imageUrl);
   };
@@ -446,7 +445,7 @@ export const CreateDestinationForm = ({
       console.log("Raw form data:", {
         tripName: data.tripName,
         status: isDraft ? "DRAFT" : "ACTIVE",
-        dayWiseDataLength: data.dayWiseData?.length || 0,
+        dayWiseDataLength: data.dayWiseData?.length || 0
       });
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
@@ -462,7 +461,7 @@ export const CreateDestinationForm = ({
               day: idx + 1,
               title: day.title || `Day ${idx + 1}`,
               hasActivities:
-                Array.isArray(day.activities) && day.activities.length > 0,
+                Array.isArray(day.activities) && day.activities.length > 0
             })
           )
         );
@@ -557,7 +556,7 @@ export const CreateDestinationForm = ({
             activities: Array.isArray(day.activities) ? day.activities : [],
             meals: day.meals || "",
             accommodation: day.accommodation || "",
-            dayWiseImage: day.dayWiseImage || "",
+            dayWiseImage: day.dayWiseImage || ""
           })
         );
       } catch (processingError) {
@@ -588,7 +587,7 @@ export const CreateDestinationForm = ({
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
-        status: statusToSend,
+        status: statusToSend
       };
 
       let result;
@@ -605,9 +604,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)",
+            fontFamily: "var(--font-instrument)"
           },
-          duration: 3000,
+          duration: 3000
         });
         console.error(
           `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
@@ -620,9 +619,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)",
+            fontFamily: "var(--font-instrument)"
           },
-          duration: 3000,
+          duration: 3000
         });
         router.push("/dashboard/host");
       }
@@ -634,9 +633,9 @@ export const CreateDestinationForm = ({
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)",
+          fontFamily: "var(--font-instrument)"
         },
-        duration: 3000,
+        duration: 3000
       });
     } finally {
       setIsSubmitting(false);
@@ -664,7 +663,7 @@ export const CreateDestinationForm = ({
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
             type: "manual",
-            message: errorMessage[0],
+            message: errorMessage[0]
           });
         }
       });
@@ -686,23 +685,22 @@ export const CreateDestinationForm = ({
         return {
           title: "Basic Trip Information",
           description:
-            "Let's start with the essentials - trip name, dates, and preferences",
+            "Let's start with the essentials - trip name, dates, and preferences"
         };
       case 2:
         return {
           title: "Location & Pricing",
-          description:
-            "Tell us where you're going and set your pricing details",
+          description: "Tell us where you're going and set your pricing details"
         };
       case 3:
         return {
           title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out",
+          description: "Add the finishing touches to make your trip stand out"
         };
       default:
         return {
           title: "Create Trip",
-          description: "Fill in your trip details",
+          description: "Fill in your trip details"
         };
     }
   };
@@ -938,7 +936,7 @@ export const CreateDestinationForm = ({
                                     value={(field.value as string[])?.map(
                                       (val) => ({
                                         value: val,
-                                        label: val,
+                                        label: val
                                       })
                                     )}
                                     onChange={(newValue) => {
@@ -957,31 +955,31 @@ export const CreateDestinationForm = ({
                                         borderRadius: "0.375rem",
                                         boxShadow: "none",
                                         "&:hover": {
-                                          borderColor: "#a855f7",
+                                          borderColor: "#a855f7"
                                         },
                                         "&:focus-within": {
                                           borderColor: "#a855f7",
                                           boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
-                                        },
+                                            "0 0 0 3px rgba(168, 85, 247, 0.1)"
+                                        }
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
                                         backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem",
+                                        borderRadius: "0.25rem"
                                       }),
                                       multiValueLabel: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
-                                        fontWeight: "500",
+                                        fontWeight: "500"
                                       }),
                                       multiValueRemove: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
                                         "&:hover": {
                                           backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9",
-                                        },
+                                          color: "#6d28d9"
+                                        }
                                       }),
                                       option: (base, state) => ({
                                         ...base,
@@ -992,12 +990,12 @@ export const CreateDestinationForm = ({
                                           : "white",
                                         color: state.isSelected
                                           ? "white"
-                                          : "#374151",
+                                          : "#374151"
                                       }),
                                       placeholder: (base) => ({
                                         ...base,
-                                        color: "#9ca3af",
-                                      }),
+                                        color: "#9ca3af"
+                                      })
                                     }}
                                     placeholder={data.placeholder}
                                     className="font-instrument"
@@ -1070,7 +1068,7 @@ export const CreateDestinationForm = ({
                                                         [];
                                                       const newValue = [
                                                         ...currentValue,
-                                                        option,
+                                                        option
                                                       ];
                                                       field.onChange(newValue);
                                                     }}
@@ -1219,7 +1217,7 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                item,
+                                                item
                                               ]);
                                               setCustomInput("");
                                             }
@@ -1237,7 +1235,7 @@ export const CreateDestinationForm = ({
                                           ) {
                                             field.onChange([
                                               ...(field.value || []),
-                                              item,
+                                              item
                                             ]);
                                             setCustomInput("");
                                           }
@@ -1537,7 +1535,7 @@ export const CreateDestinationForm = ({
                                           onChange={(e) =>
                                             setCustomActivityInput((prev) => ({
                                               ...prev,
-                                              [index]: e.target.value,
+                                              [index]: e.target.value
                                             }))
                                           }
                                           onKeyDown={(e) => {
@@ -1555,12 +1553,12 @@ export const CreateDestinationForm = ({
                                               ) {
                                                 field.onChange([
                                                   ...(field.value || []),
-                                                  activity,
+                                                  activity
                                                 ]);
                                                 setCustomActivityInput(
                                                   (prev) => ({
                                                     ...prev,
-                                                    [index]: "",
+                                                    [index]: ""
                                                   })
                                                 );
                                               }
@@ -1583,12 +1581,12 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                activity,
+                                                activity
                                               ]);
                                               setCustomActivityInput(
                                                 (prev) => ({
                                                   ...prev,
-                                                  [index]: "",
+                                                  [index]: ""
                                                 })
                                               );
                                             }

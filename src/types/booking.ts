@@ -77,6 +77,7 @@ export interface HostProfile {
   image?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  averageRating?: number | null;
   hostEmail: string | null;
   hostMobile: string | null;
   user: User;

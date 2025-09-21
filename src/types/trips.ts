@@ -36,6 +36,8 @@ export type Trip = {
   tripImage: string;
   maxParticipants?: number;
   seatsLeft?: number;
+  startDate?: string;
+  endDate?: string;
   bookedSeats?: number;
   averageRating: number;
   reviewCount: number;
