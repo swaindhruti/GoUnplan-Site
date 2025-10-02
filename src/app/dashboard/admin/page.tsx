@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import {
   Mail,
   Phone,
   EyeIcon,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import {
   getAllUsers,
@@ -41,7 +41,7 @@ import {
   updateUserRole,
   getAlltravelPlanApplications,
   approveTravelPlan,
-  getAllBookings
+  getAllBookings,
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import { Role } from "@/types/auth";
@@ -52,7 +52,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { processRefund } from "@/actions/booking/actions";
 import { PaymentStatus } from "@prisma/client";
@@ -181,33 +181,33 @@ export default function AdminDashboard() {
       FULLY_PAID: {
         icon: CheckCircle,
         color: "bg-green-100 text-green-800 border-green-200",
-        label: "Fully Paid"
+        label: "Fully Paid",
       },
       PARTIALLY_PAID: {
         icon: CheckCircle,
         color: "bg-blue-100 text-blue-800 border-blue-200",
-        label: "Partially Paid"
+        label: "Partially Paid",
       },
       PENDING: {
         icon: Clock,
         color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        label: "Pending"
+        label: "Pending",
       },
       OVERDUE: {
         icon: AlertTriangle,
         color: "bg-red-100 text-red-800 border-red-200",
-        label: "Overdue"
+        label: "Overdue",
       },
       CANCELLED: {
         icon: XCircle,
         color: "bg-gray-100 text-gray-800 border-gray-200",
-        label: "Cancelled"
+        label: "Cancelled",
       },
       REFUNDED: {
         icon: RefreshCw,
         color: "bg-purple-100 text-purple-800 border-purple-200",
-        label: "Refunded"
-      }
+        label: "Refunded",
+      },
     };
     return statusMap[status] || statusMap.PENDING;
   };
@@ -227,16 +227,16 @@ export default function AdminDashboard() {
     CANCELLED: 0,
     REFUNDED: 0,
     PENDING: 0,
-    OVERDUE: 0
+    OVERDUE: 0,
   });
   const [revenue, setRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
   });
 
   const [totalRevenue, setTotalRevenue] = useState<RevenueData>({
     totalSales: { _sum: { totalPrice: 0 }, _count: { id: 0 } },
-    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } }
+    refundAmount: { _sum: { refundAmount: 0 }, _count: { id: 0 } },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState("users");
   const [userFilter, setUserFilter] = useState<
-    "all" | "users" | "hosts" | "admins"
+    "all" | "users" | "hosts" | "admins" | "support"
   >("all");
   const [applicationFilter, setApplicationFilter] = useState<
     "all" | "hosts" | "travelplans"
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
 
   const [dateRange, setDateRange] = useState({
     startDate: "",
-    endDate: ""
+    endDate: "",
   });
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
 
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
     hostApplicants: 0,
     totalBookings: 0,
     totalSales: 0,
-    pendingRefunds: 0
+    pendingRefunds: 0,
   });
 
   // NEW: Set default dates (last 30 days)
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
 
     setDateRange({
       startDate: thirtyDaysAgo.toISOString().split("T")[0],
-      endDate: today.toISOString().split("T")[0]
+      endDate: today.toISOString().split("T")[0],
     });
   }, []);
   const handleAnalyticsModal = () => {
@@ -311,7 +311,7 @@ export default function AdminDashboard() {
       setStatsData((prev) => ({
         ...prev,
         totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
-        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0
+        pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
       }));
     } catch (err) {
       setError("Failed to fetch revenue data");
@@ -392,7 +392,7 @@ export default function AdminDashboard() {
               CANCELLED: 0,
               REFUNDED: 0,
               PENDING: 0,
-              OVERDUE: 0
+              OVERDUE: 0,
             }
           );
         }
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
             (travelPlansResponse.travelPlans?.length || 0),
           totalBookings: bookingsResponse.counts?.ALL || 0,
           totalSales: totalRevenue.totalSales._sum.totalPrice || 0, // This will be updated by fetchRevenueData
-          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0 // This will be updated by fetchRevenueData
+          pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0, // This will be updated by fetchRevenueData
         });
       } catch (err) {
         setError("Failed to fetch admin dashboard data");
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
     fetchAdminData();
   }, [
     totalRevenue.refundAmount._sum.refundAmount,
-    totalRevenue.totalSales._sum.totalPrice
+    totalRevenue.totalSales._sum.totalPrice,
   ]);
 
   const handleApproveHost = async (email: string) => {
@@ -447,7 +447,7 @@ export default function AdminDashboard() {
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
-        totalHosts: statsData.totalHosts + 1
+        totalHosts: statsData.totalHosts + 1,
       });
     } catch (err) {
       setError("Failed to approve host application");
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
       setApplicants(applicants.filter((app) => app.email !== email));
       setStatsData({
         ...statsData,
-        hostApplicants: statsData.hostApplicants - 1
+        hostApplicants: statsData.hostApplicants - 1,
       });
     } catch (err) {
       setError("Failed to reject host application");
@@ -536,7 +536,7 @@ export default function AdminDashboard() {
         setBookingCounts((prev) => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
-          REFUNDED: prev.REFUNDED + 1
+          REFUNDED: prev.REFUNDED + 1,
         }));
       } else {
         setError(result.error || "Failed to mark booking as refunded");
@@ -554,7 +554,7 @@ export default function AdminDashboard() {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
   const formatDateRange = () => {
@@ -563,12 +563,12 @@ export default function AdminDashboard() {
     const start = new Date(dateRange.startDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     });
     const end = new Date(dateRange.endDate).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     });
 
     return `${start} - ${end}`;
@@ -583,6 +583,7 @@ export default function AdminDashboard() {
     if (userFilter === "users") return user.role === "USER";
     if (userFilter === "hosts") return user.role === "HOST";
     if (userFilter === "admins") return user.role === "ADMIN";
+    if (userFilter === "support") return user.role === "SUPPORT";
     return true;
   });
   const tabs = [
@@ -590,33 +591,39 @@ export default function AdminDashboard() {
       id: "users",
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
-      description: "User Management"
+      description: "User Management",
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management"
+      description: "Host Management",
+    },
+    {
+      id: "support",
+      label: "SUPPORT",
+      icon: <Shield className="w-5 h-5" />,
+      description: "Support Team Management",
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews"
+      description: "Pending Reviews",
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics"
+      description: "Financial Analytics",
     },
 
     {
       id: "bookings",
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
-      description: "Booking Management"
-    }
+      description: "Booking Management",
+    },
   ];
 
   if (loading) {
@@ -979,6 +986,17 @@ export default function AdminDashboard() {
                     >
                       Admins ({users.filter((u) => u.role === "ADMIN").length})
                     </button>
+                    <button
+                      onClick={() => setUserFilter("support")}
+                      className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                        userFilter === "support"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Support (
+                      {users.filter((u) => u.role === "SUPPORT").length})
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1033,6 +1051,8 @@ export default function AdminDashboard() {
                                   ? "bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
                                   : user.role === "HOST"
                                   ? "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
+                                  : user.role === "SUPPORT"
+                                  ? "bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
                                   : "bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
                               }
                             >
@@ -1057,6 +1077,19 @@ export default function AdminDashboard() {
                                     {user.role === "USER"
                                       ? "Make Host"
                                       : "Make User"}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-blue-600 text-white hover:bg-blue-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
+                                    onClick={() =>
+                                      handleUpdateRole(
+                                        user.email || "",
+                                        "SUPPORT"
+                                      )
+                                    }
+                                  >
+                                    Make Support
                                   </Button>
                                   <Button
                                     variant="outline"
@@ -1256,6 +1289,122 @@ export default function AdminDashboard() {
                   )}
                 </DialogContent>
               </Dialog>
+            </div>
+          )}
+
+          {activeTab === "support" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">
+                    Support Team Management
+                  </h2>
+                  <p className="text-gray-600">
+                    View and manage current support team members
+                  </p>
+                </div>
+                <Button
+                  onClick={() => (window.location.href = "/dashboard/support")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Open Support Dashboard
+                </Button>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="px-6 py-4 border-b">
+                  <h3 className="text-lg font-semibold">Support Staff</h3>
+                  <p className="text-sm text-gray-600">
+                    Users assigned with Support role (
+                    {users.filter((u) => u.role === "SUPPORT").length} total)
+                  </p>
+                </div>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Join Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.filter((user) => user.role === "SUPPORT").length >
+                      0 ? (
+                        users
+                          .filter((user) => user.role === "SUPPORT")
+                          .map((staff) => (
+                            <TableRow key={staff.id}>
+                              <TableCell className="font-medium">
+                                {staff.name || "No Name"}
+                              </TableCell>
+                              <TableCell>{staff.email || "No Email"}</TableCell>
+                              <TableCell>{staff.phone || "N/A"}</TableCell>
+                              <TableCell>
+                                {staff.createdAt
+                                  ? new Date(
+                                      staff.createdAt
+                                    ).toLocaleDateString()
+                                  : "N/A"}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant="outline"
+                                  className="bg-green-50 text-green-700 border-green-200"
+                                >
+                                  Active
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex space-x-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      (window.location.href =
+                                        "/dashboard/support")
+                                    }
+                                  >
+                                    View Dashboard
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 hover:text-red-700"
+                                    onClick={() =>
+                                      staff.email &&
+                                      handleUpdateRole(staff.email, "USER")
+                                    }
+                                    disabled={!staff.email}
+                                  >
+                                    Remove Support Role
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 font-medium">
+                              No support staff assigned
+                            </p>
+                            <p className="text-gray-500 text-sm">
+                              Use the Users tab to assign Support roles to team
+                              members
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1761,7 +1910,7 @@ export default function AdminDashboard() {
                       "CANCELLED",
                       "REFUNDED",
                       "PENDING",
-                      "OVERDUE"
+                      "OVERDUE",
                     ].map((status) => (
                       <button
                         key={status}

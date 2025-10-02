@@ -15,9 +15,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
-      }
+          response_type: "code",
+        },
+      },
     }),
     // Email/Password Credentials
     Credentials({
@@ -27,13 +27,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: {
           type: "email",
           label: "Email",
-          placeholder: "johndoe@gmail.com"
+          placeholder: "johndoe@gmail.com",
         },
         password: {
           type: "password",
           label: "Password",
-          placeholder: "********"
-        }
+          placeholder: "********",
+        },
       },
       async authorize(credentials) {
         try {
@@ -42,7 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!email || !password) return null;
 
           const user = await prisma.user.findUnique({
-            where: { email: email as string }
+            where: { email: email as string },
           });
 
           if (!user || !user.password) return null;
@@ -57,7 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Error in credentials authorize:", error);
           return null;
         }
-      }
+      },
     }),
     Credentials({
       id: "phone",
@@ -66,13 +66,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         phone: {
           type: "text",
           label: "Phone",
-          placeholder: "+1234567890"
+          placeholder: "+1234567890",
         },
         otp: {
           type: "text",
           label: "OTP",
-          placeholder: "123456"
-        }
+          placeholder: "123456",
+        },
       },
       async authorize(credentials) {
         try {
@@ -84,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!otpResult.success) return null;
 
           let user = await prisma.user.findUnique({
-            where: { phone: phone as string }
+            where: { phone: phone as string },
           });
 
           if (!user) {
@@ -93,8 +93,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 phone: phone as string,
                 name: "",
                 password: null,
-                role: "USER" as Role
-              }
+                role: "USER" as Role,
+              },
             });
           }
 
@@ -103,11 +103,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Error in phone authorize:", error);
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -119,7 +119,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (account?.provider === "google") {
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! }
+            where: { email: user.email! },
           });
           if (existingUser) {
             token.role = existingUser.role;
@@ -129,6 +129,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         } else {
           token.role = user.role;
+        }
+      } else {
+        // Always fetch the latest role from database for existing sessions
+        if (token.email) {
+          const currentUser = await prisma.user.findUnique({
+            where: { email: token.email as string },
+            select: { role: true },
+          });
+          if (currentUser) {
+            token.role = currentUser.role;
+          }
         }
       }
       return token;
@@ -147,7 +158,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === "google") {
         try {
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! }
+            where: { email: user.email! },
           });
           if (!existingUser) {
             const newUser = await prisma.user.create({
@@ -156,8 +167,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 name: user.name || "",
                 image: user.image,
                 password: null,
-                role: "USER" as Role
-              }
+                role: "USER" as Role,
+              },
             });
             user.id = newUser.id;
           } else {
@@ -170,14 +181,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       }
       return true;
-    }
+    },
   },
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
-    error: "/auth/error"
+    error: "/auth/error",
   },
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development"
+  debug: process.env.NODE_ENV === "development",
 });

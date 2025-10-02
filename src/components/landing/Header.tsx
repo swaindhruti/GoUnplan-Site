@@ -8,7 +8,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -17,7 +17,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuShortcut,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Menu,
@@ -34,7 +34,7 @@ import {
   UserCog,
   MapPin,
   HelpCircle,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -58,6 +58,7 @@ export default function Header() {
   const [isMobileDashboardOpen, setIsMobileDashboardOpen] = useState(false);
   const [isHostMode, setIsHostMode] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isSupportMode, setIsSupportMode] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -68,7 +69,7 @@ export default function Header() {
     { name: "Home", href: "/", section: "#home" },
     { name: "Vibes", href: "/vibes", section: "#vibes" },
     { name: "About", href: "/about", section: "#about" },
-    { name: "Contact", href: "/contact", section: "#contact" }
+    { name: "Contact", href: "/contact", section: "#contact" },
   ];
 
   useEffect(() => {
@@ -135,18 +136,26 @@ export default function Header() {
     const items: { label: string; href: string; icon: React.ComponentType }[] =
       [];
 
-    if (userRole === "HOST" || userRole === "ADMIN") {
+    if (userRole === "HOST" || userRole === "ADMIN" || userRole === "SUPPORT") {
       items.push({
         label: "User Dashboard",
         href: "/dashboard/user",
-        icon: User
+        icon: User,
       });
     }
     if (userRole === "HOST") {
       items.push({
         label: "Host Dashboard",
         href: "/dashboard/host",
-        icon: Crown
+        icon: Crown,
+      });
+    }
+
+    if (userRole === "SUPPORT" || userRole === "ADMIN") {
+      items.push({
+        label: "Support Dashboard",
+        href: "/dashboard/support",
+        icon: HelpCircle,
       });
     }
 
@@ -154,7 +163,7 @@ export default function Header() {
       items.push({
         label: "Admin Dashboard",
         href: "/dashboard/admin",
-        icon: Shield
+        icon: Shield,
       });
     }
 
@@ -175,7 +184,7 @@ export default function Header() {
     breadcrumbs.push({
       label: "Home",
       href: "/",
-      isActive: pathname === "/"
+      isActive: pathname === "/",
     });
 
     let currentPath = "";
@@ -218,7 +227,7 @@ export default function Header() {
         breadcrumbs.push({
           label,
           href: currentPath,
-          isActive: isLast
+          isActive: isLast,
         });
       }
     });
@@ -241,7 +250,8 @@ export default function Header() {
   const isHomePage = pathname === "/";
   const isDashboardPage =
     pathname.startsWith("/dashboard/host") ||
-    pathname.startsWith("/dashboard/admin");
+    pathname.startsWith("/dashboard/admin") ||
+    pathname.startsWith("/dashboard/support");
 
   const headerClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
@@ -252,6 +262,7 @@ export default function Header() {
   console.log(isRegularUser);
   const isUserHost = session?.user?.role === "HOST";
   const isUserAdmin = session?.user?.role === "ADMIN";
+  const isUserSupport = session?.user?.role === "SUPPORT";
 
   const handleHostModeToggle = (checked: boolean) => {
     setIsHostMode(checked);
@@ -273,9 +284,20 @@ export default function Header() {
     setIsDashboardMenuOpen(false);
   };
 
+  const handleSupportModeToggle = (checked: boolean) => {
+    setIsSupportMode(checked);
+    if (checked) {
+      router.push("/dashboard/support");
+    } else {
+      router.push("/");
+    }
+    setIsDashboardMenuOpen(false);
+  };
+
   useEffect(() => {
     setIsHostMode(pathname.startsWith("/dashboard/host"));
     setIsAdminMode(pathname.startsWith("/dashboard/admin"));
+    setIsSupportMode(pathname.startsWith("/dashboard/support"));
   }, [pathname, status]);
 
   useEffect(() => {
@@ -401,11 +423,11 @@ export default function Header() {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => router.push("/help")}
+            onClick={() => router.push("/support")}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <HelpCircle className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-            <span className="font-medium text-gray-900">Help and FAQ</span>
+            <span className="font-medium text-gray-900"> Help and FAQ</span>
             <DropdownMenuShortcut className="text-gray-400">
               ⌘H
             </DropdownMenuShortcut>
@@ -546,6 +568,20 @@ export default function Header() {
                       />
                     </div>
                   )}
+
+                  {isUserSupport && (
+                    <div className="flex items-center gap-2 bg-blue-50 rounded-full px-4 py-2 border border-blue-200">
+                      <HelpCircle className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-gray-700 text-sm font-instrument">
+                        Support Mode
+                      </span>
+                      <Switch
+                        checked={isSupportMode}
+                        onCheckedChange={handleSupportModeToggle}
+                        className="data-[state=checked]:bg-blue-600"
+                      />
+                    </div>
+                  )}
                   {!isDashboardPage && <StandardDropdownMenu />}
                 </div>
               ) : (
@@ -643,6 +679,20 @@ export default function Header() {
                   </div>
                 )}
 
+                {isUserSupport && (
+                  <div className="flex items-center gap-2 bg-blue-50 rounded-full px-4 py-2 border border-blue-200">
+                    <HelpCircle className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-gray-700 text-sm font-instrument">
+                      Support Mode
+                    </span>
+                    <Switch
+                      checked={isSupportMode}
+                      onCheckedChange={handleSupportModeToggle}
+                      className="data-[state=checked]:bg-blue-600"
+                    />
+                  </div>
+                )}
+
                 <StandardDropdownMenu />
               </div>
             )}
@@ -675,7 +725,7 @@ export default function Header() {
                           animationDelay: `${index * 100}ms`,
                           animation: isOpen
                             ? "slideInRight 0.6s ease-out forwards"
-                            : "none"
+                            : "none",
                         }}
                       >
                         <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
@@ -754,7 +804,7 @@ export default function Header() {
                                       animationDelay: `${(index + 1) * 100}ms`,
                                       animation: isMobileDashboardOpen
                                         ? "slideInRight 0.4s ease-out forwards"
-                                        : "none"
+                                        : "none",
                                     }}
                                   >
                                     <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
@@ -791,14 +841,14 @@ export default function Header() {
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/help");
+                            router.push("/support");
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
                           <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                             <div className="flex items-center">
                               <HelpCircle className="mr-3 h-5 w-5 text-purple-600" />
-                              Help and FAQ
+                              Support Center
                             </div>
                             <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                           </span>
