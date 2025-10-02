@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { requireAdmin, requireSupport, requireAuth } from "@/lib/roleGaurd";
+import { requireSupport, requireAuth } from "@/lib/roleGaurd";
 import {
   CreateTicketData,
   UpdateTicketData,
@@ -9,7 +9,7 @@ import {
 } from "@/types/support";
 
 export const getAllSupportStaff = async () => {
-  const session = await requireAdmin();
+  const session = await requireSupport();
   if (!session) return { error: "Unauthorized" };
 
   try {
