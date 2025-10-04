@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { KeyboardEvent, ClipboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
@@ -48,9 +49,43 @@ export default function PhoneAuthPage() {
     }
   }, [countdown]);
 
-  // Format phone number
   const formatPhoneNumber = (value: string) => {
-    return value.replace(/[^\d]/g, ""); // keep only digits
+    return value.replace(/[^\d]/g, ""); 
+  };
+
+  const handlePhoneKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = [
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Home",
+      "End",
+      "Tab",
+      "Enter"
+    ];
+
+    if (e.ctrlKey || e.metaKey) return;
+
+    if (allowedKeys.includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  // Clean pasted input to digits only
+  const handlePhonePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const paste = e.clipboardData?.getData("text") ?? "";
+    const cleaned = paste.replace(/[^\d]/g, "");
+    if (!cleaned) return;
+    setPhoneNumber((prev) => {
+      // append cleaned digits to existing value
+      return `${prev}${cleaned}`;
+    });
   };
 
   // Send OTP
@@ -385,13 +420,17 @@ export default function PhoneAuthPage() {
                     </select>
                     <Input
                       type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={phoneNumber}
                       onChange={(e) =>
                         setPhoneNumber(formatPhoneNumber(e.target.value))
                       }
                       placeholder="Enter phone number"
                       className="flex-1 h-12"
-                      onKeyPress={(e) => {
+                      onKeyDown={handlePhoneKeyDown}
+                      onPaste={handlePhonePaste}
+                      onKeyPress={(e: any) => {
                         if (e.key === "Enter" && phoneNumber) {
                           handleSendOtp();
                         }
@@ -415,7 +454,6 @@ export default function PhoneAuthPage() {
               </>
             ) : (
               <>
-                {/* OTP Input */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
                     Verification Code
@@ -424,7 +462,9 @@ export default function PhoneAuthPage() {
                     <InputOTP
                       maxLength={6}
                       value={otp}
-                      onChange={(value) => setOtp(value)}
+                      onChange={(value) =>
+                        setOtp(value.replace(/\D/g, "").slice(0, 6))
+                      }
                     >
                       <InputOTPGroup className="flex gap-3">
                         {[...Array(6)].map((_, i) => (
