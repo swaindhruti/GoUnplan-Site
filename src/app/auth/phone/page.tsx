@@ -12,12 +12,12 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSlot
+  InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Phone, Shield } from "lucide-react";
@@ -29,7 +29,7 @@ const COUNTRY_CODES = [
   { code: "+1", label: "🇺🇸 US" },
   { code: "+91", label: "🇮🇳 India" },
   { code: "+44", label: "🇬🇧 UK" },
-  { code: "+61", label: "🇦🇺 Australia" }
+  { code: "+61", label: "🇦🇺 Australia" },
 ];
 
 export default function PhoneAuthPage() {
@@ -50,7 +50,7 @@ export default function PhoneAuthPage() {
   }, [countdown]);
 
   const formatPhoneNumber = (value: string) => {
-    return value.replace(/[^\d]/g, ""); 
+    return value.replace(/[^\d]/g, "");
   };
 
   const handlePhoneKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -64,7 +64,7 @@ export default function PhoneAuthPage() {
       "Home",
       "End",
       "Tab",
-      "Enter"
+      "Enter",
     ];
 
     if (e.ctrlKey || e.metaKey) return;
@@ -99,9 +99,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -116,9 +116,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -132,9 +132,9 @@ export default function PhoneAuthPage() {
         backdropFilter: "blur(12px)",
         border: "1px solid rgba(196, 181, 253, 0.3)",
         color: "white",
-        fontFamily: "var(--font-instrument)"
+        fontFamily: "var(--font-instrument)",
       },
-      duration: 2000
+      duration: 2000,
     });
 
     try {
@@ -149,9 +149,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
       } else {
         const errorMessage = result.error || "Failed to send OTP";
@@ -162,9 +162,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -176,9 +176,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error sending OTP:", error);
     } finally {
@@ -196,9 +196,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -212,9 +212,9 @@ export default function PhoneAuthPage() {
         backdropFilter: "blur(12px)",
         border: "1px solid rgba(196, 181, 253, 0.3)",
         color: "white",
-        fontFamily: "var(--font-instrument)"
+        fontFamily: "var(--font-instrument)",
       },
-      duration: 2000
+      duration: 2000,
     });
 
     try {
@@ -224,7 +224,7 @@ export default function PhoneAuthPage() {
       const authResult = await signIn("phone", {
         phone,
         otp,
-        redirect: false
+        redirect: false,
       });
 
       if (authResult?.ok) {
@@ -234,9 +234,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         router.push("/");
         router.refresh();
@@ -249,9 +249,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -263,9 +263,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error verifying OTP:", error);
     } finally {
@@ -285,9 +285,9 @@ export default function PhoneAuthPage() {
         backdropFilter: "blur(12px)",
         border: "1px solid rgba(196, 181, 253, 0.3)",
         color: "white",
-        fontFamily: "var(--font-instrument)"
+        fontFamily: "var(--font-instrument)",
       },
-      duration: 2000
+      duration: 2000,
     });
 
     try {
@@ -302,9 +302,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
       } else {
         const errorMessage = result.error || "Failed to resend OTP";
@@ -315,9 +315,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -329,9 +329,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error resending OTP:", error);
     } finally {
@@ -349,9 +349,9 @@ export default function PhoneAuthPage() {
         backdropFilter: "blur(12px)",
         border: "1px solid rgba(196, 181, 253, 0.3)",
         color: "white",
-        fontFamily: "var(--font-instrument)"
+        fontFamily: "var(--font-instrument)",
       },
-      duration: 2000
+      duration: 2000,
     });
   };
 
@@ -430,7 +430,7 @@ export default function PhoneAuthPage() {
                       className="flex-1 h-12"
                       onKeyDown={handlePhoneKeyDown}
                       onPaste={handlePhonePaste}
-                      onKeyPress={(e: any) => {
+                      onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === "Enter" && phoneNumber) {
                           handleSendOtp();
                         }
