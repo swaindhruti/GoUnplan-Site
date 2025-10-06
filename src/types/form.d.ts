@@ -2,8 +2,7 @@ type FieldId =
   | "tripName"
   | "destination"
   | "country"
-  | "state"
-  | "city"
+  | "stops"
   | "price"
   | "filters"
   | "startDate"
@@ -21,6 +20,8 @@ type FieldId =
 type ZodType = "string" | "number" | "enum" | "date" | "enum[]";
 
 type DayWiseFieldId = "title" | "description" | "meals" | "accommodation";
+
+type DayWiseFieldId = "title" | "description" | "meals" | "accommodation" | "destination";
 
 type InputType =
   | "text"
