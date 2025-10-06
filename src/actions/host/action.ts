@@ -132,7 +132,7 @@ export const createTravelPlan = async (data: {
     dayWiseImage: string;
   }>;
 }) => {
-  console.log(data);
+  console.log(",,",data);
   const session = await requireHost();
   if (!session)
     return { error: "Unauthorized", message: "Please login to continue" };

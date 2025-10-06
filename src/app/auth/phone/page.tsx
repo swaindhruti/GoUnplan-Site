@@ -430,7 +430,7 @@ export default function PhoneAuthPage() {
                       className="flex-1 h-12"
                       onKeyDown={handlePhoneKeyDown}
                       onPaste={handlePhonePaste}
-                      onKeyPress={(e: any) => {
+                      onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === "Enter" && phoneNumber) {
                           handleSendOtp();
                         }

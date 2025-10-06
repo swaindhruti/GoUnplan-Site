@@ -26,20 +26,13 @@ export const CreateDestinationFormData: FormFields[] = [
     zod: "string"
   },
   {
-    label: "state",
-    type: "text",
-    id: "state",
-    placeholder: "odisha",
+    label: "Stops",
+    type: "custom-input-list",
+    id: "stops",
+    placeholder: "Add stops or waypoints (type to create)",
+    options: [],
     className: "col-span-1",
-    zod: "string"
-  },
-  {
-    label: "city",
-    type: "text",
-    id: "city",
-    placeholder: "sambalpur",
-    className: "col-span-1",
-    zod: "string"
+    zod: "enum[]"
   },
   {
     label: "Price Per Person (INR)",
