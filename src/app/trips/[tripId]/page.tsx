@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Map,
   ArrowRightCircle,
-  Dot
+  Dot,
 } from "lucide-react";
 import { ChatButton } from "@/components/chat/ChatButton";
 import { requireUser } from "@/lib/roleGaurd";
@@ -17,6 +17,8 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { v4 as uuidv4 } from "uuid";
 import TripItinerary from "@/components/trips/Itenary";
+import React from "react";
+import { MapWrapper } from "@/components/trips/MapWrapper";
 
 type Props = {
   params: Promise<{
@@ -44,6 +46,8 @@ export default async function TripDetailsPage({ params }: Props) {
       })
       .toUpperCase();
   };
+
+
 
   const highlights = (() => {
     const result: string[][] = [];
@@ -134,6 +138,7 @@ export default async function TripDetailsPage({ params }: Props) {
     languages: trip.languages.join(", ")
   };
 
+
   const sections = [
     {
       title: "What's Special",
@@ -212,7 +217,6 @@ export default async function TripDetailsPage({ params }: Props) {
               </div>
             </div>
 
-            {/* Trip Stats - Responsive Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm sm:text-base text-gray-700">
               <div className="flex items-center gap-2">
                 <span>⏳</span>
@@ -238,7 +242,6 @@ export default async function TripDetailsPage({ params }: Props) {
               </div>
             </div>
 
-            {/* What's Included/Not Included Sections */}
             <div className="space-y-6">
               {sections.map((section, sectionIdx) => (
                 <div
@@ -272,10 +275,10 @@ export default async function TripDetailsPage({ params }: Props) {
                 {trip.description}
               </p>
             </div>
-            {/* 
-            <TripMap locations={mapItinerary} /> */}
-
-            {/* Itinerary */}
+             
+           
+            <MapWrapper stops={trip.stops} startDate={trip.startDate!}/>
+            
             <TripItinerary
               itinerary={trip.dayWiseItinerary.map((day) => ({
                 ...day,

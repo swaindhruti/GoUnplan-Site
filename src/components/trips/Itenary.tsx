@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { MapPin, Calendar, Car, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
@@ -28,7 +27,6 @@ export default function TripItinerary({
     {}
   );
 
-  // Calculate consecutive dates based on Day 1's start date
   const calculateDate = (dayNumber: number, baseStartDate?: Date | null) => {
     if (!baseStartDate) return null;
 
@@ -37,7 +35,6 @@ export default function TripItinerary({
     return date;
   };
 
-  // Format date for display
   const formatDate = (date: Date | null) => {
     if (!date) return null;
 
@@ -56,7 +53,6 @@ export default function TripItinerary({
     };
   };
 
-  // Get the base start date from Day 1
   const baseStartDate = itinerary.find(
     (item) => item.dayNumber === 1
   )?.startDate;
@@ -80,34 +76,8 @@ export default function TripItinerary({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-12">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-                Trip Itinerary
-              </h1>
-              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
-                Your curated travel schedule at a glance
-              </p>
-              {baseStartDate && (
-                <p className="text-purple-600 font-medium text-sm mt-1">
-                  Starts {formatDate(new Date(baseStartDate))?.fullDate}
-                </p>
-              )}
-            </div>
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              <MapPin className="w-4 h-4 mr-2" />
-              View Map
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Timeline */}
+   
       <div className="relative mt-6 sm:mt-10">
-        {/* Timeline line */}
         <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-red-500 to-blue-500"></div>
 
         {itinerary.map((item, index) => {
