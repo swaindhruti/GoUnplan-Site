@@ -107,6 +107,7 @@ export const createTravelPlan = async (data: {
   destination: string;
   description: string;
   includedActivities: string[];
+  stops?: string[];
   restrictions: string[];
   special: string[] | "";
   activities: string[] | "";
@@ -128,8 +129,9 @@ export const createTravelPlan = async (data: {
     description: string;
     activities: string[];
     meals: string;
+    destination?: string;
     accommodation: string;
-    dayWiseImage: string;
+    dayWiseImage?: string;
   }>;
 }) => {
   console.log(",,",data);
@@ -207,7 +209,8 @@ export const createTravelPlan = async (data: {
         title: data.title || "Untitled Trip",
         description: data.description || "",
         includedActivities: data.includedActivities || [],
-        notIncludedActivities: [], // Required field that was missing
+        stops: data.stops || [],
+        notIncludedActivities: [], 
         destination: data.destination || "",
         startDate: data.startDate,
         endDate: data.endDate,
@@ -234,7 +237,7 @@ export const createTravelPlan = async (data: {
       travelPlan.status
     );
 
-    if (data.dayWiseData && data.dayWiseData.length > 0) {
+  if (data.dayWiseData && data.dayWiseData.length > 0) {
       console.log(`Processing ${data.dayWiseData.length} day entries...`);
 
       try {
@@ -257,12 +260,13 @@ export const createTravelPlan = async (data: {
               accommodation: dayData.accommodation || "",
               dayWiseImage:
                 dayData.dayWiseImage || "https://avatar.iran.liara.run/public",
+              destination: dayData.destination || "",
             },
           });
 
           console.log(
             `Day ${dayData.dayNumber} created successfully:`,
-            createdDay.id
+            createdDay.destination
           );
         }
 
@@ -279,10 +283,10 @@ export const createTravelPlan = async (data: {
     } else {
       console.log("No day-wise data provided");
     }
-
+    console.log("Final created travel plan:", travelPlan.stops);  
     return {
       success: true,
-      travelPlan: travelPlan,
+      travelPlan: { ...travelPlan, stops: travelPlan.stops || [] },
       message:
         data.status === "DRAFT"
           ? "Trip saved as draft successfully! You can continue editing it later."
@@ -342,7 +346,6 @@ export const getAllTrips = async () => {
       },
     });
 
-    // Transform the data to match our Trip type
     const transformedTrips = trips.map((trip) => ({
       ...trip,
       dayWiseData:
@@ -354,6 +357,7 @@ export const getAllTrips = async () => {
           meals: day.meals,
           accommodation: day.accommodation,
           dayWiseImage: day.dayWiseImage,
+          destination: day.destination || "",
         })) || [],
     }));
 
@@ -371,6 +375,7 @@ export const updateTravelPlan = async (
     description?: string;
     includedActivities?: string[];
     restrictions?: string[];
+    stops?: string[];
     special?: string[] | "";
     noOfDays?: number;
     price?: number;
@@ -393,6 +398,7 @@ export const updateTravelPlan = async (
       description: string;
       activities: string[];
       meals: string;
+      destination?: string;
       accommodation: string;
       dayWiseImage: string;
     }>;
@@ -418,10 +424,8 @@ export const updateTravelPlan = async (
       return { error: "Travel plan not found or unauthorized access" };
     }
 
-    // Extract dayWiseData from the data object
     const { dayWiseData, ...travelPlanData } = data;
 
-    // Prepare the update data with proper handling of all fields
     const updateData: Prisma.TravelPlansUpdateInput = {};
 
     if (travelPlanData.title !== undefined)
@@ -444,6 +448,8 @@ export const updateTravelPlan = async (
       updateData.maxParticipants = Number(travelPlanData.maxParticipants);
     if (travelPlanData.country !== undefined)
       updateData.country = travelPlanData.country;
+    if (travelPlanData.stops !== undefined)
+       updateData.stops = travelPlanData.stops;
     if (travelPlanData.state !== undefined)
       updateData.state = travelPlanData.state;
     if (travelPlanData.city !== undefined)
@@ -472,9 +478,7 @@ export const updateTravelPlan = async (
       data: updateData,
     });
 
-    // Handle day-wise data update if provided
     if (dayWiseData && dayWiseData.length > 0) {
-      // Delete existing day-wise data
       await prisma.dayWiseItinerary.deleteMany({
         where: { travelPlanId: id },
       });
@@ -489,8 +493,8 @@ export const updateTravelPlan = async (
           activities: Array.isArray(day.activities) ? day.activities : [],
           meals: day.meals || "",
           accommodation: day.accommodation || "",
-          dayWiseImage:
-            day.dayWiseImage || "https://avatar.iran.liara.run/public",
+          dayWiseImage: day.dayWiseImage || "https://avatar.iran.liara.run/public",
+          destination: day.destination || "",
         })),
       });
     }
@@ -720,7 +724,7 @@ export const getTripById = async (tripId: string) => {
     // Transform the data to match the form structure
     const transformedTrip = {
       ...trip,
-      dayWiseData: trip.dayWiseItinerary.map((day) => ({
+        dayWiseData: trip.dayWiseItinerary.map((day) => ({
         dayNumber: day.dayNumber,
         title: day.title,
         description: day.description,
@@ -728,6 +732,7 @@ export const getTripById = async (tripId: string) => {
         meals: day.meals || "",
         accommodation: day.accommodation || "",
         dayWiseImage: day.dayWiseImage || "",
+        destination: day.destination || "",
       })),
     };
 
@@ -1162,3 +1167,57 @@ export const getRevenueAnalytics = async () => {
     return { error: "Failed to calculate revenue analytics" };
   }
 };
+
+
+type LocationIQResult = { display_name?: string };
+
+export async function searchPlaces(query: string) {
+  try {
+    const decodedQuery = decodeURIComponent(query);
+    
+    if (!decodedQuery) {
+      return { results: [], error: null };
+    }
+
+    console.log("Query:", query);
+    console.log("hiiii");
+
+    const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
+    
+    if (!token) {
+      return {
+        results: [],
+        error: "LOCATIONIQ_ACCESS_TOKEN environment variable not set",
+      };
+    }
+
+    const apiUrl = `https://api.locationiq.com/v1/autocomplete?q=${encodeURIComponent(
+      query
+    )}&key=${token}&limit=6&tag=place:*,boundary:administrative&format=json`;
+
+    const res = await fetch(apiUrl);
+
+    if (!res.ok) {
+      console.error("LocationIQ error:", res.status);
+      return {
+        results: [],
+        error: `LocationIQ API returned status ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+
+    // Extract place names
+    const places = (Array.isArray(data) ? data : [])
+      .map((place: LocationIQResult) => place.display_name)
+      .filter(Boolean) as string[];
+
+    return { results: places, error: null };
+  } catch (err) {
+    console.error("LocationIQ API error:", err);
+    return {
+      results: [],
+      error: err instanceof Error ? err.message : "Unknown error occurred",
+    };
+  }
+}

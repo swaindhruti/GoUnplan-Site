@@ -61,6 +61,7 @@ model DayWiseItinerary {
   dayNumber     Int
   title         String
   description   String
+  destination   String      @default("")
   activities    String[]    @default([])
   meals         String?
   accommodation String?
@@ -94,6 +95,7 @@ model TravelPlans {
   destination           String?
   filters               String[]           @default([])
   languages             String[]           @default([])
+  stops                 String[]           @default([])
   endDate               DateTime?
   startDate             DateTime?
   averageRating         Float              @default(0)

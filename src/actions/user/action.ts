@@ -525,9 +525,9 @@ export const getAllActiveTrips = async () => {
 
     const activeTrips = await prisma.travelPlans.findMany({
       where: {
-        status: "ACTIVE",
-        startDate:minimumStartDate
-      },
+        status: "ACTIVE"},
+        // startDate:minimumStartDate
+       
       select: {
         travelPlanId: true,
         title: true,

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FormComponentProps } from "@/types/form";
-import { createTravelPlan, updateTravelPlan } from "@/actions/host/action";
+import { createTravelPlan, searchPlaces, updateTravelPlan } from "@/actions/host/action";
 import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
@@ -268,19 +268,20 @@ export const CreateDestinationForm = ({
       return;
     }
     try {
-      console.log("hi");
-      const res = await fetch(`/api/places?q=${encodeURIComponent(q)}`);
-      console.log("Query:", res);
-      if (!res.ok) {
-        setStopSuggestions([]);
-      } else {
-        const json = await res.json();
-        setStopSuggestions(json.results || []);
-      }
-    } catch {
-      setStopSuggestions([]);
-    } finally {
-    }
+  console.log("hi");
+  const res = await searchPlaces(q); 
+  console.log("Query:", res);
+  
+  if (res.error) {
+    console.error(res.error);
+    setStopSuggestions([]);
+  } else {
+    setStopSuggestions(res.results || []);
+  }
+} catch (error) {
+  console.error("Search error:", error);
+  setStopSuggestions([]);
+}
   };
 
   const totalSteps = 3;
@@ -651,8 +652,7 @@ export const CreateDestinationForm = ({
         noOfDays = Math.max(noOfDays, 1); // Ensure at least 1 day for drafts
       }
 
-      // Validate that the day-wise entries count matches the selected number of days
-      // Only enforce for non-draft submissions
+  
       try {
         const desiredDays = Number((data as Partial<FormDataType>).noofdays) || noOfDays;
         const actualDays = (data.dayWiseData || []).length;
@@ -684,6 +684,7 @@ export const CreateDestinationForm = ({
         meals: string;
         accommodation: string;
         dayWiseImage: string;
+        destination?: string;
       }> = [];
       try {
         processedDayWiseData = (data.dayWiseData || []).map(
@@ -692,6 +693,7 @@ export const CreateDestinationForm = ({
               title?: string;
               description?: string;
               activities?: string[];
+              destination?: string;
               meals?: string;
               accommodation?: string;
               dayWiseImage?: string;
@@ -704,7 +706,8 @@ export const CreateDestinationForm = ({
             activities: Array.isArray(day.activities) ? day.activities : [],
             meals: day.meals || "",
             accommodation: day.accommodation || "",
-            dayWiseImage: day.dayWiseImage || ""
+            dayWiseImage: day.dayWiseImage || "",
+            destination: day.destination || ""  
           })
         );
       } catch (processingError) {
