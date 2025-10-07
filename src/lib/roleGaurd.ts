@@ -37,17 +37,9 @@ export async function requireSupport() {
   try {
     // Get current session
     const session = await auth();
-    console.log("🔍 requireSupport - Session Check:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userRole: session?.user?.role,
-    });
 
     // Check if user is authenticated
     if (!session?.user?.email) {
-      console.log(
-        "❌ requireSupport - No session/email, redirecting to signin"
-      );
       redirect("/auth/signin");
     }
 
@@ -57,23 +49,10 @@ export async function requireSupport() {
       select: { role: true, email: true },
     });
 
-    console.log("🔍 requireSupport - Database Check:", {
-      dbUser: dbUser,
-      hasDbUser: !!dbUser,
-      dbRole: dbUser?.role,
-      hasValidRole:
-        dbUser && (dbUser.role === "SUPPORT" || dbUser.role === "ADMIN"),
-    });
-
     // Check if user has SUPPORT or ADMIN role in database
     if (!dbUser || (dbUser.role !== "SUPPORT" && dbUser.role !== "ADMIN")) {
-      console.log(
-        "❌ requireSupport - Access denied, redirecting to unauthorized"
-      );
       redirect("/unauthorized");
     }
-
-    console.log("✅ requireSupport - Access granted");
 
     // Return session with updated role from database
     return {
@@ -98,12 +77,6 @@ export async function requireSupportOrAdmin() {
 export async function checkSupportAccess() {
   try {
     const session = await auth();
-    console.log("🔍 checkSupportAccess - Session Check:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userRole: session?.user?.role,
-    });
-
     if (!session?.user?.email) {
       return { error: "No session", code: "NO_SESSION" };
     }
@@ -111,14 +84,6 @@ export async function checkSupportAccess() {
     const dbUser = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { role: true, email: true },
-    });
-
-    console.log("🔍 checkSupportAccess - Database Check:", {
-      dbUser: dbUser,
-      hasDbUser: !!dbUser,
-      dbRole: dbUser?.role,
-      hasValidRole:
-        dbUser && (dbUser.role === "SUPPORT" || dbUser.role === "ADMIN"),
     });
 
     if (!dbUser) {
@@ -133,7 +98,6 @@ export async function checkSupportAccess() {
       };
     }
 
-    console.log("✅ checkSupportAccess - Access granted");
     return {
       success: true,
       session: {

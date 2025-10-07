@@ -53,13 +53,11 @@ export const updateUserRole = async (email: string, role: Role) => {
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
     if (!user) return { error: "User not found" };
-    console.log("mm", role);
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { role: role },
     });
-    console.log("mm", updatedUser);
 
     // Only create HostProfile for HOST role
     if (role === "HOST") {
@@ -192,8 +190,6 @@ export const getTotalRevenue = async (
           }
         : {};
 
-    console.log("DAte:", dateFilter);
-
     const totalSales = await prisma.booking.aggregate({
       where: {
         paymentStatus: {
@@ -213,7 +209,6 @@ export const getTotalRevenue = async (
       _sum: { refundAmount: true },
       _count: { id: true },
     });
-    console.log("totalSales", totalSales);
     return {
       totalSales,
       refundAmount,
@@ -942,7 +937,6 @@ export const getAnalyticsData = async (
             prevRefundedBookings.length / previousBookings.length) *
           100
         : 0;
-    console.log("Revenue Growth:", topDestinations);
     return {
       success: true,
       data: {

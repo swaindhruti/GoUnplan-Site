@@ -137,7 +137,6 @@ export const createTravelPlan = async (data: {
     dayWiseImage?: string;
   }>;
 }) => {
-  console.log(",,", data);
   const session = await requireHost();
   if (!session)
     return { error: "Unauthorized", message: "Please login to continue" };
@@ -154,33 +153,11 @@ export const createTravelPlan = async (data: {
       };
     }
 
-    console.log("Received travel plan data:", {
-      title: data.title,
-      description: data.description?.slice(0, 30) + "..." || "",
-      noOfDays: data.noOfDays,
-      filters: data.filters,
-      languages: data.languages,
-      status: data.status,
-      dayWiseData: data.dayWiseData
-        ? `${data.dayWiseData.length} days`
-        : "none",
-    });
-
     if (data.dayWiseData && data.dayWiseData.length > 0) {
-      console.log(
-        "Received day-wise data details:",
-        JSON.stringify(data.dayWiseData, null, 2)
-      );
+      // Day-wise data received
     } else {
-      console.log("WARNING: No day-wise data received or the array is empty");
+      // No day-wise data received or the array is empty
     }
-
-    console.log("🔍 DEBUG ACTION: Received status =", data.status);
-    console.log("🔍 DEBUG ACTION: TravelPlanStatus enum values:", {
-      DRAFT: TravelPlanStatus.DRAFT,
-      ACTIVE: TravelPlanStatus.ACTIVE,
-      INACTIVE: TravelPlanStatus.INACTIVE,
-    });
 
     let statusToSet;
     if (data.status === "DRAFT") {
@@ -190,22 +167,18 @@ export const createTravelPlan = async (data: {
     } else {
       statusToSet = TravelPlanStatus.INACTIVE;
     }
-    console.log("🔍 DEBUG ACTION: statusToSet =", statusToSet);
 
     // Handle price conversion with fallback for drafts
     const price = isNaN(Number(data.price)) ? 0 : Number(data.price);
-    console.log("Processed price:", price);
 
     // Handle noOfDays with fallback for drafts
     const noOfDays =
       isNaN(data.noOfDays) || data.noOfDays <= 0 ? 1 : data.noOfDays;
-    console.log("Processed noOfDays:", noOfDays);
 
     // Handle maxParticipants with fallback for drafts
     const maxParticipants = isNaN(Number(data.maxParticipants))
       ? 0
       : Number(data.maxParticipants);
-    console.log("Processed maxParticipants:", maxParticipants);
 
     const travelPlan = await prisma.travelPlans.create({
       data: {
@@ -235,22 +208,10 @@ export const createTravelPlan = async (data: {
       },
     });
 
-    console.log(
-      "🔍 DEBUG ACTION: Travel plan created with status:",
-      travelPlan.status
-    );
-
     if (data.dayWiseData && data.dayWiseData.length > 0) {
-      console.log(`Processing ${data.dayWiseData.length} day entries...`);
-
       try {
         for (const dayData of data.dayWiseData) {
-          console.log(
-            `Creating day ${dayData.dayNumber}:`,
-            JSON.stringify(dayData, null, 2)
-          );
-
-          const createdDay = await prisma.dayWiseItinerary.create({
+          await prisma.dayWiseItinerary.create({
             data: {
               travelPlanId: travelPlan.travelPlanId,
               dayNumber: dayData.dayNumber,
@@ -266,14 +227,7 @@ export const createTravelPlan = async (data: {
               destination: dayData.destination || "",
             },
           });
-
-          console.log(
-            `Day ${dayData.dayNumber} created successfully:`,
-            createdDay.destination
-          );
         }
-
-        console.log("All day-wise itineraries created successfully!");
       } catch (dayError) {
         console.error("Error creating day-wise data:", dayError);
 
@@ -283,10 +237,8 @@ export const createTravelPlan = async (data: {
 
         throw dayError;
       }
-    } else {
-      console.log("No day-wise data provided");
     }
-    console.log("Final created travel plan:", travelPlan.stops);
+
     return {
       success: true,
       travelPlan: { ...travelPlan, stops: travelPlan.stops || [] },
@@ -1181,9 +1133,6 @@ export async function searchPlaces(query: string) {
     if (!decodedQuery) {
       return { results: [], error: null };
     }
-
-    console.log("Query:", query);
-    console.log("hiiii");
 
     const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
 

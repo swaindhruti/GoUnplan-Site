@@ -155,7 +155,6 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
           ...prev,
           successMessage: "Successfully submitted your host application!",
         }));
-        console.log("Request success:", register.user);
 
         // Wait 2 seconds before refreshing to show success message
         setTimeout(() => {

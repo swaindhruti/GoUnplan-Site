@@ -1,7 +1,7 @@
 "use client";
 import {
   CldUploadWidget,
-  CloudinaryUploadWidgetResults
+  CloudinaryUploadWidgetResults,
 } from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
@@ -11,24 +11,28 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FormComponentProps } from "@/types/form";
-import { createTravelPlan, searchPlaces, updateTravelPlan } from "@/actions/host/action";
+import {
+  createTravelPlan,
+  searchPlaces,
+  updateTravelPlan,
+} from "@/actions/host/action";
 import { useRouter } from "next/navigation";
 import { MultiValue } from "react-select";
 import {
   getValidationSchema,
-  CreateDestinationSchema
+  CreateDestinationSchema,
 } from "@/config/form/formSchemaData/CreateDestinationSchema";
 import { z } from "zod";
 
 // Define the form data type
 type FormDataType = z.infer<typeof CreateDestinationSchema>;
-  
+
 // Day item type inferred from schema (explicit to avoid `any` and satisfy ESLint)
 type DayItem = {
   dayNumber?: number;
@@ -55,7 +59,7 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
@@ -71,7 +75,7 @@ const ReactSelect = dynamic(() => import("react-select"), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
-  )
+  ),
 });
 
 type SelectOption = {
@@ -86,7 +90,7 @@ const getSelectOptions = (options?: string[]) => {
 export const CreateDestinationForm = ({
   FormData,
   initialData,
-  isEditMode = false
+  isEditMode = false,
 }: FormComponentProps) => {
   const router = useRouter();
   const { uploadedFile, UploadButton } = useCloudinaryUpload();
@@ -112,7 +116,7 @@ export const CreateDestinationForm = ({
 
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
-  stops: initialData.stops || [],
+        stops: initialData.stops || [],
         languages: initialData.languages || [],
         includedActivities: initialData.includedActivities || [],
         restrictions: initialData.restrictions || [],
@@ -129,9 +133,9 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: ""
-                }
-              ]
+                  dayWiseImage: "",
+                },
+              ],
       }
     : {
         ...FormData.reduce(
@@ -144,7 +148,7 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
-                : ""
+                : "",
           }),
           {}
         ),
@@ -156,21 +160,21 @@ export const CreateDestinationForm = ({
             activities: [],
             meals: "",
             accommodation: "",
-            dayWiseImage: ""
-          }
+            dayWiseImage: "",
+          },
         ],
         tripImage: "",
-        stops: []
+        stops: [],
       };
 
   const form = useForm<FormDataType>({
     resolver: undefined,
     defaultValues,
-    mode: "onChange"
+    mode: "onChange",
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData"
+    name: "dayWiseData",
   });
 
   const watchedNoOfDays = form.watch("noofdays") as number | undefined;
@@ -191,11 +195,13 @@ export const CreateDestinationForm = ({
       const calculatedEnd = new Date(parsedStart);
       calculatedEnd.setDate(calculatedEnd.getDate() + (days - 1));
       const currentEnd = form.getValues().endDate as string | undefined;
-      if (!currentEnd || new Date(currentEnd).toISOString() !== calculatedEnd.toISOString()) {
+      if (
+        !currentEnd ||
+        new Date(currentEnd).toISOString() !== calculatedEnd.toISOString()
+      ) {
         form.setValue("endDate", formatDateForFormInput(calculatedEnd));
       }
-    } catch {
-    }
+    } catch {}
   }, [watchedStart, watchedNoOfDays, form]);
 
   useEffect(() => {
@@ -204,7 +210,7 @@ export const CreateDestinationForm = ({
 
     if (isNaN(desired) || desired < 1) return;
 
-  const currentLen = fields.length;
+    const currentLen = fields.length;
     if (currentLen < desired) {
       for (let i = currentLen; i < desired; i++) {
         append({
@@ -214,7 +220,7 @@ export const CreateDestinationForm = ({
           activities: [],
           meals: "",
           accommodation: "",
-          dayWiseImage: ""
+          dayWiseImage: "",
         });
       }
     } else if (currentLen > desired) {
@@ -227,17 +233,18 @@ export const CreateDestinationForm = ({
       const current = (form.getValues().dayWiseData || []) as DayItem[];
       const updated: DayItem[] = current.map((d: DayItem, idx: number) => ({
         ...(d || {}),
-        dayNumber: idx + 1
+        dayNumber: idx + 1,
       }));
-  form.setValue("dayWiseData", updated as unknown as FormDataType["dayWiseData"]);
+      form.setValue(
+        "dayWiseData",
+        updated as unknown as FormDataType["dayWiseData"]
+      );
     } catch {
       // ignore
     }
   }, [watchedNoOfDays, append, remove, fields.length, form]);
 
-  const [dayWiseImages, setDayWiseImages] = useState<{ [key: number]: string }>(
-    {}
-  );
+  const [_, setDayWiseImages] = useState<{ [key: number]: string }>({});
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -262,36 +269,29 @@ export const CreateDestinationForm = ({
   };
 
   const fetchSuggestions = async (q: string) => {
-    console.log("fetchSuggestions called with query:", q);
     if (!q) {
       setStopSuggestions([]);
       return;
     }
     try {
-  console.log("hi");
-  const res = await searchPlaces(q); 
-  console.log("Query:", res);
-  
-  if (res.error) {
-    console.error(res.error);
-    setStopSuggestions([]);
-  } else {
-    setStopSuggestions(res.results || []);
-  }
-} catch (error) {
-  console.error("Search error:", error);
-  setStopSuggestions([]);
-}
+      const res = await searchPlaces(q);
+
+      if (res.error) {
+        console.error(res.error);
+        setStopSuggestions([]);
+      } else {
+        setStopSuggestions(res.results || []);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      setStopSuggestions([]);
+    }
   };
 
   const totalSteps = 3;
 
-  console.log(dayWiseImages);
-
   useEffect(() => {
     if (initialData) {
-      console.log("Resetting form with initialData:", initialData);
-
       const formData = {
         tripName: initialData.title || "",
         destination: initialData.destination || "",
@@ -331,7 +331,7 @@ export const CreateDestinationForm = ({
                     : [],
                   meals: day.meals || "",
                   accommodation: day.accommodation || "",
-                  dayWiseImage: day.dayWiseImage || ""
+                  dayWiseImage: day.dayWiseImage || "",
                 })
               )
             : [
@@ -342,12 +342,11 @@ export const CreateDestinationForm = ({
                   activities: [],
                   meals: "",
                   accommodation: "",
-                  dayWiseImage: ""
-                }
-              ]
+                  dayWiseImage: "",
+                },
+              ],
       };
 
-      console.log("Form data to reset:", formData);
       form.reset(formData);
 
       if (initialData.dayWiseData?.length > 0) {
@@ -370,7 +369,7 @@ export const CreateDestinationForm = ({
             }
           }
         );
-        console.log("Setting dayWiseImages:", imageMap);
+
         setDayWiseImages(imageMap);
       }
     }
@@ -395,14 +394,14 @@ export const CreateDestinationForm = ({
       "endDate",
       "filters",
       "tripImage",
-      "noofdays"
+      "noofdays",
     ];
     const step2Fields = [
       "destination",
       "country",
       "price",
       "maxLimit",
-      "stops"
+      "stops",
     ];
 
     switch (currentStep) {
@@ -426,7 +425,7 @@ export const CreateDestinationForm = ({
       activities: [],
       meals: "",
       accommodation: "",
-      dayWiseImage: ""
+      dayWiseImage: "",
     });
   };
 
@@ -443,8 +442,14 @@ export const CreateDestinationForm = ({
         const current = (form.getValues().dayWiseData || []) as DayItem[];
         const updated: DayItem[] = current
           .filter((_: DayItem, idx: number) => idx !== index)
-          .map((d: DayItem, idx: number) => ({ ...(d || {}), dayNumber: idx + 1 }));
-  form.setValue("dayWiseData", updated as unknown as FormDataType["dayWiseData"]);
+          .map((d: DayItem, idx: number) => ({
+            ...(d || {}),
+            dayNumber: idx + 1,
+          }));
+        form.setValue(
+          "dayWiseData",
+          updated as unknown as FormDataType["dayWiseData"]
+        );
       } catch {
         // ignore
       }
@@ -461,12 +466,16 @@ export const CreateDestinationForm = ({
       const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
         idx === dayIndex ? { ...(d || {}), dayWiseImage: "" } : d
       );
-  form.setValue("dayWiseData", updated as unknown as FormDataType["dayWiseData"]);
+      form.setValue(
+        "dayWiseData",
+        updated as unknown as FormDataType["dayWiseData"]
+      );
     } catch {
       // fallback: set back to whatever we have (typed)
       form.setValue(
         "dayWiseData",
-        (form.getValues().dayWiseData || []) as unknown as FormDataType["dayWiseData"]
+        (form.getValues().dayWiseData ||
+          []) as unknown as FormDataType["dayWiseData"]
       );
     }
   };
@@ -476,7 +485,6 @@ export const CreateDestinationForm = ({
       form.setValue("tripImage", imageUrl);
     };
     if (uploadedFile?.secure_url) {
-      console.log("tt:", uploadedFile);
       handleImageUpload(uploadedFile.secure_url);
     }
   }, [uploadedFile, form]);
@@ -485,14 +493,17 @@ export const CreateDestinationForm = ({
   const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
     setDayWiseImages((prev) => ({
       ...prev,
-      [dayIndex]: imageUrl
+      [dayIndex]: imageUrl,
     }));
     try {
       const current = (form.getValues().dayWiseData || []) as DayItem[];
       const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
         idx === dayIndex ? { ...(d || {}), dayWiseImage: imageUrl } : d
       );
-  form.setValue("dayWiseData", updated as unknown as FormDataType["dayWiseData"]);
+      form.setValue(
+        "dayWiseData",
+        updated as unknown as FormDataType["dayWiseData"]
+      );
     } catch {
       // fallback
     }
@@ -570,7 +581,7 @@ export const CreateDestinationForm = ({
       console.log("Raw form data:", {
         tripName: data.tripName,
         status: isDraft ? "DRAFT" : "ACTIVE",
-        dayWiseDataLength: data.dayWiseData?.length || 0
+        dayWiseDataLength: data.dayWiseData?.length || 0,
       });
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
@@ -586,7 +597,7 @@ export const CreateDestinationForm = ({
               day: idx + 1,
               title: day.title || `Day ${idx + 1}`,
               hasActivities:
-                Array.isArray(day.activities) && day.activities.length > 0
+                Array.isArray(day.activities) && day.activities.length > 0,
             })
           )
         );
@@ -652,9 +663,9 @@ export const CreateDestinationForm = ({
         noOfDays = Math.max(noOfDays, 1); // Ensure at least 1 day for drafts
       }
 
-  
       try {
-        const desiredDays = Number((data as Partial<FormDataType>).noofdays) || noOfDays;
+        const desiredDays =
+          Number((data as Partial<FormDataType>).noofdays) || noOfDays;
         const actualDays = (data.dayWiseData || []).length;
         if (!isDraft && desiredDays !== actualDays) {
           toast.error(
@@ -663,9 +674,9 @@ export const CreateDestinationForm = ({
               style: {
                 background: "rgba(220, 38, 38, 0.95)",
                 color: "white",
-                fontFamily: "var(--font-instrument)"
+                fontFamily: "var(--font-instrument)",
               },
-              duration: 4000
+              duration: 4000,
             }
           );
           setIsSubmitting(false);
@@ -707,7 +718,7 @@ export const CreateDestinationForm = ({
             meals: day.meals || "",
             accommodation: day.accommodation || "",
             dayWiseImage: day.dayWiseImage || "",
-            destination: day.destination || ""  
+            destination: day.destination || "",
           })
         );
       } catch (processingError) {
@@ -718,7 +729,7 @@ export const CreateDestinationForm = ({
 
       const statusToSend: "DRAFT" | "INACTIVE" = isDraft ? "DRAFT" : "INACTIVE";
 
-  const tripData = {
+      const tripData = {
         title: data.tripName || "",
         description: data.description || "",
         destination: data.destination || "",
@@ -731,16 +742,16 @@ export const CreateDestinationForm = ({
         endDate: end,
         special: data.special || [],
         maxParticipants: data.maxLimit || 0,
-  country: data.country || "",
-  stops: data.stops || [],
-  // legacy support: state/city may be absent in the new form
-  state: (data as Partial<FormDataType> & { state?: string }).state || "",
-  city: (data as Partial<FormDataType> & { city?: string }).city || "",
+        country: data.country || "",
+        stops: data.stops || [],
+        // legacy support: state/city may be absent in the new form
+        state: (data as Partial<FormDataType> & { state?: string }).state || "",
+        city: (data as Partial<FormDataType> & { city?: string }).city || "",
         languages: data.languages || [],
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
         tripImage: data.tripImage || "",
-        status: statusToSend
+        status: statusToSend,
       };
 
       let result;
@@ -757,9 +768,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         console.error(
           `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
@@ -772,9 +783,9 @@ export const CreateDestinationForm = ({
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         router.push("/dashboard/host");
       }
@@ -786,9 +797,9 @@ export const CreateDestinationForm = ({
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 3000
+        duration: 3000,
       });
     } finally {
       setIsSubmitting(false);
@@ -816,7 +827,7 @@ export const CreateDestinationForm = ({
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
             type: "manual",
-            message: errorMessage[0]
+            message: errorMessage[0],
           });
         }
       });
@@ -838,22 +849,23 @@ export const CreateDestinationForm = ({
         return {
           title: "Basic Trip Information",
           description:
-            "Let's start with the essentials - trip name, dates, and preferences"
+            "Let's start with the essentials - trip name, dates, and preferences",
         };
       case 2:
         return {
           title: "Location & Pricing",
-          description: "Tell us where you're going and set your pricing details"
+          description:
+            "Tell us where you're going and set your pricing details",
         };
       case 3:
         return {
           title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out"
+          description: "Add the finishing touches to make your trip stand out",
         };
       default:
         return {
           title: "Create Trip",
-          description: "Fill in your trip details"
+          description: "Fill in your trip details",
         };
     }
   };
@@ -983,8 +995,8 @@ export const CreateDestinationForm = ({
                                 <FormMessage />
                                 {data.id === "noofdays" && (
                                   <p className="text-xs text-gray-500 mt-1 font-instrument">
-                                    Setting the number of days will auto-generate
-                                    
+                                    Setting the number of days will
+                                    auto-generate
                                   </p>
                                 )}
                               </FormItem>
@@ -1009,7 +1021,13 @@ export const CreateDestinationForm = ({
                                     type="date"
                                     className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
                                     {...field}
-                                    value={formatDateForInput(field.value as string | Date | number | undefined)}
+                                    value={formatDateForInput(
+                                      field.value as
+                                        | string
+                                        | Date
+                                        | number
+                                        | undefined
+                                    )}
                                     onChange={(e) =>
                                       field.onChange(
                                         e.target.value
@@ -1098,7 +1116,7 @@ export const CreateDestinationForm = ({
                                     value={(field.value as string[])?.map(
                                       (val) => ({
                                         value: val,
-                                        label: val
+                                        label: val,
                                       })
                                     )}
                                     onChange={(newValue) => {
@@ -1117,31 +1135,31 @@ export const CreateDestinationForm = ({
                                         borderRadius: "0.375rem",
                                         boxShadow: "none",
                                         "&:hover": {
-                                          borderColor: "#a855f7"
+                                          borderColor: "#a855f7",
                                         },
                                         "&:focus-within": {
                                           borderColor: "#a855f7",
                                           boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)"
-                                        }
+                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
+                                        },
                                       }),
                                       multiValue: (base) => ({
                                         ...base,
                                         backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem"
+                                        borderRadius: "0.25rem",
                                       }),
                                       multiValueLabel: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
-                                        fontWeight: "500"
+                                        fontWeight: "500",
                                       }),
                                       multiValueRemove: (base) => ({
                                         ...base,
                                         color: "#7c3aed",
                                         "&:hover": {
                                           backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9"
-                                        }
+                                          color: "#6d28d9",
+                                        },
                                       }),
                                       option: (base, state) => ({
                                         ...base,
@@ -1152,12 +1170,12 @@ export const CreateDestinationForm = ({
                                           : "white",
                                         color: state.isSelected
                                           ? "white"
-                                          : "#374151"
+                                          : "#374151",
                                       }),
                                       placeholder: (base) => ({
                                         ...base,
-                                        color: "#9ca3af"
-                                      })
+                                        color: "#9ca3af",
+                                      }),
                                     }}
                                     placeholder={data.placeholder}
                                     className="font-instrument"
@@ -1170,111 +1188,149 @@ export const CreateDestinationForm = ({
                         );
                       }
 
-                            // Stops field: creatable multi-select with suggestions
-                            if (data.id === "stops") {
-                              return (
-                                <FormField
-                                  key={data.id}
-                                  control={form.control}
-                                  name={data.id as keyof FormDataType}
-                                  render={({ field }) => (
-                                    <FormItem className={data.className}>
-                                      <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                        {data.label}
-                                      </FormLabel>
-                                      <FormControl>
-                                        <div className="space-y-3 mt-3">
-                                          <div className="flex gap-2">
-                                            <Input
-                                              placeholder={data.placeholder}
-                                              className="flex-1 border-gray-200 font-instrument"
-                                              value={customStopsInput}
-                                              onChange={(e) => {
-                                                const v = e.target.value;
-                                                console.log("Input changed:", v);
-                                                setCustomStopsInput(v);
-                                                console.log("stops input changed:", v);
-                                                if (v.trim()) debouncedFetch(v);
-                                              }}
-                                              onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                  e.preventDefault();
-                                                  const val = customStopsInput.trim();
-                                                  const currentVals = Array.isArray(field.value) ? (field.value as string[]) : [];
-                                                  if (val && !currentVals.includes(val)) {
-                                                    field.onChange([...currentVals, val]);
-                                                    setCustomStopsInput("");
-                                                    setStopSuggestions([]);
-                                                  }
-                                                }
-                                              }}
-                                            />
-                                            <Button
-                                              type="button"
-                                              size="sm"
-                                              onClick={() => {
-                                                const val = customStopsInput.trim();
-                                                const currentVals = Array.isArray(field.value) ? (field.value as string[]) : [];
-                                                if (val && !currentVals.includes(val)) {
-                                                  field.onChange([...currentVals, val]);
-                                                  setCustomStopsInput("");
-                                                }
-                                              }}
-                                              className="px-3 bg-purple-600 hover:bg-purple-700 text-white"
-                                            >
-                                              <Plus className="h-4 w-4" />
-                                            </Button>
-                                          </div>
+                      // Stops field: creatable multi-select with suggestions
+                      if (data.id === "stops") {
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                  {data.label}
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="space-y-3 mt-3">
+                                    <div className="flex gap-2">
+                                      <Input
+                                        placeholder={data.placeholder}
+                                        className="flex-1 border-gray-200 font-instrument"
+                                        value={customStopsInput}
+                                        onChange={(e) => {
+                                          const v = e.target.value;
+                                          console.log("Input changed:", v);
+                                          setCustomStopsInput(v);
+                                          console.log(
+                                            "stops input changed:",
+                                            v
+                                          );
+                                          if (v.trim()) debouncedFetch(v);
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const val = customStopsInput.trim();
+                                            const currentVals = Array.isArray(
+                                              field.value
+                                            )
+                                              ? (field.value as string[])
+                                              : [];
+                                            if (
+                                              val &&
+                                              !currentVals.includes(val)
+                                            ) {
+                                              field.onChange([
+                                                ...currentVals,
+                                                val,
+                                              ]);
+                                              setCustomStopsInput("");
+                                              setStopSuggestions([]);
+                                            }
+                                          }
+                                        }}
+                                      />
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => {
+                                          const val = customStopsInput.trim();
+                                          const currentVals = Array.isArray(
+                                            field.value
+                                          )
+                                            ? (field.value as string[])
+                                            : [];
+                                          if (
+                                            val &&
+                                            !currentVals.includes(val)
+                                          ) {
+                                            field.onChange([
+                                              ...currentVals,
+                                              val,
+                                            ]);
+                                            setCustomStopsInput("");
+                                          }
+                                        }}
+                                        className="px-3 bg-purple-600 hover:bg-purple-700 text-white"
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                    </div>
 
-                                          {Array.isArray(field.value) && (field.value as string[]).length > 0 && (
-                                            <div className="flex flex-wrap gap-2">
-                                              {(field.value as string[]).map((item: string, itemIndex: number) => (
-                                                <span key={itemIndex} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                                                  {item}
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const newItems = (field.value as string[]).filter((_: string, i: number) => i !== itemIndex);
-                                                      field.onChange(newItems);
-                                                    }}
-                                                    className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
-                                                  >
-                                                    <Minus className="h-3 w-3" />
-                                                  </button>
-                                                </span>
-                                              ))}
-                                            </div>
-                                          )}
-                                          {/* suggestions dropdown */}
-                                          {stopSuggestions.length > 0 && (
-                                            <div className="mt-2 border border-gray-200 rounded bg-white shadow-sm max-h-48 overflow-auto">
-                                              {stopSuggestions.map((sug, i) => (
+                                    {Array.isArray(field.value) &&
+                                      (field.value as string[]).length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                          {(field.value as string[]).map(
+                                            (
+                                              item: string,
+                                              itemIndex: number
+                                            ) => (
+                                              <span
+                                                key={itemIndex}
+                                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                              >
+                                                {item}
                                                 <button
-                                                  key={i}
                                                   type="button"
                                                   onClick={() => {
-                                                    const cur = (field.value || []) as string[];
-                                                    if (!cur.includes(sug)) {
-                                                      field.onChange([...cur, sug]);
-                                                    }
-                                                    setCustomStopsInput("");
-                                                    setStopSuggestions([]);
+                                                    const newItems = (
+                                                      field.value as string[]
+                                                    ).filter(
+                                                      (_: string, i: number) =>
+                                                        i !== itemIndex
+                                                    );
+                                                    field.onChange(newItems);
                                                   }}
-                                                  className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                                                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
                                                 >
-                                                  {sug}
+                                                  <Minus className="h-3 w-3" />
                                                 </button>
-                                              ))}
-                                            </div>
+                                              </span>
+                                            )
                                           )}
                                         </div>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              );
-                            }
+                                      )}
+                                    {/* suggestions dropdown */}
+                                    {stopSuggestions.length > 0 && (
+                                      <div className="mt-2 border border-gray-200 rounded bg-white shadow-sm max-h-48 overflow-auto">
+                                        {stopSuggestions.map((sug, i) => (
+                                          <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => {
+                                              const cur = (field.value ||
+                                                []) as string[];
+                                              if (!cur.includes(sug)) {
+                                                field.onChange([...cur, sug]);
+                                              }
+                                              setCustomStopsInput("");
+                                              setStopSuggestions([]);
+                                            }}
+                                            className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                                          >
+                                            {sug}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
 
                       // Inclusion List Component
                       if (
@@ -1336,7 +1392,7 @@ export const CreateDestinationForm = ({
                                                         [];
                                                       const newValue = [
                                                         ...currentValue,
-                                                        option
+                                                        option,
                                                       ];
                                                       field.onChange(newValue);
                                                     }}
@@ -1473,25 +1529,45 @@ export const CreateDestinationForm = ({
                                           setCustomInput(e.target.value)
                                         }
                                         onKeyDown={(e) => {
-                                              if (e.key === "Enter") {
-                                                e.preventDefault();
-                                                const item = customInput.trim();
-                                                const currentVals = Array.isArray(field.value) ? (field.value as string[]) : [];
-                                                if (item && !currentVals.includes(item)) {
-                                                  field.onChange([...currentVals, item]);
-                                                  setCustomInput("");
-                                                }
-                                              }
-                                            }}
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const item = customInput.trim();
+                                            const currentVals = Array.isArray(
+                                              field.value
+                                            )
+                                              ? (field.value as string[])
+                                              : [];
+                                            if (
+                                              item &&
+                                              !currentVals.includes(item)
+                                            ) {
+                                              field.onChange([
+                                                ...currentVals,
+                                                item,
+                                              ]);
+                                              setCustomInput("");
+                                            }
+                                          }
+                                        }}
                                       />
-                                          <Button
+                                      <Button
                                         type="button"
                                         size="sm"
                                         onClick={() => {
                                           const item = customInput.trim();
-                                          const currentVals = Array.isArray(field.value) ? (field.value as string[]) : [];
-                                          if (item && !currentVals.includes(item)) {
-                                            field.onChange([...currentVals, item]);
+                                          const currentVals = Array.isArray(
+                                            field.value
+                                          )
+                                            ? (field.value as string[])
+                                            : [];
+                                          if (
+                                            item &&
+                                            !currentVals.includes(item)
+                                          ) {
+                                            field.onChange([
+                                              ...currentVals,
+                                              item,
+                                            ]);
                                             setCustomInput("");
                                           }
                                         }}
@@ -1508,48 +1584,57 @@ export const CreateDestinationForm = ({
                                         <Plus className="h-4 w-4" />
                                       </Button>
                                     </div>
-                                    {Array.isArray(field.value) && (field.value as string[]).length > 0 && (
-                                      <div className="flex flex-wrap gap-2">
-                                        {(field.value as string[]).map(
-                                          (item: string, itemIndex: number) => (
-                                            <span
-                                              key={itemIndex}
-                                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                                                isIncluded
-                                                  ? "bg-green-100 text-green-800"
-                                                  : data.label ===
-                                                    "Not Included"
-                                                  ? "bg-red-100 text-red-800"
-                                                  : isFilters
-                                                  ? "bg-purple-100 text-purple-800"
-                                                  : "bg-blue-100 text-blue-800"
-                                              }`}
-                                            >
-                                              {item}
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  const newItems = (field.value as string[]).filter((_: string, i: number) => i !== itemIndex);
-                                                  field.onChange(newItems);
-                                                }}
-                                                className={`ml-1 rounded-full p-0.5 transition-colors ${
+                                    {Array.isArray(field.value) &&
+                                      (field.value as string[]).length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                          {(field.value as string[]).map(
+                                            (
+                                              item: string,
+                                              itemIndex: number
+                                            ) => (
+                                              <span
+                                                key={itemIndex}
+                                                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                                                   isIncluded
-                                                    ? "hover:bg-green-200"
+                                                    ? "bg-green-100 text-green-800"
                                                     : data.label ===
                                                       "Not Included"
-                                                    ? "hover:bg-red-200"
+                                                    ? "bg-red-100 text-red-800"
                                                     : isFilters
-                                                    ? "hover:bg-purple-200"
-                                                    : "hover:bg-blue-200"
+                                                    ? "bg-purple-100 text-purple-800"
+                                                    : "bg-blue-100 text-blue-800"
                                                 }`}
                                               >
-                                                <Minus className="h-3 w-3" />
-                                              </button>
-                                            </span>
-                                          )
-                                        )}
-                                      </div>
-                                    )}
+                                                {item}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const newItems = (
+                                                      field.value as string[]
+                                                    ).filter(
+                                                      (_: string, i: number) =>
+                                                        i !== itemIndex
+                                                    );
+                                                    field.onChange(newItems);
+                                                  }}
+                                                  className={`ml-1 rounded-full p-0.5 transition-colors ${
+                                                    isIncluded
+                                                      ? "hover:bg-green-200"
+                                                      : data.label ===
+                                                        "Not Included"
+                                                      ? "hover:bg-red-200"
+                                                      : isFilters
+                                                      ? "hover:bg-purple-200"
+                                                      : "hover:bg-blue-200"
+                                                  }`}
+                                                >
+                                                  <Minus className="h-3 w-3" />
+                                                </button>
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      )}
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1730,11 +1815,13 @@ export const CreateDestinationForm = ({
                                       className="h-11 w-full border border-gray-200 rounded px-3 font-instrument"
                                     >
                                       <option value="">Select stop</option>
-                                      {(watchedStops || []).map((s: string, si: number) => (
-                                        <option key={si} value={s}>
-                                          {s}
-                                        </option>
-                                      ))}
+                                      {(watchedStops || []).map(
+                                        (s: string, si: number) => (
+                                          <option key={si} value={s}>
+                                            {s}
+                                          </option>
+                                        )
+                                      )}
                                     </select>
                                   </FormControl>
                                   <FormMessage />
@@ -1822,7 +1909,7 @@ export const CreateDestinationForm = ({
                                           onChange={(e) =>
                                             setCustomActivityInput((prev) => ({
                                               ...prev,
-                                              [index]: e.target.value
+                                              [index]: e.target.value,
                                             }))
                                           }
                                           onKeyDown={(e) => {
@@ -1840,12 +1927,12 @@ export const CreateDestinationForm = ({
                                               ) {
                                                 field.onChange([
                                                   ...(field.value || []),
-                                                  activity
+                                                  activity,
                                                 ]);
                                                 setCustomActivityInput(
                                                   (prev) => ({
                                                     ...prev,
-                                                    [index]: ""
+                                                    [index]: "",
                                                   })
                                                 );
                                               }
@@ -1868,12 +1955,12 @@ export const CreateDestinationForm = ({
                                             ) {
                                               field.onChange([
                                                 ...(field.value || []),
-                                                activity
+                                                activity,
                                               ]);
                                               setCustomActivityInput(
                                                 (prev) => ({
                                                   ...prev,
-                                                  [index]: ""
+                                                  [index]: "",
                                                 })
                                               );
                                             }

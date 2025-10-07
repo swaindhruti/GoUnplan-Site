@@ -4,10 +4,9 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const q = url.searchParams.get("q") || "";
-    
+
     if (!q) return NextResponse.json({ results: [] });
-console.log("Query:", q);
-console.log("hiiii")
+
     const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
     if (!token) {
       return NextResponse.json(
@@ -21,7 +20,7 @@ console.log("hiiii")
     )}&key=${token}&limit=6&tag=place:*,boundary:administrative&format=json`;
 
     const res = await fetch(apiUrl);
-    
+
     if (!res.ok) {
       console.error("LocationIQ error:", res.status);
       return NextResponse.json({ results: [] }, { status: res.status });
@@ -36,7 +35,6 @@ console.log("hiiii")
       .filter(Boolean) as string[];
 
     return NextResponse.json({ results: places });
-    
   } catch (err) {
     console.error("LocationIQ API error:", err);
     return NextResponse.json({ results: [] });

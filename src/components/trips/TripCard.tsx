@@ -6,7 +6,7 @@ import {
   ArrowRight,
   Users,
   Star,
-  CalendarDays
+  CalendarDays,
 } from "lucide-react";
 import { Trip } from "@/types/trips";
 import Image from "next/image";
@@ -23,17 +23,15 @@ export const TripCard = ({
   trip,
   onClick,
   isSelected = false,
-  isTripPage = true
+  isTripPage = true,
 }: TripCardProps) => {
-  console.log(trip.tripImage, "Trip Image in TripCard");
-
   // Helper function to format dates
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       day: "2-digit",
       month: "short",
-      year: "numeric"
+      year: "numeric",
     });
   };
 

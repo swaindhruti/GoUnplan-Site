@@ -47,18 +47,10 @@ export const getAllSupportStaff = async () => {
 };
 
 export const getAllTickets = async () => {
-  console.log("🎫 getAllTickets - Server action called");
-
   try {
     const session = await requireSupport();
-    console.log("🎫 getAllTickets - Session received:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userRole: session?.user?.role,
-    });
 
     if (!session) {
-      console.log("❌ getAllTickets - No session, returning error");
       return { error: "Unauthorized" };
     }
 
@@ -112,10 +104,6 @@ export const getAllTickets = async () => {
       },
     });
 
-    console.log(
-      "✅ getAllTickets - Successfully fetched tickets:",
-      tickets.length
-    );
     return { tickets };
   } catch (error) {
     console.error("🚨 getAllTickets - Error:", error);
@@ -454,18 +442,10 @@ export const getUserBookingsForSupport = async () => {
 };
 
 export const getTicketStats = async () => {
-  console.log("📊 getTicketStats - Server action called");
-
   try {
     const session = await requireSupport();
-    console.log("📊 getTicketStats - Session received:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userRole: session?.user?.role,
-    });
 
     if (!session) {
-      console.log("❌ getTicketStats - No session, returning error");
       return { error: "Unauthorized" };
     }
 
@@ -491,7 +471,6 @@ export const getTicketStats = async () => {
       },
     });
 
-    console.log("✅ getTicketStats - Successfully fetched stats");
     return {
       totalTickets,
       openTickets,

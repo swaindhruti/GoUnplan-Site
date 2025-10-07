@@ -2,12 +2,12 @@ import { create } from "zustand";
 import type {
   BookingData,
   GuestInfoUpdate,
-  PaymentUpdate
+  PaymentUpdate,
 } from "@/types/booking";
 import {
   createBooking,
   updateBookingGuestInfo,
-  updateBookingStatus
+  updateBookingStatus,
 } from "@/actions/booking/actions";
 
 interface BookingStoreState {
@@ -24,7 +24,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   bookingData: {
     status: "PENDING",
     participants: 1,
-    refundAmount: 0
+    refundAmount: 0,
   },
   isLoading: false,
   error: null,
@@ -44,7 +44,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         const result = await updateBookingGuestInfo(bookingData.id, {
           participants: update.participants,
           guests: update.guests,
-          specialRequirements: update.specialRequirements
+          specialRequirements: update.specialRequirements,
         });
 
         if (result.error) {
@@ -61,7 +61,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     } catch (err) {
       set({
         error:
-          err instanceof Error ? err.message : "Failed to update guest info"
+          err instanceof Error ? err.message : "Failed to update guest info",
       });
       return false;
     } finally {
@@ -92,7 +92,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return true;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to process payment"
+        error: err instanceof Error ? err.message : "Failed to process payment",
       });
       return false;
     } finally {
@@ -114,13 +114,10 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         participants: data.participants || 1,
         guests: data.guests,
         specialRequirements: data.specialRequirements ?? undefined,
-        allowPartialPayment: true
+        allowPartialPayment: true,
       };
 
-      console.log("Creating booking with complete data:", payload);
-
       const result = await createBooking(payload);
-      console.log("Booking created:", result);
 
       if (result.error) {
         set({ error: result.error });
@@ -135,13 +132,13 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return null;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to create booking"
+        error: err instanceof Error ? err.message : "Failed to create booking",
       });
       return null;
     } finally {
       set({ isLoading: false });
     }
-  }
+  },
 }));
 
 export type { BookingStoreState };

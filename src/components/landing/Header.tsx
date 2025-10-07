@@ -63,7 +63,6 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  console.log("ll", session);
 
   const navigationItems: NavigationItem[] = [
     { name: "Home", href: "/", section: "#home" },
@@ -259,7 +258,7 @@ export default function Header() {
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `;
   const isRegularUser = session?.user?.role === "USER";
-  console.log(isRegularUser);
+
   const isUserHost = session?.user?.role === "HOST";
   const isUserAdmin = session?.user?.role === "ADMIN";
   const isUserSupport = session?.user?.role === "SUPPORT";

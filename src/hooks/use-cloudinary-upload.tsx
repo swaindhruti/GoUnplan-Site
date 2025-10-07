@@ -26,7 +26,6 @@ export const useCloudinaryUpload = () => {
           display_name: resultsInfo.original_filename ?? "",
           isCopied: false,
         });
-        console.log("Upload successful:", resultsInfo);
       } else {
         console.error("Invalid upload response:", resultsInfo ?? "undefined");
       }

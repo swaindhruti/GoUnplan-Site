@@ -149,7 +149,7 @@ const UserTicketDetailPage = () => {
       if (result.success) {
         // Don't refresh the entire ticket - optimistic update is sufficient
         // The optimistic message will stay in the UI
-        console.log("Message sent successfully");
+        // Message sent successfully
       } else {
         // Remove optimistic message on error
         setTicket((prev) => {

@@ -293,16 +293,6 @@ const SupportChatClient = ({ ticketId }: SupportChatClientProps) => {
                     // Customer message = message from the ticket creator (user who opened the ticket)
                     const isCustomerMessage =
                       message.sender.id === ticket.userId;
-                    console.log(
-                      "Message:",
-                      message.id,
-                      "Sender ID:",
-                      message.sender.id,
-                      "Ticket User ID:",
-                      ticket.userId,
-                      "Is Customer:",
-                      isCustomerMessage
-                    );
                     return (
                       <div
                         key={message.id}

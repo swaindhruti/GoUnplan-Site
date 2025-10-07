@@ -4,18 +4,10 @@ import prisma from "@/lib/prisma";
 import { requireSupport } from "@/lib/roleGaurd";
 
 export const getMyAssignedTickets = async () => {
-  console.log("🎫 getMyAssignedTickets - Server action called");
-
   try {
     const session = await requireSupport();
-    console.log("🎫 getMyAssignedTickets - Session received:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userRole: session?.user?.role,
-    });
 
     if (!session) {
-      console.log("❌ getMyAssignedTickets - No session, returning error");
       return { error: "Unauthorized" };
     }
 
@@ -72,10 +64,6 @@ export const getMyAssignedTickets = async () => {
       },
     });
 
-    console.log(
-      "✅ getMyAssignedTickets - Successfully fetched tickets:",
-      tickets.length
-    );
     return { tickets };
   } catch (error) {
     console.error("🚨 getMyAssignedTickets - Error:", error);

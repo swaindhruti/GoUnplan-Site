@@ -14,7 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 import {
   X,
@@ -24,7 +24,7 @@ import {
   Users,
   Target,
   RefreshCw,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 import { getAnalyticsData } from "@/actions/admin/action";
 
@@ -92,7 +92,7 @@ type ActiveChart = "overview" | "trends" | "distribution";
 
 const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
   dateRange,
-  onClose
+  onClose,
 }) => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
@@ -129,19 +129,19 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
               confirmedBookings: 0,
               refundedBookings: 0,
               avgOrderValue: 0,
-              refundRate: 0
+              refundRate: 0,
             },
             growth: {
               revenue: 0,
               transactions: 0,
               avgOrderValue: 0,
-              refundRate: 0
+              refundRate: 0,
             },
             period: {
               startDate: dateRange.startDate,
               endDate: dateRange.endDate,
-              totalDays: 0
-            }
+              totalDays: 0,
+            },
           });
         }
       } catch (error) {
@@ -159,7 +159,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -177,7 +177,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
 
   /*  const exportCharts = () => {
     // Implementation for exporting charts as PDF/PNG
-    console.log("Exporting charts...");
+    // Exporting charts...
   }; */
 
   if (loading) {
@@ -229,7 +229,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
           {[
             { id: "overview", label: "Overview", icon: BarChart3 },
             { id: "trends", label: "Trends", icon: TrendingUp },
-            { id: "distribution", label: "Distribution", icon: Target }
+            { id: "distribution", label: "Distribution", icon: Target },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -431,7 +431,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
                       const parsed = Date.parse(value);
                       if (!isNaN(parsed)) {
                         return new Date(parsed).toLocaleDateString("en-US", {
-                          weekday: "short"
+                          weekday: "short",
                         });
                       }
 
@@ -447,7 +447,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
                         ? new Date(parsed).toLocaleDateString("en-US", {
                             weekday: "long",
                             month: "short",
-                            day: "numeric"
+                            day: "numeric",
                           })
                         : String(label);
                     }}
@@ -522,7 +522,7 @@ const RevenueAnalytics: React.FC<RevenueAnalyticsProps> = ({
                   <Tooltip
                     formatter={(value: number, name: string) => [
                       name === "revenue" ? formatCurrency(value) : value,
-                      name === "transactions" ? "Transactions" : "Revenue"
+                      name === "transactions" ? "Transactions" : "Revenue",
                     ]}
                   />
                   <Legend />
