@@ -1,12 +1,45 @@
 "use client";
 import { useState, useEffect } from "react";
 import { getHostDetails, updateHostProfile } from "@/actions/host/action";
-import { User, AlertCircle, CheckCircle } from "lucide-react";
+import { User, AlertCircle, CheckCircle, Languages, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { HostData } from "../types";
 import Image from "next/image";
+
+// Common languages list
+const COMMON_LANGUAGES = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Portuguese",
+  "Russian",
+  "Chinese (Mandarin)",
+  "Japanese",
+  "Korean",
+  "Arabic",
+  "Hindi",
+  "Dutch",
+  "Swedish",
+  "Norwegian",
+  "Danish",
+  "Finnish",
+  "Polish",
+  "Czech",
+  "Hungarian",
+  "Greek",
+  "Turkish",
+  "Hebrew",
+  "Thai",
+  "Vietnamese",
+  "Indonesian",
+  "Malay",
+  "Tagalog",
+  "Swahili",
+];
 
 // Define proper interfaces based on the actual API response structure
 interface HostDetails {
@@ -14,6 +47,7 @@ interface HostDetails {
   description?: string | null;
   image?: string | null;
   hostMobile?: string;
+  languages?: string[];
   createdAt?: string | Date;
   user?: {
     id: string;
@@ -27,6 +61,7 @@ interface ProfileUpdateData {
   description: string;
   image: string;
   hostMobile: string;
+  languages: string[];
 }
 
 type ProfileSectionProps = {
@@ -42,7 +77,8 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
   const [formData, setFormData] = useState<ProfileUpdateData>({
     description: "",
     image: "",
-    hostMobile: ""
+    hostMobile: "",
+    languages: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Add this to prevent hydration mismatch during initial render
@@ -72,7 +108,8 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           setFormData({
             description: response.host?.description || "",
             image: response.host?.image || "",
-            hostMobile: response.host?.user?.phone || ""
+            hostMobile: response.host?.user?.phone || "",
+            languages: response.host?.languages || [],
           });
         }
       } catch (err) {
@@ -92,7 +129,23 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
+    }));
+  };
+
+  const handleLanguageAdd = (language: string) => {
+    if (!formData.languages.includes(language)) {
+      setFormData((prev) => ({
+        ...prev,
+        languages: [...prev.languages, language],
+      }));
+    }
+  };
+
+  const handleLanguageRemove = (languageToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      languages: prev.languages.filter((lang) => lang !== languageToRemove),
     }));
   };
 
@@ -210,7 +263,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                         {
                           year: "numeric",
                           month: "long",
-                          day: "numeric"
+                          day: "numeric",
                         }
                       )
                     : "N/A"}
@@ -262,6 +315,62 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                       placeholder="Enter mobile number"
                       className="w-full"
                     />
+                  </div>
+
+                  {/* Languages Section */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Languages You Speak
+                    </label>
+                    <div className="space-y-3">
+                      {/* Selected Languages */}
+                      <div className="flex flex-wrap gap-2">
+                        {formData.languages.map((language) => (
+                          <span
+                            key={language}
+                            className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
+                          >
+                            {language}
+                            <button
+                              type="button"
+                              onClick={() => handleLanguageRemove(language)}
+                              className="hover:bg-purple-200 rounded-full p-0.5"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Language Selection Dropdown */}
+                      <div className="relative">
+                        <Languages className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <select
+                          className="w-full pl-10 pr-4 py-2 h-11 border border-gray-200 rounded-md focus:border-purple-400 focus:ring-purple-100 bg-white font-instrument"
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              handleLanguageAdd(e.target.value);
+                              e.target.value = ""; // Reset selection
+                            }
+                          }}
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Select a language to add...
+                          </option>
+                          {COMMON_LANGUAGES.filter(
+                            (lang) => !formData.languages.includes(lang)
+                          ).map((language) => (
+                            <option key={language} value={language}>
+                              {language}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Select languages you can communicate with guests in
+                      </p>
+                    </div>
                   </div>
 
                   <div>

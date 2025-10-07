@@ -24,5 +24,9 @@ export default async function SupportDashboard() {
   }
 
   // If we reach here, the user has proper SUPPORT or ADMIN role
-  return <SupportDashboardClient />;
+  return (
+    <div className="mt-20">
+      <SupportDashboardClient />
+    </div>
+  );
 }

@@ -45,6 +45,7 @@ model HostProfile {
   hostMobile    String
   averageRating Float         @default(0)
   reviewCount   Int           @default(0)
+  languages     String[]      @default([])
   instagramUrl  String?
   linkedinUrl   String?
   twitterUrl    String?

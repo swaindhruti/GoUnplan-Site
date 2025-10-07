@@ -251,6 +251,26 @@ export default async function HostProfilePage({ params }: Props) {
                   </div>
                 </div>
 
+                {/* Languages Section */}
+                {host.languages && host.languages.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-purple-600" />
+                      Languages Spoken
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {host.languages.map((language) => (
+                        <span
+                          key={language}
+                          className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-medium"
+                        >
+                          {language}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <Clock className="h-4 w-4 text-purple-600" />

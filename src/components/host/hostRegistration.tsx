@@ -15,6 +15,8 @@ import {
   Globe,
   Compass,
   Crown,
+  Languages,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { applyForHost, hasAppliedForHost } from "@/actions/user/action";
@@ -23,6 +25,39 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import Link from "next/link";
+
+// Common languages list
+const COMMON_LANGUAGES = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Portuguese",
+  "Russian",
+  "Chinese (Mandarin)",
+  "Japanese",
+  "Korean",
+  "Arabic",
+  "Hindi",
+  "Dutch",
+  "Swedish",
+  "Norwegian",
+  "Danish",
+  "Finnish",
+  "Polish",
+  "Czech",
+  "Hungarian",
+  "Greek",
+  "Turkish",
+  "Hebrew",
+  "Thai",
+  "Vietnamese",
+  "Indonesian",
+  "Malay",
+  "Tagalog",
+  "Swahili",
+];
 
 export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   const router = useRouter();
@@ -35,6 +70,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
     description: "",
     hostEmail: userEmail,
     hostMobile: "",
+    languages: [] as string[],
     instagramUrl: "",
     twitterUrl: "",
     linkedinUrl: "",
@@ -85,6 +121,22 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleLanguageAdd = (language: string) => {
+    if (!formData.languages.includes(language)) {
+      setFormData((prev) => ({
+        ...prev,
+        languages: [...prev.languages, language],
+      }));
+    }
+  };
+
+  const handleLanguageRemove = (languageToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      languages: prev.languages.filter((lang) => lang !== languageToRemove),
     }));
   };
 
@@ -157,7 +209,9 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
         <div className="flex flex-1 min-h-0 items-center justify-center">
           <div className="text-center">
             <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full inline-block mb-4"></div>
-            <p className="text-gray-600 font-instrument">Checking application status...</p>
+            <p className="text-gray-600 font-instrument">
+              Checking application status...
+            </p>
           </div>
         </div>
       </div>
@@ -220,7 +274,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <Clock className="h-8 w-8 text-amber-600" />
                       </div>
                       <p className="text-gray-600 font-instrument mb-6">
-                        We&apos;ll notify you by email once your application is approved.
+                        We&apos;ll notify you by email once your application is
+                        approved.
                       </p>
                     </div>
 
@@ -231,15 +286,21 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="font-instrument">Review within 1-3 business days</span>
+                          <span className="font-instrument">
+                            Review within 1-3 business days
+                          </span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="font-instrument">Email notification once approved</span>
+                          <span className="font-instrument">
+                            Email notification once approved
+                          </span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="font-instrument">Access to host features after approval</span>
+                          <span className="font-instrument">
+                            Access to host features after approval
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -256,66 +317,75 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                   </div>
                 </div>
               ) : step === 1 ? (
-              // Step 1: Initial Info Page
-              <div className="w-full">
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
-                      Want to be a Host?
-                    </h1>
-                    <p className="text-gray-600 font-instrument mt-2">
-                      Join thousands of hosts creating unforgettable experiences
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-800 font-bricolage">
-                      Benefits of being a host
-                    </h3>
-                    <ul className="space-y-3">
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600 font-instrument">Share your local knowledge and experiences</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600 font-instrument">Earn money by creating unique travel plans</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600 font-instrument">Connect with travelers from around the world</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600 font-instrument">Flexibility to manage your own schedule</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <Button
-                    onClick={() => setStep(2)}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold font-instrument shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Crown className="w-4 h-4" />
-                      <span>Apply to be a Host</span>
-                      <ArrowRight className="w-4 h-4" />
+                // Step 1: Initial Info Page
+                <div className="w-full">
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
+                        Want to be a Host?
+                      </h1>
+                      <p className="text-gray-600 font-instrument mt-2">
+                        Join thousands of hosts creating unforgettable
+                        experiences
+                      </p>
                     </div>
-                  </Button>
 
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600 font-instrument">
-                      Already a host?{" "}
-                      <button
-                        className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
-                        onClick={() => router.push("/auth/signin")}
-                      >
-                        Sign in here
-                      </button>
-                    </p>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-800 font-bricolage">
+                        Benefits of being a host
+                      </h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-start gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-600 font-instrument">
+                            Share your local knowledge and experiences
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-600 font-instrument">
+                            Earn money by creating unique travel plans
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-600 font-instrument">
+                            Connect with travelers from around the world
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-600 font-instrument">
+                            Flexibility to manage your own schedule
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <Button
+                      onClick={() => setStep(2)}
+                      className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold font-instrument shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Crown className="w-4 h-4" />
+                        <span>Apply to be a Host</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </Button>
+
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 font-instrument">
+                        Already a host?{" "}
+                        <button
+                          className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
+                          onClick={() => router.push("/auth/signin")}
+                        >
+                          Sign in here
+                        </button>
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
               ) : (
                 // Step 2: Application Form
                 <div className="w-full">
@@ -365,7 +435,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                           />
                         </div>
                         <p className="text-xs text-gray-500 font-instrument mt-1">
-                          A good description helps travelers trust you as a host (minimum 100 characters).
+                          A good description helps travelers trust you as a host
+                          (minimum 100 characters).
                         </p>
                       </div>
 
@@ -410,6 +481,62 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                               required
                             />
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Languages Section */}
+                      <div className="mb-6">
+                        <label className="text-sm font-semibold text-gray-700 font-instrument">
+                          Languages You Speak
+                        </label>
+                        <div className="mt-2">
+                          {/* Selected Languages */}
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {formData.languages.map((language) => (
+                              <span
+                                key={language}
+                                className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
+                              >
+                                {language}
+                                <button
+                                  type="button"
+                                  onClick={() => handleLanguageRemove(language)}
+                                  className="hover:bg-purple-200 rounded-full p-0.5"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Language Selection Dropdown */}
+                          <div className="relative">
+                            <Languages className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <select
+                              className="w-full pl-10 pr-4 py-2 h-11 border border-gray-200 rounded-md focus:border-purple-400 focus:ring-purple-100 bg-white font-instrument"
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  handleLanguageAdd(e.target.value);
+                                  e.target.value = ""; // Reset selection
+                                }
+                              }}
+                              defaultValue=""
+                            >
+                              <option value="" disabled>
+                                Select a language to add...
+                              </option>
+                              {COMMON_LANGUAGES.filter(
+                                (lang) => !formData.languages.includes(lang)
+                              ).map((language) => (
+                                <option key={language} value={language}>
+                                  {language}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <p className="text-xs text-gray-500 font-instrument mt-1">
+                            Select languages you can communicate with guests in
+                          </p>
                         </div>
                       </div>
 
@@ -496,15 +623,22 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <ul className="text-sm text-gray-600 space-y-1">
                           <li className="flex items-start">
                             <CheckCircle2 className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="font-instrument">Your application will be reviewed by our team</span>
+                            <span className="font-instrument">
+                              Your application will be reviewed by our team
+                            </span>
                           </li>
                           <li className="flex items-start">
                             <CheckCircle2 className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="font-instrument">You&apos;ll receive an email when approved</span>
+                            <span className="font-instrument">
+                              You&apos;ll receive an email when approved
+                            </span>
                           </li>
                           <li className="flex items-start">
                             <CheckCircle2 className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="font-instrument">After approval, you can start creating travel plans</span>
+                            <span className="font-instrument">
+                              After approval, you can start creating travel
+                              plans
+                            </span>
                           </li>
                         </ul>
                       </div>
@@ -541,9 +675,9 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         </Button>
                       </div>
                     </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             </div>
           </div>
         </div>

@@ -21,6 +21,7 @@ export const getHostDetails = async () => {
         hostId: true,
         description: true,
         image: true,
+        languages: true,
         user: {
           select: {
             id: true,
@@ -80,6 +81,7 @@ export const updateHostProfile = async (data: {
   bio?: string;
   hostEmail?: string;
   hostMobile?: string;
+  languages?: string[];
 }) => {
   const session = await requireHost();
   if (!session) return { error: "Unauthorized" };
@@ -92,6 +94,7 @@ export const updateHostProfile = async (data: {
         image: data.image,
         hostEmail: data.hostEmail,
         hostMobile: data.hostMobile,
+        languages: data.languages,
       },
     });
 
@@ -134,7 +137,7 @@ export const createTravelPlan = async (data: {
     dayWiseImage?: string;
   }>;
 }) => {
-  console.log(",,",data);
+  console.log(",,", data);
   const session = await requireHost();
   if (!session)
     return { error: "Unauthorized", message: "Please login to continue" };
@@ -210,7 +213,7 @@ export const createTravelPlan = async (data: {
         description: data.description || "",
         includedActivities: data.includedActivities || [],
         stops: data.stops || [],
-        notIncludedActivities: [], 
+        notIncludedActivities: [],
         destination: data.destination || "",
         startDate: data.startDate,
         endDate: data.endDate,
@@ -237,7 +240,7 @@ export const createTravelPlan = async (data: {
       travelPlan.status
     );
 
-  if (data.dayWiseData && data.dayWiseData.length > 0) {
+    if (data.dayWiseData && data.dayWiseData.length > 0) {
       console.log(`Processing ${data.dayWiseData.length} day entries...`);
 
       try {
@@ -283,7 +286,7 @@ export const createTravelPlan = async (data: {
     } else {
       console.log("No day-wise data provided");
     }
-    console.log("Final created travel plan:", travelPlan.stops);  
+    console.log("Final created travel plan:", travelPlan.stops);
     return {
       success: true,
       travelPlan: { ...travelPlan, stops: travelPlan.stops || [] },
@@ -449,7 +452,7 @@ export const updateTravelPlan = async (
     if (travelPlanData.country !== undefined)
       updateData.country = travelPlanData.country;
     if (travelPlanData.stops !== undefined)
-       updateData.stops = travelPlanData.stops;
+      updateData.stops = travelPlanData.stops;
     if (travelPlanData.state !== undefined)
       updateData.state = travelPlanData.state;
     if (travelPlanData.city !== undefined)
@@ -493,7 +496,8 @@ export const updateTravelPlan = async (
           activities: Array.isArray(day.activities) ? day.activities : [],
           meals: day.meals || "",
           accommodation: day.accommodation || "",
-          dayWiseImage: day.dayWiseImage || "https://avatar.iran.liara.run/public",
+          dayWiseImage:
+            day.dayWiseImage || "https://avatar.iran.liara.run/public",
           destination: day.destination || "",
         })),
       });
@@ -724,7 +728,7 @@ export const getTripById = async (tripId: string) => {
     // Transform the data to match the form structure
     const transformedTrip = {
       ...trip,
-        dayWiseData: trip.dayWiseItinerary.map((day) => ({
+      dayWiseData: trip.dayWiseItinerary.map((day) => ({
         dayNumber: day.dayNumber,
         title: day.title,
         description: day.description,
@@ -1168,13 +1172,12 @@ export const getRevenueAnalytics = async () => {
   }
 };
 
-
 type LocationIQResult = { display_name?: string };
 
 export async function searchPlaces(query: string) {
   try {
     const decodedQuery = decodeURIComponent(query);
-    
+
     if (!decodedQuery) {
       return { results: [], error: null };
     }
@@ -1183,7 +1186,7 @@ export async function searchPlaces(query: string) {
     console.log("hiiii");
 
     const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
-    
+
     if (!token) {
       return {
         results: [],

@@ -264,6 +264,38 @@ export default function TravelPlanModal({
                           {travelPlan.host.user.phone}
                         </div>
                       </div>
+
+                      {/* Languages Display */}
+                      {(
+                        travelPlan.host as typeof travelPlan.host & {
+                          languages?: string[];
+                        }
+                      ).languages &&
+                        (
+                          travelPlan.host as typeof travelPlan.host & {
+                            languages?: string[];
+                          }
+                        ).languages!.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-xs text-gray-600 mr-2">
+                              Languages:
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {(
+                                travelPlan.host as typeof travelPlan.host & {
+                                  languages: string[];
+                                }
+                              ).languages.map((language: string) => (
+                                <span
+                                  key={language}
+                                  className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium"
+                                >
+                                  {language}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                     </div>
                     {travelPlan.host.description && (
                       <p className="text-gray-600">

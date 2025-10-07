@@ -101,24 +101,77 @@ const UserTicketDetailPage = () => {
     fetchTicket();
   }, [fetchTicket]);
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || sending) return;
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
+    if (!newMessage.trim() || sending || !session?.user) return;
+
+    const messageContent = newMessage.trim();
+    setNewMessage("");
     setSending(true);
+
+    // Optimistic update - add message immediately to UI
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      ticketId,
+      senderId: session.user.id,
+      message: messageContent,
+      isInternal: false,
+      attachments: [],
+      createdAt: new Date(),
+      sender: {
+        id: session.user.id,
+        name: session.user.name || "You",
+        email: session.user.email || null,
+        role: "USER",
+        image: session.user.image || null,
+      },
+    };
+
+    setTicket((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: [...prev.messages, optimisticMessage],
+      };
+    });
+
     try {
       const messageData: CreateTicketMessageData = {
         ticketId,
-        message: newMessage,
+        message: messageContent,
         isInternal: false, // Users can't send internal messages
       };
 
       const result = await addTicketMessage(messageData);
       if (result.success) {
-        setNewMessage("");
-        fetchTicket(); // Refresh to show new message
+        // Don't refresh the entire ticket - optimistic update is sufficient
+        // The optimistic message will stay in the UI
+        console.log("Message sent successfully");
+      } else {
+        // Remove optimistic message on error
+        setTicket((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            messages: prev.messages.filter(
+              (m) => m.id !== optimisticMessage.id
+            ),
+          };
+        });
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      // Remove optimistic message on error
+      setTicket((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          messages: prev.messages.filter((m) => m.id !== optimisticMessage.id),
+        };
+      });
     } finally {
       setSending(false);
     }
@@ -347,67 +400,85 @@ const UserTicketDetailPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4 max-h-96 overflow-y-auto p-2">
             {ticket.messages
               .filter((m) => !m.isInternal) // Hide internal messages from users
-              .map((message) => (
-                <div
-                  key={message.id}
-                  className={`p-4 rounded-lg ${
-                    message.sender.role === "USER"
-                      ? "bg-blue-50 ml-8"
-                      : "bg-gray-50 mr-8"
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          message.sender.role === "USER"
-                            ? "bg-blue-200"
-                            : "bg-gray-200"
-                        }`}
-                      >
-                        <User className="h-4 w-4 text-gray-600" />
+              .map((message) => {
+                // Customer message = message from the ticket creator (user who opened the ticket)
+                const isCustomerMessage = message.sender.id === ticket.userId;
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      isCustomerMessage ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`p-4 rounded-lg max-w-xs lg:max-w-md ${
+                        isCustomerMessage
+                          ? "bg-orange-100 text-gray-900 border border-orange-200 shadow-sm"
+                          : "bg-green-600 text-white border border-green-700 shadow-md"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              isCustomerMessage
+                                ? "bg-orange-200 text-orange-700"
+                                : "bg-green-200 text-green-700"
+                            }`}
+                          >
+                            <span className="text-xs font-semibold">
+                              {message.sender.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {message.sender.name}
+                            </p>
+                            <p className="text-xs opacity-75">
+                              {isCustomerMessage ? "You" : "Support Team"} •{" "}
+                              {new Date(message.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{message.sender.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {message.sender.role === "USER"
-                            ? "You"
-                            : "Support Team"}{" "}
-                          • {new Date(message.createdAt).toLocaleString()}
-                        </p>
-                      </div>
+                      <p className="text-sm">{message.message}</p>
                     </div>
                   </div>
-                  <p className="mt-2 text-gray-700">{message.message}</p>
-                </div>
-              ))}
+                );
+              })}
           </div>
 
           {/* New Message Form */}
           {ticket.status !== "CLOSED" && (
             <div className="mt-6 border-t pt-4">
-              <div className="space-y-3">
+              <form onSubmit={handleSendMessage} className="space-y-3">
                 <Textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Type your message..."
                   className="min-h-[100px]"
                   disabled={sending}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault();
+                      handleSendMessage(e);
+                    }
+                  }}
                 />
 
                 <div className="flex justify-end">
                   <Button
-                    onClick={handleSendMessage}
+                    type="submit"
                     disabled={!newMessage.trim() || sending}
                   >
                     <Send className="h-4 w-4 mr-2" />
                     {sending ? "Sending..." : "Send Message"}
                   </Button>
                 </div>
-              </div>
+              </form>
             </div>
           )}
 
