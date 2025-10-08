@@ -510,7 +510,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 
   const canCancelBooking = () => {
     if (booking.paymentStatus !== "FULLY_PAID") return false;
-    console.log("hii");
+
     const now = new Date();
     const startDate = new Date(booking.startDate);
     const daysUntilTrip = Math.ceil(
@@ -543,7 +543,7 @@ function BookingCard({ booking }: { booking: Booking }) {
     setIsLoading(true);
     try {
       const result = await cancelBooking(booking.id);
-      console.log("hloooo");
+
       if (result.success) {
         toast.success(
           "Booking cancelled successfully. Refund will be processed shortly."
@@ -552,7 +552,6 @@ function BookingCard({ booking }: { booking: Booking }) {
         router.refresh();
       } else {
         toast.error(result.error || "Failed to cancel booking");
-        console.log(result.error);
       }
     } catch (error) {
       console.error("Frontend: Cancellation error:", error);

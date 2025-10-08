@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { KeyboardEvent, ClipboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
@@ -11,12 +12,12 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSlot
+  InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Phone, Shield } from "lucide-react";
@@ -28,7 +29,7 @@ const COUNTRY_CODES = [
   { code: "+1", label: "🇺🇸 US" },
   { code: "+91", label: "🇮🇳 India" },
   { code: "+44", label: "🇬🇧 UK" },
-  { code: "+61", label: "🇦🇺 Australia" }
+  { code: "+61", label: "🇦🇺 Australia" },
 ];
 
 export default function PhoneAuthPage() {
@@ -48,9 +49,43 @@ export default function PhoneAuthPage() {
     }
   }, [countdown]);
 
-  // Format phone number
   const formatPhoneNumber = (value: string) => {
-    return value.replace(/[^\d]/g, ""); // keep only digits
+    return value.replace(/[^\d]/g, "");
+  };
+
+  const handlePhoneKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = [
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Home",
+      "End",
+      "Tab",
+      "Enter",
+    ];
+
+    if (e.ctrlKey || e.metaKey) return;
+
+    if (allowedKeys.includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  // Clean pasted input to digits only
+  const handlePhonePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const paste = e.clipboardData?.getData("text") ?? "";
+    const cleaned = paste.replace(/[^\d]/g, "");
+    if (!cleaned) return;
+    setPhoneNumber((prev) => {
+      // append cleaned digits to existing value
+      return `${prev}${cleaned}`;
+    });
   };
 
   // Send OTP
@@ -64,9 +99,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -81,9 +116,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -91,16 +126,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Sending verification code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)"
-      },
-      duration: 2000
-    });
+    // toast.loading("Sending verification code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 1000,
+    // });
 
     try {
       const result = await sendOtp(`${countryCode}${cleanPhone}`);
@@ -114,9 +149,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
       } else {
         const errorMessage = result.error || "Failed to send OTP";
@@ -127,9 +162,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -141,9 +176,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error sending OTP:", error);
     } finally {
@@ -161,9 +196,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       return;
     }
@@ -171,16 +206,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Verifying code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)"
-      },
-      duration: 2000
-    });
+    // toast.loading("Verifying code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 1000,
+    // });
 
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
@@ -189,7 +224,7 @@ export default function PhoneAuthPage() {
       const authResult = await signIn("phone", {
         phone,
         otp,
-        redirect: false
+        redirect: false,
       });
 
       if (authResult?.ok) {
@@ -199,9 +234,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         router.push("/");
         router.refresh();
@@ -214,9 +249,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -228,9 +263,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error verifying OTP:", error);
     } finally {
@@ -244,16 +279,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Resending verification code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)"
-      },
-      duration: 2000
-    });
+    // toast.loading("Resending verification code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 2000,
+    // });
 
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
@@ -267,9 +302,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
       } else {
         const errorMessage = result.error || "Failed to resend OTP";
@@ -280,9 +315,9 @@ export default function PhoneAuthPage() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(196, 181, 253, 0.3)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     } catch (error) {
@@ -294,9 +329,9 @@ export default function PhoneAuthPage() {
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(196, 181, 253, 0.3)",
           color: "white",
-          fontFamily: "var(--font-instrument)"
+          fontFamily: "var(--font-instrument)",
         },
-        duration: 4000
+        duration: 4000,
       });
       console.error("Error resending OTP:", error);
     } finally {
@@ -314,9 +349,9 @@ export default function PhoneAuthPage() {
         backdropFilter: "blur(12px)",
         border: "1px solid rgba(196, 181, 253, 0.3)",
         color: "white",
-        fontFamily: "var(--font-instrument)"
+        fontFamily: "var(--font-instrument)",
       },
-      duration: 2000
+      duration: 2000,
     });
   };
 
@@ -385,13 +420,17 @@ export default function PhoneAuthPage() {
                     </select>
                     <Input
                       type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={phoneNumber}
                       onChange={(e) =>
                         setPhoneNumber(formatPhoneNumber(e.target.value))
                       }
                       placeholder="Enter phone number"
                       className="flex-1 h-12"
-                      onKeyPress={(e) => {
+                      onKeyDown={handlePhoneKeyDown}
+                      onPaste={handlePhonePaste}
+                      onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === "Enter" && phoneNumber) {
                           handleSendOtp();
                         }
@@ -415,7 +454,6 @@ export default function PhoneAuthPage() {
               </>
             ) : (
               <>
-                {/* OTP Input */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
                     Verification Code
@@ -424,7 +462,9 @@ export default function PhoneAuthPage() {
                     <InputOTP
                       maxLength={6}
                       value={otp}
-                      onChange={(value) => setOtp(value)}
+                      onChange={(value) =>
+                        setOtp(value.replace(/\D/g, "").slice(0, 6))
+                      }
                     >
                       <InputOTPGroup className="flex gap-3">
                         {[...Array(6)].map((_, i) => (

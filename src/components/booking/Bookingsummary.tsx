@@ -8,7 +8,8 @@ import {
   CheckCircle,
   CreditCard,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  IndianRupee
 } from "lucide-react";
 import { BookingData, TravelPlan } from "@/types/booking";
 import // editBookingAction,
@@ -17,15 +18,7 @@ import // editBookingAction,
 "@/actions/booking/actions";
 /* import { BookingStatus } from "@prisma/client"; */
 import { useRouter } from "next/navigation";
-import { TripCard } from "../trips/TripCard";
 import { RawTrip } from "@/types/trips";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious
-} from "../ui/carousel";
 
 export interface BookingSummaryProps {
   booking: BookingData | null;
@@ -36,7 +29,7 @@ export interface BookingSummaryProps {
 }
 
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
-  ({ booking, travelPlan, loading = false, allTrips }) => {
+  ({ booking, travelPlan, loading = false }) => {
     const router = useRouter();
     const isCancelled = booking?.paymentStatus === "CANCELLED";
 
@@ -56,7 +49,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       (amount: number | undefined | null): string => {
         if (!amount) return "₹0";
         return new Intl.NumberFormat("en-IN", {
-          style: "currency",
+          
           currency: "INR"
         }).format(amount);
       },
@@ -65,17 +58,14 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
     // Calculate tax and totals
     const calculatePaymentBreakdown = useCallback(() => {
-      if (!booking) return { subtotal: 0, tax: 0, total: 0 };
+      if (!booking) return { subtotal: 0,total: 0 };
 
       const subtotal =
         (booking.pricePerPerson || 0) * (booking.participants || 0);
-      const taxRate = 0.18; // 18% GST
-      const tax = subtotal * taxRate;
-      const total = subtotal + tax;
+      const total = subtotal ;
 
       return {
         subtotal,
-        tax,
         total
       };
     }, [booking]);
@@ -384,7 +374,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     </div>
 
                     {/* Explore More Trips */}
-                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100">
+                    <div onClick={()=>router.push("/trips")} className="cursor-pointer bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="bg-purple-100 p-2 rounded-lg">
                           <MapPin className="w-4 h-4 text-purple-600" />
@@ -397,7 +387,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         Discover amazing destinations and create unforgettable
                         memories with our curated travel packages.
                       </p>
-
+{/* 
                       <Carousel>
                         <CarouselContent className="px-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {allTrips?.map((trip) => (
@@ -423,7 +413,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         </CarouselContent>
                         <CarouselPrevious />
                         <CarouselNext />
-                      </Carousel>
+                      </Carousel> */}
                     </div>
                     {booking.specialRequirements && (
                       <div className="bg-gray-50 rounded-xl p-5">
@@ -529,8 +519,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                               <span className="text-gray-700 font-instrument text-sm">
                                 Cost per person:
                               </span>
-                              <span className="font-semibold text-gray-900 font-instrument text-sm">
-                                {formatCurrency(booking.pricePerPerson)}
+                              <span className="font-semibold flex gap-1 text-gray-900 font-instrument text-sm">
+                                <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(booking.pricePerPerson)}</div>
                               </span>
                             </div>
                             <div className="flex justify-between items-center py-2 border-b border-gray-200">
@@ -541,29 +531,15 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                 {booking.participants || 0}
                               </span>
                             </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                              <span className="text-gray-700 font-instrument text-sm">
-                                Subtotal:
-                              </span>
-                              <span className="font-semibold text-gray-900 font-instrument text-sm">
-                                {formatCurrency(paymentBreakdown.subtotal)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                              <span className="text-gray-700 font-instrument text-sm">
-                                Tax (GST 18%):
-                              </span>
-                              <span className="font-semibold text-gray-900 font-instrument text-sm">
-                                {formatCurrency(paymentBreakdown.tax)}
-                              </span>
-                            </div>
+                         
+                    
                             <div className="bg-purple-50 rounded-lg p-3 mt-3">
                               <div className="flex justify-between items-center">
                                 <span className="text-gray-900 font-bold font-instrument">
                                   Total Amount:
                                 </span>
-                                <span className="text-lg font-bold text-purple-600 font-instrument">
-                                  {formatCurrency(paymentBreakdown.total)}
+                                <span className="text-lg gap-1 flex font-bold text-purple-600 font-instrument">
+                                  <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(paymentBreakdown.total)}</div>
                                 </span>
                               </div>
                             </div>
@@ -580,7 +556,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                     onClick={() =>
                                       handleContinueToPayment(true)
                                     }
-                                    className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
+                                    className="cursor-pointer w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
                transition-all duration-200
@@ -595,20 +571,19 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                       Book a Seat (Partial)
                                     </div>
                                     <span
-                                      className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+                                      className="bg-white/20 backdrop-blur-sm flex items-center gap-1 text-gray-500 text-sm font-medium
                  px-3 py-1 rounded-full border border-white/30
                  shadow-sm"
                                     >
-                                      Pay Partial ${booking.minPaymentAmount}
+                                      Pay Partial <div className="flex items-center"><IndianRupee className="w-4 h-4"/> {booking.minPaymentAmount}</div>
                                     </span>
                                   </button>
 
-                                  {/* Pay Complete Button */}
                                   <button
                                     onClick={() =>
                                       handleContinueToPayment(false)
                                     }
-                                    className="w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
+                                    className="cursor-pointer w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
                transition-all duration-200
@@ -624,11 +599,10 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                     </div>
                                     <span
                                       className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
-                 px-3 py-1 rounded-full border border-white/30
+                 px-3 py-1 rounded-full border flex gap-1 border-white/30
                  shadow-sm"
                                     >
-                                      Pay Full $
-                                      {formatCurrency(paymentBreakdown.total)}
+                                      Pay Full <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(paymentBreakdown.total)}</div>
                                     </span>
                                   </button>
                                 </>
@@ -652,11 +626,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                     Complete Payment
                                   </div>
                                   <span
-                                    className="bg-white/20 backdrop-blur-sm text-gray-500 text-sm font-medium
+                                    className="bg-white/20 flex gap-1 backdrop-blur-sm text-gray-500 text-sm font-medium
                px-3 py-1 rounded-full border border-white/30
                shadow-sm"
                                   >
-                                    Pay Remaining ${booking.remainingAmount}
+                                    Pay Remaining <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{booking.remainingAmount}</div>
                                   </span>
                                 </button>
                               )}

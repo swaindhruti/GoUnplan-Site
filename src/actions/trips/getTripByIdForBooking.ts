@@ -15,25 +15,24 @@ export const getTripById = async (tripId: string, bookingId: string) => {
       include: {
         host: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     });
 
     if (!trip) {
       return { error: "Trip not found" };
     }
-    console.log("Booking ID:", trip);
 
     const booking = await prisma.booking.findFirst({
       where: {
         userId: session.user.id,
         travelPlanId: tripId,
-        id: bookingId
+        id: bookingId,
       },
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
       select: {
         id: true,
@@ -50,8 +49,8 @@ export const getTripById = async (tripId: string, bookingId: string) => {
         travelPlan: true,
         guests: true,
         updatedAt: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
     return { trip, booking };
   } catch (error) {

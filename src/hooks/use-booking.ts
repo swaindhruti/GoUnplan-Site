@@ -4,13 +4,13 @@ import { useState, useCallback } from "react";
 import {
   createBooking,
   updateBookingGuestInfo,
-  updateBookingStatus
+  updateBookingStatus,
 } from "@/actions/booking/actions";
 import type {
   BookingData,
   DateSelectorUpdate,
   GuestInfoUpdate,
-  PaymentUpdate
+  PaymentUpdate,
 } from "@/types/booking";
 import { Booking } from "@prisma/client";
 
@@ -33,7 +33,7 @@ interface UseBookingStateReturn {
 export function useBookingState({
   userId,
   travelPlanId,
-  initialData = {}
+  initialData = {},
 }: UseBookingStateProps): UseBookingStateReturn {
   const [bookingData, setBookingData] = useState<Partial<BookingData>>({
     userId,
@@ -41,7 +41,7 @@ export function useBookingState({
     status: "PENDING",
     participants: 1,
     refundAmount: 0,
-    ...initialData
+    ...initialData,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +65,7 @@ export function useBookingState({
 
       return {
         ...rest,
-        ...(mappedStatus && { status: mappedStatus })
+        ...(mappedStatus && { status: mappedStatus }),
       };
     },
     []
@@ -78,10 +78,6 @@ export function useBookingState({
 
       try {
         updateBookingData(update);
-        if (bookingData.id) {
-          const result = { success: true };
-          console.log(result);
-        }
 
         return true;
       } catch (err) {
@@ -91,7 +87,7 @@ export function useBookingState({
         setIsLoading(false);
       }
     },
-    [bookingData.id, updateBookingData]
+    [updateBookingData]
   );
 
   const updateGuestInfo = useCallback(
@@ -106,7 +102,7 @@ export function useBookingState({
           const result = await updateBookingGuestInfo(bookingData.id, {
             participants: update.participants,
             guests: update.guests,
-            specialRequirements: update.specialRequirements
+            specialRequirements: update.specialRequirements,
             // submissionType: update.submissionType
           });
 
@@ -189,7 +185,7 @@ export function useBookingState({
           participants: data.participants || bookingData.participants || 1,
           specialRequirements: data.specialRequirements ?? undefined,
           guests: data.guests,
-          submissionType: data.submissionType
+          submissionType: data.submissionType,
         };
 
         const result = await createBooking(bookingPayload);
@@ -222,7 +218,7 @@ export function useBookingState({
       userId,
       travelPlanId,
       updateBookingData,
-      convertPrismaBookingToBookingData
+      convertPrismaBookingToBookingData,
     ]
   );
 
@@ -233,6 +229,6 @@ export function useBookingState({
     updateDateSelection,
     updateGuestInfo,
     updatePaymentInfo,
-    createNewBooking
+    createNewBooking,
   };
 }

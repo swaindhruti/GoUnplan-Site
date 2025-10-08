@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Map,
   ArrowRightCircle,
-  Dot
+  Dot,
 } from "lucide-react";
 import { ChatButton } from "@/components/chat/ChatButton";
 import { requireUser } from "@/lib/roleGaurd";
@@ -17,6 +17,8 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { v4 as uuidv4 } from "uuid";
 import TripItinerary from "@/components/trips/Itenary";
+import React from "react";
+import { MapWrapper } from "@/components/trips/MapWrapper";
 
 type Props = {
   params: Promise<{
@@ -40,7 +42,7 @@ export default async function TripDetailsPage({ params }: Props) {
       .toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
-        year: "2-digit"
+        year: "2-digit",
       })
       .toUpperCase();
   };
@@ -53,7 +55,7 @@ export default async function TripDetailsPage({ params }: Props) {
       : [
           `${trip.noOfDays} days of adventure`,
           `Explore ${trip.city}, ${trip.state}`,
-          `Professional guidance included`
+          `Professional guidance included`,
         ];
 
     result.push(tripHighlights);
@@ -69,7 +71,7 @@ export default async function TripDetailsPage({ params }: Props) {
       : [
           "No pets allowed",
           "Suitable for ages 12+",
-          "Not wheelchair accessible"
+          "Not wheelchair accessible",
         ];
 
     result.push(tripRestrictions);
@@ -85,7 +87,7 @@ export default async function TripDetailsPage({ params }: Props) {
       : [
           "Exclusive local experiences",
           "Personalized guided tours",
-          "Scenic hidden spots included"
+          "Scenic hidden spots included",
         ];
 
     result.push(tripSpecials);
@@ -124,14 +126,14 @@ export default async function TripDetailsPage({ params }: Props) {
     image: trip.host.image || "https://via.placeholder.com/60",
     email: trip.host.hostEmail,
     description: trip.host.description,
-    createdYear
+    createdYear,
   };
 
   const tripStats = {
     price: trip.price,
     noOfDays: trip.noOfDays,
     maxParticipants: trip.maxParticipants,
-    languages: trip.languages.join(", ")
+    languages: trip.languages.join(", "),
   };
 
   const sections = [
@@ -139,20 +141,20 @@ export default async function TripDetailsPage({ params }: Props) {
       title: "What's Special",
       items: specials,
       icon: "★",
-      iconColor: "text-yellow-400"
+      iconColor: "text-yellow-400",
     },
     {
       title: "What's Included",
       items: highlights,
       icon: "✓",
-      iconColor: "text-green-400"
+      iconColor: "text-green-400",
     },
     {
       title: "What's Not Included",
       items: restrictions,
       icon: "✗",
-      iconColor: "text-red-400"
-    }
+      iconColor: "text-red-400",
+    },
   ];
 
   const bookedSeats = trip.bookings.reduce((sum, b) => sum + b.participants, 0);
@@ -199,6 +201,29 @@ export default async function TripDetailsPage({ params }: Props) {
                   <p className="font-semibold text-base sm:text-lg text-gray-800 truncate">
                     Hosted by {trip.host.user.name}
                   </p>
+
+                  {/* Languages Display */}
+                  {trip.host.languages && trip.host.languages.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      <span className="text-xs text-gray-600 mr-1">
+                        Speaks:
+                      </span>
+                      {trip.host.languages.slice(0, 3).map((language) => (
+                        <span
+                          key={language}
+                          className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium"
+                        >
+                          {language}
+                        </span>
+                      ))}
+                      {trip.host.languages.length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          +{trip.host.languages.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {UserSession.user?.id && (
                     <ChatButton
                       currentUserId={UserSession.user.id}
@@ -212,7 +237,6 @@ export default async function TripDetailsPage({ params }: Props) {
               </div>
             </div>
 
-            {/* Trip Stats - Responsive Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm sm:text-base text-gray-700">
               <div className="flex items-center gap-2">
                 <span>⏳</span>
@@ -221,15 +245,10 @@ export default async function TripDetailsPage({ params }: Props) {
               <div className="flex items-center gap-2">
                 <span>📍</span>
                 <span className="truncate">
-                  {trip.city}, {trip.country}
+                  {trip.country}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span>🚩</span>
-                <span className="truncate">
-                  {trip.dayWiseItinerary.length} stops
-                </span>
-              </div>
+           
               <div className="flex items-center gap-2">
                 <span>👥</span>
                 <span className="truncate">
@@ -237,8 +256,15 @@ export default async function TripDetailsPage({ params }: Props) {
                 </span>
               </div>
             </div>
+              <div className="flex items-center gap-2">
+                <span>🚩</span>
+                <span className="truncate">
+                  {trip.stops.map((items,index)=>(
+                    <div key={index}>{items}</div>
+                  ))} 
+                </span>
+              </div>
 
-            {/* What's Included/Not Included Sections */}
             <div className="space-y-6">
               {sections.map((section, sectionIdx) => (
                 <div
@@ -272,15 +298,14 @@ export default async function TripDetailsPage({ params }: Props) {
                 {trip.description}
               </p>
             </div>
-            {/* 
-            <TripMap locations={mapItinerary} /> */}
 
-            {/* Itinerary */}
+            <MapWrapper stops={trip.stops} startDate={trip.startDate!} />
+
             <TripItinerary
               itinerary={trip.dayWiseItinerary.map((day) => ({
                 ...day,
                 startDate: trip.startDate ?? null,
-                accommodation: day.accommodation ?? undefined
+                accommodation: day.accommodation ?? undefined,
               }))}
             />
           </div>

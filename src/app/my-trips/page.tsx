@@ -20,8 +20,6 @@ export default async function MyTripsPage() {
     }
     const bookingsResponse = await getUserBookings(userSession.user.id);
 
-    console.log(bookingsResponse.bookings);
-
     if (!bookingsResponse.success) {
       console.error("Failed to fetch bookings:", bookingsResponse.error);
       return (
@@ -44,7 +42,7 @@ export default async function MyTripsPage() {
         user={{
           id: userSession.user.id,
           name: userSession.user.name || "",
-          email: userSession.user.email || ""
+          email: userSession.user.email || "",
         }}
       />
     );

@@ -20,7 +20,6 @@ export const MessageComponent = () => {
         setLoading(true);
         const result = await getUnreadCount(session.data.user.id);
         setUnreadCount(result.count || 0);
-        console.log("Unread messages:", result);
       } catch (error) {
         console.error("Error fetching unread count:", error);
         setUnreadCount(0);

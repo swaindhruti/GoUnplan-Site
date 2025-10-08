@@ -14,7 +14,6 @@ export const useTripsData = () => {
     const loadTrips = async () => {
       try {
         const result = await getAllActiveTrips();
-        console.log(result);
 
         if (!isMounted) return;
 
@@ -41,7 +40,7 @@ export const useTripsData = () => {
       isMounted = false;
     };
   }, []);
-  console.log(trips);
+
   return { trips, isLoading, error };
 };
 
@@ -74,8 +73,8 @@ export const useFilters = (trips: Trip[]) => {
         "Pet Friendly",
         "Senior",
         "Business",
-        "Backpackers"
-      ]
+        "Backpackers",
+      ],
     }),
     [trips]
   );
@@ -91,7 +90,7 @@ export const useFilters = (trips: Trip[]) => {
           trip.description,
           trip.city,
           trip.state,
-          trip.country
+          trip.country,
         ]
           .join(" ")
           .toLowerCase();
@@ -151,6 +150,6 @@ export const useFilters = (trips: Trip[]) => {
     clearAllFilters,
     filteredTrips,
     activeFiltersCount,
-    filterOptions
+    filterOptions,
   };
 };

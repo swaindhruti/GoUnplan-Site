@@ -78,7 +78,7 @@ export function PaymentForm({
   );
 
   const calculatePaymentBreakdown = useCallback(() => {
-    if (!booking) return { subtotal: 0, tax: 0, total: 0 };
+    if (!booking) return { subtotal: 0, total: 0 };
 
     let subtotal = 0;
 
@@ -92,13 +92,11 @@ export function PaymentForm({
         (booking.participants || tripData.numberOfGuests || 0);
     }
 
-    const taxRate = 0.18;
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
+  
+    const total = subtotal
 
     return {
       subtotal,
-      tax,
       total
     };
   }, [booking, tripData, isPartialPayment, isRemainingPayment]);
@@ -108,22 +106,10 @@ export function PaymentForm({
     [calculatePaymentBreakdown]
   );
 
-  const platformFee = useMemo(
-    () => Math.round(paymentBreakdown.subtotal * 0.025),
-    [paymentBreakdown.subtotal]
-  );
-  const serviceFee = useMemo(
-    () => Math.round(paymentBreakdown.subtotal * 0.075),
-    [paymentBreakdown.subtotal]
-  );
-  const gstAmount = useMemo(
-    () =>
-      Math.round((paymentBreakdown.subtotal + platformFee + serviceFee) * 0.18),
-    [paymentBreakdown.subtotal, platformFee, serviceFee]
-  );
+  
   const total = useMemo(
-    () => paymentBreakdown.subtotal + platformFee + serviceFee + gstAmount,
-    [paymentBreakdown.subtotal, platformFee, serviceFee, gstAmount]
+    () => paymentBreakdown.subtotal ,
+    [paymentBreakdown.subtotal]
   );
 
   // Countdown effect for payment completion
@@ -425,7 +411,7 @@ export function PaymentForm({
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    {/* <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-medium">
                           Platform Fee
@@ -441,9 +427,9 @@ export function PaymentForm({
                       <span className="font-semibold text-gray-900">
                         {formatCurrency(platformFee)}
                       </span>
-                    </div>
+                    </div> */}
 
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    {/* <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-medium">
                           Service Fee
@@ -459,9 +445,9 @@ export function PaymentForm({
                       <span className="font-semibold text-gray-900">
                         {formatCurrency(serviceFee)}
                       </span>
-                    </div>
+                    </div> */}
 
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    {/* <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-medium">GST</span>
                         <span className="text-xs text-gray-500">(18%)</span>
@@ -469,7 +455,7 @@ export function PaymentForm({
                       <span className="font-semibold text-gray-900">
                         {formatCurrency(gstAmount)}
                       </span>
-                    </div>
+                    </div> */}
 
                     <div className="flex justify-between items-center py-4 bg-gray-50 -mx-6 px-6 rounded-lg mt-4">
                       <span className="text-lg font-bold text-gray-900">

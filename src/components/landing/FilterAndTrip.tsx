@@ -8,7 +8,7 @@ import {
   Users,
   Search,
   ChevronDown,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -21,12 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem
+  SelectItem,
 } from "@/components/ui/select";
 import {
   Popover,
   PopoverTrigger,
-  PopoverContent
+  PopoverContent,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { PrimaryButton } from "./common";
@@ -50,13 +50,13 @@ export const FilterAndTrip = () => {
       label: "Destination",
       icon: <MapPin className="w-4 h-4 text-purple-600" />,
       type: "input",
-      placeholder: "Where to?"
+      placeholder: "Where to?",
     },
     {
       id: "startDate",
       label: "Start Date",
       icon: <Calendar className="w-4 h-4 text-purple-600" />,
-      type: "date"
+      type: "date",
     },
     {
       id: "travelerType",
@@ -73,9 +73,9 @@ export const FilterAndTrip = () => {
         { value: "Pet Friendly", label: "Pet Friendly" },
         { value: "Senior", label: "Senior" },
         { value: "Business", label: "Business" },
-        { value: "Backpackers", label: "Backpackers" }
+        { value: "Backpackers", label: "Backpackers" },
       ],
-      placeholder: "Select type"
+      placeholder: "Select type",
     },
     {
       id: "vibe",
@@ -92,10 +92,10 @@ export const FilterAndTrip = () => {
         { value: "Luxury", label: "Luxury" },
         { value: "Budget", label: "Budget" },
         { value: "Wellness", label: "Wellness" },
-        { value: "Family", label: "Family" }
+        { value: "Family", label: "Family" },
       ],
-      placeholder: "Your mood?"
-    }
+      placeholder: "Your mood?",
+    },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -104,7 +104,7 @@ export const FilterAndTrip = () => {
     if (vibe) params.append("vibe", vibe);
     if (travelerType) params.append("travelerType", travelerType);
     if (startDate) params.append("startDate", startDate.toISOString());
-    console.log("Search params:", params.toString());
+
     if (destination) params.append("destination", destination);
 
     router.push(`/trips?${params.toString()}`);
@@ -135,7 +135,7 @@ export const FilterAndTrip = () => {
               transition={{
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
               className="hidden sm:block"
             >
@@ -157,7 +157,7 @@ export const FilterAndTrip = () => {
                 delay: 0.8,
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
               className="hidden sm:block"
             >
