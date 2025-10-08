@@ -87,7 +87,7 @@ export function useBookingState({
         setIsLoading(false);
       }
     },
-    [bookingData.id, updateBookingData]
+    [updateBookingData]
   );
 
   const updateGuestInfo = useCallback(

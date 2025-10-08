@@ -245,15 +245,10 @@ export default async function TripDetailsPage({ params }: Props) {
               <div className="flex items-center gap-2">
                 <span>📍</span>
                 <span className="truncate">
-                  {trip.city}, {trip.country}
+                  {trip.country}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span>🚩</span>
-                <span className="truncate">
-                  {trip.dayWiseItinerary.length} stops
-                </span>
-              </div>
+           
               <div className="flex items-center gap-2">
                 <span>👥</span>
                 <span className="truncate">
@@ -261,6 +256,14 @@ export default async function TripDetailsPage({ params }: Props) {
                 </span>
               </div>
             </div>
+              <div className="flex items-center gap-2">
+                <span>🚩</span>
+                <span className="truncate">
+                  {trip.stops.map((items,index)=>(
+                    <div key={index}>{items}</div>
+                  ))} 
+                </span>
+              </div>
 
             <div className="space-y-6">
               {sections.map((section, sectionIdx) => (

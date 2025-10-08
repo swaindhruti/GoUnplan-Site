@@ -126,16 +126,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Sending verification code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)",
-      },
-      duration: 2000,
-    });
+    // toast.loading("Sending verification code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 1000,
+    // });
 
     try {
       const result = await sendOtp(`${countryCode}${cleanPhone}`);
@@ -206,16 +206,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Verifying code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)",
-      },
-      duration: 2000,
-    });
+    // toast.loading("Verifying code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 1000,
+    // });
 
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
@@ -279,16 +279,16 @@ export default function PhoneAuthPage() {
     setIsLoading(true);
     setErrors({});
 
-    toast.loading("Resending verification code...", {
-      style: {
-        background: "rgba(147, 51, 234, 0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(196, 181, 253, 0.3)",
-        color: "white",
-        fontFamily: "var(--font-instrument)",
-      },
-      duration: 2000,
-    });
+    // toast.loading("Resending verification code...", {
+    //   style: {
+    //     background: "rgba(147, 51, 234, 0.95)",
+    //     backdropFilter: "blur(12px)",
+    //     border: "1px solid rgba(196, 181, 253, 0.3)",
+    //     color: "white",
+    //     fontFamily: "var(--font-instrument)",
+    //   },
+    //   duration: 2000,
+    // });
 
     try {
       const cleanPhone = phoneNumber.replace(/[^\d]/g, "");
