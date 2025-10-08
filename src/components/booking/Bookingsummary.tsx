@@ -65,17 +65,14 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
     // Calculate tax and totals
     const calculatePaymentBreakdown = useCallback(() => {
-      if (!booking) return { subtotal: 0, tax: 0, total: 0 };
+      if (!booking) return { subtotal: 0,total: 0 };
 
       const subtotal =
         (booking.pricePerPerson || 0) * (booking.participants || 0);
-      const taxRate = 0.18; // 18% GST
-      const tax = subtotal * taxRate;
-      const total = subtotal + tax;
+      const total = subtotal ;
 
       return {
         subtotal,
-        tax,
         total
       };
     }, [booking]);
@@ -541,22 +538,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                 {booking.participants || 0}
                               </span>
                             </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                              <span className="text-gray-700 font-instrument text-sm">
-                                Subtotal:
-                              </span>
-                              <span className="font-semibold text-gray-900 font-instrument text-sm">
-                                {formatCurrency(paymentBreakdown.subtotal)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                              <span className="text-gray-700 font-instrument text-sm">
-                                Tax (GST 18%):
-                              </span>
-                              <span className="font-semibold text-gray-900 font-instrument text-sm">
-                                {formatCurrency(paymentBreakdown.tax)}
-                              </span>
-                            </div>
+                         
+                    
                             <div className="bg-purple-50 rounded-lg p-3 mt-3">
                               <div className="flex justify-between items-center">
                                 <span className="text-gray-900 font-bold font-instrument">
@@ -580,7 +563,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                     onClick={() =>
                                       handleContinueToPayment(true)
                                     }
-                                    className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
+                                    className="cursor-pointer w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
                transition-all duration-200
@@ -603,12 +586,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                     </span>
                                   </button>
 
-                                  {/* Pay Complete Button */}
                                   <button
                                     onClick={() =>
                                       handleContinueToPayment(false)
                                     }
-                                    className="w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
+                                    className="cursor-pointer w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
                transition-all duration-200
@@ -627,7 +609,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                  px-3 py-1 rounded-full border border-white/30
                  shadow-sm"
                                     >
-                                      Pay Full $
+                                      Pay Full
                                       {formatCurrency(paymentBreakdown.total)}
                                     </span>
                                   </button>

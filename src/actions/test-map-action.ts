@@ -1,6 +1,6 @@
 'use server'
 
-const LOCATIONIQ_API_KEY = 'pk.9ce3b9941516974807b79b5b9f408f8c';
+const LOCATIONIQ_API_KEY = process.env.LOCATIONIQ_API_KEY;
 
 export async function geocodeLocations(locations: string[]) {
   try {
