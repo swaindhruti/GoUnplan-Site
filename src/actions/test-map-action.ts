@@ -1,13 +1,12 @@
 'use server'
 
-const LOCATIONIQ_API_KEY = process.env.LOCATIONIQ_API_KEY;
 
 export async function geocodeLocations(locations: string[]) {
   try {
     const geocodedMarkers = [];
     
     for (const location of locations) {
-      const url = `https://us1.locationiq.com/v1/search?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(location)}&format=json`;
+      const url = `https://us1.locationiq.com/v1/search?key=${process.env.LOCATIONIQ_API_KEY}&q=${encodeURIComponent(location)}&format=json`;
       
       const response = await fetch(url, {
         cache: 'no-store',
@@ -54,5 +53,5 @@ export async function geocodeLocations(locations: string[]) {
 
 export async function getStaticMapUrl(markers: Array<{lat: number, lon: number}>, center: {lat: number, lon: number}, zoom: number) {
   const markerString = markers.map(m => `${m.lat},${m.lon}`).join('|');
-  return `https://maps.locationiq.com/v3/staticmap?key=${LOCATIONIQ_API_KEY}&center=${center.lat},${center.lon}&zoom=${zoom}&size=1200x600&format=png&markers=${markerString}`;
+  return `https://maps.locationiq.com/v3/staticmap?key=${process.env.LOCATIONIQ_API_KEY}&center=${center.lat},${center.lon}&zoom=${zoom}&size=1200x600&format=png&markers=${markerString}`;
 }

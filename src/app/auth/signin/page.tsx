@@ -81,16 +81,16 @@ function SignInForm() {
 
   const handleGoogleSignIn = async () => {
     try {
-      toast.loading("Redirecting to Google...", {
-        style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
-        },
-        duration: 2000,
-      });
+      // toast.loading("Redirecting to Google...", {
+      //   style: {
+      //     background: "rgba(147, 51, 234, 0.95)",
+      //     backdropFilter: "blur(12px)",
+      //     border: "1px solid rgba(196, 181, 253, 0.3)",
+      //     color: "white",
+      //     fontFamily: "var(--font-instrument)",
+      //   },
+      //   duration: 2000,
+      // });
 
       await signIn("google", {
         callbackUrl: "/",
