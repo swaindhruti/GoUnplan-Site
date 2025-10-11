@@ -11,19 +11,19 @@ import {
   Shield,
   CheckCircle,
   Users,
-  X,
   AlertCircle,
   Info,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { BookingData } from "@/types/booking";
 import Image from "next/image";
 import GreenConfirmationLoader from "../global/Loaders";
 import {
-  completeRemainingPayment,
-  processPartialPayment
-} from "@/actions/booking/actions";
+  processRazorpayPayment,
+  handlePaymentFailure,
+} from "@/actions/payment/razorpayActions";
 import { toast } from "sonner";
+import { initiateRazorpayPayment } from "@/lib/razorpay";
 
 interface PaymentFormProps {
   tripData: {
@@ -47,6 +47,11 @@ interface PaymentFormProps {
   paymentType?: string;
   isPartialPayment?: boolean;
   isRemainingPayment?: boolean;
+  userDetails?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 }
 
 export function PaymentForm({
@@ -54,16 +59,13 @@ export function PaymentForm({
   bookingId,
   booking,
   isPartialPayment,
-  isRemainingPayment
+  isRemainingPayment,
+  userDetails,
 }: PaymentFormProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<
-    "pending" | "success" | "failed" | null
-  >(null);
   const [countdown, setCountdown] = useState(10);
 
   const formatCurrency = useCallback(
@@ -71,7 +73,7 @@ export function PaymentForm({
       if (!amount) return "₹0";
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
-        currency: "INR"
+        currency: "INR",
       }).format(amount);
     },
     []
@@ -92,12 +94,11 @@ export function PaymentForm({
         (booking.participants || tripData.numberOfGuests || 0);
     }
 
-  
-    const total = subtotal
+    const total = subtotal;
 
     return {
       subtotal,
-      total
+      total,
     };
   }, [booking, tripData, isPartialPayment, isRemainingPayment]);
 
@@ -106,9 +107,8 @@ export function PaymentForm({
     [calculatePaymentBreakdown]
   );
 
-  
   const total = useMemo(
-    () => paymentBreakdown.subtotal ,
+    () => paymentBreakdown.subtotal,
     [paymentBreakdown.subtotal]
   );
 
@@ -126,98 +126,116 @@ export function PaymentForm({
     }
   }, [paymentCompleted, countdown, router]);
 
-  const handlePaymentClick = useCallback(() => {
-    setShowPaymentModal(true);
-    setPaymentStatus(null);
-  }, []);
-
   const formatDate = useCallback(
     (dateString: Date | string | undefined | null): string => {
       if (!dateString) return "N/A";
       return new Date(dateString).toLocaleDateString("en-IN", {
         year: "numeric",
         month: "short",
-        day: "numeric"
+        day: "numeric",
       });
     },
     []
   );
 
-  const handlePaymentConfirm = useCallback(async () => {
+  const handlePaymentClick = useCallback(async () => {
+    if (isProcessing) return;
+
     setIsProcessing(true);
-    setShowPaymentModal(false);
-    setShowLoader(true);
 
     try {
-      const result = isPartialPayment
-        ? await processPartialPayment(bookingId, total)
-        : await completeRemainingPayment(bookingId);
+      const paymentUserDetails = userDetails || {
+        name: "Guest User",
+        email: "",
+        phone: "",
+      };
 
-      if (result.success) {
-        toast.success(result.message, {
-          style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)"
-          },
-          duration: 3000
-        });
-      } else {
-        toast.error(result.message, {
-          style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)"
-          },
-          duration: 3000
-        });
-        throw new Error(result.error || "Payment failed");
-      }
-    } catch (error) {
-      toast.success("Some payment error occured during the payment", {
-        style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+      await initiateRazorpayPayment({
+        amount: total,
+        bookingId,
+        userDetails: paymentUserDetails,
+        tripTitle: tripData?.title || "Trip Booking",
+        onSuccess: async (paymentData) => {
+          setShowLoader(true);
+
+          try {
+            // Use the new Razorpay-specific payment processing
+            const result = await processRazorpayPayment(
+              bookingId,
+              paymentData,
+              total
+            );
+
+            if (result.success) {
+              toast.success(result.message, {
+                style: {
+                  background: "rgba(147, 51, 234, 0.95)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(196, 181, 253, 0.3)",
+                  color: "white",
+                  fontFamily: "var(--font-instrument)",
+                },
+                duration: 3000,
+              });
+            } else {
+              throw new Error(result.error || "Payment processing failed");
+            }
+          } catch (error) {
+            console.error("Payment processing error:", error);
+            toast.error(
+              "Payment was successful but processing failed. Please contact support.",
+              {
+                style: {
+                  background: "rgba(239, 68, 68, 0.95)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(252, 165, 165, 0.3)",
+                  color: "white",
+                  fontFamily: "var(--font-instrument)",
+                },
+                duration: 5000,
+              }
+            );
+          }
         },
-        duration: 3000
+        onFailure: async (error) => {
+          setIsProcessing(false);
+
+          // Log the failure using our action
+          await handlePaymentFailure(bookingId, error);
+
+          toast.error(error, {
+            style: {
+              background: "rgba(239, 68, 68, 0.95)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(252, 165, 165, 0.3)",
+              color: "white",
+              fontFamily: "var(--font-instrument)",
+            },
+            duration: 3000,
+          });
+        },
       });
-      console.error("Payment error:", error);
-      setShowLoader(false);
-      setPaymentStatus("failed");
-      setShowPaymentModal(true);
+    } catch (error) {
       setIsProcessing(false);
+      console.error("Payment initiation error:", error);
+      toast.error("Failed to initiate payment. Please try again.", {
+        style: {
+          background: "rgba(239, 68, 68, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(252, 165, 165, 0.3)",
+          color: "white",
+          fontFamily: "var(--font-instrument)",
+        },
+        duration: 3000,
+      });
     }
-  }, [bookingId, total, isPartialPayment]);
+  }, [bookingId, total, isProcessing, tripData, userDetails]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
     setIsProcessing(false);
     setPaymentCompleted(true);
   }, []);
-
-  const handlePaymentDecline = useCallback(() => {
-    setPaymentStatus("failed");
-    setIsProcessing(false);
-  }, []);
-
-  const handleRetryPayment = useCallback(() => {
-    setPaymentStatus(null);
-    setIsProcessing(false);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    if (!isProcessing) {
-      setShowPaymentModal(false);
-      setPaymentStatus(null);
-    }
-  }, [isProcessing]);
 
   const handleGoToTrips = useCallback(() => {
     router.push("/my-trips");
@@ -337,7 +355,7 @@ export function PaymentForm({
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
                 tripData?.tripImage ||
                 "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-              }')`
+              }')`,
             }}
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -689,91 +707,6 @@ export function PaymentForm({
               </div>
             </div>
           </div>
-
-          {/* Payment Confirmation Modal - Updated to show only when not using loader */}
-          {showPaymentModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
-                {/* Close Button */}
-                <button
-                  onClick={handleCloseModal}
-                  disabled={isProcessing}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-
-                {/* Modal Content */}
-                <div className="text-center">
-                  {paymentStatus === null && (
-                    <>
-                      <div className="bg-purple-100 p-4 rounded-2xl mb-6 inline-flex">
-                        <CreditCard className="w-12 h-12 text-purple-600" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        Confirm Payment
-                      </h2>
-                      <p className="text-gray-600 mb-6">
-                        You are about to pay{" "}
-                        <span className="font-bold text-purple-600">
-                          {formatCurrency(total)}
-                        </span>{" "}
-                        for{" "}
-                        <span className="font-semibold">{tripData.title}</span>
-                      </p>
-
-                      <div className="space-y-3">
-                        <Button
-                          onClick={handlePaymentConfirm}
-                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 rounded-xl"
-                        >
-                          Confirm & Pay
-                        </Button>
-                        <Button
-                          onClick={handlePaymentDecline}
-                          variant="outline"
-                          className="w-full border-red-300 text-red-600 hover:bg-red-50 font-semibold py-3 rounded-xl"
-                        >
-                          Cancel Payment
-                        </Button>
-                      </div>
-                    </>
-                  )}
-
-                  {paymentStatus === "failed" && (
-                    <>
-                      <div className="bg-red-100 p-4 rounded-2xl mb-6 inline-flex">
-                        <AlertCircle className="w-12 h-12 text-red-600" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        Payment Failed
-                      </h2>
-                      <p className="text-gray-600 mb-6">
-                        Your payment could not be processed. Please try again or
-                        contact support.
-                      </p>
-
-                      <div className="space-y-3">
-                        <Button
-                          onClick={handleRetryPayment}
-                          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 rounded-xl"
-                        >
-                          Retry Payment
-                        </Button>
-                        <Button
-                          onClick={handleCloseModal}
-                          variant="outline"
-                          className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-3 rounded-xl"
-                        >
-                          Close
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </>

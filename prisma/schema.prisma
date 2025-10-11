@@ -149,6 +149,8 @@ model Booking {
   paymentDeadline     DateTime?
   paymentStatus       PaymentStatus    @default(PENDING)
   remainingAmount     Int              @default(0)
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
   travelPlan          TravelPlans      @relation(fields: [travelPlanId], references: [travelPlanId])
   user                User             @relation(fields: [userId], references: [id])
   partialPayments     PartialPayment[]

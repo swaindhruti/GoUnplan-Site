@@ -87,13 +87,13 @@ export const Footer = () => {
             </h4>
             <nav className="space-y-3">
               {[
-                { name: "About Us", href: "/about" },
-                { name: "How It Works", href: "/how-it-works" },
-                { name: "Destinations", href: "/destinations" },
-                { name: "Experiences", href: "/experiences" },
-                { name: "Host Stories", href: "/stories" },
-                { name: "Travel Blog", href: "/blog" },
-                { name: "Help Center", href: "/help" },
+                { name: "Browse Trips", href: "/trips" },
+                { name: "My Trips", href: "/my-trips" },
+                { name: "Profile", href: "/profile" },
+                { name: "Chat", href: "/chat" },
+                { name: "Contact Us", href: "/contact" },
+                { name: "Support", href: "/support" },
+                { name: "Coming Soon", href: "/coming-soon" },
               ].map((link) => (
                 <Link
                   key={link.name}
@@ -118,9 +118,9 @@ export const Footer = () => {
                 </h4>
                 <nav className="space-y-2">
                   {[
-                    { name: "Book Experiences", href: "/book" },
-                    { name: "Travel Insurance", href: "/insurance" },
-                    { name: "Trip Planning", href: "/plan" },
+                    { name: "Browse Trips", href: "/trips" },
+                    { name: "My Bookings", href: "/my-trips" },
+                    { name: "Trip Planning", href: "/trips" },
                     { name: "Customer Support", href: "/support" },
                   ].map((link) => (
                     <Link
@@ -142,10 +142,10 @@ export const Footer = () => {
                 </h4>
                 <nav className="space-y-2">
                   {[
-                    { name: "Become a Host", href: "/host/register" },
+                    { name: "Become a Host", href: "/dashboard/host" },
                     { name: "Host Dashboard", href: "/dashboard/host" },
-                    { name: "Host Resources", href: "/host/resources" },
-                    { name: "Earnings Calculator", href: "/host/calculator" },
+                    { name: "Host Resources", href: "/support" },
+                    { name: "Host Support", href: "/support" },
                   ].map((link) => (
                     <Link
                       key={link.name}
@@ -248,19 +248,47 @@ export const Footer = () => {
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               {[
-                { name: "Privacy Policy", href: "/privacy" },
-                { name: "Terms of Service", href: "/terms" },
-                { name: "Cookie Policy", href: "/cookies" },
-                { name: "Refund Policy", href: "/refund" },
-              ].map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-600 hover:text-purple-600 transition-colors font-instrument"
-                >
-                  {link.name}
-                </Link>
-              ))}
+                {
+                  name: "Privacy Policy",
+                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  external: true,
+                },
+                {
+                  name: "Terms of Service",
+                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  external: true,
+                },
+                {
+                  name: "Payment Policy",
+                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  external: true,
+                },
+                {
+                  name: "Refund Policy",
+                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  external: true,
+                },
+              ].map((link) =>
+                link.external ? (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-purple-600 transition-colors font-instrument"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors font-instrument"
+                  >
+                    {link.name}
+                  </Link>
+                )
+              )}
             </div>
 
             {/* Language/Currency */}

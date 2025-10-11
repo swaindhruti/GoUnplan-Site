@@ -25,7 +25,7 @@ export default async function PaymentPage({ params, searchParams }: Props) {
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
       getTripById(tripId, bookingId),
-      requireUser()
+      requireUser(),
     ]);
 
     if (!userSession) {
@@ -47,6 +47,11 @@ export default async function PaymentPage({ params, searchParams }: Props) {
           paymentType={paymentType || "full-pay"}
           isPartialPayment={isPartialPayment}
           isRemainingPayment={isRemainingPayment}
+          userDetails={{
+            name: userSession.user.name || "Guest User",
+            email: userSession.user.email || "",
+            phone: userSession.user.phone || "",
+          }}
           tripData={{
             ...trip,
             tripImage:
@@ -55,7 +60,7 @@ export default async function PaymentPage({ params, searchParams }: Props) {
             pricePerPerson: trip?.price || 0,
             numberOfGuests: booking?.guests?.length,
             startDate: format(startDate, "MMM dd, yyyy"),
-            endDate: format(endDate, "MMM dd, yyyy")
+            endDate: format(endDate, "MMM dd, yyyy"),
           }}
         />
       </>

@@ -527,6 +527,28 @@ function BookingCard({ booking }: { booking: Booking }) {
     );
   };
 
+  const calculateRefundAmount = () => {
+    const daysUntilTrip = getDaysUntilTrip();
+    let refundPercentage = 0;
+
+    if (daysUntilTrip >= 30) {
+      refundPercentage = 1.0;
+    } else if (daysUntilTrip >= 14) {
+      refundPercentage = 0.8;
+    } else if (daysUntilTrip >= 7) {
+      refundPercentage = 0.5;
+    } else if (daysUntilTrip >= 4) {
+      refundPercentage = 0.2;
+    }
+
+    return {
+      refundAmount: Math.floor(
+        (booking.amountPaid || booking.totalPrice) * refundPercentage
+      ),
+      refundPercentage: Math.round(refundPercentage * 100),
+    };
+  };
+
   const handleOpenCancelModal = () => {
     if (!canCancelBooking()) {
       toast.error(
@@ -756,8 +778,13 @@ function BookingCard({ booking }: { booking: Booking }) {
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   <span>
-                    <strong>Full refund:</strong>{" "}
-                    {formatCurrency(booking.totalPrice)}
+                    <strong>
+                      {calculateRefundAmount().refundPercentage === 100
+                        ? "Full refund"
+                        : `${calculateRefundAmount().refundPercentage}% refund`}
+                      :
+                    </strong>{" "}
+                    {formatCurrency(calculateRefundAmount().refundAmount)}
                   </span>
                 </div>
                 <div className="mt-1 text-green-700">
