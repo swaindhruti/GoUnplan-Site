@@ -274,13 +274,16 @@ export const CreateDestinationForm = ({
       return;
     }
     try {
+    
       const res = await searchPlaces(q);
 
       if (res.error) {
         console.error(res.error);
         setStopSuggestions([]);
       } else {
-        setStopSuggestions(res.results || []);
+          if(q.length<=1)setStopSuggestions([])
+          else setStopSuggestions(res.results || []);
+        
       }
     } catch (error) {
       console.error("Search error:", error);

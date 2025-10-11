@@ -1134,7 +1134,7 @@ export async function searchPlaces(query: string) {
       return { results: [], error: null };
     }
 
-    const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
+    const token = process.env.LOCATIONIQ_API_KEY;
 
     if (!token) {
       return {
