@@ -218,7 +218,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50 mt-16">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,7 +250,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 mt-4">
         {/* Form - Full Width */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl w-full">

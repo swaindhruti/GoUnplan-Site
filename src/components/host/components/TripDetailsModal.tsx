@@ -323,6 +323,109 @@ export const TripDetailsModal = ({
                   </div>
                 </div>
 
+                {/* Travel Plan Details Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                  {/* What's Included */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-300">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 font-bricolage flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-blue-600" />
+                      What&apos;s Included
+                    </h3>
+                    <div className="space-y-2">
+                      {trip.includedActivities &&
+                      trip.includedActivities.length > 0 ? (
+                        trip.includedActivities.map((activity, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-gray-700 font-instrument">
+                              {activity}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 italic font-instrument">
+                          No included activities specified for this trip
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Not Included */}
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-5 border-2 border-red-300">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 font-bricolage flex items-center gap-2">
+                      <X className="h-5 w-5 text-red-600" />
+                      Not Included
+                    </h3>
+                    <div className="space-y-2">
+                      {trip.restrictions && trip.restrictions.length > 0 ? (
+                        trip.restrictions.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <span className="text-gray-700 font-instrument">
+                              {item}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 italic font-instrument">
+                          No exclusions specified for this trip
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* What's Special */}
+                  <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl p-5 border-2 border-emerald-300">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 font-bricolage flex items-center gap-2">
+                      <Star className="h-5 w-5 text-emerald-600" />
+                      What&apos;s Special
+                    </h3>
+                    <div className="space-y-2">
+                      {trip.special && trip.special.length > 0 ? (
+                        trip.special.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                            <span className="text-gray-700 font-instrument">
+                              {item}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 italic font-instrument">
+                          No special features specified for this trip
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Gender Preference */}
+                  <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-5 border-2 border-violet-300">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 font-bricolage flex items-center gap-2">
+                      <Users className="h-5 w-5 text-violet-600" />
+                      Gender Preference
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`px-3 py-1 rounded-full text-sm font-medium font-instrument ${
+                          trip.genderPreference === "MALE_ONLY"
+                            ? "bg-blue-100 text-blue-800"
+                            : trip.genderPreference === "FEMALE_ONLY"
+                            ? "bg-pink-100 text-pink-800"
+                            : "bg-purple-100 text-purple-800"
+                        }`}
+                      >
+                        {trip.genderPreference === "MALE_ONLY" &&
+                          "👨 Male Only"}
+                        {trip.genderPreference === "FEMALE_ONLY" &&
+                          "👩 Female Only"}
+                        {(trip.genderPreference === "MIX" ||
+                          !trip.genderPreference) &&
+                          "👥 Mixed Group"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Day-wise Itinerary */}
                 {trip.dayWiseData && trip.dayWiseData.length > 0 && (
                   <div className="space-y-4">

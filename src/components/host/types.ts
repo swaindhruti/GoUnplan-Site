@@ -63,6 +63,11 @@ export type Trip = {
   averageRating?: number;
   filters?: string[];
   languages?: string[];
+  includedActivities?: string[];
+  restrictions?: string[];
+  special?: string[];
+  notIncludedActivities?: string[];
+  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
   dayWiseData?: Array<{
     dayNumber: number;
     title: string;

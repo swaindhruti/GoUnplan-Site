@@ -394,6 +394,10 @@ export const updateTravelPlan = async (
       updateData.includedActivities = travelPlanData.includedActivities;
     if (travelPlanData.restrictions !== undefined)
       updateData.restrictions = travelPlanData.restrictions;
+    if (travelPlanData.special !== undefined)
+      updateData.special = Array.isArray(travelPlanData.special)
+        ? travelPlanData.special
+        : [];
     if (travelPlanData.noOfDays !== undefined)
       updateData.noOfDays = Number(travelPlanData.noOfDays);
     if (travelPlanData.price !== undefined)

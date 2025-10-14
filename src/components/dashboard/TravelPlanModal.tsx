@@ -59,6 +59,9 @@ interface TravelPlanDetails {
   description: string;
   includedActivities: string[];
   restrictions: string[];
+  special: string[];
+  notIncludedActivities: string[];
+  genderPreference: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
   noOfDays: number;
   hostId: string;
   price: number;
@@ -323,34 +326,96 @@ export default function TravelPlanModal({
               {/* Travel Plan Details */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Included Activities */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200/50">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-300">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <Filter className="w-5 h-5 text-blue-600" />
-                    Included Activities
+                    What&apos;s Included
                   </h4>
                   <div className="space-y-2">
-                    {travelPlan.includedActivities.map((activity, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="text-gray-700">{activity}</span>
-                      </div>
-                    ))}
+                    {travelPlan.includedActivities &&
+                    travelPlan.includedActivities.length > 0 ? (
+                      travelPlan.includedActivities.map((activity, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-gray-700">{activity}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No included activities specified for this trip
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Restrictions */}
-                <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-200/50">
+                {/* Not Included */}
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border-2 border-red-300">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <X className="w-5 h-5 text-red-600" />
-                    Restrictions
+                    Not Included
                   </h4>
                   <div className="space-y-2">
-                    {travelPlan.restrictions.map((restriction, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span className="text-gray-700">{restriction}</span>
-                      </div>
-                    ))}
+                    {travelPlan.restrictions &&
+                    travelPlan.restrictions.length > 0 ? (
+                      travelPlan.restrictions.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          <span className="text-gray-700">{item}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No exclusions specified for this trip
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* What's Special */}
+                <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-300">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-emerald-600" />
+                    What&apos;s Special
+                  </h4>
+                  <div className="space-y-2">
+                    {travelPlan.special && travelPlan.special.length > 0 ? (
+                      travelPlan.special.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                          <span className="text-gray-700">{item}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No special features specified for this trip
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Gender Preference */}
+                <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl p-6 border-2 border-violet-300">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-violet-600" />
+                    Gender Preference
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        travelPlan.genderPreference === "MALE_ONLY"
+                          ? "bg-blue-100 text-blue-800"
+                          : travelPlan.genderPreference === "FEMALE_ONLY"
+                          ? "bg-pink-100 text-pink-800"
+                          : "bg-purple-100 text-purple-800"
+                      }`}
+                    >
+                      {travelPlan.genderPreference === "MALE_ONLY" &&
+                        "👨 Male Only"}
+                      {travelPlan.genderPreference === "FEMALE_ONLY" &&
+                        "👩 Female Only"}
+                      {travelPlan.genderPreference === "MIX" &&
+                        "👥 Mixed Group"}
+                    </Badge>
                   </div>
                 </div>
 
@@ -358,35 +423,47 @@ export default function TravelPlanModal({
                 <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-6 border border-purple-200/50">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <Languages className="w-5 h-5 text-purple-600" />
-                    Languages
+                    Languages Offered
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {travelPlan.languages.map((language, index) => (
-                      <Badge
-                        key={index}
-                        className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
-                      >
-                        {language}
-                      </Badge>
-                    ))}
+                    {travelPlan.languages && travelPlan.languages.length > 0 ? (
+                      travelPlan.languages.map((language, index) => (
+                        <Badge
+                          key={index}
+                          className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+                        >
+                          {language}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No languages specified
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Filters */}
+                {/* Trip Vibes/Filters */}
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200/50">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <Filter className="w-5 h-5 text-amber-600" />
-                    Trip Filters
+                    Trip Vibes
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {travelPlan.filters.map((filter, index) => (
-                      <Badge
-                        key={index}
-                        className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm"
-                      >
-                        {filter}
-                      </Badge>
-                    ))}
+                    {travelPlan.filters && travelPlan.filters.length > 0 ? (
+                      travelPlan.filters.map((filter, index) => (
+                        <Badge
+                          key={index}
+                          className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm"
+                        >
+                          {filter}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No trip vibes specified
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
