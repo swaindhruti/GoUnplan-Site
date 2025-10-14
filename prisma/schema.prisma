@@ -97,6 +97,7 @@ model TravelPlans {
   filters               String[]           @default([])
   languages             String[]           @default([])
   stops                 String[]           @default([])
+  genderPreference      GenderPreference   @default(MIX)
   endDate               DateTime?
   startDate             DateTime?
   averageRating         Float              @default(0)
@@ -381,4 +382,10 @@ enum SupportTicketStatus {
   WAITING_FOR_USER
   RESOLVED
   CLOSED
+}
+
+enum GenderPreference {
+  MALE_ONLY
+  FEMALE_ONLY
+  MIX
 }

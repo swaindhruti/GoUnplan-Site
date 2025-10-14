@@ -7,16 +7,22 @@ export const CreateDestinationSchema = z
       .string()
       .min(10, "Description must be at least 10 characters"),
     destination: z.string().min(3, "Destination is required"),
-  country: z.string().min(2, "Country is required"),
-  noofdays: z.coerce.number().int().min(1, "Number of days must be at least 1"),
-  // Removed top-level `state` and `city` per form change (stops handled separately)
-  stops: z.array(z.string()).optional().default([]),
+    country: z.string().min(2, "Country is required"),
+    noofdays: z.coerce
+      .number()
+      .int()
+      .min(1, "Number of days must be at least 1"),
+    // Removed top-level `state` and `city` per form change (stops handled separately)
+    stops: z.array(z.string()).optional().default([]),
     activities: z.array(z.string()).optional().default([]),
-    
+
     price: z.coerce.number().positive("Price must be a positive number"),
     maxLimit: z.coerce
       .number()
       .positive("Participant limit must be a positive number"),
+    genderPreference: z
+      .enum(["MALE_ONLY", "FEMALE_ONLY", "MIX"])
+      .default("MIX"),
     startDate: z.string().or(z.date()),
     endDate: z.string().or(z.date()),
     filters: z.array(z.string()).optional().default([]),
@@ -31,7 +37,10 @@ export const CreateDestinationSchema = z
     dayWiseData: z
       .array(
         z.object({
-          dayNumber: z.number().min(1, "Day number must be at least 1").optional(),
+          dayNumber: z
+            .number()
+            .min(1, "Day number must be at least 1")
+            .optional(),
           title: z.string().min(1, "Day title is required"),
           destination: z.string().optional(),
           accommodation: z.string().optional(),
@@ -60,10 +69,10 @@ export const CreateDestinationSchema = z
           country: z
             .string()
             .min(2, "Country must be at least 2 characters")
-            .optional()
+            .optional(),
         })
       )
-      .nonempty("At least one day must be added")
+      .nonempty("At least one day must be added"),
   })
   .refine(
     (data) => {
@@ -76,7 +85,7 @@ export const CreateDestinationSchema = z
     },
     {
       message: "End date must be on or after start date",
-      path: ["endDate"]
+      path: ["endDate"],
     }
   );
 
@@ -85,11 +94,11 @@ export const CreateDestinationDraftSchema = z
     tripName: z.string().optional().default(""),
     description: z.string().optional().default(""),
     destination: z.string().optional().default(""),
-  country: z.string().optional().default(""),
-  // Removed top-level state and city for draft schema
-  stops: z.array(z.string()).optional().default([]),
-  price: z.coerce.number().optional().default(0),
-  noofdays: z.coerce.number().optional().default(1),
+    country: z.string().optional().default(""),
+    // Removed top-level state and city for draft schema
+    stops: z.array(z.string()).optional().default([]),
+    price: z.coerce.number().optional().default(0),
+    noofdays: z.coerce.number().optional().default(1),
     maxLimit: z.coerce.number().optional().default(0),
     startDate: z.string().or(z.date()).optional().default(""),
     endDate: z.string().or(z.date()).optional().default(""),
@@ -102,7 +111,10 @@ export const CreateDestinationDraftSchema = z
     dayWiseData: z
       .array(
         z.object({
-          dayNumber: z.number().min(1, "Day number must be at least 1").optional(),
+          dayNumber: z
+            .number()
+            .min(1, "Day number must be at least 1")
+            .optional(),
           title: z.string().optional().default(""),
           destination: z.string().optional(),
           accommodation: z.string().optional().default(""),
@@ -131,7 +143,7 @@ export const CreateDestinationDraftSchema = z
           country: z
             .string()
             .min(2, "Country must be at least 2 characters")
-            .optional()
+            .optional(),
         })
       )
       .optional()
@@ -147,9 +159,9 @@ export const CreateDestinationDraftSchema = z
           longitude: undefined,
           city: "",
           state: "",
-          country: ""
-        }
-      ])
+          country: "",
+        },
+      ]),
   })
   .refine(
     (data) => {
@@ -162,7 +174,7 @@ export const CreateDestinationDraftSchema = z
     },
     {
       message: "End date must be on or after start date",
-      path: ["endDate"]
+      path: ["endDate"],
     }
   );
 

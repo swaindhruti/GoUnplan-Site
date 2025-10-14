@@ -98,6 +98,7 @@ export interface TravelPlan {
   city?: string;
   status: "ACTIVE" | "INACTIVE" | "DRAFT";
   maxParticipants?: number;
+  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
   destination?: string | null;
   filters?: string[];
   languages: string[];

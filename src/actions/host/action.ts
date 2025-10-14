@@ -120,6 +120,7 @@ export const createTravelPlan = async (data: {
   endDate: Date | null;
   filters: string[];
   maxParticipants?: number;
+  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
   country: string;
   state: string;
   city: string;
@@ -200,6 +201,7 @@ export const createTravelPlan = async (data: {
         city: data.city || "",
         languages: data.languages || [],
         filters: data.filters || [],
+        genderPreference: data.genderPreference || "MIX",
         tripImage: data.tripImage || "https://avatar.iran.liara.run/public",
         status: statusToSet,
         host: {
@@ -337,6 +339,7 @@ export const updateTravelPlan = async (
     startDate?: Date | null;
     endDate?: Date | null;
     maxParticipants?: number;
+    genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
     country?: string;
     state?: string;
     city?: string;
@@ -413,6 +416,8 @@ export const updateTravelPlan = async (
       updateData.filters = travelPlanData.filters;
     if (travelPlanData.languages !== undefined)
       updateData.languages = travelPlanData.languages;
+    if (travelPlanData.genderPreference !== undefined)
+      updateData.genderPreference = travelPlanData.genderPreference;
     if (travelPlanData.destination !== undefined)
       updateData.destination = travelPlanData.destination;
     if (travelPlanData.tripImage !== undefined)

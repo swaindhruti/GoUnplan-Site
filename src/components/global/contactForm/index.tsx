@@ -148,6 +148,8 @@ export const CreateDestinationForm = ({
                 ? ""
                 : field.type === "multi-select"
                 ? []
+                : field.type === "select"
+                ? ""
                 : "",
           }),
           {}
@@ -274,16 +276,14 @@ export const CreateDestinationForm = ({
       return;
     }
     try {
-    
       const res = await searchPlaces(q);
 
       if (res.error) {
         console.error(res.error);
         setStopSuggestions([]);
       } else {
-          if(q.length<=1)setStopSuggestions([])
-          else setStopSuggestions(res.results || []);
-        
+        if (q.length <= 1) setStopSuggestions([]);
+        else setStopSuggestions(res.results || []);
       }
     } catch (error) {
       console.error("Search error:", error);
@@ -398,6 +398,7 @@ export const CreateDestinationForm = ({
       "filters",
       "tripImage",
       "noofdays",
+      "genderPreference",
     ];
     const step2Fields = [
       "destination",
@@ -941,7 +942,22 @@ export const CreateDestinationForm = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-6 border-b border-gray-200">
-            <StepIndicator />
+            <div className="flex items-center justify-between mb-6">
+              <StepIndicator />
+
+              {/* Back Button - Only show if not on first step */}
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  onClick={prevStep}
+                  variant="outline"
+                  className="px-4 py-2 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </Button>
+              )}
+            </div>
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -1073,6 +1089,94 @@ export const CreateDestinationForm = ({
                                   Provide a detailed description of your trip
                                   experience.
                                 </p>
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      }
+
+                      if (
+                        data.type === "select" &&
+                        data.options &&
+                        Array.isArray(data.options)
+                      ) {
+                        return (
+                          <FormField
+                            key={data.id}
+                            control={form.control}
+                            name={data.id as keyof FormDataType}
+                            render={({ field }) => (
+                              <FormItem className={data.className}>
+                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                  {data.label}
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <select
+                                      {...field}
+                                      value={
+                                        typeof field.value === "string"
+                                          ? field.value
+                                          : ""
+                                      }
+                                      onChange={(e) =>
+                                        field.onChange(e.target.value)
+                                      }
+                                      className="w-full h-11 px-3 py-2 pr-10 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:outline-none font-instrument bg-white appearance-none cursor-pointer transition-all duration-200 hover:border-gray-300"
+                                    >
+                                      <option
+                                        value=""
+                                        className="text-gray-400"
+                                      >
+                                        {data.placeholder}
+                                      </option>
+                                      {(data.options || []).map((option) => (
+                                        <option
+                                          key={option}
+                                          value={option}
+                                          className="text-gray-900 py-2"
+                                        >
+                                          {option === "MALE_ONLY"
+                                            ? "👨 Male Only"
+                                            : option === "FEMALE_ONLY"
+                                            ? "👩 Female Only"
+                                            : option === "MIX"
+                                            ? "👥 Mixed Group"
+                                            : option
+                                                .replace("_", " ")
+                                                .toLowerCase()
+                                                .replace(/\b\w/g, (l) =>
+                                                  l.toUpperCase()
+                                                )}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    {/* Custom dropdown arrow */}
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                      <svg
+                                        className="w-4 h-4 text-gray-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M19 9l-7 7-7-7"
+                                        />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                                {data.id === "genderPreference" && (
+                                  <p className="text-xs text-gray-500 mt-1 font-instrument">
+                                    Choose the gender preference for this trip
+                                    experience.
+                                  </p>
+                                )}
                               </FormItem>
                             )}
                           />
@@ -2167,21 +2271,7 @@ export const CreateDestinationForm = ({
                 )}
 
                 {/* Navigation and Submit Buttons */}
-                <div className="flex justify-between gap-4">
-                  <div className="flex gap-4">
-                    {currentStep > 1 && (
-                      <Button
-                        type="button"
-                        onClick={prevStep}
-                        variant="outline"
-                        className="px-6 py-3 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-instrument flex items-center gap-2"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        Back
-                      </Button>
-                    )}
-                  </div>
-
+                <div className="flex justify-end gap-4">
                   <div className="flex gap-4">
                     {currentStep === 3 && (
                       <Button
