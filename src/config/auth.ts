@@ -19,7 +19,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
     }),
-    // Email/Password Credentials
     Credentials({
       id: "credentials",
       name: "credentials",
@@ -41,8 +40,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const { email, password } = credentials;
           if (!email || !password) return null;
 
+          const loweredEmail = (email as string).toLowerCase();
+
           const user = await prisma.user.findUnique({
-            where: { email: email as string },
+            where: { email: loweredEmail as string },
           });
 
           if (!user || !user.password) return null;
@@ -131,7 +132,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.role = user.role;
         }
       } else {
-        // Always fetch the latest role from database for existing sessions
         if (token.email) {
           const currentUser = await prisma.user.findUnique({
             where: { email: token.email as string },
@@ -163,7 +163,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!existingUser) {
             const newUser = await prisma.user.create({
               data: {
-                email: user.email!,
+                email: user.email?.toLowerCase()!,
                 name: user.name || "",
                 image: user.image,
                 password: null,

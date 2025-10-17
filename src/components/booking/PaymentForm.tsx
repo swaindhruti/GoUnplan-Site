@@ -483,59 +483,6 @@ export function PaymentForm({
                         {formatCurrency(total)}
                       </span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Payment Method Card */}
-                <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-green-100 p-2 rounded-lg">
-                      <CreditCard className="w-5 h-5 text-green-600" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Payment Method
-                    </h2>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <Shield className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-blue-900">
-                          Secure Payment Gateway
-                        </p>
-                        <p className="text-sm text-blue-700">
-                          Your payment is protected by industry-standard
-                          encryption
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        VISA
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        MASTERCARD
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        UPI
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        NET BANKING
-                      </div>
-                    </div>
-                  </div>
 
                   <Button
                     onClick={handlePaymentClick}
@@ -545,7 +492,11 @@ export function PaymentForm({
                     <CreditCard className="w-5 h-5 mr-2" />
                     Pay {formatCurrency(total)}
                   </Button>
+                  </div>
                 </div>
+
+                {/* Payment Method Card */}
+                
 
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 shadow-xl transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="flex items-start gap-3">
@@ -637,7 +588,7 @@ export function PaymentForm({
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
+                  {/* <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="bg-green-100 p-2 rounded-lg">
                         <Shield className="w-5 h-5 text-green-600" />
@@ -673,7 +624,7 @@ export function PaymentForm({
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Support Contact */}
                   <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 shadow-xl transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
@@ -690,11 +641,12 @@ export function PaymentForm({
 
                       <Button
                         onClick={() => {
-                          const message = `Hi! I need help with my payment for "${tripData.title}". Trip ID: ${tripData.travelPlanId}`;
-                          const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
-                            message
-                          )}`;
-                          window.open(whatsappUrl, "_blank");
+                          // const message = `Hi! I need help with my payment for "${tripData.title}". Trip ID: ${tripData.travelPlanId}`;
+                          // const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
+                          //   message
+                          // )}`;
+                          // window.open(whatsappUrl, "_blank");
+                          router.push("/support");
                         }}
                         variant="outline"
                         className="w-full border-purple-300 text-purple-700 hover:bg-purple-100"

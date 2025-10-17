@@ -385,7 +385,7 @@ function SignInForm() {
             Continue with Google
           </Button>
 
-          <Button
+          {/* <Button
             type="button"
             variant="outline"
             className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
@@ -404,7 +404,7 @@ function SignInForm() {
             }}
           >
             Continue with Phone
-          </Button>
+          </Button> */}
           <div className="text-center">
             <p className="text-sm text-gray-600 font-instrument">
               Don&apos;t have an account?{" "}
