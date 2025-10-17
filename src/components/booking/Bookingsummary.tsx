@@ -33,6 +33,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     const router = useRouter();
     const isCancelled = booking?.paymentStatus === "CANCELLED";
 
+    console.log("Rendering BookingSummary with booking:", travelPlan?.tripImage);
+
     const formatDate = useCallback(
       (dateString: Date | string | undefined | null): string => {
         if (!dateString) return "N/A";
@@ -55,6 +57,14 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
       },
       []
     );
+
+      const refundData = [
+    { period: "30+ days before event", refund: "100% Refund" },
+    { period: "15-29 days before event", refund: "75% Refund" },
+    { period: "7-14 days before event", refund: "50% Refund" },
+    { period: "3-6 days before event", refund: "25% Refund" },
+    { period: "Less than 3 days", refund: "No Refund" }
+  ];
 
     // Calculate tax and totals
     const calculatePaymentBreakdown = useCallback(() => {
@@ -387,7 +397,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         Discover amazing destinations and create unforgettable
                         memories with our curated travel packages.
                       </p>
-{/* 
+                         {/* 
                       <Carousel>
                         <CarouselContent className="px-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {allTrips?.map((trip) => (
@@ -434,6 +444,42 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     )}
                   </>
                 </div>
+                <div className="backdrop-blur-xl bg-white/95 border border-white/20  shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 mt-10 rounded-3xl  overflow-hidden">
+        <div className="bg-purple-100   px-7 py-6 text-black">
+          <h2 className="text-xl font-semibold font-bricolage mb-2">Cancellation & Refund Policy</h2>
+          <p className="text-sm font-roboto opacity-95">Refund amount varies based on cancellation timing</p>
+        </div>
+        
+        <div className="overflow-x-auto ">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-purple-100 font-bricolage">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-black uppercase tracking-wider border-b-2 ">
+                  Cancellation Period
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-black uppercase tracking-wider border-b-2 ">
+                  Refund Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {refundData.map((row, index) => (
+                <tr 
+                  key={index} 
+                  className="bg-white font-roboto transition-colors duration-200 border-b border-gray-200 last:border-b-0"
+                >
+                  <td className="px-6 py-5 text-gray-500 font-medium">
+                    {row.period}
+                  </td>
+                  <td className="px-6 py-5 text-purple-600 font-semibold text-base">
+                    {row.refund}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
               </div>
 
               <div>
@@ -656,6 +702,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     )}
                   </div>
                 </div>
+                
               </div>
             </div>
           </div>
