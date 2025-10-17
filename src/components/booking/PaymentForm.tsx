@@ -8,7 +8,6 @@ import {
   DollarSign,
   MapPin,
   CreditCard,
-  Shield,
   CheckCircle,
   Users,
   AlertCircle,
