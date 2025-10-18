@@ -44,6 +44,7 @@ import {
   getAllBookings,
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
+import HostApplicationModal from "@/components/dashboard/HostApplicationModal";
 import { Role } from "@/types/auth";
 import RevenueReport from "@/components/dashboard/RevenueReport";
 import RevenueAnalytics from "@/components/dashboard/RevenueAnalytics";
@@ -255,6 +256,11 @@ export default function AdminDashboard() {
     string | null
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(
+    null
+  );
+  const [isHostApplicationModalOpen, setIsHostApplicationModalOpen] =
+    useState(false);
 
   const handleRevenueReportButton = () => {
     if (analyticsModal === true) setAnalyticsModal(false);
@@ -1390,6 +1396,18 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="outline"
                                   size="sm"
+                                  className="bg-blue-600 text-white hover:bg-blue-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
+                                  onClick={() => {
+                                    setSelectedApplicantId(applicant.id);
+                                    setIsHostApplicationModalOpen(true);
+                                  }}
+                                >
+                                  <EyeIcon className="w-4 h-4 mr-1" />
+                                  View Details
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
                                   className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                   onClick={() =>
                                     handleApproveHost(applicant.email || "")
@@ -2015,6 +2033,18 @@ export default function AdminDashboard() {
           onClose={handleCloseModal}
         />
       )}
+
+      {/* Host Application Details Modal */}
+      <HostApplicationModal
+        isOpen={isHostApplicationModalOpen}
+        onClose={() => {
+          setIsHostApplicationModalOpen(false);
+          setSelectedApplicantId(null);
+        }}
+        applicantId={selectedApplicantId}
+        onApprove={handleApproveHost}
+        onReject={handleRejectHost}
+      />
     </div>
   );
 }

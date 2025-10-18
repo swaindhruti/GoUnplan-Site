@@ -112,6 +112,115 @@ export const getHostApplications = async () => {
   }
 };
 
+export const getHostApplicationDetails = async (userId: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const applicant = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        bio: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        appliedForHost: true,
+        isEmailVerified: true,
+        // Include related data
+        bookings: {
+          select: {
+            id: true,
+            status: true,
+            totalPrice: true,
+            createdAt: true,
+            travelPlan: {
+              select: {
+                title: true,
+                destination: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 5, // Latest 5 bookings
+        },
+        reviews: {
+          select: {
+            id: true,
+            rating: true,
+            comment: true,
+            createdAt: true,
+            host: {
+              select: {
+                hostEmail: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 5, // Latest 5 reviews
+        },
+        supportTickets: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+            category: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 3, // Latest 3 support tickets
+        },
+        hostProfile: {
+          select: {
+            description: true,
+            averageRating: true,
+            reviewCount: true,
+            languages: true,
+            instagramUrl: true,
+            linkedinUrl: true,
+            twitterUrl: true,
+            websiteUrl: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: {
+            bookings: true,
+            reviews: true,
+            supportTickets: true,
+            sentMessages: true,
+            receivedMessages: true,
+          },
+        },
+      },
+    });
+
+    if (!applicant) {
+      return { error: "Applicant not found" };
+    }
+
+    if (!applicant.appliedForHost) {
+      return { error: "This user has not applied for host" };
+    }
+
+    return { success: true, applicant };
+  } catch (error) {
+    console.error("Error fetching host application details:", error);
+    return { error: "Failed to fetch host application details" };
+  }
+};
+
 export const approveHostApplication = async (email: string) => {
   const session = await requireAdmin();
   if (!session) return { error: "Unauthorized" };

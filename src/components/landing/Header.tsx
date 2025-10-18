@@ -633,12 +633,24 @@ export default function Header() {
 
           <div className="hidden lg:flex items-center space-x-4">
             {status === "unauthenticated" ? (
-              <Button
-                onClick={() => router.push("/auth/signin")}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
-              >
-                Sign In
-              </Button>
+              <div className="flex items-center space-x-3">
+                <Button
+                  onClick={() =>
+                    router.push("/auth/signin?callbackUrl=/dashboard/host")
+                  }
+                  variant="outline"
+                  className="border-red-500 text-white bg-red-500 hover:bg-purple-50 font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Apply as Host
+                </Button>
+                <Button
+                  onClick={() => router.push("/auth/signin")}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
+                >
+                  Sign In
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center space-x-4">
                 {isUserHost && (
@@ -910,16 +922,30 @@ export default function Header() {
 
                   <div className="flex flex-col space-y-4 p-6 border-t border-gray-200/60 bg-white/60 backdrop-blur-sm">
                     {status === "unauthenticated" ? (
-                      <Button
-                        onClick={() => {
-                          setIsOpen(false);
-                          router.push("/auth/signin");
-                        }}
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
-                      >
-                        <Sparkles className="mr-2 h-5 w-5" />
-                        Sign In to Continue
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push(
+                              "/auth/signin?callbackUrl=/dashboard/host"
+                            );
+                          }}
+                          className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                        >
+                          <UserPlus className="mr-2 h-5 w-5" />
+                          Apply as Host
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push("/auth/signin");
+                          }}
+                          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                        >
+                          <Sparkles className="mr-2 h-5 w-5" />
+                          Sign In to Continue
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         onClick={() => {

@@ -219,36 +219,6 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 mt-16">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link href="/" className="flex items-center gap-2">
-              <Compass className="h-8 w-8 text-purple-600" />
-              <span className="text-2xl font-bold text-gray-900 font-bricolage">
-                GoUnplan
-              </span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/auth/signin"
-                className="text-gray-600 hover:text-gray-900 font-instrument font-medium transition-colors"
-              >
-                Sign in
-              </Link>
-              <Link href="/dashboard/user">
-                <Button
-                  variant="outline"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50 font-instrument"
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-1 min-h-0 mt-4">
         {/* Form - Full Width */}
