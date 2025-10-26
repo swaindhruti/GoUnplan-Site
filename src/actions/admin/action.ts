@@ -4,6 +4,10 @@ import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/roleGaurd";
 import { Role } from "@/types/auth";
 import { TravelPlanStatus, BookingStatus, Prisma } from "@prisma/client";
+import {
+  sendHostApprovalEmail,
+  sendHostRejectionEmail,
+} from "@/lib/emailService";
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();
@@ -229,12 +233,32 @@ export const approveHostApplication = async (email: string) => {
     const user = await prisma.user.findUnique({ where: { email: email } });
     if (!user) return { error: "User not found" };
 
+    // Update user role to HOST
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { role: "HOST", appliedForHost: false },
     });
 
-    return { success: true, user: updatedUser };
+    // Send approval email
+    const emailResult = await sendHostApprovalEmail(email, user.name);
+
+    if (!emailResult.success) {
+      // Log the email error but don't fail the approval
+      console.error("Email sending failed:", emailResult.error);
+      return {
+        success: true,
+        user: updatedUser,
+        emailError: emailResult.error,
+        message:
+          "Host approved successfully, but notification email failed to send. Please inform the user manually.",
+      };
+    }
+
+    return {
+      success: true,
+      user: updatedUser,
+      message: "Host approved successfully and notification email sent.",
+    };
   } catch (error) {
     console.error("Error approving host application:", error);
     return { error: "Failed to approve host application" };
@@ -249,12 +273,32 @@ export const rejectHostApplication = async (email: string) => {
     const user = await prisma.user.findUnique({ where: { email: email } });
     if (!user) return { error: "User not found" };
 
+    // Update user to remove host application flag
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { appliedForHost: false },
     });
 
-    return { success: true, user: updatedUser };
+    // Send rejection email
+    const emailResult = await sendHostRejectionEmail(email, user.name);
+
+    if (!emailResult.success) {
+      // Log the email error but don't fail the rejection
+      console.error("Email sending failed:", emailResult.error);
+      return {
+        success: true,
+        user: updatedUser,
+        emailError: emailResult.error,
+        message:
+          "Application rejected successfully, but notification email failed to send. Please inform the user manually.",
+      };
+    }
+
+    return {
+      success: true,
+      user: updatedUser,
+      message: "Application rejected successfully and notification email sent.",
+    };
   } catch (error) {
     console.error("Error rejecting host application:", error);
     return { error: "Failed to reject host application" };
@@ -496,6 +540,45 @@ export const approveTravelPlan = async (travelPlanId: string) => {
     }
     console.error("Error approving travel plan:", error);
     return { error: "Failed to approve travel plan" };
+  }
+};
+
+export const getAllActiveTrips = async () => {
+  const session = await requireAdmin();
+  if (!session) return { error: "Unauthorized" };
+
+  try {
+    const activeTrips = await prisma.travelPlans.findMany({
+      where: { status: TravelPlanStatus.ACTIVE },
+      include: {
+        host: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            bookings: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!activeTrips || activeTrips.length === 0) {
+      return { success: true, activeTrips: [] };
+    }
+
+    return { success: true, activeTrips };
+  } catch (error) {
+    console.error("Error fetching active trips:", error);
+    return { error: "Failed to fetch active trips" };
   }
 };
 

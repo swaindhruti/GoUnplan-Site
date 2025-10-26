@@ -8,29 +8,31 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  email            String?           @unique
-  name             String
-  bio              String?           @default("Travelling with vibe")
-  phone            String?           @unique
-  password         String?
-  role             Role              @default(USER)
-  image            String?           @default("https://avatar.iran.liara.run/public")
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  appliedForHost   Boolean           @default(false)
-  isEmailVerified  Boolean           @default(false)
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  bookings         Booking[]
-  chatParticipants ChatParticipant[]
-  hostProfile      HostProfile?
-  receivedMessages Message[]         @relation("ReceivedMessages")
-  sentMessages     Message[]         @relation("SentMessages")
-  reviews          Review[]
-  supportTickets   SupportTicket[]
-  assignedTickets  SupportTicket[]   @relation("AssignedTickets")
-  ticketMessages   TicketMessage[]   @relation("TicketMessages")
+  id                      String            @id @default(cuid())
+  email                   String?           @unique
+  name                    String
+  bio                     String?           @default("Travelling with vibe")
+  phone                   String?           @unique
+  password                String?
+  role                    Role              @default(USER)
+  image                   String?           @default("https://avatar.iran.liara.run/public")
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  appliedForHost          Boolean           @default(false)
+  isEmailVerified         Boolean           @default(false)
+  verificationToken       String?
+  verificationTokenExpiry DateTime?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  bookings                Booking[]
+  chatParticipants        ChatParticipant[]
+  hostProfile             HostProfile?
+  receivedMessages        Message[]         @relation("ReceivedMessages")
+  sentMessages            Message[]         @relation("SentMessages")
+  reviews                 Review[]
+  supportTickets          SupportTicket[]
+  assignedTickets         SupportTicket[]   @relation("AssignedTickets")
+  ticketMessages          TicketMessage[]   @relation("TicketMessages")
 
   @@map("users")
 }

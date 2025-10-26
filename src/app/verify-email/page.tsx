@@ -11,27 +11,67 @@ import {
   ArrowLeft,
   User,
   Phone,
+  AlertCircle,
 } from "lucide-react";
-import { verifyEmail } from "@/actions/email-verification/action";
+import {
+  verifyEmail,
+  verifyEmailWithToken,
+} from "@/actions/email-verification/action";
 import { getUserProfile } from "@/actions/user/action";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Extract token from URL
+  const token = searchParams.get("token");
+
   useEffect(() => {
-    if (session?.user?.email) {
+    // Auto-verify if token is present in URL
+    if (token) {
+      handleTokenVerification(token);
+    } else if (session?.user?.email) {
+      // Only fetch profile if no token present
       fetchUserProfile();
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, session?.user?.email]);
+
+  const handleTokenVerification = async (verificationToken: string) => {
+    setIsVerifying(true);
+    setIsLoading(true);
+    try {
+      const result = await verifyEmailWithToken(verificationToken);
+      if (result.success) {
+        setIsVerified(true);
+        toast.success(result.message);
+        // Fetch updated user profile
+        if (session?.user?.email) {
+          await fetchUserProfile();
+        }
+      } else {
+        setTokenError(result.error || "Verification failed");
+        toast.error(result.error || "Failed to verify email");
+      }
+    } catch (error) {
+      console.error("Token verification error:", error);
+      setTokenError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsVerifying(false);
+      setIsLoading(false);
+    }
+  };
 
   const fetchUserProfile = async () => {
     if (!session?.user?.email) return;
@@ -159,7 +199,53 @@ export default function VerifyEmailPage() {
 
             {/* Content Section */}
             <div className="p-8 space-y-8">
-              {!isVerified ? (
+              {tokenError ? (
+                <>
+                  <div className="text-center space-y-6">
+                    <div className="mx-auto w-20 h-20 bg-gradient-to-br from-red-100 to-orange-100 rounded-full flex items-center justify-center shadow-lg">
+                      <AlertCircle className="h-10 w-10 text-red-600" />
+                    </div>
+                    <div className="space-y-3">
+                      <h2 className="text-2xl font-bold text-red-900 font-bricolage">
+                        Verification Failed
+                      </h2>
+                      <p className="text-gray-600 font-instrument text-lg">
+                        {tokenError}
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6 shadow-sm">
+                      <div className="flex items-center gap-3 justify-center text-red-700">
+                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                          <AlertCircle className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium font-instrument">
+                          {tokenError.includes("expired")
+                            ? "Your verification link has expired"
+                            : "Invalid verification link"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      onClick={handleGoToProfile}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white h-12 font-instrument shadow-lg hover:shadow-xl transition-all duration-200"
+                      size="lg"
+                    >
+                      Go to Profile
+                    </Button>
+                    <Button
+                      onClick={handleGoHome}
+                      variant="outline"
+                      className="h-12 font-instrument border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200"
+                      size="lg"
+                    >
+                      Go Home
+                    </Button>
+                  </div>
+                </>
+              ) : !isVerified ? (
                 <>
                   <div className="text-center space-y-6">
                     <div className="space-y-2">

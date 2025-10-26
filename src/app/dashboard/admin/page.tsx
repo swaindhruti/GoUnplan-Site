@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import Image from "next/image";
 
 import {
   Table,
@@ -30,6 +32,7 @@ import {
   Phone,
   EyeIcon,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import {
   getAllUsers,
@@ -42,6 +45,7 @@ import {
   getAlltravelPlanApplications,
   approveTravelPlan,
   getAllBookings,
+  getAllActiveTrips,
 } from "@/actions/admin/action";
 import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
 import HostApplicationModal from "@/components/dashboard/HostApplicationModal";
@@ -96,6 +100,38 @@ interface TravelPlan {
   price: number;
   hostId: string;
   createdAt: Date;
+}
+
+interface ActiveTrip {
+  travelPlanId: string;
+  title: string;
+  description: string;
+  country: string;
+  state: string;
+  city: string;
+  noOfDays: number;
+  price: number;
+  hostId: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  startDate: Date | null;
+  endDate: Date | null;
+  maxParticipants: number;
+  tripImage: string | null;
+  averageRating: number;
+  reviewCount: number;
+  host: {
+    hostId: string;
+    user: {
+      name: string;
+      email: string | null;
+      phone: string | null;
+    };
+  };
+  _count: {
+    bookings: number;
+  };
 }
 
 interface Booking {
@@ -219,6 +255,7 @@ export default function AdminDashboard() {
   const [hosts, setHosts] = useState<Host[]>([]);
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [travelPlans, setTravelPlans] = useState<TravelPlan[]>([]);
+  const [activeTrips, setActiveTrips] = useState<ActiveTrip[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [revenueReportModal, setRevenueReportModal] = useState(false);
   const [bookingCounts, setBookingCounts] = useState<BookingCounts>({
@@ -252,6 +289,9 @@ export default function AdminDashboard() {
     "all" | "hosts" | "travelplans"
   >("all");
   const [bookingFilter, setBookingFilter] = useState<string>("ALL");
+  const [liveTripsFilter, setLiveTripsFilter] = useState<
+    "upcoming" | "ongoing" | "completed"
+  >("upcoming");
   const [selectedTravelPlanId, setSelectedTravelPlanId] = useState<
     string | null
   >(null);
@@ -383,6 +423,14 @@ export default function AdminDashboard() {
         }
         setTravelPlans(travelPlansResponse.travelPlans || []);
 
+        // Fetch active trips
+        const activeTripsResponse = await getAllActiveTrips();
+        if (activeTripsResponse.error) {
+          setError(activeTripsResponse.error);
+          return;
+        }
+        setActiveTrips(activeTripsResponse.activeTrips || []);
+
         const bookingsResponse = await getAllBookings();
         if (bookingsResponse.error) {
           setError(bookingsResponse.error);
@@ -441,7 +489,26 @@ export default function AdminDashboard() {
       const response = await approveHostApplication(email);
       if (response?.error) {
         setError(response.error);
+        toast.error("Failed to Approve", {
+          description: response.error,
+        });
         return;
+      }
+
+      // Check if there was an email error
+      if (response.emailError) {
+        toast.warning("Approval Successful with Warning", {
+          description:
+            response.message ||
+            "Host approved but email notification failed to send.",
+          duration: 6000,
+        });
+      } else {
+        toast.success("Host Approved!", {
+          description:
+            response.message ||
+            "Host application approved and notification email sent successfully.",
+        });
       }
 
       setApplicants(applicants.filter((app) => app.email !== email));
@@ -457,6 +524,9 @@ export default function AdminDashboard() {
       });
     } catch (err) {
       setError("Failed to approve host application");
+      toast.error("Error", {
+        description: "Failed to approve host application. Please try again.",
+      });
       console.error(err);
     }
   };
@@ -466,8 +536,28 @@ export default function AdminDashboard() {
       const response = await rejectHostApplication(email);
       if (response && response.error) {
         setError(response.error);
+        toast.error("Failed to Reject", {
+          description: response.error,
+        });
         return;
       }
+
+      // Check if there was an email error
+      if (response.emailError) {
+        toast.warning("Rejection Successful with Warning", {
+          description:
+            response.message ||
+            "Application rejected but email notification failed to send.",
+          duration: 6000,
+        });
+      } else {
+        toast.success("Application Rejected", {
+          description:
+            response.message ||
+            "Application rejected and notification email sent successfully.",
+        });
+      }
+
       setApplicants(applicants.filter((app) => app.email !== email));
       setStatsData({
         ...statsData,
@@ -475,6 +565,9 @@ export default function AdminDashboard() {
       });
     } catch (err) {
       setError("Failed to reject host application");
+      toast.error("Error", {
+        description: "Failed to reject host application. Please try again.",
+      });
       console.error(err);
     }
   };
@@ -598,30 +691,42 @@ export default function AdminDashboard() {
       label: "USERS",
       icon: <Users className="w-5 h-5" />,
       description: "User Management",
+      count: users.length,
     },
     {
       id: "hosts",
       label: "HOSTS",
       icon: <UserCheck className="w-5 h-5" />,
       description: "Host Management",
+      count: hosts.length,
     },
     {
       id: "support",
       label: "SUPPORT",
       icon: <Shield className="w-5 h-5" />,
       description: "Support Team Management",
+      count: users.filter((u) => u.role === "SUPPORT").length,
     },
     {
       id: "applicants",
       label: "APPLICATIONS",
       icon: <UserPlus className="w-5 h-5" />,
       description: "Pending Reviews",
+      count: applicants.length + travelPlans.length,
+    },
+    {
+      id: "livetrips",
+      label: "LIVE TRIPS",
+      icon: <MapPin className="w-5 h-5" />,
+      description: "Active Travel Plans",
+      count: activeTrips.length,
     },
     {
       id: "revenue",
       label: "REVENUE",
       icon: <BarChart3 className="w-5 h-5" />,
       description: "Financial Analytics",
+      count: undefined, // No count for revenue tab
     },
 
     {
@@ -629,6 +734,7 @@ export default function AdminDashboard() {
       label: "BOOKINGS",
       icon: <Calendar className="w-5 h-5" />,
       description: "Booking Management",
+      count: bookings.length,
     },
   ];
 
@@ -686,13 +792,13 @@ export default function AdminDashboard() {
       </div>
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-center space-x-2 overflow-x-auto py-4">
+          <div className="flex flex-wrap justify-center gap-2 py-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  px-6 py-3 rounded-full font-instrument font-semibold text-sm transition-all duration-200
+                  px-6 py-3 rounded-full font-instrument font-semibold text-sm transition-all duration-200 relative whitespace-nowrap
                   ${
                     activeTab === tab.id
                       ? "bg-purple-600 text-white"
@@ -703,6 +809,20 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-2">
                   {tab.icon}
                   <span>{tab.label}</span>
+                  {tab.count !== undefined && tab.count > 0 && (
+                    <span
+                      className={`
+                        ml-2 px-2 py-0.5 rounded-full text-xs font-bold
+                        ${
+                          activeTab === tab.id
+                            ? "bg-white text-purple-600"
+                            : "bg-purple-100 text-purple-600"
+                        }
+                      `}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
                 </div>
               </button>
             ))}
@@ -1769,6 +1889,336 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === "livetrips" && (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Live Trips Management
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    View and manage all active travel plans on the platform
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold text-green-700">
+                    {activeTrips.length} Active Trip
+                    {activeTrips.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filter Buttons */}
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    Filter by Status:
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setLiveTripsFilter("upcoming")}
+                    className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                      liveTripsFilter === "upcoming"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Upcoming (
+                    {
+                      activeTrips.filter(
+                        (t) => t.startDate && new Date(t.startDate) > new Date()
+                      ).length
+                    }
+                    )
+                  </button>
+                  <button
+                    onClick={() => setLiveTripsFilter("ongoing")}
+                    className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                      liveTripsFilter === "ongoing"
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Ongoing (
+                    {
+                      activeTrips.filter(
+                        (t) =>
+                          t.startDate &&
+                          t.endDate &&
+                          new Date(t.startDate) <= new Date() &&
+                          new Date(t.endDate) >= new Date()
+                      ).length
+                    }
+                    )
+                  </button>
+                  <button
+                    onClick={() => setLiveTripsFilter("completed")}
+                    className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
+                      liveTripsFilter === "completed"
+                        ? "bg-purple-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Completed (
+                    {
+                      activeTrips.filter(
+                        (t) => t.endDate && new Date(t.endDate) < new Date()
+                      ).length
+                    }
+                    )
+                  </button>
+                </div>
+              </div>
+
+              {activeTrips.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <MapPin className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 font-bricolage mb-2">
+                    No Active Trips
+                  </h3>
+                  <p className="text-gray-600 font-instrument">
+                    There are currently no active travel plans on the platform.
+                  </p>
+                </div>
+              ) : (
+                (() => {
+                  // Filter trips based on selected filter
+                  const now = new Date();
+                  const filteredTrips = activeTrips.filter((trip) => {
+                    if (liveTripsFilter === "upcoming") {
+                      return trip.startDate && new Date(trip.startDate) > now;
+                    } else if (liveTripsFilter === "ongoing") {
+                      return (
+                        trip.startDate &&
+                        trip.endDate &&
+                        new Date(trip.startDate) <= now &&
+                        new Date(trip.endDate) >= now
+                      );
+                    } else if (liveTripsFilter === "completed") {
+                      return trip.endDate && new Date(trip.endDate) < now;
+                    }
+                    return true;
+                  });
+
+                  return filteredTrips.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <MapPin className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 font-bricolage mb-2">
+                        No{" "}
+                        {liveTripsFilter.charAt(0).toUpperCase() +
+                          liveTripsFilter.slice(1)}{" "}
+                        Trips
+                      </h3>
+                      <p className="text-gray-600 font-instrument">
+                        There are currently no {liveTripsFilter} travel plans.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader className="bg-gray-50 border-b border-gray-200">
+                          <TableRow>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Trip Title
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Location
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Host
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Duration
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Price
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Bookings
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Rating
+                            </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Status
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="bg-white divide-y divide-slate-200">
+                          {filteredTrips.map((trip) => {
+                            // Determine trip status
+                            let statusBadge;
+                            if (
+                              trip.startDate &&
+                              new Date(trip.startDate) > now
+                            ) {
+                              statusBadge = (
+                                <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    Upcoming
+                                  </div>
+                                </Badge>
+                              );
+                            } else if (
+                              trip.startDate &&
+                              trip.endDate &&
+                              new Date(trip.startDate) <= now &&
+                              new Date(trip.endDate) >= now
+                            ) {
+                              statusBadge = (
+                                <Badge className="bg-green-100 text-green-800 border-green-200">
+                                  <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    Ongoing
+                                  </div>
+                                </Badge>
+                              );
+                            } else if (
+                              trip.endDate &&
+                              new Date(trip.endDate) < now
+                            ) {
+                              statusBadge = (
+                                <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+                                  <div className="flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Completed
+                                  </div>
+                                </Badge>
+                              );
+                            } else {
+                              statusBadge = (
+                                <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+                                  Active
+                                </Badge>
+                              );
+                            }
+
+                            return (
+                              <TableRow
+                                key={trip.travelPlanId}
+                                className="hover:bg-gray-50 transition-colors duration-150"
+                              >
+                                <TableCell className="px-6 py-4">
+                                  <div className="flex items-center gap-3">
+                                    {trip.tripImage && (
+                                      <Image
+                                        src={trip.tripImage}
+                                        alt={trip.title}
+                                        width={48}
+                                        height={48}
+                                        className="w-12 h-12 rounded-lg object-cover"
+                                      />
+                                    )}
+                                    <div>
+                                      <div className="font-semibold text-gray-900 font-instrument">
+                                        {trip.title}
+                                      </div>
+                                      <div className="text-sm text-gray-500 font-instrument line-clamp-1">
+                                        {trip.description.substring(0, 50)}...
+                                      </div>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  <div className="flex items-center gap-1 text-gray-700 font-instrument">
+                                    <MapPin className="w-4 h-4 text-purple-600" />
+                                    <span className="text-sm">
+                                      {trip.city}, {trip.state}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {trip.country}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  <div className="text-sm font-medium text-gray-900 font-instrument">
+                                    {trip.host.user.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 font-instrument">
+                                    {trip.host.user.email}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  <div className="flex items-center gap-1 text-gray-700">
+                                    <Calendar className="w-4 h-4 text-purple-600" />
+                                    <span className="text-sm font-instrument">
+                                      {trip.noOfDays}{" "}
+                                      {trip.noOfDays === 1 ? "day" : "days"}
+                                    </span>
+                                  </div>
+                                  {trip.startDate && trip.endDate && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {new Date(
+                                        trip.startDate
+                                      ).toLocaleDateString()}{" "}
+                                      -{" "}
+                                      {new Date(
+                                        trip.endDate
+                                      ).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  <div className="flex items-center gap-1">
+                                    <DollarSign className="w-4 h-4 text-green-600" />
+                                    <span className="font-semibold text-gray-900 font-instrument">
+                                      ₹{trip.price.toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    per person
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  <div className="text-center">
+                                    <div className="font-semibold text-purple-600 font-instrument">
+                                      {trip._count.bookings}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      / {trip.maxParticipants} max
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  {trip.reviewCount > 0 ? (
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-yellow-500">★</span>
+                                      <span className="font-semibold text-gray-900 font-instrument">
+                                        {trip.averageRating.toFixed(1)}
+                                      </span>
+                                      <span className="text-xs text-gray-500">
+                                        ({trip.reviewCount})
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-sm text-gray-400 font-instrument">
+                                      No reviews
+                                    </span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  {statusBadge}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  );
+                })()
+              )}
             </div>
           )}
 
