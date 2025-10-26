@@ -674,35 +674,6 @@ export function PaymentForm({
                       </div>
                     </div>
                   </div>
-
-                  {/* Support Contact */}
-                  <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 shadow-xl transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
-                    <div className="text-center">
-                      <div className="bg-purple-100 p-3 rounded-full inline-flex mb-3">
-                        <Users className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <h3 className="font-semibold text-purple-900 mb-2">
-                        Need Help?
-                      </h3>
-                      <p className="text-sm text-purple-700 mb-4">
-                        Our support team is here to assist you
-                      </p>
-
-                      <Button
-                        onClick={() => {
-                          const message = `Hi! I need help with my payment for "${tripData.title}". Trip ID: ${tripData.travelPlanId}`;
-                          const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
-                            message
-                          )}`;
-                          window.open(whatsappUrl, "_blank");
-                        }}
-                        variant="outline"
-                        className="w-full border-purple-300 text-purple-700 hover:bg-purple-100"
-                      >
-                        Contact Support
-                      </Button>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

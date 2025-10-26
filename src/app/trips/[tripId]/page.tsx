@@ -188,50 +188,54 @@ export default async function TripDetailsPage({ params }: Props) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           <div className="flex-1 lg:w-2/3 space-y-8 lg:space-y-12">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
+            {/* Host Information Card */}
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="flex items-start gap-4">
                 <Image
                   src={trip.host.image || "https://via.placeholder.com/48"}
                   alt="Host"
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full ring-2 ring-purple-100"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-base sm:text-lg text-gray-800 truncate">
+                  <p className="font-semibold text-lg sm:text-xl text-gray-900 mb-1">
                     Hosted by {trip.host.user.name}
                   </p>
 
                   {/* Languages Display */}
                   {trip.host.languages && trip.host.languages.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      <span className="text-xs text-gray-600 mr-1">
+                    <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
+                      <span className="text-sm text-gray-600 mr-1 font-medium">
                         Speaks:
                       </span>
                       {trip.host.languages.slice(0, 3).map((language) => (
                         <span
                           key={language}
-                          className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium"
+                          className="inline-flex items-center px-2.5 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium"
                         >
                           {language}
                         </span>
                       ))}
                       {trip.host.languages.length > 3 && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 py-1">
                           +{trip.host.languages.length - 3} more
                         </span>
                       )}
                     </div>
                   )}
 
+                  {/* Ask a Question Button */}
                   {UserSession.user?.id && (
-                    <ChatButton
-                      currentUserId={UserSession.user.id}
-                      hostId={trip.host.user.id}
-                      travelPlanId={trip.travelPlanId}
-                      hostName={trip.host.user.name}
-                      isTripSide={true}
-                    />
+                    <div className="mt-4">
+                      <ChatButton
+                        currentUserId={UserSession.user.id}
+                        hostId={trip.host.user.id}
+                        travelPlanId={trip.travelPlanId}
+                        hostName={trip.host.user.name}
+                        isTripSide={true}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -244,11 +248,9 @@ export default async function TripDetailsPage({ params }: Props) {
               </div>
               <div className="flex items-center gap-2">
                 <span>📍</span>
-                <span className="truncate">
-                  {trip.country}
-                </span>
+                <span className="truncate">{trip.country}</span>
               </div>
-           
+
               <div className="flex items-center gap-2">
                 <span>👥</span>
                 <span className="truncate">
@@ -256,14 +258,14 @@ export default async function TripDetailsPage({ params }: Props) {
                 </span>
               </div>
             </div>
-              <div className="flex items-center gap-2">
-                <span>🚩</span>
-                <span className="truncate">
-                  {trip.stops.map((items,index)=>(
-                    <div key={index}>{items}</div>
-                  ))} 
-                </span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span>🚩</span>
+              <span className="truncate">
+                {trip.stops.map((items, index) => (
+                  <div key={index}>{items}</div>
+                ))}
+              </span>
+            </div>
 
             <div className="space-y-6">
               {sections.map((section, sectionIdx) => (

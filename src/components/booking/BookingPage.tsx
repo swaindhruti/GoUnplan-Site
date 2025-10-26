@@ -12,7 +12,7 @@ import {
   DollarSign,
   MessageCircle,
   Languages,
-  Star
+  Star,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ const EnhancedLoadingState = () => {
       "Preparing your booking...",
       "Processing guest information...",
       "Securing your spot...",
-      "Almost ready..."
+      "Almost ready...",
     ];
     let messageIndex = 0;
     let progressValue = 0;
@@ -92,7 +92,7 @@ export function BookingPage({
   tripData,
   existingBookingData,
   Step,
-  bookingId
+  bookingId,
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -102,7 +102,7 @@ export function BookingPage({
   const updateBookingData = useBookingStore((state) => state.updateBookingData);
   const createNewBooking = useBookingStore((state) => state.createNewBooking);
 
-  const [numberOfGuests, setNumberOfGuests] = useState<number>(
+  const [_numberOfGuests, setNumberOfGuests] = useState<number>(
     bookingData.participants || 1
   );
 
@@ -112,7 +112,7 @@ export function BookingPage({
       travelPlanId: tripData.travelPlanId,
       pricePerPerson: tripData.price,
       participants: tripData.maxParticipants,
-      ...existingBookingData
+      ...existingBookingData,
     });
   }, [
     existingBookingData,
@@ -120,7 +120,7 @@ export function BookingPage({
     tripData.travelPlanId,
     updateBookingData,
     userId,
-    tripData.maxParticipants
+    tripData.maxParticipants,
   ]);
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export function BookingPage({
           guests: guestData.guests,
           specialRequirements: guestData.specialRequirements,
           status: "PENDING" as const,
-          totalPrice: (tripData?.price || 0) * guestCount
+          totalPrice: (tripData?.price || 0) * guestCount,
         };
 
         const newBooking = await createNewBooking(completeBookingData);
@@ -160,9 +160,9 @@ export function BookingPage({
               backdropFilter: "blur(12px)",
               border: "1px solid rgba(196, 181, 253, 0.3)",
               color: "white",
-              fontFamily: "var(--font-instrument)"
+              fontFamily: "var(--font-instrument)",
             },
-            duration: 3000
+            duration: 3000,
           });
           router.push(
             `/trips/booking/${tripData.travelPlanId}/booking-summary/${newBooking.id}`
@@ -176,9 +176,9 @@ export function BookingPage({
             background: "rgba(147, 51, 234, 0.95)",
             backdropFilter: "blur(12px)",
             color: "white",
-            fontFamily: "var(--font-instrument)"
+            fontFamily: "var(--font-instrument)",
           },
-          duration: 3000
+          duration: 3000,
         });
         console.error("Failed to create booking:", error);
         setIsTransitioning(false);
@@ -192,12 +192,12 @@ export function BookingPage({
     return new Date(date).toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "short",
-      year: "numeric"
+      year: "numeric",
     });
   };
 
   const heroTags = [
-    `${formatDate(tripData.startDate)} - ${formatDate(tripData.endDate)}`
+    `${formatDate(tripData.startDate)} - ${formatDate(tripData.endDate)}`,
   ];
 
   const createdYear = new Date(tripData.createdAt || new Date()).getFullYear();
@@ -208,14 +208,14 @@ export function BookingPage({
     email: tripData.host?.hostEmail || "",
     description: tripData.host?.description || "",
     createdYear,
-    averageRating: tripData.host?.averageRating || 0
+    averageRating: tripData.host?.averageRating || 0,
   };
 
   const tripStats = {
     price: tripData.price || 0,
     noOfDays: tripData.noOfDays || 0,
     maxParticipants: tripData.maxParticipants || 0,
-    languages: tripData.languages?.join(", ") || "English"
+    languages: tripData.languages?.join(", ") || "English",
   };
 
   if (isLoading) {
@@ -231,7 +231,7 @@ export function BookingPage({
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
             tripData.tripImage ||
             "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-          }')`
+          }')`,
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -342,12 +342,6 @@ export function BookingPage({
                         per person
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 font-instrument">
-                      Total: ₹
-                      {(tripStats.price * numberOfGuests).toLocaleString()} for{" "}
-                      {numberOfGuests}{" "}
-                      {numberOfGuests === 1 ? "guest" : "guests"}
-                    </p>
                   </div>
 
                   <div className="space-y-4 mb-6">
@@ -357,14 +351,6 @@ export function BookingPage({
                       </div>
                       <span className="text-gray-700 font-instrument">
                         {tripStats.noOfDays} days experience
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="bg-green-50 p-2 rounded-lg">
-                        <Users className="h-4 w-4 text-green-600" />
-                      </div>
-                      <span className="text-gray-700 font-instrument">
-                        Up to {tripStats.maxParticipants} travelers
                       </span>
                     </div>
                     <div className="flex items-center gap-3">

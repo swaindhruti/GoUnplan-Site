@@ -4,6 +4,7 @@ type FieldId =
   | "country"
   | "stops"
   | "price"
+  | "commission"
   | "filters"
   | "startDate"
   | "endDate"
@@ -65,7 +66,7 @@ type BaseFormField = {
 export type FormFields = BaseFormField;
 
 export type FormDataShape = {
-  [K in FieldId]?: K extends "price" | "maxLimit"
+  [K in FieldId]?: K extends "price" | "maxLimit" | "commission"
     ? number
     : K extends "startDate" | "endDate"
     ? Date
@@ -94,7 +95,7 @@ export type FormDataShape = {
 };
 
 export type FormInputShape = {
-  [K in FieldId]?: K extends "price" | "maxLimit"
+  [K in FieldId]?: K extends "price" | "maxLimit" | "commission"
     ? string | number
     : K extends "startDate" | "endDate"
     ? string | Date

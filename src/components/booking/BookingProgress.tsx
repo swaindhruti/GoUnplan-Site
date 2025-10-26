@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Calendar, Users, Tag } from "lucide-react";
+import { Calendar, Tag } from "lucide-react";
 import type { BookingData } from "@/types/booking";
 
 interface BookingProgressProps {
@@ -76,22 +76,6 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
             <span className="text-sm font-semibold text-gray-900 font-instrument">
               {format(bookingData.startDate, "MMM dd")} -{" "}
               {format(bookingData.endDate!, "MMM dd")}
-            </span>
-          </div>
-        )}
-
-        {/* Guests */}
-        {bookingData.participants && (
-          <div className="flex justify-between items-center py-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">
-                Travelers:
-              </span>
-            </div>
-            <span className="text-sm font-semibold text-gray-900 font-instrument">
-              {bookingData.participants}{" "}
-              {bookingData.participants === 1 ? "person" : "people"}
             </span>
           </div>
         )}

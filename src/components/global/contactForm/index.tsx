@@ -63,7 +63,7 @@ import {
 } from "lucide-react";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -182,6 +182,15 @@ export const CreateDestinationForm = ({
   const watchedNoOfDays = form.watch("noofdays") as number | undefined;
   const watchedStops = (form.watch("stops") as string[]) || [];
   const watchedStart = form.watch("startDate") as string | undefined;
+  const watchedPrice = form.watch("price") as number | undefined;
+  const watchedCommission = form.watch("commission") as number | undefined;
+
+  // Calculate total price per person with commission
+  const totalPricePerPerson = useMemo(() => {
+    if (!watchedPrice || typeof watchedPrice !== "number") return 0;
+    const commission = watchedCommission || 0;
+    return watchedPrice + (watchedPrice * commission) / 100;
+  }, [watchedPrice, watchedCommission]);
 
   useEffect(() => {
     try {
@@ -404,6 +413,7 @@ export const CreateDestinationForm = ({
       "destination",
       "country",
       "price",
+      "commission",
       "maxLimit",
       "stops",
     ];
@@ -1012,12 +1022,50 @@ export const CreateDestinationForm = ({
                                   />
                                 </FormControl>
                                 <FormMessage />
-                                {data.id === "noofdays" && (
-                                  <p className="text-xs text-gray-500 mt-1 font-instrument">
-                                    Setting the number of days will
-                                    auto-generate
-                                  </p>
-                                )}
+                                {data.id === "commission" &&
+                                  watchedPrice &&
+                                  watchedPrice > 0 && (
+                                    <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                          <span className="text-gray-600 font-instrument">
+                                            Trip Price/Person:
+                                          </span>
+                                          <span className="font-semibold text-gray-900 font-instrument">
+                                            ₹{watchedPrice.toLocaleString()}
+                                          </span>
+                                        </div>
+                                        {watchedCommission &&
+                                          watchedCommission > 0 && (
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-gray-600 font-instrument">
+                                                Commission ({watchedCommission}
+                                                %):
+                                              </span>
+                                              <span className="font-semibold text-gray-900 font-instrument">
+                                                ₹
+                                                {(
+                                                  (watchedPrice *
+                                                    watchedCommission) /
+                                                  100
+                                                ).toLocaleString()}
+                                              </span>
+                                            </div>
+                                          )}
+                                        <div className="pt-2 border-t border-purple-300">
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-sm font-semibold text-purple-900 font-instrument">
+                                              Total Price/Person:
+                                            </span>
+                                            <span className="text-lg font-bold text-purple-900 font-instrument">
+                                              ₹
+                                              {totalPricePerPerson.toLocaleString()}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
                               </FormItem>
                             )}
                           />
@@ -1691,6 +1739,96 @@ export const CreateDestinationForm = ({
                                         <Plus className="h-4 w-4" />
                                       </Button>
                                     </div>
+
+                                    {/* Quick Add Options */}
+                                    <div className="space-y-2">
+                                      <p className="text-xs text-gray-500 font-instrument">
+                                        Quick add:
+                                      </p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {(isIncluded
+                                          ? [
+                                              "Breakfast",
+                                              "Lunch",
+                                              "Dinner",
+                                              "Accommodation",
+                                              "Transportation",
+                                              "Guide",
+                                              "Entry Fees",
+                                              "Activities",
+                                            ]
+                                          : data.label === "Not Included"
+                                          ? [
+                                              "International Flights",
+                                              "Personal Expenses",
+                                              "Travel Insurance",
+                                              "Visa Fees",
+                                              "Tips",
+                                              "Alcoholic Beverages",
+                                              "Shopping",
+                                            ]
+                                          : isFilters
+                                          ? [
+                                              "Adventure",
+                                              "Cultural",
+                                              "Beach",
+                                              "Mountain",
+                                              "City",
+                                              "Nature",
+                                              "Wildlife",
+                                              "Photography",
+                                            ]
+                                          : [
+                                              "Special Activity",
+                                              "Unique Experience",
+                                              "Local Culture",
+                                              "Scenic Views",
+                                            ]
+                                        ).map((quickOption) => {
+                                          const currentVals = Array.isArray(
+                                            field.value
+                                          )
+                                            ? (field.value as string[])
+                                            : [];
+                                          const isAlreadyAdded =
+                                            currentVals.includes(quickOption);
+
+                                          return (
+                                            <Button
+                                              key={quickOption}
+                                              type="button"
+                                              variant="outline"
+                                              size="sm"
+                                              disabled={isAlreadyAdded}
+                                              onClick={() => {
+                                                if (!isAlreadyAdded) {
+                                                  field.onChange([
+                                                    ...currentVals,
+                                                    quickOption,
+                                                  ]);
+                                                }
+                                              }}
+                                              className={`text-xs font-instrument ${
+                                                isAlreadyAdded
+                                                  ? "opacity-50 cursor-not-allowed"
+                                                  : isIncluded
+                                                  ? "border-green-300 text-green-700 hover:bg-green-50"
+                                                  : data.label ===
+                                                    "Not Included"
+                                                  ? "border-red-300 text-red-700 hover:bg-red-50"
+                                                  : isFilters
+                                                  ? "border-purple-300 text-purple-700 hover:bg-purple-50"
+                                                  : "border-blue-300 text-blue-700 hover:bg-blue-50"
+                                              }`}
+                                            >
+                                              {isAlreadyAdded ? "✓ " : "+ "}
+                                              {quickOption}
+                                            </Button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+
                                     {Array.isArray(field.value) &&
                                       (field.value as string[]).length > 0 && (
                                         <div className="flex flex-wrap gap-2">

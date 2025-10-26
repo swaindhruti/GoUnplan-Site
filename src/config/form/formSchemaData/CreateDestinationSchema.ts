@@ -17,6 +17,12 @@ export const CreateDestinationSchema = z
     activities: z.array(z.string()).optional().default([]),
 
     price: z.coerce.number().positive("Price must be a positive number"),
+    commission: z.coerce
+      .number()
+      .min(0, "Commission must be 0 or greater")
+      .max(100, "Commission cannot exceed 100%")
+      .optional()
+      .default(0),
     maxLimit: z.coerce
       .number()
       .positive("Participant limit must be a positive number"),
@@ -98,6 +104,7 @@ export const CreateDestinationDraftSchema = z
     // Removed top-level state and city for draft schema
     stops: z.array(z.string()).optional().default([]),
     price: z.coerce.number().optional().default(0),
+    commission: z.coerce.number().optional().default(0),
     noofdays: z.coerce.number().optional().default(1),
     maxLimit: z.coerce.number().optional().default(0),
     startDate: z.string().or(z.date()).optional().default(""),

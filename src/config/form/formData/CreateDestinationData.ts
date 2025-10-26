@@ -42,6 +42,14 @@ export const CreateDestinationFormData: FormFields[] = [
     className: "col-span-1",
     zod: "number",
   },
+  {
+    label: "Your Commission (%)",
+    type: "number",
+    id: "commission",
+    placeholder: "10",
+    className: "col-span-1",
+    zod: "number",
+  },
 
   {
     label: "Pick Trip Vibe",
