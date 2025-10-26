@@ -35,6 +35,8 @@ import {
   MapPin,
   HelpCircle,
   UserPlus,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 import { handleScroll } from "../global/Handlescroll";
 import Link from "next/link";
@@ -42,6 +44,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
+import { hasAppliedForHost as checkHostApplication } from "@/actions/user/action";
 
 // Define interface for navigation items
 interface NavigationItem {
@@ -59,6 +62,8 @@ export default function Header() {
   const [isHostMode, setIsHostMode] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isSupportMode, setIsSupportMode] = useState(false);
+  const [hasAppliedForHost, setHasAppliedForHost] = useState(false);
+  const [_isCheckingHostStatus, setIsCheckingHostStatus] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -299,6 +304,29 @@ export default function Header() {
     setIsSupportMode(pathname.startsWith("/dashboard/support"));
   }, [pathname, status]);
 
+  // Check if user has applied for host
+  useEffect(() => {
+    const checkApplicationStatus = async () => {
+      if (status === "authenticated" && session?.user?.email) {
+        setIsCheckingHostStatus(true);
+        try {
+          const result = await checkHostApplication(session.user.email);
+          if (result.success && result.hasApplied !== undefined) {
+            setHasAppliedForHost(result.hasApplied);
+          }
+        } catch (error) {
+          console.error("Error checking host application status:", error);
+        } finally {
+          setIsCheckingHostStatus(false);
+        }
+      } else {
+        setHasAppliedForHost(false);
+      }
+    };
+
+    checkApplicationStatus();
+  }, [status, session?.user?.email]);
+
   useEffect(() => {
     if (isDashboardMenuOpen) {
       document.body.style.overflowX = "hidden";
@@ -310,6 +338,40 @@ export default function Header() {
       document.body.style.overflowX = "";
     };
   }, [isDashboardMenuOpen]);
+
+  const HostApplicationStatusBadge = () => {
+    const userRole = session?.user?.role || "USER";
+
+    if (userRole === "HOST") {
+      return (
+        <div className="flex items-center gap-2 bg-green-50 rounded-full px-4 py-2 border border-green-200">
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-700 text-xs font-instrument">
+              Application Status
+            </span>
+            <span className="font-semibold text-green-700 text-sm font-instrument">
+              Approved
+            </span>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center gap-2 bg-amber-50 rounded-full px-4 py-2 border border-amber-200">
+          <Clock className="h-4 w-4 text-amber-600" />
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-700 text-xs font-instrument">
+              Application Status
+            </span>
+            <span className="font-semibold text-amber-700 text-sm font-instrument">
+              Under Review
+            </span>
+          </div>
+        </div>
+      );
+    }
+  };
 
   const StandardDropdownMenu = () => (
     <DropdownMenu
@@ -531,7 +593,7 @@ export default function Header() {
             <div className="flex items-center">
               {status === "authenticated" ? (
                 <div className="flex items-center space-x-4">
-                  {isHomePage && isRegularUser && (
+                  {isHomePage && isRegularUser && !hasAppliedForHost && (
                     <Button
                       onClick={handleApplyForHost}
                       className="bg-orange-600 hover:bg-orange-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
@@ -539,6 +601,9 @@ export default function Header() {
                       <UserPlus className="h-4 w-4 mr-2" />
                       Apply for Host
                     </Button>
+                  )}
+                  {isHomePage && isRegularUser && hasAppliedForHost && (
+                    <HostApplicationStatusBadge />
                   )}
                   {isUserHost && (
                     <div className="flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 border border-purple-200">
@@ -666,7 +731,7 @@ export default function Header() {
                     />
                   </div>
                 )}
-                {isRegularUser && (
+                {isRegularUser && !hasAppliedForHost && (
                   <Button
                     onClick={handleApplyForHost}
                     className="bg-orange-600 hover:bg-orange-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
@@ -674,6 +739,9 @@ export default function Header() {
                     <UserPlus className="h-4 w-4 mr-2" />
                     Apply for Host
                   </Button>
+                )}
+                {isRegularUser && hasAppliedForHost && (
+                  <HostApplicationStatusBadge />
                 )}
 
                 {isUserAdmin && (
@@ -947,16 +1015,35 @@ export default function Header() {
                         </Button>
                       </>
                     ) : (
-                      <Button
-                        onClick={() => {
-                          setIsOpen(false);
-                          handleSignOut();
-                        }}
-                        className="w-full bg-red-50 py-6 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
-                      >
-                        <LogOut className="mr-2 h-5 w-5" />
-                        Sign Out
-                      </Button>
+                      <>
+                        {isRegularUser && !hasAppliedForHost && (
+                          <Button
+                            onClick={() => {
+                              setIsOpen(false);
+                              handleApplyForHost();
+                            }}
+                            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
+                          >
+                            <UserPlus className="mr-2 h-5 w-5" />
+                            Apply for Host
+                          </Button>
+                        )}
+                        {isRegularUser && hasAppliedForHost && (
+                          <div className="w-full">
+                            <HostApplicationStatusBadge />
+                          </div>
+                        )}
+                        <Button
+                          onClick={() => {
+                            setIsOpen(false);
+                            handleSignOut();
+                          }}
+                          className="w-full bg-red-50 py-6 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
+                        >
+                          <LogOut className="mr-2 h-5 w-5" />
+                          Sign Out
+                        </Button>
+                      </>
                     )}
                     <Button
                       className="w-full bg-purple-600 hover:bg-purple-700 flex justify-center items-center text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center"

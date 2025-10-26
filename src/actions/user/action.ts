@@ -163,6 +163,9 @@ export const applyForHost = async (
     description?: string;
     image?: string;
     hostMobile?: string;
+    hostCity?: string;
+    plannedHostingMonths?: string[];
+    plannedHostingLocation?: string;
     languages?: string[];
     instagramUrl?: string;
     twitterUrl?: string;
@@ -187,6 +190,9 @@ export const applyForHost = async (
             description: hostData?.description || "",
             hostEmail: email,
             hostMobile: hostData?.hostMobile || "",
+            hostCity: hostData?.hostCity || "",
+            plannedHostingMonths: hostData?.plannedHostingMonths || [],
+            plannedHostingLocation: hostData?.plannedHostingLocation || null,
             languages: hostData?.languages || [],
             instagramUrl: hostData?.instagramUrl || null,
             twitterUrl: hostData?.twitterUrl || null,

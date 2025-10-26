@@ -36,23 +36,26 @@ model User {
 }
 
 model HostProfile {
-  hostId        String        @id @default(cuid())
-  description   String?
-  image         String?       @default("https://avatar.iran.liara.run/public")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  hostEmail     String        @unique
-  hostMobile    String
-  averageRating Float         @default(0)
-  reviewCount   Int           @default(0)
-  languages     String[]      @default([])
-  instagramUrl  String?
-  linkedinUrl   String?
-  twitterUrl    String?
-  websiteUrl    String?
-  user          User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  reviews       Review[]
-  travelPlans   TravelPlans[]
+  hostId                 String        @id @default(cuid())
+  description            String?
+  image                  String?       @default("https://avatar.iran.liara.run/public")
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  hostEmail              String        @unique
+  hostMobile             String
+  averageRating          Float         @default(0)
+  reviewCount            Int           @default(0)
+  languages              String[]      @default([])
+  instagramUrl           String?
+  linkedinUrl            String?
+  twitterUrl             String?
+  websiteUrl             String?
+  hostCity               String?
+  plannedHostingMonths   String[]      @default([])
+  plannedHostingLocation String?
+  user                   User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  reviews                Review[]
+  travelPlans            TravelPlans[]
 
   @@map("host_profiles")
 }
