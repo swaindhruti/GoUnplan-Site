@@ -146,7 +146,7 @@ export const TripCard = ({
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-purple-600" />
                 <span className="truncate">
-                  {trip.city}, {trip.state}, {trip.country}
+                  {trip.country}
                 </span>
               </div>
 

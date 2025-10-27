@@ -56,7 +56,7 @@ export async function getStaticMapUrl(
   zoom: number
 ) {
   // Ola Maps static map API format
-  const markerParams = markers.map((m, idx) => 
+  const markerParams = markers.map((m) => 
     `markers=${m.lat},${m.lon}`
   ).join('&');
   

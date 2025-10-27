@@ -21,9 +21,7 @@ export const HowItWorksSection = () => {
               HOW IT WORKS
             </span>
             <h1 className="text-2xl font-bricolage leading-[1.05] tracking-tighter sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-medium text-black  drop-shadow-2xl mb-8">
-              Simple Steps to
-              <br />
-              Adventure
+              Travel, <span className="text-purple-600">Simplified.</span>
             </h1>
             <div className="space-y-8">
               <div className="flex items-start gap-4">
@@ -32,12 +30,13 @@ export const HowItWorksSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
-                    Search & Discover
+                   Explore trips designed by real hosts.
                   </h3>
-                  <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
+                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
                     Browse through our curated collection of unique destinations
                     and experiences tailored to your interests and preferences.
                   </p>
+                 
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -46,7 +45,8 @@ export const HowItWorksSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
-                    Plan & Customize
+                    Match with people your age who vibe like you.
+
                   </h3>
                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
                     Work with our expert team to customize your itinerary,
@@ -61,7 +61,7 @@ export const HowItWorksSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
-                    Book & Explore
+                   Go. Experience. Belong.
                   </h3>
                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
                     Confirm your booking and embark on your unforgettable
