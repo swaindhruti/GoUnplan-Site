@@ -1133,52 +1133,69 @@ export const getRevenueAnalytics = async () => {
   }
 };
 
-type LocationIQResult = { display_name?: string };
+interface OlaMapsAutocompleteResult {
+  predictions: Array<{
+    description: string;
+    types?: string[];
+  }>;
+}
 
-export async function searchPlaces(query: string) {
+interface SearchPlacesResponse {
+  results: string[];
+  error: string | null;
+}
+
+export async function searchPlaces(query: string): Promise<SearchPlacesResponse> {
   try {
-    const decodedQuery = decodeURIComponent(query);
-
-    if (!decodedQuery) {
+    const sanitizedQuery = decodeURIComponent(query).trim();
+    
+    if (!sanitizedQuery || sanitizedQuery.length < 2) {
       return { results: [], error: null };
     }
 
-    const token = process.env.LOCATIONIQ_API_KEY;
-
-    if (!token) {
-      return {
-        results: [],
-        error: "LOCATIONIQ_ACCESS_TOKEN environment variable not set",
-      };
+    const apiKey = process.env.OLA_MAPS_API_KEY;
+    
+    if (!apiKey) {
+      return { results: [], error: 'API key not configured' };
     }
 
-    const apiUrl = `https://api.locationiq.com/v1/autocomplete?q=${encodeURIComponent(
-      query
-    )}&key=${token}&limit=6&tag=place:*,boundary:administrative&format=json`;
+    const apiUrl = `https://api.olamaps.io/places/v1/autocomplete?input=${encodeURIComponent(sanitizedQuery)}&api_key=${apiKey}&limit=6`;
 
-    const res = await fetch(apiUrl);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    if (!res.ok) {
-      console.error("LocationIQ error:", res.status);
-      return {
-        results: [],
-        error: `LocationIQ API returned status ${res.status}`,
-      };
+    const response = await fetch(apiUrl, {
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.error(`Ola Maps API error: ${response.status}`);
+      return { results: [], error: `Search failed with status ${response.status}` };
     }
 
-    const data = await res.json();
+    const data: OlaMapsAutocompleteResult = await response.json();
 
-    // Extract place names
-    const places = (Array.isArray(data) ? data : [])
-      .map((place: LocationIQResult) => place.display_name)
-      .filter(Boolean) as string[];
+    if (!data.predictions || !Array.isArray(data.predictions)) {
+      return { results: [], error: null };
+    }
+
+    // Extract only the place names
+    const places = data.predictions
+      .filter(place => place.description && place.description.trim())
+      .map(place => place.description)
+      .slice(0, 6);
 
     return { results: places, error: null };
+
   } catch (err) {
-    console.error("LocationIQ API error:", err);
-    return {
-      results: [],
-      error: err instanceof Error ? err.message : "Unknown error occurred",
-    };
+    if (err instanceof Error && err.name === 'AbortError') {
+      return { results: [], error: 'Request timed out' };
+    }
+    
+    console.error('Search error:', err);
+    return { results: [], error: 'Failed to search places' };
   }
 }
