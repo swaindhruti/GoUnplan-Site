@@ -13,6 +13,7 @@ import { TopHosts } from "@/components/landing/TopHosts";
 import { SectionJoinerMarquee } from "@/components/landing/common";
 import { Footer } from "@/components/landing/Footer";
 import { MessageComponent } from "@/components/landing/messageComponent";
+import { StickyBanner } from "@/components/landing/StickyBanner";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
       <AboutUs />
       <ReadyToStart />
       <FAQSection />
+      <StickyBanner/>
       <Footer />
     </main>
   );

@@ -9,7 +9,6 @@ import {
   DollarSign,
   Star,
   MapPin,
-  Mail,
   Globe,
   Award,
   Clock,
@@ -128,10 +127,10 @@ export default async function HostProfilePage({ params }: Props) {
                   {host.user.name}
                 </span>
               </h1>
-              <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
+              {/* <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
                 Professional travel guide with {totalTrips} experiences and{" "}
                 {totalReviews} happy travelers
-              </p>
+              </p> */}
             </div>
             <div className="flex items-center gap-4">
               <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
@@ -222,7 +221,7 @@ export default async function HostProfilePage({ params }: Props) {
               </div>
 
               <div className="space-y-6">
-                <div>
+                {/* <div>
                   <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <Mail className="h-4 w-4 text-purple-600" />
                     Contact Details
@@ -249,7 +248,7 @@ export default async function HostProfilePage({ params }: Props) {
                       <p className="text-gray-600 mt-1">{host.hostMobile}</p>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Languages Section */}
                 {host.languages && host.languages.length > 0 && (

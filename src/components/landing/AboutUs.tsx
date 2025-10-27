@@ -37,16 +37,16 @@ export default function AboutUs() {
         {/* Right Side Text */}
         <div className="w-full lg:w-1/2 text-center lg:text-left">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bricolage leading-[1.05] tracking-tighter font-extrabold text-gray-800">
-            Your Journey, <span className="text-purple-600">Our Passion</span>
+           We’re building a new way to <span className="text-purple-600">travel</span>
           </h2>
 
           <p className="text-base md:text-lg font-instrument text-gray-700 leading-relaxed mt-6">
-            GoUnplan isn’t just a travel company — it’s a movement to make
-            travel more personal, inspiring, and meaningful. We help turn your
-            travel dreams into reality by blending expert planning with the
-            freedom to explore. Whether you’re a solo backpacker, a couple
-            seeking romance, or a family in search of adventure, we’re here to
-            craft journeys that resonate with your unique style.
+              We started this because we were tired of cookie-cutter trips.
+              Here, travel isn’t about packages, it’s about people.
+              A host who shares their world.
+              A traveler who finds their tribe.
+              And stories that stay long after the trip ends.
+ 
             <br className="hidden sm:block" />
             {/*  <span className="block mt-4">
               From spontaneous weekend getaways to immersive cultural
