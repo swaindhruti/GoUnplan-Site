@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { MessageSquarePlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { MessageSquarePlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type {
   TransformedChat,
   ChatWithLastMessage,
   CreateChatResult,
-  ChatUser
-} from "@/types/chats";
-import ChatWindow from "./ChatWindow";
-import { createOrGetChat } from "@/actions/chat/actions";
-import ChatList from "./ChatList";
+  ChatUser,
+} from '@/types/chats';
+import ChatWindow from './ChatWindow';
+import { createOrGetChat } from '@/actions/chat/actions';
+import ChatList from './ChatList';
 
 interface ChatContainerProps {
   currentUserId: string;
@@ -24,7 +24,7 @@ export default function ChatContainer({
   currentUserId,
   initialChats = [],
   hostId,
-  travelPlanId
+  travelPlanId,
 }: ChatContainerProps) {
   const [selectedChat, setSelectedChat] = useState<{
     chatId: string;
@@ -41,30 +41,28 @@ export default function ChatContainer({
     const result: CreateChatResult = await createOrGetChat({
       userId: currentUserId,
       hostId,
-      travelPlanId
+      travelPlanId,
     });
 
     if (result.success) {
       const chat: ChatWithLastMessage = result.chat;
-      const otherParticipant = chat.participants.find(
-        (p) => p.userId !== currentUserId
-      );
+      const otherParticipant = chat.participants.find(p => p.userId !== currentUserId);
 
       if (otherParticipant?.user) {
         const chatUser: ChatUser = {
           id: otherParticipant.user.id,
           name: otherParticipant.user.name,
           image: otherParticipant.user.image,
-          role: otherParticipant.user.role
+          role: otherParticipant.user.role,
         };
 
         setSelectedChat({
           chatId: chat.id,
-          otherUser: chatUser
+          otherUser: chatUser,
         });
       }
     } else {
-      console.error("Failed to create chat:", result.error);
+      console.error('Failed to create chat:', result.error);
     }
   };
 
@@ -104,12 +102,10 @@ export default function ChatContainer({
               <div className="w-20 h-20 bg-slate-100/80 border border-slate-200/60 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <MessageSquarePlus className="h-10 w-10 text-gray-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Welcome to Messages
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Welcome to Messages</h2>
               <p className="text-gray-600 leading-relaxed font-medium">
-                Select a conversation from the sidebar to start messaging, or
-                create a new chat to begin connecting with others.
+                Select a conversation from the sidebar to start messaging, or create a new chat to
+                begin connecting with others.
               </p>
             </div>
           </div>

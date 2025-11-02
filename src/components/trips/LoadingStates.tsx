@@ -1,9 +1,9 @@
-import { Search, AlertCircle, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { TripCard } from "./TripCard";
-import { useState, useEffect } from "react";
-import { Trip } from "@/types/trips";
+import { Search, AlertCircle, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TripCard } from './TripCard';
+import { useState, useEffect } from 'react';
+import { Trip } from '@/types/trips';
 
 export const LoadingSkeleton = () => (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
@@ -74,10 +74,7 @@ interface EmptyStateProps {
   };
 }
 
-export const EmptyState = ({
-  onClearFilters,
-  searchContext,
-}: EmptyStateProps) => {
+export const EmptyState = ({ onClearFilters, searchContext }: EmptyStateProps) => {
   const [suggestedTrips, setSuggestedTrips] = useState<Trip[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
@@ -87,10 +84,10 @@ export const EmptyState = ({
 
       setIsLoadingSuggestions(true);
       try {
-        const response = await fetch("/api/trips/suggestions", {
-          method: "POST",
+        const response = await fetch('/api/trips/suggestions', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             searchContext,
@@ -103,7 +100,7 @@ export const EmptyState = ({
           setSuggestedTrips(result.trips);
         }
       } catch (error) {
-        console.error("Error fetching suggested trips:", error);
+        console.error('Error fetching suggested trips:', error);
       } finally {
         setIsLoadingSuggestions(false);
       }
@@ -129,11 +126,10 @@ export const EmptyState = ({
                 No Adventures Found
               </h3>
               <p className="text-gray-600 font-instrument leading-relaxed">
-                We couldn&apos;t find any trips matching your current
-                preferences.
+                We couldn&apos;t find any trips matching your current preferences.
                 {suggestedTrips.length > 0
                   ? " But don't worry - we have some similar adventures you might love!"
-                  : " Try adjusting your filters or explore our other amazing destinations!"}
+                  : ' Try adjusting your filters or explore our other amazing destinations!'}
               </p>
             </div>
 
@@ -191,7 +187,7 @@ export const EmptyState = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suggestedTrips.map((trip) => (
+              {suggestedTrips.map(trip => (
                 <div key={trip.travelPlanId} className="relative">
                   <div className="absolute -top-2 -right-2 z-10">
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
@@ -207,7 +203,7 @@ export const EmptyState = ({
           {suggestedTrips.length > 0 && (
             <div className="text-center mt-8">
               <Button
-                onClick={() => (window.location.href = "/trips")}
+                onClick={() => (window.location.href = '/trips')}
                 variant="outline"
                 className="border-purple-300 text-purple-600 hover:bg-purple-50 font-instrument font-semibold px-8 py-3 rounded-full"
               >
@@ -239,9 +235,7 @@ export const ErrorDisplay = ({ error }: ErrorDisplayProps) => (
           <h3 className="text-2xl font-bricolage font-bold text-gray-900">
             Oops! Something went wrong
           </h3>
-          <p className="text-gray-600 font-instrument leading-relaxed">
-            {error}
-          </p>
+          <p className="text-gray-600 font-instrument leading-relaxed">{error}</p>
         </div>
 
         {/* Button */}

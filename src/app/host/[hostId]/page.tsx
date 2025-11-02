@@ -1,8 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { BackButton } from "@/components/global/buttons";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { BackButton } from '@/components/global/buttons';
 import {
   Calendar,
   Users,
@@ -16,7 +16,7 @@ import {
   MessageCircle,
   ArrowRightCircle,
   Sparkles,
-} from "lucide-react";
+} from 'lucide-react';
 
 type Props = {
   params: Promise<{
@@ -26,7 +26,7 @@ type Props = {
 
 async function getHostProfile(hostId: string) {
   try {
-    const { prisma } = await import("@/lib/shared");
+    const { prisma } = await import('@/lib/shared');
 
     const host = await prisma.hostProfile.findUnique({
       where: { hostId },
@@ -43,7 +43,7 @@ async function getHostProfile(hostId: string) {
         },
         travelPlans: {
           where: {
-            status: "ACTIVE",
+            status: 'ACTIVE',
           },
           include: {
             reviews: {
@@ -58,7 +58,7 @@ async function getHostProfile(hostId: string) {
             },
           },
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
         },
         reviews: {
@@ -77,7 +77,7 @@ async function getHostProfile(hostId: string) {
             },
           },
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           take: 5,
         },
@@ -86,7 +86,7 @@ async function getHostProfile(hostId: string) {
 
     return host;
   } catch (error) {
-    console.error("Error fetching host profile:", error);
+    console.error('Error fetching host profile:', error);
     return null;
   }
 }
@@ -123,9 +123,7 @@ export default async function HostProfilePage({ params }: Props) {
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
                 Meet Your Host
-                <span className="block text-purple-300 mt-2">
-                  {host.user.name}
-                </span>
+                <span className="block text-purple-300 mt-2">{host.user.name}</span>
               </h1>
               {/* <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
                 Professional travel guide with {totalTrips} experiences and{" "}
@@ -150,7 +148,7 @@ export default async function HostProfilePage({ params }: Props) {
               <Avatar className="h-24 w-24 lg:h-32 lg:w-32 border-4 border-purple-200 shadow-lg">
                 <AvatarImage src={host.user.image || undefined} />
                 <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-2xl lg:text-4xl font-bold">
-                  {host.user.name?.charAt(0).toUpperCase() ?? "H"}
+                  {host.user.name?.charAt(0).toUpperCase() ?? 'H'}
                 </AvatarFallback>
               </Avatar>
 
@@ -167,21 +165,18 @@ export default async function HostProfilePage({ params }: Props) {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.round(host.averageRating)
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300"
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-gray-300'
                           }`}
                         />
                       ))}
                     </div>
                     <span className="text-gray-700 font-semibold">
-                      {host.averageRating > 0
-                        ? host.averageRating.toFixed(1)
-                        : "No ratings"}
+                      {host.averageRating > 0 ? host.averageRating.toFixed(1) : 'No ratings'}
                     </span>
                   </div>
                   <span className="text-gray-600">
-                    ({host.reviewCount}{" "}
-                    {host.reviewCount === 1 ? "review" : "reviews"})
+                    ({host.reviewCount} {host.reviewCount === 1 ? 'review' : 'reviews'})
                   </span>
                 </div>
 
@@ -215,9 +210,7 @@ export default async function HostProfilePage({ params }: Props) {
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
                   <MessageCircle className="h-5 w-5" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                  Host Information
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 font-bricolage">Host Information</h3>
               </div>
 
               <div className="space-y-6">
@@ -258,7 +251,7 @@ export default async function HostProfilePage({ params }: Props) {
                       Languages Spoken
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {host.languages.map((language) => (
+                      {host.languages.map(language => (
                         <span
                           key={language}
                           className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-medium"
@@ -278,22 +271,16 @@ export default async function HostProfilePage({ params }: Props) {
                   <div className="grid grid-cols-1 gap-3 text-sm">
                     <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                       <span className="text-gray-700">Member since</span>
-                      <span className="font-semibold text-purple-700">
-                        {createdYear}
-                      </span>
+                      <span className="font-semibold text-purple-700">{createdYear}</span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                       <span className="text-gray-700">Total trips</span>
-                      <span className="font-semibold text-green-700">
-                        {totalTrips}
-                      </span>
+                      <span className="font-semibold text-green-700">{totalTrips}</span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                       <span className="text-gray-700">Average rating</span>
                       <span className="font-semibold text-yellow-700">
-                        {host.averageRating > 0
-                          ? host.averageRating.toFixed(1)
-                          : "No ratings"}
+                        {host.averageRating > 0 ? host.averageRating.toFixed(1) : 'No ratings'}
                       </span>
                     </div>
                   </div>
@@ -331,7 +318,7 @@ export default async function HostProfilePage({ params }: Props) {
 
               {totalTrips > 0 ? (
                 <div className="grid gap-6">
-                  {host.travelPlans.map((trip) => (
+                  {host.travelPlans.map(trip => (
                     <div
                       key={trip.travelPlanId}
                       className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
@@ -345,9 +332,7 @@ export default async function HostProfilePage({ params }: Props) {
                               </h3>
                               <div className="flex items-center gap-2 text-gray-600 mb-3">
                                 <MapPin className="h-4 w-4 text-purple-600" />
-                                <span className="font-instrument">
-                                  {trip.destination}
-                                </span>
+                                <span className="font-instrument">{trip.destination}</span>
                               </div>
                             </div>
                             <Badge className="bg-green-100 text-green-800 border-green-200 font-instrument">
@@ -378,8 +363,7 @@ export default async function HostProfilePage({ params }: Props) {
                               <div className="flex items-center gap-2">
                                 <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                                 <span className="text-gray-700 font-instrument text-sm">
-                                  {trip.averageRating.toFixed(1)} (
-                                  {trip.reviewCount})
+                                  {trip.averageRating.toFixed(1)} ({trip.reviewCount})
                                 </span>
                               </div>
                             )}
@@ -426,7 +410,7 @@ export default async function HostProfilePage({ params }: Props) {
                 </div>
 
                 <div className="space-y-4">
-                  {host.reviews.map((review) => (
+                  {host.reviews.map(review => (
                     <div
                       key={review.id}
                       className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
@@ -435,7 +419,7 @@ export default async function HostProfilePage({ params }: Props) {
                         <Avatar className="h-12 w-12 border-2 border-purple-200">
                           <AvatarImage src={review.user.image || undefined} />
                           <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold">
-                            {review.user.name?.charAt(0).toUpperCase() || "U"}
+                            {review.user.name?.charAt(0).toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
 
@@ -450,8 +434,8 @@ export default async function HostProfilePage({ params }: Props) {
                                   key={i}
                                   className={`h-4 w-4 ${
                                     i < review.rating
-                                      ? "text-yellow-400 fill-yellow-400"
-                                      : "text-gray-300"
+                                      ? 'text-yellow-400 fill-yellow-400'
+                                      : 'text-gray-300'
                                   }`}
                                 />
                               ))}
@@ -459,15 +443,12 @@ export default async function HostProfilePage({ params }: Props) {
                           </div>
 
                           <p className="text-gray-600 font-instrument text-sm mb-3">
-                            Reviewed &quot;{review.travelPlan.title}&quot; •{" "}
-                            {new Date(review.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
+                            Reviewed &quot;{review.travelPlan.title}&quot; •{' '}
+                            {new Date(review.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
                           </p>
 
                           {review.comment && (

@@ -1,6 +1,6 @@
 export const formatDateRange = (start: Date, end: Date) => {
-  const startMonth = start.toLocaleDateString("en-US", { month: "short" });
-  const endMonth = end.toLocaleDateString("en-US", { month: "short" });
+  const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+  const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
   const startDay = start.getDate();
   const endDay = end.getDate();
   const year = start.getFullYear();

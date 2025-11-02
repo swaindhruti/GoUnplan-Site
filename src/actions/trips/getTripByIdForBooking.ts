@@ -1,13 +1,13 @@
-import { prisma, requireUser } from "@/lib/shared";
+import { prisma, requireUser } from '@/lib/shared';
 
 export const getTripById = async (tripId: string, bookingId: string) => {
   // Add validation to ensure tripId is provided
   if (!tripId) {
-    return { error: "Trip ID is required" };
+    return { error: 'Trip ID is required' };
   }
 
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const trip = await prisma?.travelPlans.findUnique({
@@ -22,7 +22,7 @@ export const getTripById = async (tripId: string, bookingId: string) => {
     });
 
     if (!trip) {
-      return { error: "Trip not found" };
+      return { error: 'Trip not found' };
     }
 
     const booking = await prisma.booking.findFirst({
@@ -32,7 +32,7 @@ export const getTripById = async (tripId: string, bookingId: string) => {
         id: bookingId,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
       select: {
         id: true,
@@ -54,7 +54,7 @@ export const getTripById = async (tripId: string, bookingId: string) => {
     });
     return { trip, booking };
   } catch (error) {
-    console.error("Error fetching trip by ID:", error);
-    return { error: "Failed to fetch trip" };
+    console.error('Error fetching trip by ID:', error);
+    return { error: 'Failed to fetch trip' };
   }
 };

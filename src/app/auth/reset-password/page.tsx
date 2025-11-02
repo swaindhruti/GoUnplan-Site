@@ -1,26 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { toast } from "sonner";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  Compass
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  resetPassword,
-  verifyResetToken
-} from "@/actions/password-reset/actions";
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { toast } from 'sonner';
+import { AlertCircle, CheckCircle2, Lock, Eye, EyeOff, ArrowLeft, Compass } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { resetPassword, verifyResetToken } from '@/actions/password-reset/actions';
 
 interface FormData {
   password: string;
@@ -41,8 +30,8 @@ interface User {
 
 function ResetPasswordForm() {
   const [formData, setFormData] = useState<FormData>({
-    password: "",
-    confirmPassword: ""
+    password: '',
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +43,7 @@ function ResetPasswordForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -68,17 +57,17 @@ function ResetPasswordForm() {
         setIsTokenValid(true);
         setUser(result.user);
       } catch (error) {
-        console.error("Token verification error:", error);
+        console.error('Token verification error:', error);
         setIsTokenValid(false);
-        toast.error("Invalid or expired reset link", {
+        toast.error('Invalid or expired reset link', {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)"
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(196, 181, 253, 0.3)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
-          duration: 4000
+          duration: 4000,
         });
       }
     };
@@ -88,15 +77,15 @@ function ResetPasswordForm() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
@@ -105,23 +94,21 @@ function ResetPasswordForm() {
     const newErrors: FormErrors = {};
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+      newErrors.password = 'Password must be at least 8 characters long';
     } else if (!/(?=.*[a-z])/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one lowercase letter";
+      newErrors.password = 'Password must contain at least one lowercase letter';
     } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one uppercase letter";
+      newErrors.password = 'Password must contain at least one uppercase letter';
     } else if (!/(?=.*\d)/.test(formData.password)) {
-      newErrors.password = "Password must contain at least one number";
+      newErrors.password = 'Password must contain at least one number';
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords don&apos;t match";
+      newErrors.confirmPassword = 'Passwords don&apos;t match';
     }
 
     setErrors(newErrors);
@@ -130,13 +117,13 @@ function ResetPasswordForm() {
       const firstError = Object.values(newErrors)[0];
       toast.error(firstError, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
-        duration: 4000
+        duration: 4000,
       });
     }
 
@@ -155,37 +142,34 @@ function ResetPasswordForm() {
       await resetPassword(token, formData.password);
 
       setIsSuccess(true);
-      toast.success("Password reset successful!", {
+      toast.success('Password reset successful!', {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
-        duration: 5000
+        duration: 5000,
       });
 
       // Redirect to signin page after a delay
       setTimeout(() => {
-        router.push(
-          "/auth/signin?message=Password reset successfully. You can now sign in."
-        );
+        router.push('/auth/signin?message=Password reset successfully. You can now sign in.');
       }, 2000);
     } catch (error) {
-      console.error("Password reset error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "An unexpected error occurred";
+      console.error('Password reset error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       setErrors({ general: errorMessage });
       toast.error(errorMessage, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
-        duration: 4000
+        duration: 4000,
       });
     } finally {
       setIsLoading(false);
@@ -212,9 +196,7 @@ function ResetPasswordForm() {
             <div className="bg-red-100 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <AlertCircle className="h-8 w-8 text-red-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
-              Invalid Reset Link
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 font-bricolage">Invalid Reset Link</h1>
             <p className="text-gray-600 font-instrument mt-2">
               This password reset link is invalid or has expired.
             </p>
@@ -223,8 +205,7 @@ function ResetPasswordForm() {
           <Alert className="bg-red-50 border-red-200">
             <AlertCircle className="h-4 w-4 text-red-600" />
             <AlertDescription className="text-red-800 font-instrument">
-              The reset link may have expired or been used already. Please
-              request a new one.
+              The reset link may have expired or been used already. Please request a new one.
             </AlertDescription>
           </Alert>
 
@@ -262,8 +243,7 @@ function ResetPasswordForm() {
               Password Reset Complete
             </h1>
             <p className="text-gray-600 font-instrument mt-2">
-              Your password has been successfully reset. You can now sign in
-              with your new password.
+              Your password has been successfully reset. You can now sign in with your new password.
             </p>
           </div>
 
@@ -292,9 +272,7 @@ function ResetPasswordForm() {
           <div className="bg-purple-100 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             <Lock className="h-8 w-8 text-purple-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
-            Set New Password
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">Set New Password</h1>
           <p className="text-gray-600 font-instrument mt-2">
             Hi {user?.name}! Enter your new password below.
           </p>
@@ -320,12 +298,12 @@ function ResetPasswordForm() {
                 <Input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={handleInputChange}
                   className={`pl-10 pr-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument ${
-                    errors.password ? "border-red-400" : ""
+                    errors.password ? 'border-red-400' : ''
                   }`}
                   placeholder="••••••••"
                 />
@@ -334,17 +312,11 @@ function ResetPasswordForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-red-600 font-instrument mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-xs text-red-600 font-instrument mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -357,12 +329,12 @@ function ResetPasswordForm() {
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   className={`pl-10 pr-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument ${
-                    errors.confirmPassword ? "border-red-400" : ""
+                    errors.confirmPassword ? 'border-red-400' : ''
                   }`}
                   placeholder="••••••••"
                 />
@@ -418,9 +390,7 @@ export default function ResetPasswordPage() {
           <div className="flex justify-between items-center py-6">
             <Link href="/" className="flex items-center gap-2">
               <Compass className="h-8 w-8 text-purple-600" />
-              <span className="text-2xl font-bold text-gray-900 font-bricolage">
-                GoUnplan
-              </span>
+              <span className="text-2xl font-bold text-gray-900 font-bricolage">GoUnplan</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link
@@ -469,9 +439,7 @@ export default function ResetPasswordPage() {
           />
           <div className="absolute inset-0 bg-black/20" />
           <div className="absolute bottom-8 left-8 text-white">
-            <h2 className="text-2xl font-bold font-bricolage mb-2">
-              Fresh Start Awaits
-            </h2>
+            <h2 className="text-2xl font-bold font-bricolage mb-2">Fresh Start Awaits</h2>
             <p className="text-white/80 font-instrument">
               Set a strong password and continue your adventure with confidence.
             </p>

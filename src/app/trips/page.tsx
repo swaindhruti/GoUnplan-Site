@@ -1,26 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { useTripsData, useFilters } from "@/hooks/useTrips";
-import { MultiValue } from "react-select";
-import { SelectOption } from "@/types/trips";
-import { FilterPanel } from "@/components/trips/FilterPanel";
-import { TripCard } from "@/components/trips/TripCard";
-import {
-  LoadingSkeleton,
-  EmptyState,
-  ErrorDisplay,
-} from "@/components/trips/LoadingStates";
-import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { Search, Filter, Sparkles, X } from "lucide-react";
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useTripsData, useFilters } from '@/hooks/useTrips';
+import { MultiValue } from 'react-select';
+import { SelectOption } from '@/types/trips';
+import { FilterPanel } from '@/components/trips/FilterPanel';
+import { TripCard } from '@/components/trips/TripCard';
+import { LoadingSkeleton, EmptyState, ErrorDisplay } from '@/components/trips/LoadingStates';
+import { useSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Search, Filter, Sparkles, X } from 'lucide-react';
 
 // Floating Action Button
 const FloatingActionButton = ({
   onClick,
   children,
-  className = "",
+  className = '',
 }: {
   onClick: () => void;
   children: React.ReactNode;
@@ -45,8 +41,8 @@ export default function TripsPage() {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (mounted && status === "unauthenticated") {
-      router.push("/auth/signin");
+    if (mounted && status === 'unauthenticated') {
+      router.push('/auth/signin');
     }
   }, [mounted, status, router]);
 
@@ -73,19 +69,19 @@ export default function TripsPage() {
       setShowScrollTop(window.scrollY > 400);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [mounted]);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Typing animation for search
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setIsTyping(true);
-      updateFilter("searchTerm", e.target.value);
+      updateFilter('searchTerm', e.target.value);
 
       // Clear typing indicator after delay
       setTimeout(() => setIsTyping(false), 1000);
@@ -97,22 +93,22 @@ export default function TripsPage() {
     () => ({
       control: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
-        borderWidth: "1px",
-        borderColor: "rgba(147, 51, 234, 0.3)",
-        borderRadius: "0.75rem",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-        padding: "6px",
-        fontSize: "0.95rem",
-        fontWeight: "500",
-        transition: "all 0.2s ease",
-        "&:hover": {
-          borderColor: "rgba(147, 51, 234, 0.5)",
-          boxShadow: "0 6px 25px rgba(147, 51, 234, 0.15)",
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderWidth: '1px',
+        borderColor: 'rgba(147, 51, 234, 0.3)',
+        borderRadius: '0.75rem',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        padding: '6px',
+        fontSize: '0.95rem',
+        fontWeight: '500',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          borderColor: 'rgba(147, 51, 234, 0.5)',
+          boxShadow: '0 6px 25px rgba(147, 51, 234, 0.15)',
         },
-        "&:focus-within": {
-          borderColor: "rgb(147, 51, 234)",
-          boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.1)",
+        '&:focus-within': {
+          borderColor: 'rgb(147, 51, 234)',
+          boxShadow: '0 0 0 3px rgba(147, 51, 234, 0.1)',
         },
       }),
       option: (
@@ -121,74 +117,74 @@ export default function TripsPage() {
       ) => ({
         ...baseStyles,
         backgroundColor: state.isSelected
-          ? "rgb(147, 51, 234)"
+          ? 'rgb(147, 51, 234)'
           : state.isFocused
-          ? "rgba(147, 51, 234, 0.1)"
-          : "white",
-        color: state.isSelected ? "white" : "rgb(55, 65, 81)",
-        fontWeight: state.isSelected ? "600" : "500",
-        padding: "10px 14px",
-        fontSize: "0.875rem",
-        transition: "all 0.2s ease",
+            ? 'rgba(147, 51, 234, 0.1)'
+            : 'white',
+        color: state.isSelected ? 'white' : 'rgb(55, 65, 81)',
+        fontWeight: state.isSelected ? '600' : '500',
+        padding: '10px 14px',
+        fontSize: '0.875rem',
+        transition: 'all 0.2s ease',
       }),
       multiValue: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        backgroundColor: "rgba(147, 51, 234, 0.1)",
-        border: "1px solid rgba(147, 51, 234, 0.3)",
-        borderRadius: "0.5rem",
-        padding: "2px 6px",
-        margin: "2px 4px 2px 0",
+        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+        border: '1px solid rgba(147, 51, 234, 0.3)',
+        borderRadius: '0.5rem',
+        padding: '2px 6px',
+        margin: '2px 4px 2px 0',
       }),
       multiValueLabel: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        color: "rgb(147, 51, 234)",
-        fontWeight: "500",
-        fontSize: "0.875rem",
+        color: 'rgb(147, 51, 234)',
+        fontWeight: '500',
+        fontSize: '0.875rem',
       }),
       multiValueRemove: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        color: "rgb(147, 51, 234)",
-        transition: "all 0.2s ease",
-        "&:hover": {
-          backgroundColor: "rgb(147, 51, 234)",
-          color: "white",
+        color: 'rgb(147, 51, 234)',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: 'rgb(147, 51, 234)',
+          color: 'white',
         },
       }),
       placeholder: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        color: "rgb(107, 114, 128)",
-        fontWeight: "400",
+        color: 'rgb(107, 114, 128)',
+        fontWeight: '400',
       }),
       input: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        color: "rgb(55, 65, 81)",
-        fontWeight: "500",
+        color: 'rgb(55, 65, 81)',
+        fontWeight: '500',
       }),
       indicatorSeparator: () => ({
-        display: "none",
+        display: 'none',
       }),
       dropdownIndicator: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        color: "rgb(147, 51, 234)",
-        "&:hover": {
-          color: "rgb(126, 34, 206)",
+        color: 'rgb(147, 51, 234)',
+        '&:hover': {
+          color: 'rgb(126, 34, 206)',
         },
       }),
       menu: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        backgroundColor: "white",
-        border: "1px solid rgba(147, 51, 234, 0.2)",
-        borderRadius: "0.75rem",
-        boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
-        overflow: "hidden",
+        backgroundColor: 'white',
+        border: '1px solid rgba(147, 51, 234, 0.2)',
+        borderRadius: '0.75rem',
+        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+        overflow: 'hidden',
       }),
       menuList: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "6px",
+        padding: '6px',
       }),
       valueContainer: (baseStyles: Record<string, unknown>) => ({
         ...baseStyles,
-        padding: "4px 8px",
+        padding: '4px 8px',
       }),
     }),
     []
@@ -197,17 +193,14 @@ export default function TripsPage() {
   // Handler functions for filter changes
   const handlePriceMinChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      updateFilter("priceRange", [+e.target.value || 0, filters.priceRange[1]]);
+      updateFilter('priceRange', [+e.target.value || 0, filters.priceRange[1]]);
     },
     [updateFilter, filters.priceRange]
   );
 
   const handlePriceMaxChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      updateFilter("priceRange", [
-        filters.priceRange[0],
-        +e.target.value || Infinity,
-      ]);
+      updateFilter('priceRange', [filters.priceRange[0], +e.target.value || Infinity]);
     },
     [updateFilter, filters.priceRange]
   );
@@ -215,8 +208,8 @@ export default function TripsPage() {
   const handleLanguageChange = useCallback(
     (selected: MultiValue<SelectOption>) => {
       updateFilter(
-        "languageFilter",
-        selected.map((opt) => opt.value)
+        'languageFilter',
+        selected.map(opt => opt.value)
       );
     },
     [updateFilter]
@@ -225,8 +218,8 @@ export default function TripsPage() {
   const handleVibeChange = useCallback(
     (selected: MultiValue<SelectOption>) => {
       updateFilter(
-        "vibeFilter",
-        selected.map((opt) => opt.value)
+        'vibeFilter',
+        selected.map(opt => opt.value)
       );
     },
     [updateFilter]
@@ -235,8 +228,8 @@ export default function TripsPage() {
   const handleTravellerChange = useCallback(
     (selected: MultiValue<SelectOption>) => {
       updateFilter(
-        "travellerFilter",
-        selected.map((opt) => opt.value)
+        'travellerFilter',
+        selected.map(opt => opt.value)
       );
     },
     [updateFilter]
@@ -246,20 +239,20 @@ export default function TripsPage() {
 
   useEffect(() => {
     // Map query params to filter keys
-    const travelerType = searchParams.get("travelerType");
-    const startDate = searchParams.get("startDate");
-    const destination = searchParams.get("destination");
-    const vibe = searchParams.get("vibe");
+    const travelerType = searchParams.get('travelerType');
+    const startDate = searchParams.get('startDate');
+    const destination = searchParams.get('destination');
+    const vibe = searchParams.get('vibe');
     // Add more params as needed (e.g., language, priceRange, etc.)
 
     if (travelerType) {
-      updateFilter("travellerFilter", [travelerType]);
+      updateFilter('travellerFilter', [travelerType]);
     }
     if (vibe) {
-      updateFilter("vibeFilter", [vibe]);
+      updateFilter('vibeFilter', [vibe]);
     }
     if (destination) {
-      updateFilter("searchTerm", destination);
+      updateFilter('searchTerm', destination);
     }
     if (startDate) {
       // If you want to filter by date, add a date filter to your FilterState and handle it here
@@ -274,24 +267,21 @@ export default function TripsPage() {
     if (element) {
       // Calculate offset to position the card nicely in the viewport
       const yOffset = -100; // Adjust this value as needed
-      const y =
-        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
       window.scrollTo({
         top: y,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   }, []);
 
   // Show unauthorized page if not authenticated
-  if (status === "unauthenticated") {
+  if (status === 'unauthenticated') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Access Denied
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
           <p className="text-gray-600">Please sign in to view trips.</p>
         </div>
       </div>
@@ -376,8 +366,8 @@ export default function TripsPage() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-8 py-4 font-semibold text-sm rounded-2xl transition-all duration-300 flex items-center gap-3 font-instrument relative overflow-hidden ${
                     showFilters
-                      ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-2xl shadow-purple-500/30"
-                      : "bg-white/90 text-gray-700 hover:bg-white border-2 border-purple-200/50 hover:border-purple-300 shadow-lg hover:shadow-xl"
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-2xl shadow-purple-500/30'
+                      : 'bg-white/90 text-gray-700 hover:bg-white border-2 border-purple-200/50 hover:border-purple-300 shadow-lg hover:shadow-xl'
                   }`}
                   onClick={() => setShowFilters(!showFilters)}
                 >
@@ -420,7 +410,7 @@ export default function TripsPage() {
             <motion.div
               initial={false}
               animate={{
-                height: showFilters ? "auto" : 0,
+                height: showFilters ? 'auto' : 0,
                 opacity: showFilters ? 1 : 0,
               }}
               transition={{
@@ -485,18 +475,18 @@ export default function TripsPage() {
               <div className="flex items-center gap-3">
                 <h2 className="text-2xl font-bold text-gray-900 font-bricolage">
                   {filteredTrips.length} Trip
-                  {filteredTrips.length !== 1 ? "s" : ""} Found
+                  {filteredTrips.length !== 1 ? 's' : ''} Found
                 </h2>
                 {isTyping && (
                   <div className="flex items-center gap-2 text-purple-600">
                     <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
                     <div
                       className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
+                      style={{ animationDelay: '0.1s' }}
                     />
                     <div
                       className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
+                      style={{ animationDelay: '0.2s' }}
                     />
                   </div>
                 )}
@@ -505,7 +495,7 @@ export default function TripsPage() {
 
             {/* Trip grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTrips.map((trip) => (
+              {filteredTrips.map(trip => (
                 <motion.div
                   key={trip.travelPlanId}
                   id={`trip-${trip.travelPlanId}`}
@@ -514,10 +504,7 @@ export default function TripsPage() {
                   transition={{ duration: 0.5 }}
                   whileHover={{ y: -5 }}
                 >
-                  <TripCard
-                    trip={trip}
-                    onClick={() => handleTripClick(trip.travelPlanId)}
-                  />
+                  <TripCard trip={trip} onClick={() => handleTripClick(trip.travelPlanId)} />
                 </motion.div>
               ))}
             </div>
@@ -528,12 +515,7 @@ export default function TripsPage() {
       {/* Scroll to top button */}
       {showScrollTop && (
         <FloatingActionButton onClick={scrollToTop}>
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

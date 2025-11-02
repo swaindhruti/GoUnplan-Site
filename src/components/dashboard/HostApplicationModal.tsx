@@ -1,17 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { User, Mail, Phone, Calendar, XCircle, Star } from "lucide-react";
-import { getHostApplicationDetails } from "@/actions/admin/action";
-import { Role } from "@/types/auth";
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { User, Mail, Phone, Calendar, XCircle, Star } from 'lucide-react';
+import { getHostApplicationDetails } from '@/actions/admin/action';
+import { Role } from '@/types/auth';
 
 interface ApplicationDetails {
   id: string;
@@ -87,8 +82,7 @@ export default function HostApplicationModal({
   onApprove,
   onReject,
 }: HostApplicationModalProps) {
-  const [applicationDetails, setApplicationDetails] =
-    useState<ApplicationDetails | null>(null);
+  const [applicationDetails, setApplicationDetails] = useState<ApplicationDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,7 +101,7 @@ export default function HostApplicationModal({
           setApplicationDetails(response.applicant);
         }
       } catch {
-        setError("Failed to fetch application details");
+        setError('Failed to fetch application details');
       } finally {
         setLoading(false);
       }
@@ -119,12 +113,12 @@ export default function HostApplicationModal({
   }, [isOpen, applicantId]);
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -195,22 +189,12 @@ export default function HostApplicationModal({
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {applicationDetails.name}
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{applicationDetails.name}</h3>
                   <p className="text-gray-600">{applicationDetails.email}</p>
                   <div className="flex items-center space-x-2 mt-2">
                     <Badge variant="outline">{applicationDetails.role}</Badge>
-                    <Badge
-                      variant={
-                        applicationDetails.isEmailVerified
-                          ? "default"
-                          : "destructive"
-                      }
-                    >
-                      {applicationDetails.isEmailVerified
-                        ? "Verified"
-                        : "Not Verified"}
+                    <Badge variant={applicationDetails.isEmailVerified ? 'default' : 'destructive'}>
+                      {applicationDetails.isEmailVerified ? 'Verified' : 'Not Verified'}
                     </Badge>
                   </div>
                 </div>
@@ -218,26 +202,20 @@ export default function HostApplicationModal({
 
               {/* Contact Information */}
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900">
-                  Contact Information
-                </h4>
+                <h4 className="font-medium text-gray-900">Contact Information</h4>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                     <Mail className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="text-sm text-gray-600">Email</p>
-                      <p className="font-medium">
-                        {applicationDetails.email || "Not provided"}
-                      </p>
+                      <p className="font-medium">{applicationDetails.email || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                     <Phone className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="text-sm text-gray-600">Phone</p>
-                      <p className="font-medium">
-                        {applicationDetails.phone || "Not provided"}
-                      </p>
+                      <p className="font-medium">{applicationDetails.phone || 'Not provided'}</p>
                     </div>
                   </div>
                 </div>
@@ -245,17 +223,13 @@ export default function HostApplicationModal({
 
               {/* Application Dates */}
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900">
-                  Application Timeline
-                </h4>
+                <h4 className="font-medium text-gray-900">Application Timeline</h4>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                     <Calendar className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="text-sm text-gray-600">Applied On</p>
-                      <p className="font-medium">
-                        {formatDate(applicationDetails.createdAt)}
-                      </p>
+                      <p className="font-medium">{formatDate(applicationDetails.createdAt)}</p>
                     </div>
                   </div>
                 </div>
@@ -278,9 +252,7 @@ export default function HostApplicationModal({
                   <div className="p-4 bg-gray-50 rounded-lg space-y-3">
                     {applicationDetails.hostProfile.description && (
                       <div>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Description
-                        </p>
+                        <p className="text-sm text-gray-600 mb-2">Description</p>
                         <p className="text-gray-700">
                           {applicationDetails.hostProfile.description}
                         </p>
@@ -290,17 +262,11 @@ export default function HostApplicationModal({
                       <div>
                         <p className="text-sm text-gray-600 mb-2">Languages</p>
                         <div className="flex flex-wrap gap-1">
-                          {applicationDetails.hostProfile.languages.map(
-                            (lang, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                {lang}
-                              </Badge>
-                            )
-                          )}
+                          {applicationDetails.hostProfile.languages.map((lang, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {lang}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -308,10 +274,8 @@ export default function HostApplicationModal({
                       <div className="flex items-center space-x-2">
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
                         <span className="text-sm font-medium">
-                          {applicationDetails.hostProfile.averageRating.toFixed(
-                            1
-                          )}
-                          ({applicationDetails.hostProfile.reviewCount} reviews)
+                          {applicationDetails.hostProfile.averageRating.toFixed(1)}(
+                          {applicationDetails.hostProfile.reviewCount} reviews)
                         </span>
                       </div>
                     )}
@@ -327,7 +291,7 @@ export default function HostApplicationModal({
               <Button variant="outline" onClick={onClose}>
                 Close
               </Button>
-              {applicationDetails.role !== "HOST" && (
+              {applicationDetails.role !== 'HOST' && (
                 <>
                   <Button variant="destructive" onClick={handleReject}>
                     Reject

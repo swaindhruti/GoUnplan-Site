@@ -1,15 +1,12 @@
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface HeroSectionProps {
   searchTerm: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const HeroSection = ({
-  searchTerm,
-  onSearchChange
-}: HeroSectionProps) => {
+export const HeroSection = ({ searchTerm, onSearchChange }: HeroSectionProps) => {
   return (
     <div className="bg-purple-600 border-b-3 border-black text-white py-16 px-8 relative overflow-hidden">
       {/* Reduced set of decorative elements placed away from content */}

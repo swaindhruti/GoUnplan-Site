@@ -1,26 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  CheckCircle,
-  Mail,
-  Loader2,
-  ArrowLeft,
-  User,
-  Phone,
-  AlertCircle,
-} from "lucide-react";
-import {
-  verifyEmail,
-  verifyEmailWithToken,
-} from "@/actions/email-verification/action";
-import { getUserProfile } from "@/actions/user/action";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Mail, Loader2, ArrowLeft, User, Phone, AlertCircle } from 'lucide-react';
+import { verifyEmail, verifyEmailWithToken } from '@/actions/email-verification/action';
+import { getUserProfile } from '@/actions/user/action';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -34,7 +23,7 @@ export default function VerifyEmailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Extract token from URL
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
   useEffect(() => {
     // Auto-verify if token is present in URL
@@ -60,13 +49,13 @@ export default function VerifyEmailPage() {
           await fetchUserProfile();
         }
       } else {
-        setTokenError(result.error || "Verification failed");
-        toast.error(result.error || "Failed to verify email");
+        setTokenError(result.error || 'Verification failed');
+        toast.error(result.error || 'Failed to verify email');
       }
     } catch (error) {
-      console.error("Token verification error:", error);
-      setTokenError("An unexpected error occurred");
-      toast.error("An unexpected error occurred");
+      console.error('Token verification error:', error);
+      setTokenError('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     } finally {
       setIsVerifying(false);
       setIsLoading(false);
@@ -83,7 +72,7 @@ export default function VerifyEmailPage() {
         setIsVerified(result.user.isEmailVerified || false);
       }
     } catch {
-      toast.error("Failed to fetch user profile");
+      toast.error('Failed to fetch user profile');
     } finally {
       setIsLoading(false);
     }
@@ -98,22 +87,22 @@ export default function VerifyEmailPage() {
         toast.success(result.message);
         // Redirect to profile page after successful verification
         setTimeout(() => {
-          router.push("/profile");
+          router.push('/profile');
         }, 2000); // 2 second delay to show success message
       }
     } catch {
-      toast.error("Failed to verify email");
+      toast.error('Failed to verify email');
     } finally {
       setIsVerifying(false);
     }
   };
 
   const handleGoToProfile = () => {
-    router.push("/profile");
+    router.push('/profile');
   };
 
   const handleGoHome = () => {
-    router.push("/");
+    router.push('/');
   };
 
   if (isLoading) {
@@ -176,13 +165,11 @@ export default function VerifyEmailPage() {
                         <Badge
                           className={
                             userProfile.isEmailVerified
-                              ? "bg-green-100 text-green-800 border-green-200"
-                              : "bg-amber-100 text-amber-800 border-amber-200"
+                              ? 'bg-green-100 text-green-800 border-green-200'
+                              : 'bg-amber-100 text-amber-800 border-amber-200'
                           }
                         >
-                          {userProfile.isEmailVerified
-                            ? "Verified"
-                            : "Unverified"}
+                          {userProfile.isEmailVerified ? 'Verified' : 'Unverified'}
                         </Badge>
                       </p>
                     </div>
@@ -209,9 +196,7 @@ export default function VerifyEmailPage() {
                       <h2 className="text-2xl font-bold text-red-900 font-bricolage">
                         Verification Failed
                       </h2>
-                      <p className="text-gray-600 font-instrument text-lg">
-                        {tokenError}
-                      </p>
+                      <p className="text-gray-600 font-instrument text-lg">{tokenError}</p>
                     </div>
                     <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6 shadow-sm">
                       <div className="flex items-center gap-3 justify-center text-red-700">
@@ -219,9 +204,9 @@ export default function VerifyEmailPage() {
                           <AlertCircle className="h-4 w-4" />
                         </div>
                         <span className="font-medium font-instrument">
-                          {tokenError.includes("expired")
-                            ? "Your verification link has expired"
-                            : "Invalid verification link"}
+                          {tokenError.includes('expired')
+                            ? 'Your verification link has expired'
+                            : 'Invalid verification link'}
                         </span>
                       </div>
                     </div>
@@ -253,8 +238,7 @@ export default function VerifyEmailPage() {
                         Verify Your Email
                       </h2>
                       <p className="text-gray-600 font-instrument text-lg">
-                        Complete your account setup by verifying your email
-                        address
+                        Complete your account setup by verifying your email address
                       </p>
                     </div>
 
@@ -302,8 +286,7 @@ export default function VerifyEmailPage() {
                         Email Already Verified!
                       </h2>
                       <p className="text-gray-600 font-instrument text-lg">
-                        Your email is already verified. You have access to all
-                        features.
+                        Your email is already verified. You have access to all features.
                       </p>
                     </div>
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
@@ -358,8 +341,7 @@ export default function VerifyEmailPage() {
                         Email Verified Successfully!
                       </h2>
                       <p className="text-gray-600 font-instrument text-lg">
-                        Your email has been verified. You now have access to all
-                        features.
+                        Your email has been verified. You now have access to all features.
                       </p>
                     </div>
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
@@ -402,7 +384,7 @@ export default function VerifyEmailPage() {
           <div className="mt-8 text-center">
             <div className="bg-white/50 backdrop-blur rounded-xl p-6 border border-white/20 shadow-sm">
               <p className="text-gray-600 font-instrument">
-                Having trouble? You can also verify your email from your{" "}
+                Having trouble? You can also verify your email from your{' '}
                 <button
                   onClick={handleGoToProfile}
                   className="text-purple-600 hover:text-purple-700 font-semibold underline decoration-purple-300 hover:decoration-purple-500 transition-colors duration-200"

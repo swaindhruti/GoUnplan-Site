@@ -1,21 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { UserProfile } from "@/types/dashboard";
-import {
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  Edit,
-  Save,
-  X,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
-import { useState } from "react";
-import { updateUserProfile } from "@/actions/user/action";
-import { sendVerificationEmail } from "@/actions/email-verification/action";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { UserProfile } from '@/types/dashboard';
+import { User, Mail, Phone, Calendar, Edit, Save, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { updateUserProfile } from '@/actions/user/action';
+import { sendVerificationEmail } from '@/actions/email-verification/action';
 
 interface ProfileTabProps {
   profile: UserProfile | null;
@@ -26,14 +16,12 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setSaving] = useState(false);
   const [isSendingVerification, setIsSendingVerification] = useState(false);
-  const [verificationMessage, setVerificationMessage] = useState<string | null>(
-    null
-  );
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: profile?.name || "",
-    phone: profile?.phone || "",
-    bio: profile?.bio || "",
-    email: profile?.email || "",
+    name: profile?.name || '',
+    phone: profile?.phone || '',
+    bio: profile?.bio || '',
+    email: profile?.email || '',
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -41,10 +29,10 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
   const handleEdit = () => {
     setIsEditing(true);
     setFormData({
-      name: profile?.name || "",
-      phone: profile?.phone || "",
-      bio: profile?.bio || "",
-      email: profile?.email || "",
+      name: profile?.name || '',
+      phone: profile?.phone || '',
+      bio: profile?.bio || '',
+      email: profile?.email || '',
     });
     setError(null);
     setSuccess(null);
@@ -53,10 +41,10 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
   const handleCancel = () => {
     setIsEditing(false);
     setFormData({
-      name: profile?.name || "",
-      phone: profile?.phone || "",
-      bio: profile?.bio || "",
-      email: profile?.email || "",
+      name: profile?.name || '',
+      phone: profile?.phone || '',
+      bio: profile?.bio || '',
+      email: profile?.email || '',
     });
     setError(null);
     setSuccess(null);
@@ -78,7 +66,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
       if (result.error) {
         setError(result.error);
       } else if (result.success && result.user) {
-        setSuccess("Profile updated successfully!");
+        setSuccess('Profile updated successfully!');
         setIsEditing(false);
 
         // Update the profile data
@@ -98,14 +86,14 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
         setTimeout(() => setSuccess(null), 3000);
       }
     } catch {
-      setError("Failed to update profile. Please try again.");
+      setError('Failed to update profile. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSendVerificationEmail = async () => {
@@ -115,15 +103,11 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
     try {
       const result = await sendVerificationEmail();
       if (result.success) {
-        setVerificationMessage(
-          "Verification email sent successfully! Please check your inbox."
-        );
+        setVerificationMessage('Verification email sent successfully! Please check your inbox.');
         setTimeout(() => setVerificationMessage(null), 5000);
       }
     } catch {
-      setVerificationMessage(
-        "Failed to send verification email. Please try again."
-      );
+      setVerificationMessage('Failed to send verification email. Please try again.');
       setTimeout(() => setVerificationMessage(null), 5000);
     } finally {
       setIsSendingVerification(false);
@@ -134,9 +118,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
       {/* Header Section */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-            User Profile
-          </h3>
+          <h3 className="text-2xl font-bold text-gray-900 font-bricolage">User Profile</h3>
           <p className="text-gray-600 font-instrument mt-1">
             Your personal information and preferences
           </p>
@@ -157,7 +139,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
               className="bg-green-600 hover:bg-green-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
             >
               <Save className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save"}
+              {isLoading ? 'Saving...' : 'Save'}
             </Button>
             <Button
               onClick={handleCancel}
@@ -190,9 +172,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
           <div className="flex flex-col items-center">
             <div className="mb-6">
               <div className="h-32 w-32 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-4xl font-bold">
-                {(isEditing ? formData.name : profile?.name)
-                  ?.charAt(0)
-                  .toUpperCase() || "U"}
+                {(isEditing ? formData.name : profile?.name)?.charAt(0).toUpperCase() || 'U'}
               </div>
             </div>
             {isEditing ? (
@@ -203,7 +183,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                   </label>
                   <Input
                     value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    onChange={e => handleInputChange('name', e.target.value)}
                     className="font-instrument"
                     placeholder="Enter your name"
                   />
@@ -214,7 +194,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                   </label>
                   <Input
                     value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    onChange={e => handleInputChange('email', e.target.value)}
                     className="font-instrument"
                     placeholder="Enter your email"
                     type="email"
@@ -266,17 +246,13 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                       {profile?.isEmailVerified ? (
                         <div className="flex items-center gap-2 text-green-600">
                           <CheckCircle size={16} />
-                          <span className="text-sm font-instrument">
-                            Email verified
-                          </span>
+                          <span className="text-sm font-instrument">Email verified</span>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="flex items-center gap-2 text-amber-600">
                             <AlertCircle size={16} />
-                            <span className="text-sm font-instrument">
-                              Email not verified
-                            </span>
+                            <span className="text-sm font-instrument">Email not verified</span>
                           </div>
                           <Button
                             onClick={handleSendVerificationEmail}
@@ -284,16 +260,14 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                             size="sm"
                             className="bg-amber-600 hover:bg-amber-700 text-white font-instrument text-sm"
                           >
-                            {isSendingVerification
-                              ? "Sending..."
-                              : "Send Verification Email"}
+                            {isSendingVerification ? 'Sending...' : 'Send Verification Email'}
                           </Button>
                           {verificationMessage && (
                             <p
                               className={`text-sm font-instrument mt-2 ${
-                                verificationMessage.includes("successfully")
-                                  ? "text-green-600"
-                                  : "text-red-600"
+                                verificationMessage.includes('successfully')
+                                  ? 'text-green-600'
+                                  : 'text-red-600'
                               }`}
                             >
                               {verificationMessage}
@@ -316,15 +290,13 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                   {isEditing ? (
                     <Input
                       value={formData.phone}
-                      onChange={(e) =>
-                        handleInputChange("phone", e.target.value)
-                      }
+                      onChange={e => handleInputChange('phone', e.target.value)}
                       className="font-instrument mt-2"
                       placeholder="Enter your phone number"
                     />
                   ) : (
                     <p className="font-semibold text-gray-900 font-instrument">
-                      {profile?.phone || "Not provided"}
+                      {profile?.phone || 'Not provided'}
                     </p>
                   )}
                 </div>
@@ -347,7 +319,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                     </label>
                     <Textarea
                       value={formData.bio}
-                      onChange={(e) => handleInputChange("bio", e.target.value)}
+                      onChange={e => handleInputChange('bio', e.target.value)}
                       className="font-instrument min-h-[120px]"
                       placeholder="Tell us about yourself and your travel preferences..."
                     />
@@ -355,7 +327,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                 ) : (
                   <p className="text-gray-900 font-instrument leading-relaxed">
                     {profile?.bio ||
-                      "No bio information provided. Click edit to add your bio and tell us about your travel preferences."}
+                      'No bio information provided. Click edit to add your bio and tell us about your travel preferences.'}
                   </p>
                 )}
               </div>
@@ -380,9 +352,7 @@ export function ProfileTab({ profile, onProfileUpdate }: ProfileTabProps) {
                     </p>
                   </div>
                   <p className="font-semibold text-gray-900 font-instrument">
-                    {profile?.createdAt
-                      ? new Date(profile.createdAt).toLocaleDateString()
-                      : "N/A"}
+                    {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
               </div>

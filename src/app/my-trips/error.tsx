@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -40,17 +40,17 @@ export default function Error({ error, reset }: ErrorProps) {
               <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="h-12 w-12 text-red-600" />
               </div>
-              
+
               <h2 className="text-2xl font-bold text-gray-900 mb-4 font-bricolage">
                 Unable to Load Your Trips
               </h2>
-              
+
               <p className="text-gray-600 font-instrument mb-2 max-w-md mx-auto">
-                We&apos;re having trouble accessing your travel history right now. 
-                This could be a temporary issue.
+                We&apos;re having trouble accessing your travel history right now. This could be a
+                temporary issue.
               </p>
-              
-              {process.env.NODE_ENV === "development" && (
+
+              {process.env.NODE_ENV === 'development' && (
                 <details className="mt-4 text-left max-w-2xl mx-auto">
                   <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700 font-instrument">
                     Technical Details (Development Mode)
@@ -61,7 +61,7 @@ export default function Error({ error, reset }: ErrorProps) {
                   </pre>
                 </details>
               )}
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                 <Button
                   onClick={reset}
@@ -70,7 +70,7 @@ export default function Error({ error, reset }: ErrorProps) {
                   <RefreshCw className="h-4 w-4" />
                   Try Again
                 </Button>
-                
+
                 <Link href="/">
                   <Button
                     variant="outline"
@@ -81,10 +81,11 @@ export default function Error({ error, reset }: ErrorProps) {
                   </Button>
                 </Link>
               </div>
-              
+
               <div className="mt-8 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800 font-instrument">
-                  <strong>Need help?</strong> If this problem persists, please contact our support team.
+                  <strong>Need help?</strong> If this problem persists, please contact our support
+                  team.
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { PaymentStatus } from "@prisma/client";
+import { PaymentStatus } from '@prisma/client';
 
 export interface UserProfile {
   id: string;

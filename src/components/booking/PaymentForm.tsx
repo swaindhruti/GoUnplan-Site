@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
   Calendar,
   DollarSign,
@@ -14,16 +14,13 @@ import {
   AlertCircle,
   Info,
   ArrowRight,
-} from "lucide-react";
-import { BookingData } from "@/types/booking";
-import Image from "next/image";
-import GreenConfirmationLoader from "../global/Loaders";
-import {
-  processRazorpayPayment,
-  handlePaymentFailure,
-} from "@/actions/payment/razorpayActions";
-import { toast } from "sonner";
-import { initiateRazorpayPayment } from "@/lib/razorpay";
+} from 'lucide-react';
+import { BookingData } from '@/types/booking';
+import Image from 'next/image';
+import GreenConfirmationLoader from '../global/Loaders';
+import { processRazorpayPayment, handlePaymentFailure } from '@/actions/payment/razorpayActions';
+import { toast } from 'sonner';
+import { initiateRazorpayPayment } from '@/lib/razorpay';
 
 interface PaymentFormProps {
   tripData: {
@@ -68,16 +65,13 @@ export function PaymentForm({
   const [showLoader, setShowLoader] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
-  const formatCurrency = useCallback(
-    (amount: number | undefined | null): string => {
-      if (!amount) return "₹0";
-      return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-    },
-    []
-  );
+  const formatCurrency = useCallback((amount: number | undefined | null): string => {
+    if (!amount) return '₹0';
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(amount);
+  }, []);
 
   const calculatePaymentBreakdown = useCallback(() => {
     if (!booking) return { subtotal: 0, total: 0 };
@@ -102,15 +96,9 @@ export function PaymentForm({
     };
   }, [booking, tripData, isPartialPayment, isRemainingPayment]);
 
-  const paymentBreakdown = useMemo(
-    () => calculatePaymentBreakdown(),
-    [calculatePaymentBreakdown]
-  );
+  const paymentBreakdown = useMemo(() => calculatePaymentBreakdown(), [calculatePaymentBreakdown]);
 
-  const total = useMemo(
-    () => paymentBreakdown.subtotal,
-    [paymentBreakdown.subtotal]
-  );
+  const total = useMemo(() => paymentBreakdown.subtotal, [paymentBreakdown.subtotal]);
 
   // Countdown effect for payment completion
   useEffect(() => {
@@ -122,21 +110,18 @@ export function PaymentForm({
       return () => clearTimeout(timer);
     } else if (paymentCompleted && countdown === 0) {
       // Auto redirect when countdown reaches 0
-      router.push("/my-trips");
+      router.push('/my-trips');
     }
   }, [paymentCompleted, countdown, router]);
 
-  const formatDate = useCallback(
-    (dateString: Date | string | undefined | null): string => {
-      if (!dateString) return "N/A";
-      return new Date(dateString).toLocaleDateString("en-IN", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    },
-    []
-  );
+  const formatDate = useCallback((dateString: Date | string | undefined | null): string => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }, []);
 
   const handlePaymentClick = useCallback(async () => {
     if (isProcessing) return;
@@ -145,59 +130,52 @@ export function PaymentForm({
 
     try {
       const paymentUserDetails = userDetails || {
-        name: "Guest User",
-        email: "",
-        phone: "",
+        name: 'Guest User',
+        email: '',
+        phone: '',
       };
 
       await initiateRazorpayPayment({
         amount: total,
         bookingId,
         userDetails: paymentUserDetails,
-        tripTitle: tripData?.title || "Trip Booking",
-        onSuccess: async (paymentData) => {
+        tripTitle: tripData?.title || 'Trip Booking',
+        onSuccess: async paymentData => {
           setShowLoader(true);
 
           try {
             // Use the new Razorpay-specific payment processing
-            const result = await processRazorpayPayment(
-              bookingId,
-              paymentData,
-              total
-            );
+            const result = await processRazorpayPayment(bookingId, paymentData, total);
 
             if (result.success) {
               toast.success(result.message, {
                 style: {
-                  background: "rgba(147, 51, 234, 0.95)",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(196, 181, 253, 0.3)",
-                  color: "white",
-                  fontFamily: "var(--font-instrument)",
+                  background: 'rgba(147, 51, 234, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(196, 181, 253, 0.3)',
+                  color: 'white',
+                  fontFamily: 'var(--font-instrument)',
                 },
                 duration: 3000,
               });
             } else {
-              throw new Error(result.error || "Payment processing failed");
+              throw new Error(result.error || 'Payment processing failed');
             }
           } catch (error) {
-            console.error("Payment processing error:", error);
-            toast.error(
-              "Payment was successful but processing failed. Please contact support.",
-              {
-                style: {
-                  background: "rgba(239, 68, 68, 0.95)",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(252, 165, 165, 0.3)",
-                  color: "white",
-                  fontFamily: "var(--font-instrument)",
-                },
-                duration: 5000,
-              }
-            );
+            console.error('Payment processing error:', error);
+            toast.error('Payment was successful but processing failed. Please contact support.', {
+              style: {
+                background: 'rgba(239, 68, 68, 0.95)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(252, 165, 165, 0.3)',
+                color: 'white',
+                fontFamily: 'var(--font-instrument)',
+              },
+              duration: 5000,
+            });
           }
         },
-        onFailure: async (error) => {
+        onFailure: async error => {
           setIsProcessing(false);
 
           // Log the failure using our action
@@ -205,11 +183,11 @@ export function PaymentForm({
 
           toast.error(error, {
             style: {
-              background: "rgba(239, 68, 68, 0.95)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(252, 165, 165, 0.3)",
-              color: "white",
-              fontFamily: "var(--font-instrument)",
+              background: 'rgba(239, 68, 68, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(252, 165, 165, 0.3)',
+              color: 'white',
+              fontFamily: 'var(--font-instrument)',
             },
             duration: 3000,
           });
@@ -217,14 +195,14 @@ export function PaymentForm({
       });
     } catch (error) {
       setIsProcessing(false);
-      console.error("Payment initiation error:", error);
-      toast.error("Failed to initiate payment. Please try again.", {
+      console.error('Payment initiation error:', error);
+      toast.error('Failed to initiate payment. Please try again.', {
         style: {
-          background: "rgba(239, 68, 68, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(252, 165, 165, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(239, 68, 68, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(252, 165, 165, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 3000,
       });
@@ -238,7 +216,7 @@ export function PaymentForm({
   }, []);
 
   const handleGoToTrips = useCallback(() => {
-    router.push("/my-trips");
+    router.push('/my-trips');
   }, [router]);
 
   return (
@@ -258,11 +236,9 @@ export function PaymentForm({
               </h1>
 
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Thank you for your payment. Your booking for{" "}
-                <span className="font-semibold text-gray-800">
-                  {tripData?.title}
-                </span>{" "}
-                has been confirmed successfully!
+                Thank you for your payment. Your booking for{' '}
+                <span className="font-semibold text-gray-800">{tripData?.title}</span> has been
+                confirmed successfully!
               </p>
 
               {/* Trip Details Summary */}
@@ -273,8 +249,7 @@ export function PaymentForm({
                     <div>
                       <p className="text-sm text-gray-500">Trip Dates</p>
                       <p className="font-medium text-gray-900">
-                        {formatDate(tripData?.startDate)} -{" "}
-                        {formatDate(tripData?.endDate)}
+                        {formatDate(tripData?.startDate)} - {formatDate(tripData?.endDate)}
                       </p>
                     </div>
                   </div>
@@ -283,8 +258,8 @@ export function PaymentForm({
                     <div>
                       <p className="text-sm text-gray-500">Guests</p>
                       <p className="font-medium text-gray-900">
-                        {tripData.numberOfGuests}{" "}
-                        {tripData.numberOfGuests === 1 ? "Person" : "People"}
+                        {tripData.numberOfGuests}{' '}
+                        {tripData.numberOfGuests === 1 ? 'Person' : 'People'}
                       </p>
                     </div>
                   </div>
@@ -326,13 +301,8 @@ export function PaymentForm({
                       <strong>What&apos;s next?</strong>
                     </p>
                     <ul className="text-sm text-blue-700 mt-2 space-y-1">
-                      <li>
-                        • A confirmation email has been sent to your registered
-                        email
-                      </li>
-                      <li>
-                        • You can view your booking details in {`"My Trips"`}
-                      </li>
+                      <li>• A confirmation email has been sent to your registered email</li>
+                      <li>• You can view your booking details in {`"My Trips"`}</li>
                       <li>• Contact support if you have any questions</li>
                     </ul>
                   </div>
@@ -354,7 +324,7 @@ export function PaymentForm({
             style={{
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
                 tripData?.tripImage ||
-                "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
+                'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'
               }')`,
             }}
           >
@@ -368,9 +338,7 @@ export function PaymentForm({
                   </div>
                   <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
                     Confirm Your Payment
-                    <span className="block text-purple-300 mt-2">
-                      {tripData?.title}
-                    </span>
+                    <span className="block text-purple-300 mt-2">{tripData?.title}</span>
                   </h1>
                   <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
                     Verify your trip details and proceed to secure payment
@@ -379,8 +347,7 @@ export function PaymentForm({
                   <div className="flex flex-wrap gap-3 mt-6">
                     <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      {formatDate(tripData?.startDate)} -{" "}
-                      {formatDate(tripData?.endDate)}
+                      {formatDate(tripData?.startDate)} - {formatDate(tripData?.endDate)}
                     </div>
                   </div>
                 </div>
@@ -401,27 +368,19 @@ export function PaymentForm({
                     <div className="bg-purple-100 p-2 rounded-lg">
                       <DollarSign className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Payment Breakdown
-                    </h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Payment Breakdown</h2>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <div>
-                        <span className="text-gray-900 font-medium">
-                          Trip Cost
-                        </span>
+                        <span className="text-gray-900 font-medium">Trip Cost</span>
                         <p className="text-sm text-gray-500">
-                          ₹
-                          {(
-                            booking.pricePerPerson || tripData.pricePerPerson
-                          ).toLocaleString()}{" "}
-                          × {booking.participants || tripData.numberOfGuests}
-                          {(booking.participants || tripData.numberOfGuests) ===
-                          1
-                            ? " person"
-                            : " people"}
+                          ₹{(booking.pricePerPerson || tripData.pricePerPerson).toLocaleString()} ×{' '}
+                          {booking.participants || tripData.numberOfGuests}
+                          {(booking.participants || tripData.numberOfGuests) === 1
+                            ? ' person'
+                            : ' people'}
                         </p>
                       </div>
                       <span className="font-semibold text-gray-900">
@@ -476,9 +435,7 @@ export function PaymentForm({
                     </div> */}
 
                     <div className="flex justify-between items-center py-4 bg-gray-50 -mx-6 px-6 rounded-lg mt-4">
-                      <span className="text-lg font-bold text-gray-900">
-                        Total Amount
-                      </span>
+                      <span className="text-lg font-bold text-gray-900">Total Amount</span>
                       <span className="text-2xl font-bold text-purple-600">
                         {formatCurrency(total)}
                       </span>
@@ -492,9 +449,7 @@ export function PaymentForm({
                     <div className="bg-green-100 p-2 rounded-lg">
                       <CreditCard className="w-5 h-5 text-green-600" />
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Payment Method
-                    </h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
                   </div>
 
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -503,12 +458,9 @@ export function PaymentForm({
                         <Shield className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-blue-900">
-                          Secure Payment Gateway
-                        </p>
+                        <p className="font-medium text-blue-900">Secure Payment Gateway</p>
                         <p className="text-sm text-blue-700">
-                          Your payment is protected by industry-standard
-                          encryption
+                          Your payment is protected by industry-standard encryption
                         </p>
                       </div>
                     </div>
@@ -516,24 +468,16 @@ export function PaymentForm({
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        VISA
-                      </div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">VISA</div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        MASTERCARD
-                      </div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">MASTERCARD</div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        UPI
-                      </div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">UPI</div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xs font-medium text-gray-600 mb-1">
-                        NET BANKING
-                      </div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">NET BANKING</div>
                     </div>
                   </div>
 
@@ -551,25 +495,12 @@ export function PaymentForm({
                   <div className="flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <h3 className="font-semibold text-amber-900 mb-2">
-                        Important Information
-                      </h3>
+                      <h3 className="font-semibold text-amber-900 mb-2">Important Information</h3>
                       <ul className="text-sm text-amber-800 space-y-1">
-                        <li>
-                          • Payment confirmation will be sent to your registered
-                          email
-                        </li>
-                        <li>
-                          • Cancellation policy applies as per terms and
-                          conditions
-                        </li>
-                        <li>
-                          • Refunds will be processed within 5-7 business days
-                        </li>
-                        <li>
-                          • For support, contact us through the provided
-                          channels
-                        </li>
+                        <li>• Payment confirmation will be sent to your registered email</li>
+                        <li>• Cancellation policy applies as per terms and conditions</li>
+                        <li>• Refunds will be processed within 5-7 business days</li>
+                        <li>• For support, contact us through the provided channels</li>
                       </ul>
                     </div>
                   </div>
@@ -585,16 +516,16 @@ export function PaymentForm({
                       <Image
                         src={
                           tripData?.tripImage ||
-                          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
+                          'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'
                         }
                         fill
-                        alt={tripData?.title || "Trip"}
+                        alt={tripData?.title || 'Trip'}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                       <div className="absolute bottom-4 left-4 right-4">
                         <h3 className="text-white font-bold text-lg truncate">
-                          {tripData?.title || "Amazing Trip"}
+                          {tripData?.title || 'Amazing Trip'}
                         </h3>
                       </div>
                     </div>
@@ -604,16 +535,15 @@ export function PaymentForm({
                       <div className="flex items-center gap-3 text-sm text-gray-600">
                         <Calendar className="w-4 h-4" />
                         <span>
-                          {formatDate(tripData?.startDate)} -{" "}
-                          {formatDate(tripData?.endDate)}
+                          {formatDate(tripData?.startDate)} - {formatDate(tripData?.endDate)}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-3 text-sm text-gray-600">
                         <Users className="w-4 h-4" />
                         <span>
-                          {tripData.numberOfGuests}{" "}
-                          {tripData.numberOfGuests === 1 ? "Guest" : "Guests"}
+                          {tripData.numberOfGuests}{' '}
+                          {tripData.numberOfGuests === 1 ? 'Guest' : 'Guests'}
                         </span>
                       </div>
 
@@ -624,13 +554,9 @@ export function PaymentForm({
 
                       <div className="pt-4 border-t border-gray-100">
                         <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600">
-                            Price per person:
-                          </span>
+                          <span className="text-gray-600">Price per person:</span>
                           <span className="font-semibold">
-                            {formatCurrency(
-                              booking.pricePerPerson || tripData.pricePerPerson
-                            )}
+                            {formatCurrency(booking.pricePerPerson || tripData.pricePerPerson)}
                           </span>
                         </div>
                       </div>
@@ -642,35 +568,25 @@ export function PaymentForm({
                       <div className="bg-green-100 p-2 rounded-lg">
                         <Shield className="w-5 h-5 text-green-600" />
                       </div>
-                      <h3 className="font-semibold text-gray-900">
-                        Security & Trust
-                      </h3>
+                      <h3 className="font-semibold text-gray-900">Security & Trust</h3>
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">
-                          256-bit SSL encryption
-                        </span>
+                        <span className="text-sm text-gray-700">256-bit SSL encryption</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">
-                          PCI DSS compliant
-                        </span>
+                        <span className="text-sm text-gray-700">PCI DSS compliant</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">
-                          Secure payment gateway
-                        </span>
+                        <span className="text-sm text-gray-700">Secure payment gateway</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">
-                          24/7 fraud monitoring
-                        </span>
+                        <span className="text-sm text-gray-700">24/7 fraud monitoring</span>
                       </div>
                     </div>
                   </div>

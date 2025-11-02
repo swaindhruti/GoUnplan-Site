@@ -1,5 +1,5 @@
-"use client";
-import { useState, useEffect, useCallback } from "react";
+'use client';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   Users,
@@ -9,12 +9,12 @@ import {
   RefreshCw,
   Search,
   Copy,
-  Check
-} from "lucide-react";
-import Image from "next/image";
-import { getHostBookings } from "@/actions/host/action";
-import { BookingStatus, TeamMemberInput } from "@/types/booking";
-import { PaymentStatus } from "@prisma/client";
+  Check,
+} from 'lucide-react';
+import Image from 'next/image';
+import { getHostBookings } from '@/actions/host/action';
+import { BookingStatus, TeamMemberInput } from '@/types/booking';
+import { PaymentStatus } from '@prisma/client';
 
 type Booking = {
   id: string;
@@ -67,8 +67,8 @@ export const BookingsHistory = () => {
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [counts, setCounts] = useState<BookingCounts>({
     ALL: 0,
@@ -78,7 +78,7 @@ export const BookingsHistory = () => {
     FULLY_PAID: 0,
     OVERDUE: 0,
     CANCELLED: 0,
-    REFUNDED: 0
+    REFUNDED: 0,
   });
 
   const fetchAllBookings = useCallback(async () => {
@@ -87,9 +87,9 @@ export const BookingsHistory = () => {
 
     try {
       // Fetch all bookings without trip filter, using payment status filtering
-      const response = await getHostBookings(undefined, undefined, "payment");
+      const response = await getHostBookings(undefined, undefined, 'payment');
 
-      if ("error" in response) {
+      if ('error' in response) {
         setError(response.error as string);
       } else if (response.success) {
         setBookings(response.bookings || []);
@@ -99,22 +99,22 @@ export const BookingsHistory = () => {
             acc.ALL++;
 
             // Count by booking status
-            if (booking.status === "CONFIRMED") {
+            if (booking.status === 'CONFIRMED') {
               acc.CONFIRMED++;
-            } else if (booking.status === "PENDING") {
+            } else if (booking.status === 'PENDING') {
               acc.PENDING++;
-            } else if (booking.status === "CANCELLED") {
+            } else if (booking.status === 'CANCELLED') {
               acc.CANCELLED++;
             }
 
             // Count by payment status
-            if (booking.paymentStatus === "PARTIALLY_PAID") {
+            if (booking.paymentStatus === 'PARTIALLY_PAID') {
               acc.PARTIALLY_PAID++;
-            } else if (booking.paymentStatus === "FULLY_PAID") {
+            } else if (booking.paymentStatus === 'FULLY_PAID') {
               acc.FULLY_PAID++;
-            } else if (booking.paymentStatus === "OVERDUE") {
+            } else if (booking.paymentStatus === 'OVERDUE') {
               acc.OVERDUE++;
-            } else if (booking.paymentStatus === "REFUNDED") {
+            } else if (booking.paymentStatus === 'REFUNDED') {
               acc.REFUNDED++;
             }
 
@@ -128,14 +128,14 @@ export const BookingsHistory = () => {
             FULLY_PAID: 0,
             OVERDUE: 0,
             CANCELLED: 0,
-            REFUNDED: 0
+            REFUNDED: 0,
           }
         );
         setCounts(paymentCounts);
       }
     } catch (err) {
-      console.error("Error fetching bookings:", err);
-      setError("Failed to load bookings");
+      console.error('Error fetching bookings:', err);
+      setError('Failed to load bookings');
     } finally {
       setLoading(false);
     }
@@ -145,15 +145,13 @@ export const BookingsHistory = () => {
     let filtered = bookings;
 
     // Filter by status (both booking status and payment status)
-    if (selectedStatus !== "ALL") {
-      if (selectedStatus === "CONFIRMED") {
+    if (selectedStatus !== 'ALL') {
+      if (selectedStatus === 'CONFIRMED') {
         // Filter for confirmed bookings (booking status = CONFIRMED)
-        filtered = filtered.filter((booking) => booking.status === "CONFIRMED");
+        filtered = filtered.filter(booking => booking.status === 'CONFIRMED');
       } else {
         // Filter by payment status for other filters
-        filtered = filtered.filter(
-          (booking) => booking.paymentStatus === selectedStatus
-        );
+        filtered = filtered.filter(booking => booking.paymentStatus === selectedStatus);
       }
     }
 
@@ -161,10 +159,10 @@ export const BookingsHistory = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        (booking) =>
+        booking =>
           booking.user.name.toLowerCase().includes(term) ||
           booking.user.email ||
-          "".toLowerCase().includes(term) ||
+          ''.toLowerCase().includes(term) ||
           booking.travelPlan.title.toLowerCase().includes(term) ||
           booking.travelPlan.destination?.toLowerCase().includes(term) ||
           booking.id.toLowerCase().includes(term)
@@ -188,19 +186,19 @@ export const BookingsHistory = () => {
       setCopiedId(bookingId);
       setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
     } catch (err) {
-      console.error("Failed to copy booking ID:", err);
+      console.error('Failed to copy booking ID:', err);
     }
   };
 
   const getStatusIcon = (status: BookingStatus) => {
     switch (status) {
-      case "CONFIRMED":
+      case 'CONFIRMED':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "PENDING":
+      case 'PENDING':
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "CANCELLED":
+      case 'CANCELLED':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case "REFUNDED":
+      case 'REFUNDED':
         return <RefreshCw className="h-5 w-5 text-purple-500" />;
       default:
         return <Clock className="h-5 w-5 text-gray-500" />;
@@ -209,17 +207,17 @@ export const BookingsHistory = () => {
 
   const getPaymentStatusIcon = (status: PaymentStatus) => {
     switch (status) {
-      case "FULLY_PAID":
+      case 'FULLY_PAID':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "PARTIALLY_PAID":
+      case 'PARTIALLY_PAID':
         return <Clock className="h-5 w-5 text-orange-500" />;
-      case "PENDING":
+      case 'PENDING':
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "OVERDUE":
+      case 'OVERDUE':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case "CANCELLED":
+      case 'CANCELLED':
         return <XCircle className="h-5 w-5 text-gray-500" />;
-      case "REFUNDED":
+      case 'REFUNDED':
         return <RefreshCw className="h-5 w-5 text-purple-500" />;
       default:
         return <Clock className="h-5 w-5 text-gray-500" />;
@@ -228,51 +226,51 @@ export const BookingsHistory = () => {
 
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
-      case "CONFIRMED":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "REFUNDED":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+      case 'CONFIRMED':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'CANCELLED':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'REFUNDED':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getPaymentStatusColor = (status: PaymentStatus) => {
     switch (status) {
-      case "FULLY_PAID":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "PARTIALLY_PAID":
-        return "bg-orange-100 text-orange-800 border-orange-200";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "OVERDUE":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "CANCELLED":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "REFUNDED":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+      case 'FULLY_PAID':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'PARTIALLY_PAID':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'OVERDUE':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'CANCELLED':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'REFUNDED':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -280,12 +278,8 @@ export const BookingsHistory = () => {
     return (
       <div className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Bookings History
-          </h2>
-          <p className="text-gray-600 font-medium">
-            View and manage all your booking history
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Bookings History</h2>
+          <p className="text-gray-600 font-medium">View and manage all your booking history</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
           <div className="flex items-center justify-center">
@@ -300,21 +294,15 @@ export const BookingsHistory = () => {
     return (
       <div className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Bookings History
-          </h2>
-          <p className="text-gray-600 font-medium">
-            View and manage all your booking history
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Bookings History</h2>
+          <p className="text-gray-600 font-medium">View and manage all your booking history</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
           <div className="text-center">
             <div className="mx-auto h-20 w-20 bg-red-100 rounded-xl flex items-center justify-center mb-6">
               <XCircle className="h-10 w-10 text-red-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Error Loading Bookings
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Bookings</h3>
             <p className="text-red-600">{error}</p>
           </div>
         </div>
@@ -325,9 +313,7 @@ export const BookingsHistory = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Bookings History
-        </h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Bookings History</h2>
         <p className="text-gray-600 font-medium">
           View and manage all your booking history across all trips
         </p>
@@ -342,7 +328,7 @@ export const BookingsHistory = () => {
             type="text"
             placeholder="Search by customer name, email, trip title, or booking ID..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
@@ -354,17 +340,17 @@ export const BookingsHistory = () => {
           </label>
           <div className="flex flex-wrap gap-2">
             {[
-              { key: "ALL", label: "All", color: "purple" },
-              { key: "CONFIRMED", label: "Confirmed", color: "blue" },
-              { key: "PENDING", label: "Pending", color: "yellow" },
-              { key: "FULLY_PAID", label: "Fully Paid", color: "green" },
+              { key: 'ALL', label: 'All', color: 'purple' },
+              { key: 'CONFIRMED', label: 'Confirmed', color: 'blue' },
+              { key: 'PENDING', label: 'Pending', color: 'yellow' },
+              { key: 'FULLY_PAID', label: 'Fully Paid', color: 'green' },
               {
-                key: "PARTIALLY_PAID",
-                label: "Partial Payment",
-                color: "orange"
+                key: 'PARTIALLY_PAID',
+                label: 'Partial Payment',
+                color: 'orange',
               },
-              { key: "OVERDUE", label: "Payment Due", color: "red" }
-            ].map((status) => (
+              { key: 'OVERDUE', label: 'Payment Due', color: 'red' },
+            ].map(status => (
               <button
                 key={status.key}
                 onClick={() => setSelectedStatus(status.key)}
@@ -372,18 +358,18 @@ export const BookingsHistory = () => {
                   inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 font-instrument
                   ${
                     selectedStatus === status.key
-                      ? status.color === "purple"
-                        ? "bg-purple-600 text-white shadow-sm"
-                        : status.color === "green"
-                        ? "bg-green-500 text-white shadow-sm"
-                        : status.color === "orange"
-                        ? "bg-orange-500 text-white shadow-sm"
-                        : status.color === "blue"
-                        ? "bg-blue-500 text-white shadow-sm"
-                        : status.color === "yellow"
-                        ? "bg-yellow-500 text-white shadow-sm"
-                        : "bg-red-500 text-white shadow-sm"
-                      : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                      ? status.color === 'purple'
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : status.color === 'green'
+                          ? 'bg-green-500 text-white shadow-sm'
+                          : status.color === 'orange'
+                            ? 'bg-orange-500 text-white shadow-sm'
+                            : status.color === 'blue'
+                              ? 'bg-blue-500 text-white shadow-sm'
+                              : status.color === 'yellow'
+                                ? 'bg-yellow-500 text-white shadow-sm'
+                                : 'bg-red-500 text-white shadow-sm'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                   }
                 `}
               >
@@ -391,15 +377,15 @@ export const BookingsHistory = () => {
                 <span
                   className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
                     selectedStatus === status.key
-                      ? "bg-white/20 text-white"
-                      : "bg-gray-100 text-gray-600"
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-100 text-gray-600'
                   }`}
                 >
-                  {status.key === "ALL"
+                  {status.key === 'ALL'
                     ? counts.ALL
-                    : status.key === "CONFIRMED"
-                    ? counts.PENDING || 0 // Assuming PENDING represents confirmed bookings in this context
-                    : counts[status.key as keyof BookingCounts] || 0}
+                    : status.key === 'CONFIRMED'
+                      ? counts.PENDING || 0 // Assuming PENDING represents confirmed bookings in this context
+                      : counts[status.key as keyof BookingCounts] || 0}
                 </span>
               </button>
             ))}
@@ -421,15 +407,13 @@ export const BookingsHistory = () => {
             <div className="mx-auto h-20 w-20 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
               <Calendar className="h-10 w-10 text-purple-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Bookings Found
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Bookings Found</h3>
             <p className="text-gray-600">
               {searchTerm
                 ? `No bookings match your search "${searchTerm}"`
-                : selectedStatus === "ALL"
-                ? "You don't have any bookings yet."
-                : `No ${selectedStatus.toLowerCase()} bookings found.`}
+                : selectedStatus === 'ALL'
+                  ? "You don't have any bookings yet."
+                  : `No ${selectedStatus.toLowerCase()} bookings found.`}
             </p>
           </div>
         </div>
@@ -463,7 +447,7 @@ export const BookingsHistory = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBookings.map((booking) => (
+                {filteredBookings.map(booking => (
                   <tr key={booking.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -488,8 +472,7 @@ export const BookingsHistory = () => {
                         <div className="relative w-12 h-12 mr-3">
                           <Image
                             src={
-                              booking.travelPlan.tripImage ||
-                              "https://avatar.iran.liara.run/public"
+                              booking.travelPlan.tripImage || 'https://avatar.iran.liara.run/public'
                             }
                             alt={booking.travelPlan.title}
                             fill
@@ -501,8 +484,7 @@ export const BookingsHistory = () => {
                             {booking.travelPlan.title}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {booking.travelPlan.destination ||
-                              "Destination TBA"}
+                            {booking.travelPlan.destination || 'Destination TBA'}
                           </div>
                         </div>
                       </div>
@@ -540,7 +522,7 @@ export const BookingsHistory = () => {
                         )}`}
                       >
                         {getPaymentStatusIcon(booking.paymentStatus)}
-                        {booking.paymentStatus.replace("_", " ")}
+                        {booking.paymentStatus.replace('_', ' ')}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { toast } from 'sonner';
 import {
   AlertCircle,
   User,
@@ -19,54 +19,48 @@ import {
   ArrowRight,
   Sparkles,
   MapPin,
-  Compass
-} from "lucide-react";
+  Compass,
+} from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import Image from "next/image";
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import Image from 'next/image';
 
 const formSchema = z
   .object({
     name: z
       .string()
-      .min(2, { message: "Name must be at least 2 characters." })
-      .max(50, { message: "Name must not exceed 50 characters." })
+      .min(2, { message: 'Name must be at least 2 characters.' })
+      .max(50, { message: 'Name must not exceed 50 characters.' })
       .regex(/^[a-zA-Z\s]+$/, {
-        message: "Name can only contain letters and spaces."
+        message: 'Name can only contain letters and spaces.',
       }),
     email: z
       .string()
-      .email({ message: "Please enter a valid email address." })
-      .max(100, { message: "Email must not exceed 100 characters." }),
+      .email({ message: 'Please enter a valid email address.' })
+      .max(100, { message: 'Email must not exceed 100 characters.' }),
     phone: z
       .string()
-      .min(10, { message: "Phone number must be at least 10 digits." })
-      .max(15, { message: "Phone number must not exceed 15 digits." })
+      .min(10, { message: 'Phone number must be at least 10 digits.' })
+      .max(15, { message: 'Phone number must not exceed 15 digits.' })
       .regex(/^\+?[1-9]\d{1,14}$/, {
-        message: "Please enter a valid phone number."
+        message: 'Please enter a valid phone number.',
       }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters." })
-      .max(100, { message: "Password must not exceed 100 characters." })
+      .min(8, { message: 'Password must be at least 8 characters.' })
+      .max(100, { message: 'Password must not exceed 100 characters.' })
       .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
         message:
-          "Password must contain at least one uppercase letter, one lowercase letter, and one number."
+          'Password must contain at least one uppercase letter, one lowercase letter, and one number.',
       }),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(data => data.password === data.confirmPassword, {
     message: "Passwords don't match.",
-    path: ["confirmPassword"]
+    path: ['confirmPassword'],
   });
 
 type FormData = z.infer<typeof formSchema>;
@@ -81,12 +75,12 @@ function SignUpForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: ""
-    }
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
   const onSubmit = async (values: FormData) => {
@@ -94,91 +88,85 @@ function SignUpForm() {
     setServerError(null);
 
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: values.name.trim(),
           email: values.email.trim(),
           phone: values.phone.trim(),
-          password: values.password
-        })
+          password: values.password,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         if (data.details && Array.isArray(data.details)) {
-          data.details.forEach(
-            (error: { path?: string[]; message: string }) => {
-              if (error.path && error.path[0]) {
-                form.setError(error.path[0] as keyof FormData, {
-                  type: "server",
-                  message: error.message
-                });
-                // Show error toast with purple theme
-                toast.error(error.message, {
-                  style: {
-                    background: "rgba(147, 51, 234, 0.95)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(196, 181, 253, 0.3)",
-                    color: "white",
-                    fontFamily: "var(--font-instrument)"
-                  },
-                  duration: 4000
-                });
-              }
+          data.details.forEach((error: { path?: string[]; message: string }) => {
+            if (error.path && error.path[0]) {
+              form.setError(error.path[0] as keyof FormData, {
+                type: 'server',
+                message: error.message,
+              });
+              // Show error toast with purple theme
+              toast.error(error.message, {
+                style: {
+                  background: 'rgba(147, 51, 234, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(196, 181, 253, 0.3)',
+                  color: 'white',
+                  fontFamily: 'var(--font-instrument)',
+                },
+                duration: 4000,
+              });
             }
-          );
+          });
         } else {
-          const errorMessage =
-            data.error || "Something went wrong. Please try again.";
+          const errorMessage = data.error || 'Something went wrong. Please try again.';
           setServerError(errorMessage);
           toast.error(errorMessage, {
             style: {
-              background: "rgba(147, 51, 234, 0.95)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(196, 181, 253, 0.3)",
-              color: "white",
-              fontFamily: "var(--font-instrument)"
+              background: 'rgba(147, 51, 234, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(196, 181, 253, 0.3)',
+              color: 'white',
+              fontFamily: 'var(--font-instrument)',
             },
-            duration: 4000
+            duration: 4000,
           });
         }
         return;
       }
 
       // Show success toast
-      toast.success("Account created successfully! 🎉", {
+      toast.success('Account created successfully! 🎉', {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
-        duration: 3000
+        duration: 3000,
       });
 
-      router.push(
-        "/auth/signin?message=Account created successfully! Please sign in."
-      );
+      router.push('/auth/signin?message=Account created successfully! Please sign in.');
     } catch (error) {
-      console.error("Signup error:", error);
-      const networkError =
-        "Network error. Please check your connection and try again.";
+      console.error('Signup error:', error);
+      const networkError = 'Network error. Please check your connection and try again.';
       setServerError(networkError);
       toast.error(networkError, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)"
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
-        duration: 4000
+        duration: 4000,
       });
     } finally {
       setIsLoading(false);
@@ -189,9 +177,7 @@ function SignUpForm() {
     <div className="w-full">
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
-            Create your account
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">Create your account</h1>
           <p className="text-gray-600 font-instrument mt-2">
             Join thousands of travelers discovering unique experiences
           </p>
@@ -309,7 +295,7 @@ function SignUpForm() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                          type={showPassword ? "text" : "password"}
+                          type={showPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           {...field}
                           disabled={isLoading}
@@ -349,7 +335,7 @@ function SignUpForm() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                          type={showConfirmPassword ? "text" : "password"}
+                          type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           {...field}
                           disabled={isLoading}
@@ -357,9 +343,7 @@ function SignUpForm() {
                         />
                         <button
                           type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showConfirmPassword ? (
@@ -415,15 +399,15 @@ function SignUpForm() {
               variant="outline"
               className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
               onClick={() => {
-                toast.info("Google OAuth coming soon! 🚀", {
+                toast.info('Google OAuth coming soon! 🚀', {
                   style: {
-                    background: "rgba(147, 51, 234, 0.95)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(196, 181, 253, 0.3)",
-                    color: "white",
-                    fontFamily: "var(--font-instrument)"
+                    background: 'rgba(147, 51, 234, 0.95)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(196, 181, 253, 0.3)',
+                    color: 'white',
+                    fontFamily: 'var(--font-instrument)',
                   },
-                  duration: 3000
+                  duration: 3000,
                 });
               }}
             >
@@ -450,7 +434,7 @@ function SignUpForm() {
 
             <div className="text-center">
               <p className="text-sm text-gray-600 font-instrument">
-                Already have an account?{" "}
+                Already have an account?{' '}
                 <Link
                   href="/auth/signin"
                   className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
@@ -475,9 +459,7 @@ export default function SignUpPage() {
           <div className="flex justify-between items-center py-6">
             <Link href="/" className="flex items-center gap-2">
               <Compass className="h-8 w-8 text-purple-600" />
-              <span className="text-2xl font-bold text-gray-900 font-bricolage">
-                GoUnplan
-              </span>
+              <span className="text-2xl font-bold text-gray-900 font-bricolage">GoUnplan</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link
@@ -529,8 +511,8 @@ export default function SignUpPage() {
                     Start Your Journey Today
                   </h2>
                   <p className="text-white/90 text-lg font-instrument">
-                    Join thousands of travelers discovering unique, personalized
-                    experiences around the world.
+                    Join thousands of travelers discovering unique, personalized experiences around
+                    the world.
                   </p>
                 </div>
 
@@ -544,8 +526,7 @@ export default function SignUpPage() {
                         Unique Destinations
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Explore hidden gems and off-the-beaten-path locations
-                        curated by local hosts
+                        Explore hidden gems and off-the-beaten-path locations curated by local hosts
                       </p>
                     </div>
                   </div>
@@ -559,8 +540,7 @@ export default function SignUpPage() {
                         Verified Hosts
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Connect with trusted local experts who make your travel
-                        dreams come true
+                        Connect with trusted local experts who make your travel dreams come true
                       </p>
                     </div>
                   </div>
@@ -574,8 +554,7 @@ export default function SignUpPage() {
                         Personalized Experiences
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Every trip is tailored to your preferences for
-                        unforgettable memories
+                        Every trip is tailored to your preferences for unforgettable memories
                       </p>
                     </div>
                   </div>

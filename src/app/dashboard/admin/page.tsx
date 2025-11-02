@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import Image from 'next/image';
 
 import {
   Table,
@@ -11,9 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Users,
   UserCheck,
@@ -33,7 +33,7 @@ import {
   EyeIcon,
   AlertTriangle,
   MapPin,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   getAllUsers,
   getAllHosts,
@@ -46,21 +46,21 @@ import {
   approveTravelPlan,
   getAllBookings,
   getAllActiveTrips,
-} from "@/actions/admin/action";
-import TravelPlanModal from "@/components/dashboard/TravelPlanModal";
-import HostApplicationModal from "@/components/dashboard/HostApplicationModal";
-import { Role } from "@/types/auth";
-import RevenueReport from "@/components/dashboard/RevenueReport";
-import RevenueAnalytics from "@/components/dashboard/RevenueAnalytics";
+} from '@/actions/admin/action';
+import TravelPlanModal from '@/components/dashboard/TravelPlanModal';
+import HostApplicationModal from '@/components/dashboard/HostApplicationModal';
+import { Role } from '@/types/auth';
+import RevenueReport from '@/components/dashboard/RevenueReport';
+import RevenueAnalytics from '@/components/dashboard/RevenueAnalytics';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { processRefund } from "@/actions/booking/actions";
-import { PaymentStatus } from "@prisma/client";
+} from '@/components/ui/dialog';
+import { processRefund } from '@/actions/booking/actions';
+import { PaymentStatus } from '@prisma/client';
 
 // Define interfaces for your data types
 interface User {
@@ -217,33 +217,33 @@ export default function AdminDashboard() {
     const statusMap = {
       FULLY_PAID: {
         icon: CheckCircle,
-        color: "bg-green-100 text-green-800 border-green-200",
-        label: "Fully Paid",
+        color: 'bg-green-100 text-green-800 border-green-200',
+        label: 'Fully Paid',
       },
       PARTIALLY_PAID: {
         icon: CheckCircle,
-        color: "bg-blue-100 text-blue-800 border-blue-200",
-        label: "Partially Paid",
+        color: 'bg-blue-100 text-blue-800 border-blue-200',
+        label: 'Partially Paid',
       },
       PENDING: {
         icon: Clock,
-        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        label: "Pending",
+        color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        label: 'Pending',
       },
       OVERDUE: {
         icon: AlertTriangle,
-        color: "bg-red-100 text-red-800 border-red-200",
-        label: "Overdue",
+        color: 'bg-red-100 text-red-800 border-red-200',
+        label: 'Overdue',
       },
       CANCELLED: {
         icon: XCircle,
-        color: "bg-gray-100 text-gray-800 border-gray-200",
-        label: "Cancelled",
+        color: 'bg-gray-100 text-gray-800 border-gray-200',
+        label: 'Cancelled',
       },
       REFUNDED: {
         icon: RefreshCw,
-        color: "bg-purple-100 text-purple-800 border-purple-200",
-        label: "Refunded",
+        color: 'bg-purple-100 text-purple-800 border-purple-200',
+        label: 'Refunded',
       },
     };
     return statusMap[status] || statusMap.PENDING;
@@ -281,26 +281,21 @@ export default function AdminDashboard() {
   const [selectedHost, setSelectedHost] = useState<Host>();
   const [open, setOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState("users");
-  const [userFilter, setUserFilter] = useState<
-    "all" | "users" | "hosts" | "admins" | "support"
-  >("all");
-  const [applicationFilter, setApplicationFilter] = useState<
-    "all" | "hosts" | "travelplans"
-  >("all");
-  const [bookingFilter, setBookingFilter] = useState<string>("ALL");
-  const [liveTripsFilter, setLiveTripsFilter] = useState<
-    "upcoming" | "ongoing" | "completed"
-  >("upcoming");
-  const [selectedTravelPlanId, setSelectedTravelPlanId] = useState<
-    string | null
-  >(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(
-    null
+  const [activeTab, setActiveTab] = useState('users');
+  const [userFilter, setUserFilter] = useState<'all' | 'users' | 'hosts' | 'admins' | 'support'>(
+    'all'
   );
-  const [isHostApplicationModalOpen, setIsHostApplicationModalOpen] =
-    useState(false);
+  const [applicationFilter, setApplicationFilter] = useState<'all' | 'hosts' | 'travelplans'>(
+    'all'
+  );
+  const [bookingFilter, setBookingFilter] = useState<string>('ALL');
+  const [liveTripsFilter, setLiveTripsFilter] = useState<'upcoming' | 'ongoing' | 'completed'>(
+    'upcoming'
+  );
+  const [selectedTravelPlanId, setSelectedTravelPlanId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
+  const [isHostApplicationModalOpen, setIsHostApplicationModalOpen] = useState(false);
 
   const handleRevenueReportButton = () => {
     if (analyticsModal === true) setAnalyticsModal(false);
@@ -313,8 +308,8 @@ export default function AdminDashboard() {
   };
 
   const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
+    startDate: '',
+    endDate: '',
   });
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
 
@@ -335,8 +330,8 @@ export default function AdminDashboard() {
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
     setDateRange({
-      startDate: thirtyDaysAgo.toISOString().split("T")[0],
-      endDate: today.toISOString().split("T")[0],
+      startDate: thirtyDaysAgo.toISOString().split('T')[0],
+      endDate: today.toISOString().split('T')[0],
     });
   }, []);
   const handleAnalyticsModal = () => {
@@ -354,28 +349,24 @@ export default function AdminDashboard() {
       }
       setRevenue(revenueResponse as RevenueData);
 
-      setStatsData((prev) => ({
+      setStatsData(prev => ({
         ...prev,
         totalSales: revenueResponse.totalSales?._sum?.totalPrice || 0,
         pendingRefunds: revenueResponse.refundAmount?._sum?.refundAmount || 0,
       }));
     } catch (err) {
-      setError("Failed to fetch revenue data");
+      setError('Failed to fetch revenue data');
       console.error(err);
     }
   };
 
   // NEW: Handle date change
-  const handleDateChange = (field: "startDate" | "endDate", value: string) => {
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
     const newDateRange = { ...dateRange, [field]: value };
     setDateRange(newDateRange);
 
     // Only fetch data if both dates are selected and we're on revenue tab
-    if (
-      newDateRange.startDate &&
-      newDateRange.endDate &&
-      activeTab === "revenue"
-    ) {
+    if (newDateRange.startDate && newDateRange.endDate && activeTab === 'revenue') {
       setIsDateFilterActive(true);
       fetchRevenueData(newDateRange.startDate, newDateRange.endDate);
     }
@@ -471,7 +462,7 @@ export default function AdminDashboard() {
           pendingRefunds: totalRevenue.refundAmount._sum.refundAmount || 0, // This will be updated by fetchRevenueData
         });
       } catch (err) {
-        setError("Failed to fetch admin dashboard data");
+        setError('Failed to fetch admin dashboard data');
         console.error(err);
       } finally {
         setLoading(false);
@@ -479,17 +470,14 @@ export default function AdminDashboard() {
     };
 
     fetchAdminData();
-  }, [
-    totalRevenue.refundAmount._sum.refundAmount,
-    totalRevenue.totalSales._sum.totalPrice,
-  ]);
+  }, [totalRevenue.refundAmount._sum.refundAmount, totalRevenue.totalSales._sum.totalPrice]);
 
   const handleApproveHost = async (email: string) => {
     try {
       const response = await approveHostApplication(email);
       if (response?.error) {
         setError(response.error);
-        toast.error("Failed to Approve", {
+        toast.error('Failed to Approve', {
           description: response.error,
         });
         return;
@@ -497,21 +485,19 @@ export default function AdminDashboard() {
 
       // Check if there was an email error
       if (response.emailError) {
-        toast.warning("Approval Successful with Warning", {
-          description:
-            response.message ||
-            "Host approved but email notification failed to send.",
+        toast.warning('Approval Successful with Warning', {
+          description: response.message || 'Host approved but email notification failed to send.',
           duration: 6000,
         });
       } else {
-        toast.success("Host Approved!", {
+        toast.success('Host Approved!', {
           description:
             response.message ||
-            "Host application approved and notification email sent successfully.",
+            'Host application approved and notification email sent successfully.',
         });
       }
 
-      setApplicants(applicants.filter((app) => app.email !== email));
+      setApplicants(applicants.filter(app => app.email !== email));
       const hostsResponse = await getAllHosts();
       if (hostsResponse.hosts) {
         setHosts(hostsResponse.hosts);
@@ -523,9 +509,9 @@ export default function AdminDashboard() {
         totalHosts: statsData.totalHosts + 1,
       });
     } catch (err) {
-      setError("Failed to approve host application");
-      toast.error("Error", {
-        description: "Failed to approve host application. Please try again.",
+      setError('Failed to approve host application');
+      toast.error('Error', {
+        description: 'Failed to approve host application. Please try again.',
       });
       console.error(err);
     }
@@ -536,7 +522,7 @@ export default function AdminDashboard() {
       const response = await rejectHostApplication(email);
       if (response && response.error) {
         setError(response.error);
-        toast.error("Failed to Reject", {
+        toast.error('Failed to Reject', {
           description: response.error,
         });
         return;
@@ -544,29 +530,27 @@ export default function AdminDashboard() {
 
       // Check if there was an email error
       if (response.emailError) {
-        toast.warning("Rejection Successful with Warning", {
+        toast.warning('Rejection Successful with Warning', {
           description:
-            response.message ||
-            "Application rejected but email notification failed to send.",
+            response.message || 'Application rejected but email notification failed to send.',
           duration: 6000,
         });
       } else {
-        toast.success("Application Rejected", {
+        toast.success('Application Rejected', {
           description:
-            response.message ||
-            "Application rejected and notification email sent successfully.",
+            response.message || 'Application rejected and notification email sent successfully.',
         });
       }
 
-      setApplicants(applicants.filter((app) => app.email !== email));
+      setApplicants(applicants.filter(app => app.email !== email));
       setStatsData({
         ...statsData,
         hostApplicants: statsData.hostApplicants - 1,
       });
     } catch (err) {
-      setError("Failed to reject host application");
-      toast.error("Error", {
-        description: "Failed to reject host application. Please try again.",
+      setError('Failed to reject host application');
+      toast.error('Error', {
+        description: 'Failed to reject host application. Please try again.',
       });
       console.error(err);
     }
@@ -579,18 +563,16 @@ export default function AdminDashboard() {
         setError(response.error);
         return;
       }
-      const updatedUsers = users.map((user) =>
-        user.email === email ? { ...user, role } : user
-      );
+      const updatedUsers = users.map(user => (user.email === email ? { ...user, role } : user));
       setUsers(updatedUsers);
-      if (role === "HOST") {
+      if (role === 'HOST') {
         const hostsResponse = await getAllHosts();
         if (hostsResponse.hosts) {
           setHosts(hostsResponse.hosts);
         }
       }
     } catch (err) {
-      setError("Failed to update user role");
+      setError('Failed to update user role');
       console.error(err);
     }
   };
@@ -602,11 +584,9 @@ export default function AdminDashboard() {
         setError(response.error);
         return;
       }
-      setTravelPlans(
-        travelPlans.filter((plan) => plan.travelPlanId !== travelPlanId)
-      );
+      setTravelPlans(travelPlans.filter(plan => plan.travelPlanId !== travelPlanId));
     } catch (err) {
-      setError("Failed to approve travel plan");
+      setError('Failed to approve travel plan');
       console.error(err);
     }
   };
@@ -626,22 +606,20 @@ export default function AdminDashboard() {
       const result = await processRefund(bookingId);
       if (result.success) {
         setBookings(
-          bookings.map((booking) =>
-            booking.id === bookingId
-              ? { ...booking, status: "REFUNDED" }
-              : booking
+          bookings.map(booking =>
+            booking.id === bookingId ? { ...booking, status: 'REFUNDED' } : booking
           )
         );
-        setBookingCounts((prev) => ({
+        setBookingCounts(prev => ({
           ...prev,
           CANCELLED: prev.CANCELLED - 1,
           REFUNDED: prev.REFUNDED + 1,
         }));
       } else {
-        setError(result.error || "Failed to mark booking as refunded");
+        setError(result.error || 'Failed to mark booking as refunded');
       }
     } catch (err) {
-      setError("Failed to mark booking as refunded");
+      setError('Failed to mark booking as refunded');
       console.error(err);
     }
   };
@@ -649,25 +627,25 @@ export default function AdminDashboard() {
     return new Date(date).toLocaleDateString();
   };
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
   const formatDateRange = () => {
-    if (!dateRange.startDate || !dateRange.endDate) return "";
+    if (!dateRange.startDate || !dateRange.endDate) return '';
 
-    const start = new Date(dateRange.startDate).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+    const start = new Date(dateRange.startDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
-    const end = new Date(dateRange.endDate).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+    const end = new Date(dateRange.endDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
 
     return `${start} - ${end}`;
@@ -677,63 +655,63 @@ export default function AdminDashboard() {
     const totalRefunds = revenue.refundAmount._sum.refundAmount || 0;
     return totalSales - totalRefunds;
   };
-  const filteredUsers = users.filter((user) => {
-    if (userFilter === "all") return true;
-    if (userFilter === "users") return user.role === "USER";
-    if (userFilter === "hosts") return user.role === "HOST";
-    if (userFilter === "admins") return user.role === "ADMIN";
-    if (userFilter === "support") return user.role === "SUPPORT";
+  const filteredUsers = users.filter(user => {
+    if (userFilter === 'all') return true;
+    if (userFilter === 'users') return user.role === 'USER';
+    if (userFilter === 'hosts') return user.role === 'HOST';
+    if (userFilter === 'admins') return user.role === 'ADMIN';
+    if (userFilter === 'support') return user.role === 'SUPPORT';
     return true;
   });
   const tabs = [
     {
-      id: "users",
-      label: "USERS",
+      id: 'users',
+      label: 'USERS',
       icon: <Users className="w-5 h-5" />,
-      description: "User Management",
+      description: 'User Management',
       count: users.length,
     },
     {
-      id: "hosts",
-      label: "HOSTS",
+      id: 'hosts',
+      label: 'HOSTS',
       icon: <UserCheck className="w-5 h-5" />,
-      description: "Host Management",
+      description: 'Host Management',
       count: hosts.length,
     },
     {
-      id: "support",
-      label: "SUPPORT",
+      id: 'support',
+      label: 'SUPPORT',
       icon: <Shield className="w-5 h-5" />,
-      description: "Support Team Management",
-      count: users.filter((u) => u.role === "SUPPORT").length,
+      description: 'Support Team Management',
+      count: users.filter(u => u.role === 'SUPPORT').length,
     },
     {
-      id: "applicants",
-      label: "APPLICATIONS",
+      id: 'applicants',
+      label: 'APPLICATIONS',
       icon: <UserPlus className="w-5 h-5" />,
-      description: "Pending Reviews",
+      description: 'Pending Reviews',
       count: applicants.length + travelPlans.length,
     },
     {
-      id: "livetrips",
-      label: "LIVE TRIPS",
+      id: 'livetrips',
+      label: 'LIVE TRIPS',
       icon: <MapPin className="w-5 h-5" />,
-      description: "Active Travel Plans",
+      description: 'Active Travel Plans',
       count: activeTrips.length,
     },
     {
-      id: "revenue",
-      label: "REVENUE",
+      id: 'revenue',
+      label: 'REVENUE',
       icon: <BarChart3 className="w-5 h-5" />,
-      description: "Financial Analytics",
+      description: 'Financial Analytics',
       count: undefined, // No count for revenue tab
     },
 
     {
-      id: "bookings",
-      label: "BOOKINGS",
+      id: 'bookings',
+      label: 'BOOKINGS',
       icon: <Calendar className="w-5 h-5" />,
-      description: "Booking Management",
+      description: 'Booking Management',
       count: bookings.length,
     },
   ];
@@ -743,9 +721,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <span className="text-gray-600 font-instrument">
-            Loading admin dashboard...
-          </span>
+          <span className="text-gray-600 font-instrument">Loading admin dashboard...</span>
         </div>
       </div>
     );
@@ -793,7 +769,7 @@ export default function AdminDashboard() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-2 py-4">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -801,8 +777,8 @@ export default function AdminDashboard() {
                   px-6 py-3 rounded-full font-instrument font-semibold text-sm transition-all duration-200 relative whitespace-nowrap
                   ${
                     activeTab === tab.id
-                      ? "bg-purple-600 text-white"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }
                 `}
               >
@@ -815,8 +791,8 @@ export default function AdminDashboard() {
                         ml-2 px-2 py-0.5 rounded-full text-xs font-bold
                         ${
                           activeTab === tab.id
-                            ? "bg-white text-purple-600"
-                            : "bg-purple-100 text-purple-600"
+                            ? 'bg-white text-purple-600'
+                            : 'bg-purple-100 text-purple-600'
                         }
                       `}
                     >
@@ -840,9 +816,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               {statsData.totalUsers.toLocaleString()}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Total Users
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Total Users</p>
           </div>
 
           {/* Total Hosts Card */}
@@ -855,9 +829,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               {statsData.totalHosts}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Total Hosts
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Total Hosts</p>
           </div>
 
           {/* Applications Card */}
@@ -870,9 +842,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               {statsData.hostApplicants}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Applications
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Applications</p>
           </div>
 
           {/* Total Bookings Card */}
@@ -885,9 +855,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               {statsData.totalBookings}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Total Bookings
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Total Bookings</p>
           </div>
 
           {/* Total Sales Card */}
@@ -900,9 +868,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               ${statsData.totalSales.toLocaleString()}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Total Sales
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Total Sales</p>
           </div>
 
           {/* Pending Refunds Card */}
@@ -915,15 +881,13 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
               ${statsData.pendingRefunds.toLocaleString()}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Refunds
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Refunds</p>
           </div>
         </div>
 
         {/* Tabbed Content */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          {activeTab === "users" && (
+          {activeTab === 'users' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row overflow-x-auto md:items-center justify-between mb-6">
                 <div>
@@ -937,61 +901,58 @@ export default function AdminDashboard() {
                 <div className="flex flex-col md:flex-row w-full md:items-center gap-4">
                   <div className="flex w-full items-center gap-2">
                     <Filter className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-semibold text-gray-700">
-                      Filter:
-                    </span>
+                    <span className="text-sm font-semibold text-gray-700">Filter:</span>
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     <button
-                      onClick={() => setUserFilter("all")}
+                      onClick={() => setUserFilter('all')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        userFilter === "all"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        userFilter === 'all'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       All ({users.length})
                     </button>
                     <button
-                      onClick={() => setUserFilter("users")}
+                      onClick={() => setUserFilter('users')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        userFilter === "users"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        userFilter === 'users'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      Users ({users.filter((u) => u.role === "USER").length})
+                      Users ({users.filter(u => u.role === 'USER').length})
                     </button>
                     <button
-                      onClick={() => setUserFilter("hosts")}
+                      onClick={() => setUserFilter('hosts')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        userFilter === "hosts"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        userFilter === 'hosts'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      Hosts ({users.filter((u) => u.role === "HOST").length})
+                      Hosts ({users.filter(u => u.role === 'HOST').length})
                     </button>
                     <button
-                      onClick={() => setUserFilter("admins")}
+                      onClick={() => setUserFilter('admins')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        userFilter === "admins"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        userFilter === 'admins'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      Admins ({users.filter((u) => u.role === "ADMIN").length})
+                      Admins ({users.filter(u => u.role === 'ADMIN').length})
                     </button>
                     <button
-                      onClick={() => setUserFilter("support")}
+                      onClick={() => setUserFilter('support')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        userFilter === "support"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        userFilter === 'support'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      Support (
-                      {users.filter((u) => u.role === "SUPPORT").length})
+                      Support ({users.filter(u => u.role === 'SUPPORT').length})
                     </button>
                   </div>
                 </div>
@@ -1019,11 +980,8 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody className="bg-white divide-y divide-slate-200">
                     {filteredUsers.length > 0 ? (
-                      filteredUsers.map((user) => (
-                        <TableRow
-                          key={user.id}
-                          className="hover:bg-slate-50 transition-colors"
-                        >
+                      filteredUsers.map(user => (
+                        <TableRow key={user.id} className="hover:bg-slate-50 transition-colors">
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center">
                               <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm mr-3">
@@ -1043,13 +1001,13 @@ export default function AdminDashboard() {
                           <TableCell className="px-6 py-4">
                             <Badge
                               className={
-                                user.role === "ADMIN"
-                                  ? "bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
-                                  : user.role === "HOST"
-                                  ? "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
-                                  : user.role === "SUPPORT"
-                                  ? "bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
-                                  : "bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
+                                user.role === 'ADMIN'
+                                  ? 'bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
+                                  : user.role === 'HOST'
+                                    ? 'bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
+                                    : user.role === 'SUPPORT'
+                                      ? 'bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
+                                      : 'bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
                               }
                             >
                               {user.role}
@@ -1057,7 +1015,7 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <div className="flex gap-2">
-                              {user.role !== "ADMIN" && (
+                              {user.role !== 'ADMIN' && (
                                 <>
                                   <Button
                                     variant="outline"
@@ -1065,25 +1023,18 @@ export default function AdminDashboard() {
                                     className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
                                     onClick={() =>
                                       handleUpdateRole(
-                                        user.email || "",
-                                        user.role === "USER" ? "HOST" : "USER"
+                                        user.email || '',
+                                        user.role === 'USER' ? 'HOST' : 'USER'
                                       )
                                     }
                                   >
-                                    {user.role === "USER"
-                                      ? "Make Host"
-                                      : "Make User"}
+                                    {user.role === 'USER' ? 'Make Host' : 'Make User'}
                                   </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
                                     className="bg-blue-600 text-white hover:bg-blue-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                    onClick={() =>
-                                      handleUpdateRole(
-                                        user.email || "",
-                                        "SUPPORT"
-                                      )
-                                    }
+                                    onClick={() => handleUpdateRole(user.email || '', 'SUPPORT')}
                                   >
                                     Make Support
                                   </Button>
@@ -1091,25 +1042,18 @@ export default function AdminDashboard() {
                                     variant="outline"
                                     size="sm"
                                     className="bg-amber-600 text-white hover:bg-amber-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                    onClick={() =>
-                                      handleUpdateRole(
-                                        user.email || "",
-                                        "ADMIN"
-                                      )
-                                    }
+                                    onClick={() => handleUpdateRole(user.email || '', 'ADMIN')}
                                   >
                                     Make Admin
                                   </Button>
                                 </>
                               )}
-                              {user.role === "ADMIN" && (
+                              {user.role === 'ADMIN' && (
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   className="bg-gray-600 text-white hover:bg-gray-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                  onClick={() =>
-                                    handleUpdateRole(user.email || "", "USER")
-                                  }
+                                  onClick={() => handleUpdateRole(user.email || '', 'USER')}
                                 >
                                   Make User
                                 </Button>
@@ -1120,10 +1064,7 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          className="text-center py-8 text-gray-600"
-                        >
+                        <TableCell colSpan={5} className="text-center py-8 text-gray-600">
                           No users found with the selected filter
                         </TableCell>
                       </TableRow>
@@ -1134,7 +1075,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "hosts" && (
+          {activeTab === 'hosts' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -1169,11 +1110,8 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody className="bg-white divide-y divide-slate-200">
                     {hosts.length > 0 ? (
-                      hosts.map((host) => (
-                        <TableRow
-                          key={host.id}
-                          className="hover:bg-slate-50 transition-colors"
-                        >
+                      hosts.map(host => (
+                        <TableRow key={host.id} className="hover:bg-slate-50 transition-colors">
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center">
                               <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-sm mr-3">
@@ -1210,10 +1148,7 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          className="text-center py-8 text-gray-600"
-                        >
+                        <TableCell colSpan={5} className="text-center py-8 text-gray-600">
                           No hosts found
                         </TableCell>
                       </TableRow>
@@ -1243,9 +1178,7 @@ export default function AdminDashboard() {
                           <h4 className="text-lg font-semibold text-gray-900 font-instrument">
                             {selectedHost.name}
                           </h4>
-                          <p className="text-sm text-gray-500 font-instrument">
-                            Active Host
-                          </p>
+                          <p className="text-sm text-gray-500 font-instrument">Active Host</p>
                         </div>
                       </div>
 
@@ -1253,22 +1186,16 @@ export default function AdminDashboard() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div className="space-y-1">
                           <p className="text-gray-500 font-medium">Email</p>
-                          <p className="text-gray-900 font-instrument">
-                            {selectedHost.email}
-                          </p>
+                          <p className="text-gray-900 font-instrument">{selectedHost.email}</p>
                         </div>
 
                         <div className="space-y-1">
                           <p className="text-gray-500 font-medium">Phone</p>
-                          <p className="text-gray-900 font-instrument">
-                            {selectedHost.phone}
-                          </p>
+                          <p className="text-gray-900 font-instrument">{selectedHost.phone}</p>
                         </div>
 
                         <div className="space-y-1">
-                          <p className="text-gray-500 font-medium">
-                            Created At
-                          </p>
+                          <p className="text-gray-500 font-medium">Created At</p>
                           <p className="text-gray-900 font-instrument">
                             {formatDate(selectedHost.createdAt)}
                           </p>
@@ -1288,19 +1215,15 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "support" && (
+          {activeTab === 'support' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">
-                    Support Team Management
-                  </h2>
-                  <p className="text-gray-600">
-                    View and manage current support team members
-                  </p>
+                  <h2 className="text-2xl font-bold mb-2">Support Team Management</h2>
+                  <p className="text-gray-600">View and manage current support team members</p>
                 </div>
                 <Button
-                  onClick={() => (window.location.href = "/dashboard/support")}
+                  onClick={() => (window.location.href = '/dashboard/support')}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Shield className="w-4 h-4 mr-2" />
@@ -1313,7 +1236,7 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-semibold">Support Staff</h3>
                   <p className="text-sm text-gray-600">
                     Users assigned with Support role (
-                    {users.filter((u) => u.role === "SUPPORT").length} total)
+                    {users.filter(u => u.role === 'SUPPORT').length} total)
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -1329,23 +1252,20 @@ export default function AdminDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.filter((user) => user.role === "SUPPORT").length >
-                      0 ? (
+                      {users.filter(user => user.role === 'SUPPORT').length > 0 ? (
                         users
-                          .filter((user) => user.role === "SUPPORT")
-                          .map((staff) => (
+                          .filter(user => user.role === 'SUPPORT')
+                          .map(staff => (
                             <TableRow key={staff.id}>
                               <TableCell className="font-medium">
-                                {staff.name || "No Name"}
+                                {staff.name || 'No Name'}
                               </TableCell>
-                              <TableCell>{staff.email || "No Email"}</TableCell>
-                              <TableCell>{staff.phone || "N/A"}</TableCell>
+                              <TableCell>{staff.email || 'No Email'}</TableCell>
+                              <TableCell>{staff.phone || 'N/A'}</TableCell>
                               <TableCell>
                                 {staff.createdAt
-                                  ? new Date(
-                                      staff.createdAt
-                                    ).toLocaleDateString()
-                                  : "N/A"}
+                                  ? new Date(staff.createdAt).toLocaleDateString()
+                                  : 'N/A'}
                               </TableCell>
                               <TableCell>
                                 <Badge
@@ -1360,10 +1280,7 @@ export default function AdminDashboard() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() =>
-                                      (window.location.href =
-                                        "/dashboard/support")
-                                    }
+                                    onClick={() => (window.location.href = '/dashboard/support')}
                                   >
                                     View Dashboard
                                   </Button>
@@ -1372,8 +1289,7 @@ export default function AdminDashboard() {
                                     variant="outline"
                                     className="text-red-600 hover:text-red-700"
                                     onClick={() =>
-                                      staff.email &&
-                                      handleUpdateRole(staff.email, "USER")
+                                      staff.email && handleUpdateRole(staff.email, 'USER')
                                     }
                                     disabled={!staff.email}
                                   >
@@ -1387,12 +1303,9 @@ export default function AdminDashboard() {
                         <TableRow>
                           <TableCell colSpan={6} className="text-center py-8">
                             <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-600 font-medium">
-                              No support staff assigned
-                            </p>
+                            <p className="text-gray-600 font-medium">No support staff assigned</p>
                             <p className="text-gray-500 text-sm">
-                              Use the Users tab to assign Support roles to team
-                              members
+                              Use the Users tab to assign Support roles to team members
                             </p>
                           </TableCell>
                         </TableRow>
@@ -1404,7 +1317,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "applicants" && (
+          {activeTab === 'applicants' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -1418,37 +1331,35 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Filter className="w-5 h-5 text-amber-600" />
-                    <span className="text-sm font-semibold text-gray-700">
-                      Filter:
-                    </span>
+                    <span className="text-sm font-semibold text-gray-700">Filter:</span>
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setApplicationFilter("all")}
+                      onClick={() => setApplicationFilter('all')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        applicationFilter === "all"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        applicationFilter === 'all'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       All ({applicants.length + travelPlans.length})
                     </button>
                     <button
-                      onClick={() => setApplicationFilter("hosts")}
+                      onClick={() => setApplicationFilter('hosts')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        applicationFilter === "hosts"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        applicationFilter === 'hosts'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       Host Applications ({applicants.length})
                     </button>
                     <button
-                      onClick={() => setApplicationFilter("travelplans")}
+                      onClick={() => setApplicationFilter('travelplans')}
                       className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                        applicationFilter === "travelplans"
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        applicationFilter === 'travelplans'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       Travel Plans ({travelPlans.length})
@@ -1458,8 +1369,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Host Applications Table */}
-              {(applicationFilter === "all" ||
-                applicationFilter === "hosts") && (
+              {(applicationFilter === 'all' || applicationFilter === 'hosts') && (
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-900 font-bricolage flex items-center gap-2">
                     <UserPlus className="w-5 h-5 text-purple-600" />
@@ -1488,7 +1398,7 @@ export default function AdminDashboard() {
                       </TableHeader>
                       <TableBody className="bg-white divide-y divide-slate-200">
                         {applicants.length > 0 ? (
-                          applicants.map((applicant) => (
+                          applicants.map(applicant => (
                             <TableRow
                               key={applicant.id}
                               className="hover:bg-slate-50 transition-colors"
@@ -1529,9 +1439,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                  onClick={() =>
-                                    handleApproveHost(applicant.email || "")
-                                  }
+                                  onClick={() => handleApproveHost(applicant.email || '')}
                                 >
                                   Approve
                                 </Button>
@@ -1539,9 +1447,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   className="bg-red-600 text-white hover:bg-red-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                  onClick={() =>
-                                    handleRejectHost(applicant.email || "")
-                                  }
+                                  onClick={() => handleRejectHost(applicant.email || '')}
                                 >
                                   Reject
                                 </Button>
@@ -1550,10 +1456,7 @@ export default function AdminDashboard() {
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell
-                              colSpan={5}
-                              className="text-center py-8 text-gray-600"
-                            >
+                            <TableCell colSpan={5} className="text-center py-8 text-gray-600">
                               No host applications found
                             </TableCell>
                           </TableRow>
@@ -1565,8 +1468,7 @@ export default function AdminDashboard() {
               )}
 
               {/* Travel Plans Table */}
-              {(applicationFilter === "all" ||
-                applicationFilter === "travelplans") && (
+              {(applicationFilter === 'all' || applicationFilter === 'travelplans') && (
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-900 font-bricolage flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-purple-600" />
@@ -1598,7 +1500,7 @@ export default function AdminDashboard() {
                       </TableHeader>
                       <TableBody className="bg-white divide-y divide-slate-200">
                         {travelPlans.length > 0 ? (
-                          travelPlans.map((plan) => (
+                          travelPlans.map(plan => (
                             <TableRow
                               key={plan.travelPlanId}
                               className="hover:bg-slate-50 transition-colors"
@@ -1623,9 +1525,7 @@ export default function AdminDashboard() {
                                   <div className="font-medium">
                                     {plan.city}, {plan.state}
                                   </div>
-                                  <div className="text-sm text-gray-500">
-                                    {plan.country}
-                                  </div>
+                                  <div className="text-sm text-gray-500">{plan.country}</div>
                                 </div>
                               </TableCell>
                               <TableCell className="px-6 py-4 text-gray-600 font-instrument">
@@ -1642,11 +1542,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   className="bg-purple-600 text-white hover:bg-purple-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                  onClick={() =>
-                                    handleViewTravelPlanDetails(
-                                      plan.travelPlanId
-                                    )
-                                  }
+                                  onClick={() => handleViewTravelPlanDetails(plan.travelPlanId)}
                                 >
                                   View Details
                                 </Button>
@@ -1654,9 +1550,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   className="bg-green-600 text-white hover:bg-green-700 border-0 font-instrument font-medium text-sm transition-colors duration-200"
-                                  onClick={() =>
-                                    handleApproveTravelPlan(plan.travelPlanId)
-                                  }
+                                  onClick={() => handleApproveTravelPlan(plan.travelPlanId)}
                                 >
                                   Make Active
                                 </Button>
@@ -1665,10 +1559,7 @@ export default function AdminDashboard() {
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell
-                              colSpan={6}
-                              className="text-center py-8 text-gray-600"
-                            >
+                            <TableCell colSpan={6} className="text-center py-8 text-gray-600">
                               No inactive travel plans found
                             </TableCell>
                           </TableRow>
@@ -1679,7 +1570,7 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {applicationFilter === "all" &&
+              {applicationFilter === 'all' &&
                 applicants.length === 0 &&
                 travelPlans.length === 0 && (
                   <div className="text-center py-16">
@@ -1690,15 +1581,15 @@ export default function AdminDashboard() {
                       No Applications Found
                     </h3>
                     <p className="text-gray-600 max-w-md mx-auto font-instrument">
-                      There are currently no pending host applications or
-                      inactive travel plans to review.
+                      There are currently no pending host applications or inactive travel plans to
+                      review.
                     </p>
                   </div>
                 )}
             </div>
           )}
 
-          {activeTab === "revenue" && (
+          {activeTab === 'revenue' && (
             <div className="space-y-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
@@ -1717,28 +1608,20 @@ export default function AdminDashboard() {
                 <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-gray-500" />
-                    <label className="text-sm font-medium text-gray-700">
-                      From:
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">From:</label>
                     <input
                       type="date"
                       value={dateRange.startDate}
-                      onChange={(e) =>
-                        handleDateChange("startDate", e.target.value)
-                      }
+                      onChange={e => handleDateChange('startDate', e.target.value)}
                       className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      To:
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">To:</label>
                     <input
                       type="date"
                       value={dateRange.endDate}
-                      onChange={(e) =>
-                        handleDateChange("endDate", e.target.value)
-                      }
+                      onChange={e => handleDateChange('endDate', e.target.value)}
                       className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
@@ -1783,13 +1666,10 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
-                    {formatCurrency(
-                      revenue.refundAmount._sum.refundAmount || 0
-                    )}
+                    {formatCurrency(revenue.refundAmount._sum.refundAmount || 0)}
                   </div>
                   <p className="text-gray-600 text-sm font-instrument">
-                    {revenue.refundAmount._count.id || 0} cancelled/refunded
-                    bookings
+                    {revenue.refundAmount._count.id || 0} cancelled/refunded bookings
                   </p>
                 </div>
 
@@ -1805,9 +1685,7 @@ export default function AdminDashboard() {
                   <div className="text-3xl font-bold text-gray-900 mb-2 font-bricolage">
                     {formatCurrency(getNetRevenue())}
                   </div>
-                  <p className="text-gray-600 text-sm font-instrument">
-                    Total sales minus refunds
-                  </p>
+                  <p className="text-gray-600 text-sm font-instrument">Total sales minus refunds</p>
                 </div>
               </div>
 
@@ -1817,9 +1695,8 @@ export default function AdminDashboard() {
                   Revenue Management
                 </h3>
                 <p className="mb-6 text-gray-600 font-instrument">
-                  The admin dashboard allows you to track revenue from confirmed
-                  bookings and manage refunds. Use the booking management
-                  section to handle any pending refund requests.
+                  The admin dashboard allows you to track revenue from confirmed bookings and manage
+                  refunds. Use the booking management section to handle any pending refund requests.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button
@@ -1842,17 +1719,11 @@ export default function AdminDashboard() {
 
               {/* Revenue Report Modal */}
               {revenueReportModal && (
-                <RevenueReport
-                  dateRange={dateRange}
-                  onBack={handleBackRevenueModal}
-                />
+                <RevenueReport dateRange={dateRange} onBack={handleBackRevenueModal} />
               )}
 
               {analyticsModal && (
-                <RevenueAnalytics
-                  dateRange={dateRange}
-                  onClose={handleCloseAnalyticsModal}
-                />
+                <RevenueAnalytics dateRange={dateRange} onClose={handleCloseAnalyticsModal} />
               )}
 
               {/* Quick Stats */}
@@ -1873,8 +1744,7 @@ export default function AdminDashboard() {
                     <p className="text-xl font-bold">
                       {(
                         (revenue.refundAmount._count.id /
-                          (revenue.totalSales._count.id +
-                            revenue.refundAmount._count.id)) *
+                          (revenue.totalSales._count.id + revenue.refundAmount._count.id)) *
                           100 || 0
                       ).toFixed(1)}
                       %
@@ -1883,8 +1753,7 @@ export default function AdminDashboard() {
                   <div>
                     <p className="opacity-90">Total Transactions</p>
                     <p className="text-xl font-bold">
-                      {(revenue.totalSales._count.id || 0) +
-                        (revenue.refundAmount._count.id || 0)}
+                      {(revenue.totalSales._count.id || 0) + (revenue.refundAmount._count.id || 0)}
                     </p>
                   </div>
                 </div>
@@ -1892,7 +1761,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "livetrips" && (
+          {activeTab === 'livetrips' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <div>
@@ -1907,7 +1776,7 @@ export default function AdminDashboard() {
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-semibold text-green-700">
                     {activeTrips.length} Active Trip
-                    {activeTrips.length !== 1 ? "s" : ""}
+                    {activeTrips.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
@@ -1916,39 +1785,36 @@ export default function AdminDashboard() {
               <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <Filter className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-semibold text-gray-700">
-                    Filter by Status:
-                  </span>
+                  <span className="text-sm font-semibold text-gray-700">Filter by Status:</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
-                    onClick={() => setLiveTripsFilter("upcoming")}
+                    onClick={() => setLiveTripsFilter('upcoming')}
                     className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                      liveTripsFilter === "upcoming"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      liveTripsFilter === 'upcoming'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Upcoming (
                     {
-                      activeTrips.filter(
-                        (t) => t.startDate && new Date(t.startDate) > new Date()
-                      ).length
+                      activeTrips.filter(t => t.startDate && new Date(t.startDate) > new Date())
+                        .length
                     }
                     )
                   </button>
                   <button
-                    onClick={() => setLiveTripsFilter("ongoing")}
+                    onClick={() => setLiveTripsFilter('ongoing')}
                     className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                      liveTripsFilter === "ongoing"
-                        ? "bg-green-600 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      liveTripsFilter === 'ongoing'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Ongoing (
                     {
                       activeTrips.filter(
-                        (t) =>
+                        t =>
                           t.startDate &&
                           t.endDate &&
                           new Date(t.startDate) <= new Date() &&
@@ -1958,20 +1824,15 @@ export default function AdminDashboard() {
                     )
                   </button>
                   <button
-                    onClick={() => setLiveTripsFilter("completed")}
+                    onClick={() => setLiveTripsFilter('completed')}
                     className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
-                      liveTripsFilter === "completed"
-                        ? "bg-purple-600 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      liveTripsFilter === 'completed'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Completed (
-                    {
-                      activeTrips.filter(
-                        (t) => t.endDate && new Date(t.endDate) < new Date()
-                      ).length
-                    }
-                    )
+                    {activeTrips.filter(t => t.endDate && new Date(t.endDate) < new Date()).length})
                   </button>
                 </div>
               </div>
@@ -1992,17 +1853,17 @@ export default function AdminDashboard() {
                 (() => {
                   // Filter trips based on selected filter
                   const now = new Date();
-                  const filteredTrips = activeTrips.filter((trip) => {
-                    if (liveTripsFilter === "upcoming") {
+                  const filteredTrips = activeTrips.filter(trip => {
+                    if (liveTripsFilter === 'upcoming') {
                       return trip.startDate && new Date(trip.startDate) > now;
-                    } else if (liveTripsFilter === "ongoing") {
+                    } else if (liveTripsFilter === 'ongoing') {
                       return (
                         trip.startDate &&
                         trip.endDate &&
                         new Date(trip.startDate) <= now &&
                         new Date(trip.endDate) >= now
                       );
-                    } else if (liveTripsFilter === "completed") {
+                    } else if (liveTripsFilter === 'completed') {
                       return trip.endDate && new Date(trip.endDate) < now;
                     }
                     return true;
@@ -2014,9 +1875,7 @@ export default function AdminDashboard() {
                         <MapPin className="h-8 w-8 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 font-bricolage mb-2">
-                        No{" "}
-                        {liveTripsFilter.charAt(0).toUpperCase() +
-                          liveTripsFilter.slice(1)}{" "}
+                        No {liveTripsFilter.charAt(0).toUpperCase() + liveTripsFilter.slice(1)}{' '}
                         Trips
                       </h3>
                       <p className="text-gray-600 font-instrument">
@@ -2055,13 +1914,10 @@ export default function AdminDashboard() {
                           </TableRow>
                         </TableHeader>
                         <TableBody className="bg-white divide-y divide-slate-200">
-                          {filteredTrips.map((trip) => {
+                          {filteredTrips.map(trip => {
                             // Determine trip status
                             let statusBadge;
-                            if (
-                              trip.startDate &&
-                              new Date(trip.startDate) > now
-                            ) {
+                            if (trip.startDate && new Date(trip.startDate) > now) {
                               statusBadge = (
                                 <Badge className="bg-blue-100 text-blue-800 border-blue-200">
                                   <div className="flex items-center gap-1">
@@ -2084,10 +1940,7 @@ export default function AdminDashboard() {
                                   </div>
                                 </Badge>
                               );
-                            } else if (
-                              trip.endDate &&
-                              new Date(trip.endDate) < now
-                            ) {
+                            } else if (trip.endDate && new Date(trip.endDate) < now) {
                               statusBadge = (
                                 <Badge className="bg-purple-100 text-purple-800 border-purple-200">
                                   <div className="flex items-center gap-1">
@@ -2137,9 +1990,7 @@ export default function AdminDashboard() {
                                       {trip.city}, {trip.state}
                                     </span>
                                   </div>
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    {trip.country}
-                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">{trip.country}</div>
                                 </TableCell>
                                 <TableCell className="px-6 py-4">
                                   <div className="text-sm font-medium text-gray-900 font-instrument">
@@ -2153,19 +2004,13 @@ export default function AdminDashboard() {
                                   <div className="flex items-center gap-1 text-gray-700">
                                     <Calendar className="w-4 h-4 text-purple-600" />
                                     <span className="text-sm font-instrument">
-                                      {trip.noOfDays}{" "}
-                                      {trip.noOfDays === 1 ? "day" : "days"}
+                                      {trip.noOfDays} {trip.noOfDays === 1 ? 'day' : 'days'}
                                     </span>
                                   </div>
                                   {trip.startDate && trip.endDate && (
                                     <div className="text-xs text-gray-500 mt-1">
-                                      {new Date(
-                                        trip.startDate
-                                      ).toLocaleDateString()}{" "}
-                                      -{" "}
-                                      {new Date(
-                                        trip.endDate
-                                      ).toLocaleDateString()}
+                                      {new Date(trip.startDate).toLocaleDateString()} -{' '}
+                                      {new Date(trip.endDate).toLocaleDateString()}
                                     </div>
                                   )}
                                 </TableCell>
@@ -2176,9 +2021,7 @@ export default function AdminDashboard() {
                                       ₹{trip.price.toLocaleString()}
                                     </span>
                                   </div>
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    per person
-                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">per person</div>
                                 </TableCell>
                                 <TableCell className="px-6 py-4">
                                   <div className="text-center">
@@ -2207,9 +2050,7 @@ export default function AdminDashboard() {
                                     </span>
                                   )}
                                 </TableCell>
-                                <TableCell className="px-6 py-4">
-                                  {statusBadge}
-                                </TableCell>
+                                <TableCell className="px-6 py-4">{statusBadge}</TableCell>
                               </TableRow>
                             );
                           })}
@@ -2222,7 +2063,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "bookings" && (
+          {activeTab === 'bookings' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <div>
@@ -2236,31 +2077,28 @@ export default function AdminDashboard() {
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Filter className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-semibold text-gray-700">
-                      Filter:
-                    </span>
+                    <span className="text-sm font-semibold text-gray-700">Filter:</span>
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     {[
-                      "ALL",
-                      "FULLY_PAID",
-                      "PARTIALLY_PAID",
-                      "CANCELLED",
-                      "REFUNDED",
-                      "PENDING",
-                      "OVERDUE",
-                    ].map((status) => (
+                      'ALL',
+                      'FULLY_PAID',
+                      'PARTIALLY_PAID',
+                      'CANCELLED',
+                      'REFUNDED',
+                      'PENDING',
+                      'OVERDUE',
+                    ].map(status => (
                       <button
                         key={status}
                         onClick={() => setBookingFilter(status)}
                         className={`px-4 py-2 rounded-full text-sm font-instrument font-medium transition-all duration-200 ${
                           bookingFilter === status
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
-                        {status} ({bookingCounts[status as keyof BookingCounts]}
-                        )
+                        {status} ({bookingCounts[status as keyof BookingCounts]})
                       </button>
                     ))}
                   </div>
@@ -2270,31 +2108,25 @@ export default function AdminDashboard() {
               {/* Bookings List */}
               <div className="space-y-4">
                 {bookings.filter(
-                  (booking) =>
-                    bookingFilter === "ALL" ||
-                    booking.paymentStatus === bookingFilter
+                  booking => bookingFilter === 'ALL' || booking.paymentStatus === bookingFilter
                 ).length === 0 ? (
                   <div className="text-center py-16">
                     <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Calendar className="h-10 w-10 text-purple-600" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      No Bookings Found
-                    </h3>
+                    <h3 className="text-xl font-semibold text-gray-900">No Bookings Found</h3>
                     <p className="text-gray-600 mt-2">
-                      {bookingFilter === "ALL"
-                        ? "There are no bookings in the system yet."
+                      {bookingFilter === 'ALL'
+                        ? 'There are no bookings in the system yet.'
                         : `No ${bookingFilter.toLowerCase()} bookings found.`}
                     </p>
                   </div>
                 ) : (
                   bookings
                     .filter(
-                      (booking) =>
-                        bookingFilter === "ALL" ||
-                        booking.paymentStatus === bookingFilter
+                      booking => bookingFilter === 'ALL' || booking.paymentStatus === bookingFilter
                     )
-                    .map((booking) => (
+                    .map(booking => (
                       <div
                         key={booking.id}
                         className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
@@ -2308,35 +2140,25 @@ export default function AdminDashboard() {
                                   {booking.travelPlan.title}
                                 </h4>
                                 <p className="text-sm text-gray-600 mt-1">
-                                  {booking.travelPlan.destination ||
-                                    "Destination not specified"}
+                                  {booking.travelPlan.destination || 'Destination not specified'}
                                 </p>
                                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                                   <span className="flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
-                                    {new Date(
-                                      booking.startDate
-                                    ).toLocaleDateString()}{" "}
-                                    -{" "}
-                                    {new Date(
-                                      booking.endDate
-                                    ).toLocaleDateString()}
+                                    {new Date(booking.startDate).toLocaleDateString()} -{' '}
+                                    {new Date(booking.endDate).toLocaleDateString()}
                                   </span>
                                   <span className="flex items-center gap-1">
                                     <Users className="h-4 w-4" />
-                                    {booking.participants}{" "}
-                                    {booking.participants === 1
-                                      ? "guest"
-                                      : "guests"}
+                                    {booking.participants}{' '}
+                                    {booking.participants === 1 ? 'guest' : 'guests'}
                                   </span>
                                 </div>
                               </div>
 
                               <div className="flex flex-col items-start sm:items-end gap-2">
                                 {(() => {
-                                  const statusInfo = getPaymentStatusInfo(
-                                    booking.paymentStatus
-                                  );
+                                  const statusInfo = getPaymentStatusInfo(booking.paymentStatus);
                                   const IconComponent = statusInfo.icon;
                                   return (
                                     <span
@@ -2351,34 +2173,29 @@ export default function AdminDashboard() {
                                   <p className="text-xl font-bold text-gray-900">
                                     ${booking.totalPrice.toLocaleString()}
                                   </p>
-                                  {booking.paymentStatus === "PARTIALLY_PAID" &&
+                                  {booking.paymentStatus === 'PARTIALLY_PAID' &&
                                     booking.amountPaid && (
                                       <p className="text-sm text-blue-600">
-                                        Paid: $
-                                        {booking.amountPaid.toLocaleString()}
+                                        Paid: ${booking.amountPaid.toLocaleString()}
                                       </p>
                                     )}
-                                  {booking.paymentStatus === "PARTIALLY_PAID" &&
+                                  {booking.paymentStatus === 'PARTIALLY_PAID' &&
                                     booking.remainingAmount && (
                                       <p className="text-sm text-orange-600">
-                                        Remaining: $
-                                        {booking.remainingAmount.toLocaleString()}
+                                        Remaining: ${booking.remainingAmount.toLocaleString()}
                                       </p>
                                     )}
-                                  {(booking.paymentStatus === "PENDING" ||
-                                    booking.paymentStatus === "OVERDUE") &&
+                                  {(booking.paymentStatus === 'PENDING' ||
+                                    booking.paymentStatus === 'OVERDUE') &&
                                     booking.paymentDeadline && (
                                       <p className="text-xs text-gray-500">
-                                        Due:{" "}
-                                        {new Date(
-                                          booking.paymentDeadline
-                                        ).toLocaleDateString()}
+                                        Due:{' '}
+                                        {new Date(booking.paymentDeadline).toLocaleDateString()}
                                       </p>
                                     )}
                                   {booking.refundAmount > 0 && (
                                     <p className="text-sm text-red-600">
-                                      Refunded: $
-                                      {booking.refundAmount.toLocaleString()}
+                                      Refunded: ${booking.refundAmount.toLocaleString()}
                                     </p>
                                   )}
                                 </div>
@@ -2441,22 +2258,17 @@ export default function AdminDashboard() {
                                 <div className="flex items-center gap-4">
                                   <span>Booking ID: {booking.id}</span>
                                   <span>
-                                    Created:{" "}
-                                    {new Date(
-                                      booking.createdAt
-                                    ).toLocaleDateString()}
+                                    Created: {new Date(booking.createdAt).toLocaleDateString()}
                                   </span>
                                 </div>
 
                                 {/* Admin Actions */}
-                                {booking.paymentStatus === "CANCELLED" &&
+                                {booking.paymentStatus === 'CANCELLED' &&
                                   booking.refundAmount > 0 && (
                                     <Button
                                       size="sm"
                                       className="bg-green-600 hover:bg-green-700 text-white font-instrument text-xs"
-                                      onClick={() =>
-                                        handleMarkAsRefunded(booking.id)
-                                      }
+                                      onClick={() => handleMarkAsRefunded(booking.id)}
                                     >
                                       <RefreshCw className="h-3 w-3 mr-1" />
                                       Mark as Refunded

@@ -1,5 +1,5 @@
-import { Search, Calendar, MapPin } from "lucide-react";
-import Image from "next/image";
+import { Search, Calendar, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 export const WhyUsSection = () => {
   return (
@@ -36,8 +36,8 @@ export const WhyUsSection = () => {
                     Customized Packages
                   </h3>
                   <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Tailor-made itineraries to suit your preferences and
-                    interests, ensuring a unique travel experience every time.
+                    Tailor-made itineraries to suit your preferences and interests, ensuring a
+                    unique travel experience every time.
                   </p>
                 </div>
               </div>
@@ -50,8 +50,8 @@ export const WhyUsSection = () => {
                     Adventure Tours
                   </h3>
                   <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Explore thrilling destinations and activities, from mountain
-                    trekking to scuba diving, for the adrenaline seekers.
+                    Explore thrilling destinations and activities, from mountain trekking to scuba
+                    diving, for the adrenaline seekers.
                   </p>
                 </div>
               </div>
@@ -64,8 +64,8 @@ export const WhyUsSection = () => {
                     Luxury Vacations
                   </h3>
                   <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Indulge in opulent accommodations and exclusive experiences,
-                    designed for those seeking a lavish escape.
+                    Indulge in opulent accommodations and exclusive experiences, designed for those
+                    seeking a lavish escape.
                   </p>
                 </div>
               </div>

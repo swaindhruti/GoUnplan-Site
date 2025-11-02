@@ -1,6 +1,6 @@
-import { Users, Shield, User, Check } from "lucide-react";
-import Image from "next/image";
-import { useMemo } from "react";
+import { Users, Shield, User, Check } from 'lucide-react';
+import Image from 'next/image';
+import { useMemo } from 'react';
 
 interface TripCardProps {
   title: string;
@@ -21,22 +21,19 @@ export function TripCard({
   imageUrl,
   whatsIncluded,
   cancellationPolicy,
-  hostInfo
+  hostInfo,
 }: TripCardProps) {
   const cardColors = useMemo(
     () => ({
-      header: "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50",
-      included:
-        "bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50",
-      cancellation:
-        "bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50",
-      hostInfo:
-        "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50",
-      maxPeople: "bg-gradient-to-r from-purple-400 to-pink-400",
-      checkmark: "bg-gradient-to-r from-purple-600 to-pink-600",
-      border: "border border-white/60",
-      shadow: "shadow-xl hover:shadow-2xl",
-      innerShadow: "shadow-lg"
+      header: 'bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200/50',
+      included: 'bg-gradient-to-r from-green-100 to-emerald-100 border-green-200/50',
+      cancellation: 'bg-gradient-to-r from-yellow-100 to-orange-100 border-yellow-200/50',
+      hostInfo: 'bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200/50',
+      maxPeople: 'bg-gradient-to-r from-purple-400 to-pink-400',
+      checkmark: 'bg-gradient-to-r from-purple-600 to-pink-600',
+      border: 'border border-white/60',
+      shadow: 'shadow-xl hover:shadow-2xl',
+      innerShadow: 'shadow-lg',
     }),
     []
   );
@@ -56,24 +53,15 @@ export function TripCard({
           </div>
         </div>
 
-        <Image
-          src={imageUrl || "/placeholder.svg"}
-          alt={title}
-          fill
-          className="object-cover"
-        />
+        <Image src={imageUrl || '/placeholder.svg'} alt={title} fill className="object-cover" />
 
         {/* Premium overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
       </div>
 
       {/* Card Header */}
-      <div
-        className={`p-6 border-b border-white/30 ${cardColors.header} text-gray-800`}
-      >
-        <h3 className="text-2xl font-bricolage font-bold tracking-tight">
-          {title}
-        </h3>
+      <div className={`p-6 border-b border-white/30 ${cardColors.header} text-gray-800`}>
+        <h3 className="text-2xl font-bricolage font-bold tracking-tight">{title}</h3>
       </div>
 
       {/* Card Content */}
@@ -82,9 +70,7 @@ export function TripCard({
         <div
           className={`${cardColors.included} ${cardColors.border} rounded-2xl p-5 ${cardColors.innerShadow} transition-all duration-300 hover:scale-105 backdrop-blur-xl`}
         >
-          <h4 className="font-bold mb-4 text-xl text-gray-800">
-            What&apos;s included
-          </h4>
+          <h4 className="font-bold mb-4 text-xl text-gray-800">What&apos;s included</h4>
           <ul className="font-medium space-y-3 text-base">
             {whatsIncluded.slice(0, 4).map((item, index) => (
               <li key={index} className="flex items-start gap-3">
@@ -138,7 +124,7 @@ export function TripCard({
             </p>
             <p className="text-sm mt-3 backdrop-blur-xl bg-white/80 p-4 border border-white/60 rounded-xl text-gray-700 shadow-lg">
               {hostInfo.description ||
-                "Experienced guide ready to show you the best spots and hidden gems!"}
+                'Experienced guide ready to show you the best spots and hidden gems!'}
             </p>
           </div>
         </div>

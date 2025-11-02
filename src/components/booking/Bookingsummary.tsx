@@ -1,5 +1,5 @@
-"use client";
-import React, { useCallback } from "react";
+'use client';
+import React, { useCallback } from 'react';
 import {
   Calendar,
   MapPin,
@@ -9,16 +9,16 @@ import {
   CreditCard,
   XCircle,
   AlertTriangle,
-  IndianRupee
-} from "lucide-react";
-import { BookingData, TravelPlan } from "@/types/booking";
+  IndianRupee,
+} from 'lucide-react';
+import { BookingData, TravelPlan } from '@/types/booking';
 import // editBookingAction,
 /*  unCompleteBookingForm */
 /*   updateBookingStatus */
-"@/actions/booking/actions";
+'@/actions/booking/actions';
 /* import { BookingStatus } from "@prisma/client"; */
-import { useRouter } from "next/navigation";
-import { RawTrip } from "@/types/trips";
+import { useRouter } from 'next/navigation';
+import { RawTrip } from '@/types/trips';
 
 export interface BookingSummaryProps {
   booking: BookingData | null;
@@ -31,42 +31,34 @@ export interface BookingSummaryProps {
 const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
   ({ booking, travelPlan, loading = false }) => {
     const router = useRouter();
-    const isCancelled = booking?.paymentStatus === "CANCELLED";
+    const isCancelled = booking?.paymentStatus === 'CANCELLED';
 
-    const formatDate = useCallback(
-      (dateString: Date | string | undefined | null): string => {
-        if (!dateString) return "N/A";
-        return new Date(dateString).toLocaleDateString("en-IN", {
-          year: "numeric",
-          month: "short",
-          day: "numeric"
-        });
-      },
-      []
-    );
+    const formatDate = useCallback((dateString: Date | string | undefined | null): string => {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }, []);
 
-    const formatCurrency = useCallback(
-      (amount: number | undefined | null): string => {
-        if (!amount) return "₹0";
-        return new Intl.NumberFormat("en-IN", {
-          
-          currency: "INR"
-        }).format(amount);
-      },
-      []
-    );
+    const formatCurrency = useCallback((amount: number | undefined | null): string => {
+      if (!amount) return '₹0';
+      return new Intl.NumberFormat('en-IN', {
+        currency: 'INR',
+      }).format(amount);
+    }, []);
 
     // Calculate tax and totals
     const calculatePaymentBreakdown = useCallback(() => {
-      if (!booking) return { subtotal: 0,total: 0 };
+      if (!booking) return { subtotal: 0, total: 0 };
 
-      const subtotal =
-        (booking.pricePerPerson || 0) * (booking.participants || 0);
-      const total = subtotal ;
+      const subtotal = (booking.pricePerPerson || 0) * (booking.participants || 0);
+      const total = subtotal;
 
       return {
         subtotal,
-        total
+        total,
       };
     }, [booking]);
 
@@ -103,7 +95,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     }, [booking?.travelPlanId, router]);
 
     const getDuration = useCallback((): string => {
-      if (!booking?.startDate || !booking?.endDate) return "N/A";
+      if (!booking?.startDate || !booking?.endDate) return 'N/A';
       const start = new Date(booking.startDate);
       const end = new Date(booking.endDate);
       const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -113,14 +105,12 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
 
     const handleContinueToPayment = (isPartialPay?: boolean) => {
       router.push(
-        `/trips/booking/${booking?.travelPlanId}/payment-form/${
-          booking?.id
-        }?payment-type=${
+        `/trips/booking/${booking?.travelPlanId}/payment-form/${booking?.id}?payment-type=${
           isPartialPay
-            ? "partial-pay"
-            : booking?.paymentStatus === "PARTIALLY_PAID"
-            ? "remaining-amount"
-            : ""
+            ? 'partial-pay'
+            : booking?.paymentStatus === 'PARTIALLY_PAID'
+              ? 'remaining-amount'
+              : ''
         }`
       );
     };
@@ -170,8 +160,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
               travelPlan?.tripImage ||
-              "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
-            }')`
+              'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'
+            }')`,
           }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -179,34 +169,31 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
               <div className="space-y-4">
                 <div
                   className={`inline-flex items-center px-6 py-2 backdrop-blur-sm rounded-full mb-4 ${
-                    isCancelled ? "bg-red-600/80" : "bg-purple-600/80"
+                    isCancelled ? 'bg-red-600/80' : 'bg-purple-600/80'
                   }`}
                 >
                   <span className="text-white text-sm font-semibold tracking-wide uppercase font-instrument">
-                    {isCancelled ? "Cancelled Booking" : "Booking Summary"}
+                    {isCancelled ? 'Cancelled Booking' : 'Booking Summary'}
                   </span>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
-                  {isCancelled ? "Trip Cancelled" : "Review Your Booking"}
+                  {isCancelled ? 'Trip Cancelled' : 'Review Your Booking'}
                   <span
-                    className={`block mt-2 ${
-                      isCancelled ? "text-red-300" : "text-purple-300"
-                    }`}
+                    className={`block mt-2 ${isCancelled ? 'text-red-300' : 'text-purple-300'}`}
                   >
                     {travelPlan?.title}
                   </span>
                 </h1>
                 <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
                   {isCancelled
-                    ? "Your booking has been cancelled. Refund will be processed soon."
-                    : "Verify your trip details and proceed to secure payment"}
+                    ? 'Your booking has been cancelled. Refund will be processed soon.'
+                    : 'Verify your trip details and proceed to secure payment'}
                 </p>
 
                 <div className="flex flex-wrap gap-3 mt-6">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {formatDate(booking?.startDate)} -{" "}
-                    {formatDate(booking?.endDate)}
+                    {formatDate(booking?.startDate)} - {formatDate(booking?.endDate)}
                   </div>
                   <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium font-instrument flex items-center gap-2">
                     <CreditCard className="h-4 w-4" />
@@ -239,9 +226,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     </h3>
                     <div className="mt-1 text-sm text-red-700 font-instrument">
                       <p>
-                        Your booking has been cancelled successfully. The refund
-                        will be processed within 5-6 business days and credited
-                        to your original payment method.
+                        Your booking has been cancelled successfully. The refund will be processed
+                        within 5-6 business days and credited to your original payment method.
                       </p>
                     </div>
                   </div>
@@ -251,7 +237,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
           </div>
         )}
 
-        <div className={`relative z-20 ${isCancelled ? "-mt-4" : "-mt-16"}`}>
+        <div className={`relative z-20 ${isCancelled ? '-mt-4' : '-mt-16'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
@@ -261,12 +247,12 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                       <div className="flex items-center gap-3 justify-center mb-3">
                         <div
                           className={`p-2 rounded-lg ${
-                            isCancelled ? "bg-red-100" : "bg-purple-100"
+                            isCancelled ? 'bg-red-100' : 'bg-purple-100'
                           }`}
                         >
                           <MapPin
                             className={`w-4 h-4 ${
-                              isCancelled ? "text-red-600" : "text-purple-600"
+                              isCancelled ? 'text-red-600' : 'text-purple-600'
                             }`}
                           />
                         </div>
@@ -275,15 +261,15 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         </h2>
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 font-bricolage mb-1">
-                        {travelPlan?.title || "Travel Package"}
+                        {travelPlan?.title || 'Travel Package'}
                       </h3>
                       <p
                         className={`text-sm font-medium font-instrument ${
-                          isCancelled ? "text-red-600" : "text-purple-600"
+                          isCancelled ? 'text-red-600' : 'text-purple-600'
                         }`}
                       >
-                        {travelPlan?.destination || "Destination"}
-                        {isCancelled && " (Cancelled)"}
+                        {travelPlan?.destination || 'Destination'}
+                        {isCancelled && ' (Cancelled)'}
                       </p>
                     </div>
 
@@ -296,7 +282,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                             <span>{formatDate(booking.endDate)}</span>
                             <span
                               className={`text-sm ${
-                                isCancelled ? "text-red-600" : "text-purple-600"
+                                isCancelled ? 'text-red-600' : 'text-purple-600'
                               }`}
                             >
                               ({getDuration()} days)
@@ -305,14 +291,12 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         </div>
                         <div className="space-y-3">
                           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider font-instrument">
-                            Booking ID:{" "}
-                            <span className="text-gray-800 font-medium">
-                              {booking.id}
-                            </span>
+                            Booking ID:{' '}
+                            <span className="text-gray-800 font-medium">{booking.id}</span>
                           </h3>
 
                           <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider font-instrument">
-                            Guest Details{" "}
+                            Guest Details{' '}
                             <span className="ml-1 text-gray-500 font-normal">
                               ({booking.participants || 0} Travelers)
                             </span>
@@ -326,17 +310,15 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition-colors duration-200 ${
                                     member.isteamLead
                                       ? isCancelled
-                                        ? "bg-red-50 text-red-700 border border-red-200"
-                                        : "bg-purple-50 text-purple-700 border border-purple-200"
-                                      : "bg-gray-50 text-gray-700 border border-gray-200"
+                                        ? 'bg-red-50 text-red-700 border border-red-200'
+                                        : 'bg-purple-50 text-purple-700 border border-purple-200'
+                                      : 'bg-gray-50 text-gray-700 border border-gray-200'
                                   }`}
                                 >
                                   <span className="mr-1.5 font-semibold">
                                     {member.firstName} {member.lastName}
                                   </span>
-                                  <span className="text-gray-500">
-                                    {member.phone}
-                                  </span>
+                                  <span className="text-gray-500">{member.phone}</span>
                                   {member.isteamLead && (
                                     <span className="ml-2 text-[10px] uppercase tracking-wide font-bold">
                                       Lead
@@ -374,7 +356,10 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     </div>
 
                     {/* Explore More Trips */}
-                    <div onClick={()=>router.push("/trips")} className="cursor-pointer bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100">
+                    <div
+                      onClick={() => router.push('/trips')}
+                      className="cursor-pointer bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border border-purple-100"
+                    >
                       <div className="flex items-center gap-3 mb-4">
                         <div className="bg-purple-100 p-2 rounded-lg">
                           <MapPin className="w-4 h-4 text-purple-600" />
@@ -384,10 +369,10 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         </h4>
                       </div>
                       <p className="text-gray-600 font-instrument text-sm mb-4 leading-relaxed">
-                        Discover amazing destinations and create unforgettable
-                        memories with our curated travel packages.
+                        Discover amazing destinations and create unforgettable memories with our
+                        curated travel packages.
                       </p>
-{/* 
+                      {/* 
                       <Carousel>
                         <CarouselContent className="px-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {allTrips?.map((trip) => (
@@ -441,18 +426,14 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                   <div className="bg-white  border border-gray-200 rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
                       <div
-                        className={`p-2 rounded-lg ${
-                          isCancelled ? "bg-red-100" : "bg-purple-100"
-                        }`}
+                        className={`p-2 rounded-lg ${isCancelled ? 'bg-red-100' : 'bg-purple-100'}`}
                       >
                         <CreditCard
-                          className={`w-5 h-5 ${
-                            isCancelled ? "text-red-600" : "text-purple-600"
-                          }`}
+                          className={`w-5 h-5 ${isCancelled ? 'text-red-600' : 'text-purple-600'}`}
                         />
                       </div>
                       <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-                        {isCancelled ? "Refund Details" : "Payment Details"}
+                        {isCancelled ? 'Refund Details' : 'Payment Details'}
                       </h3>
                     </div>
 
@@ -468,21 +449,13 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                               </h4>
                               <div className="space-y-2 text-sm text-red-700 font-instrument">
                                 <p>
-                                  • Your refund of{" "}
-                                  <strong>
-                                    {formatCurrency(paymentBreakdown.total)}
-                                  </strong>{" "}
-                                  is being processed
-                                </p>
-                                <p>
-                                  • Amount will be credited to your original
-                                  payment method
-                                </p>
-                                <p>• Processing time: 5-6 business days</p>
-                                <p>
-                                  • You will receive a confirmation email once
+                                  • Your refund of{' '}
+                                  <strong>{formatCurrency(paymentBreakdown.total)}</strong> is being
                                   processed
                                 </p>
+                                <p>• Amount will be credited to your original payment method</p>
+                                <p>• Processing time: 5-6 business days</p>
+                                <p>• You will receive a confirmation email once processed</p>
                               </div>
                             </div>
                           </div>
@@ -520,7 +493,10 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                 Cost per person:
                               </span>
                               <span className="font-semibold flex gap-1 text-gray-900 font-instrument text-sm">
-                                <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(booking.pricePerPerson)}</div>
+                                <div className="flex items-center">
+                                  <IndianRupee className="w-4 h-4" />
+                                  {formatCurrency(booking.pricePerPerson)}
+                                </div>
                               </span>
                             </div>
                             <div className="flex justify-between items-center py-2 border-b border-gray-200">
@@ -531,31 +507,31 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                 {booking.participants || 0}
                               </span>
                             </div>
-                         
-                    
+
                             <div className="bg-purple-50 rounded-lg p-3 mt-3">
                               <div className="flex justify-between items-center">
                                 <span className="text-gray-900 font-bold font-instrument">
                                   Total Amount:
                                 </span>
                                 <span className="text-lg gap-1 flex font-bold text-purple-600 font-instrument">
-                                  <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(paymentBreakdown.total)}</div>
+                                  <div className="flex items-center">
+                                    <IndianRupee className="w-4 h-4" />
+                                    {formatCurrency(paymentBreakdown.total)}
+                                  </div>
                                 </span>
                               </div>
                             </div>
                           </div>
                         </div>
-                        {booking.paymentStatus !== "FULLY_PAID" &&
-                          booking.paymentStatus !== "REFUNDED" && (
+                        {booking.paymentStatus !== 'FULLY_PAID' &&
+                          booking.paymentStatus !== 'REFUNDED' && (
                             <>
-                              {(booking.paymentStatus === "PENDING" ||
-                                booking.paymentStatus === "OVERDUE") && (
+                              {(booking.paymentStatus === 'PENDING' ||
+                                booking.paymentStatus === 'OVERDUE') && (
                                 <>
                                   {/* Pay Partial Button */}
                                   <button
-                                    onClick={() =>
-                                      handleContinueToPayment(true)
-                                    }
+                                    onClick={() => handleContinueToPayment(true)}
                                     className="cursor-pointer w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
@@ -575,14 +551,16 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                  px-3 py-1 rounded-full border border-white/30
                  shadow-sm"
                                     >
-                                      Pay Partial <div className="flex items-center"><IndianRupee className="w-4 h-4"/> {booking.minPaymentAmount}</div>
+                                      Pay Partial{' '}
+                                      <div className="flex items-center">
+                                        <IndianRupee className="w-4 h-4" />{' '}
+                                        {booking.minPaymentAmount}
+                                      </div>
                                     </span>
                                   </button>
 
                                   <button
-                                    onClick={() =>
-                                      handleContinueToPayment(false)
-                                    }
+                                    onClick={() => handleContinueToPayment(false)}
                                     className="cursor-pointer w-full bg-gradient-to-r from-green-100 to-green-200 text-black/80 font-semibold
                border border-gray-200 rounded-xl py-4 px-6
                active:scale-[0.98]
@@ -602,13 +580,17 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                  px-3 py-1 rounded-full border flex gap-1 border-white/30
                  shadow-sm"
                                     >
-                                      Pay Full <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{formatCurrency(paymentBreakdown.total)}</div>
+                                      Pay Full{' '}
+                                      <div className="flex items-center">
+                                        <IndianRupee className="w-4 h-4" />
+                                        {formatCurrency(paymentBreakdown.total)}
+                                      </div>
                                     </span>
                                   </button>
                                 </>
                               )}
 
-                              {booking.paymentStatus === "PARTIALLY_PAID" && (
+                              {booking.paymentStatus === 'PARTIALLY_PAID' && (
                                 <button
                                   onClick={() => handleContinueToPayment(false)}
                                   className="w-full bg-gradient-to-r from-purple-100 to-purple-200 text-black/80 font-semibold
@@ -630,7 +612,11 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                px-3 py-1 rounded-full border border-white/30
                shadow-sm"
                                   >
-                                    Pay Remaining <div className="flex items-center"><IndianRupee className="w-4 h-4"/>{booking.remainingAmount}</div>
+                                    Pay Remaining{' '}
+                                    <div className="flex items-center">
+                                      <IndianRupee className="w-4 h-4" />
+                                      {booking.remainingAmount}
+                                    </div>
                                   </span>
                                 </button>
                               )}
@@ -667,6 +653,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
   }
 );
 
-BookingSummary.displayName = "BookingSummary";
+BookingSummary.displayName = 'BookingSummary';
 
 export default BookingSummary;

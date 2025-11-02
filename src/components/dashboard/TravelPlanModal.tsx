@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   X,
   MapPin,
@@ -14,11 +14,11 @@ import {
   Clock,
   Filter,
   Languages,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { getTravelPlanDetails } from "@/actions/admin/action";
-import Image from "next/image";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { getTravelPlanDetails } from '@/actions/admin/action';
+import Image from 'next/image';
 
 interface TravelPlanModalProps {
   travelPlanId: string;
@@ -61,7 +61,7 @@ interface TravelPlanDetails {
   restrictions: string[];
   special: string[];
   notIncludedActivities: string[];
-  genderPreference: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
+  genderPreference: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
   noOfDays: number;
   hostId: string;
   price: number;
@@ -84,11 +84,7 @@ interface TravelPlanDetails {
   dayWiseItinerary: DayWiseItinerary[];
 }
 
-export default function TravelPlanModal({
-  travelPlanId,
-  isOpen,
-  onClose,
-}: TravelPlanModalProps) {
+export default function TravelPlanModal({ travelPlanId, isOpen, onClose }: TravelPlanModalProps) {
   const [travelPlan, setTravelPlan] = useState<TravelPlanDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +100,7 @@ export default function TravelPlanModal({
       }
       setTravelPlan(response.travelPlan as TravelPlanDetails);
     } catch (err) {
-      setError("Failed to fetch travel plan details");
+      setError('Failed to fetch travel plan details');
       console.error(err);
     } finally {
       setLoading(false);
@@ -122,9 +118,9 @@ export default function TravelPlanModal({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -178,12 +174,8 @@ export default function TravelPlanModal({
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200/50">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      {travelPlan.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {travelPlan.description}
-                    </p>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{travelPlan.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{travelPlan.description}</p>
                   </div>
                   <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                     {travelPlan.status}
@@ -197,35 +189,27 @@ export default function TravelPlanModal({
                       <p className="font-medium text-gray-900">
                         {travelPlan.city}, {travelPlan.state}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        {travelPlan.country}
-                      </p>
+                      <p className="text-sm text-gray-600">{travelPlan.country}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="w-5 h-5 text-blue-600" />
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {travelPlan.noOfDays} days
-                      </p>
+                      <p className="font-medium text-gray-900">{travelPlan.noOfDays} days</p>
                       <p className="text-sm text-gray-600">Duration</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <DollarSign className="w-5 h-5 text-green-600" />
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {formatPrice(travelPlan.price)}
-                      </p>
+                      <p className="font-medium text-gray-900">{formatPrice(travelPlan.price)}</p>
                       <p className="text-sm text-gray-600">Total price</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-emerald-600" />
                     <div>
-                      <p className="font-medium text-gray-900">
-                        Max {travelPlan.maxParticipants}
-                      </p>
+                      <p className="font-medium text-gray-900">Max {travelPlan.maxParticipants}</p>
                       <p className="text-sm text-gray-600">Participants</p>
                     </div>
                   </div>
@@ -280,9 +264,7 @@ export default function TravelPlanModal({
                           }
                         ).languages!.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-xs text-gray-600 mr-2">
-                              Languages:
-                            </span>
+                            <span className="text-xs text-gray-600 mr-2">Languages:</span>
                             <div className="flex flex-wrap gap-1">
                               {(
                                 travelPlan.host as typeof travelPlan.host & {
@@ -301,9 +283,7 @@ export default function TravelPlanModal({
                         )}
                     </div>
                     {travelPlan.host.description && (
-                      <p className="text-gray-600">
-                        {travelPlan.host.description}
-                      </p>
+                      <p className="text-gray-600">{travelPlan.host.description}</p>
                     )}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
@@ -332,8 +312,7 @@ export default function TravelPlanModal({
                     What&apos;s Included
                   </h4>
                   <div className="space-y-2">
-                    {travelPlan.includedActivities &&
-                    travelPlan.includedActivities.length > 0 ? (
+                    {travelPlan.includedActivities && travelPlan.includedActivities.length > 0 ? (
                       travelPlan.includedActivities.map((activity, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -355,8 +334,7 @@ export default function TravelPlanModal({
                     Not Included
                   </h4>
                   <div className="space-y-2">
-                    {travelPlan.restrictions &&
-                    travelPlan.restrictions.length > 0 ? (
+                    {travelPlan.restrictions && travelPlan.restrictions.length > 0 ? (
                       travelPlan.restrictions.map((item, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -364,9 +342,7 @@ export default function TravelPlanModal({
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 italic">
-                        No exclusions specified for this trip
-                      </p>
+                      <p className="text-gray-500 italic">No exclusions specified for this trip</p>
                     )}
                   </div>
                 </div>
@@ -402,19 +378,16 @@ export default function TravelPlanModal({
                   <div className="flex items-center gap-2">
                     <Badge
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        travelPlan.genderPreference === "MALE_ONLY"
-                          ? "bg-blue-100 text-blue-800"
-                          : travelPlan.genderPreference === "FEMALE_ONLY"
-                          ? "bg-pink-100 text-pink-800"
-                          : "bg-purple-100 text-purple-800"
+                        travelPlan.genderPreference === 'MALE_ONLY'
+                          ? 'bg-blue-100 text-blue-800'
+                          : travelPlan.genderPreference === 'FEMALE_ONLY'
+                            ? 'bg-pink-100 text-pink-800'
+                            : 'bg-purple-100 text-purple-800'
                       }`}
                     >
-                      {travelPlan.genderPreference === "MALE_ONLY" &&
-                        "👨 Male Only"}
-                      {travelPlan.genderPreference === "FEMALE_ONLY" &&
-                        "👩 Female Only"}
-                      {travelPlan.genderPreference === "MIX" &&
-                        "👥 Mixed Group"}
+                      {travelPlan.genderPreference === 'MALE_ONLY' && '👨 Male Only'}
+                      {travelPlan.genderPreference === 'FEMALE_ONLY' && '👩 Female Only'}
+                      {travelPlan.genderPreference === 'MIX' && '👥 Mixed Group'}
                     </Badge>
                   </div>
                 </div>
@@ -436,9 +409,7 @@ export default function TravelPlanModal({
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-gray-500 italic">
-                        No languages specified
-                      </p>
+                      <p className="text-gray-500 italic">No languages specified</p>
                     )}
                   </div>
                 </div>
@@ -460,9 +431,7 @@ export default function TravelPlanModal({
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-gray-500 italic">
-                        No trip vibes specified
-                      </p>
+                      <p className="text-gray-500 italic">No trip vibes specified</p>
                     )}
                   </div>
                 </div>
@@ -476,26 +445,19 @@ export default function TravelPlanModal({
                     Day-wise Itinerary
                   </h4>
                   <div className="space-y-4">
-                    {travelPlan.dayWiseItinerary.map((day) => (
-                      <div
-                        key={day.id}
-                        className="bg-white rounded-xl p-4 border border-slate-200"
-                      >
+                    {travelPlan.dayWiseItinerary.map(day => (
+                      <div key={day.id} className="bg-white rounded-xl p-4 border border-slate-200">
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                             {day.dayNumber}
                           </div>
-                          <h5 className="font-bold text-gray-900">
-                            {day.title}
-                          </h5>
+                          <h5 className="font-bold text-gray-900">{day.title}</h5>
                         </div>
                         <p className="text-gray-600 mb-3">{day.description}</p>
 
                         {day.activities.length > 0 && (
                           <div className="mb-3">
-                            <h6 className="font-semibold text-gray-800 mb-2">
-                              Activities:
-                            </h6>
+                            <h6 className="font-semibold text-gray-800 mb-2">Activities:</h6>
                             <div className="space-y-1">
                               {day.activities.map((activity, index) => (
                                 <div
@@ -513,20 +475,14 @@ export default function TravelPlanModal({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                           {day.meals && (
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-800">
-                                Meals:
-                              </span>
+                              <span className="font-medium text-gray-800">Meals:</span>
                               <span className="text-gray-600">{day.meals}</span>
                             </div>
                           )}
                           {day.accommodation && (
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-800">
-                                Accommodation:
-                              </span>
-                              <span className="text-gray-600">
-                                {day.accommodation}
-                              </span>
+                              <span className="font-medium text-gray-800">Accommodation:</span>
+                              <span className="text-gray-600">{day.accommodation}</span>
                             </div>
                           )}
                         </div>
@@ -538,58 +494,36 @@ export default function TravelPlanModal({
 
               {/* Additional Information */}
               <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-200/50">
-                <h4 className="text-lg font-bold text-gray-900 mb-4">
-                  Additional Information
-                </h4>
+                <h4 className="text-lg font-bold text-gray-900 mb-4">Additional Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-800">Created:</span>
-                    <span className="text-gray-600">
-                      {formatDate(travelPlan.createdAt)}
-                    </span>
+                    <span className="text-gray-600">{formatDate(travelPlan.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">
-                      Last Updated:
-                    </span>
-                    <span className="text-gray-600">
-                      {formatDate(travelPlan.updatedAt)}
-                    </span>
+                    <span className="font-medium text-gray-800">Last Updated:</span>
+                    <span className="text-gray-600">{formatDate(travelPlan.updatedAt)}</span>
                   </div>
                   {travelPlan.startDate && (
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-800">
-                        Start Date:
-                      </span>
-                      <span className="text-gray-600">
-                        {formatDate(travelPlan.startDate)}
-                      </span>
+                      <span className="font-medium text-gray-800">Start Date:</span>
+                      <span className="text-gray-600">{formatDate(travelPlan.startDate)}</span>
                     </div>
                   )}
                   {travelPlan.endDate && (
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-800">
-                        End Date:
-                      </span>
-                      <span className="text-gray-600">
-                        {formatDate(travelPlan.endDate)}
-                      </span>
+                      <span className="font-medium text-gray-800">End Date:</span>
+                      <span className="text-gray-600">{formatDate(travelPlan.endDate)}</span>
                     </div>
                   )}
                   {travelPlan.destination && (
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-800">
-                        Destination:
-                      </span>
-                      <span className="text-gray-600">
-                        {travelPlan.destination}
-                      </span>
+                      <span className="font-medium text-gray-800">Destination:</span>
+                      <span className="text-gray-600">{travelPlan.destination}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">
-                      Travel Plan ID:
-                    </span>
+                    <span className="font-medium text-gray-800">Travel Plan ID:</span>
                     <span className="text-gray-600 font-mono text-xs">
                       {travelPlan.travelPlanId}
                     </span>
@@ -603,11 +537,7 @@ export default function TravelPlanModal({
         {/* Footer */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
           <div className="flex justify-end gap-3">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="px-6 py-2 rounded-xl"
-            >
+            <Button onClick={onClose} variant="outline" className="px-6 py-2 rounded-xl">
               Close
             </Button>
           </div>

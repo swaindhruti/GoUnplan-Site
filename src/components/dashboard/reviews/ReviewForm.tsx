@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Star, ThumbsUp, AlertCircle } from "lucide-react";
-import { ReviewFormState } from "@/types/dashboard";
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Star, ThumbsUp, AlertCircle } from 'lucide-react';
+import { ReviewFormState } from '@/types/dashboard';
 
 interface ReviewFormProps {
   reviewForm: ReviewFormState;
@@ -9,11 +9,7 @@ interface ReviewFormProps {
   handleSubmitReview: (e: React.FormEvent) => void;
 }
 
-export function ReviewForm({
-  reviewForm,
-  setReviewForm,
-  handleSubmitReview,
-}: ReviewFormProps) {
+export function ReviewForm({ reviewForm, setReviewForm, handleSubmitReview }: ReviewFormProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
       <div className="flex justify-between items-center mb-6">
@@ -22,7 +18,7 @@ export function ReviewForm({
           variant="outline"
           size="sm"
           className="font-instrument font-semibold border-gray-300 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-full"
-          onClick={() => setReviewForm((prev) => ({ ...prev, bookingId: "" }))}
+          onClick={() => setReviewForm(prev => ({ ...prev, bookingId: '' }))}
         >
           Cancel
         </Button>
@@ -48,12 +44,12 @@ export function ReviewForm({
             Rating
           </label>
           <div className="flex space-x-1">
-            {[1, 2, 3, 4, 5].map((star) => (
+            {[1, 2, 3, 4, 5].map(star => (
               <button
                 key={star}
                 type="button"
                 onClick={() =>
-                  setReviewForm((prev) => ({
+                  setReviewForm(prev => ({
                     ...prev,
                     rating: star,
                   }))
@@ -63,8 +59,8 @@ export function ReviewForm({
                 <Star
                   className={`h-8 w-8 ${
                     star <= reviewForm.rating
-                      ? "text-yellow-500 fill-yellow-500"
-                      : "text-gray-300 hover:text-yellow-400"
+                      ? 'text-yellow-500 fill-yellow-500'
+                      : 'text-gray-300 hover:text-yellow-400'
                   }`}
                 />
               </button>
@@ -84,8 +80,8 @@ export function ReviewForm({
             placeholder="Share your experience with this trip..."
             rows={4}
             value={reviewForm.comment}
-            onChange={(e) =>
-              setReviewForm((prev) => ({
+            onChange={e =>
+              setReviewForm(prev => ({
                 ...prev,
                 comment: e.target.value,
               }))
@@ -100,7 +96,7 @@ export function ReviewForm({
           className="bg-purple-600 hover:bg-purple-700 text-white w-full font-instrument font-semibold py-3 rounded-full transition-colors duration-200"
           disabled={reviewForm.isSubmitting}
         >
-          {reviewForm.isSubmitting ? "Submitting..." : "Submit Review"}
+          {reviewForm.isSubmitting ? 'Submitting...' : 'Submit Review'}
         </Button>
       </form>
     </div>

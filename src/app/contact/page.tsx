@@ -1,35 +1,22 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  MessageCircle,
-  Phone,
-  Mail,
-  Clock,
-  MapPin,
-  Send,
-  CheckCircle,
-} from "lucide-react";
-import {
-  submitContactForm,
-  type ContactFormData,
-} from "@/actions/common/contact";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { MessageCircle, Phone, Mail, Clock, MapPin, Send, CheckCircle } from 'lucide-react';
+import { submitContactForm, type ContactFormData } from '@/actions/common/contact';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({
       ...formData,
@@ -47,7 +34,7 @@ export default function ContactPage() {
       if (result.success) {
         setIsSubmitted(true);
         // Reset form
-        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFormData({ name: '', email: '', subject: '', message: '' });
 
         // Reset success message after 5 seconds
         setTimeout(() => {
@@ -55,12 +42,12 @@ export default function ContactPage() {
         }, 5000);
       } else {
         // Handle validation errors
-        console.error("Form submission failed:", result.message);
-        alert(result.message || "Something went wrong. Please try again.");
+        console.error('Form submission failed:', result.message);
+        alert(result.message || 'Something went wrong. Please try again.');
       }
     } catch (error) {
-      console.error("Form submission error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error('Form submission error:', error);
+      alert('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -82,8 +69,8 @@ export default function ContactPage() {
                 Get in <span className="text-purple-600">Touch</span>
               </h1>
               <p className="text-lg text-gray-600 font-instrument mt-2">
-                Ready to start your next adventure? Our travel experts are here
-                to help you plan the perfect trip.
+                Ready to start your next adventure? Our travel experts are here to help you plan the
+                perfect trip.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -117,9 +104,7 @@ export default function ContactPage() {
                     <h3 className="font-bricolage font-semibold text-gray-900 text-base mb-1">
                       Call Us
                     </h3>
-                    <p className="text-gray-600 text-sm mb-2 font-instrument">
-                      24/7 Support
-                    </p>
+                    <p className="text-gray-600 text-sm mb-2 font-instrument">24/7 Support</p>
                     <p className="text-purple-600 font-semibold text-base font-instrument">
                       +1 (555) 123-4567
                     </p>
@@ -136,9 +121,7 @@ export default function ContactPage() {
                     <h3 className="font-bricolage font-semibold text-gray-900 text-base mb-1">
                       Email Us
                     </h3>
-                    <p className="text-gray-600 text-sm mb-2 font-instrument">
-                      Quick Response
-                    </p>
+                    <p className="text-gray-600 text-sm mb-2 font-instrument">Quick Response</p>
                     <p className="text-green-600 font-semibold text-base font-instrument">
                       support@unplan.com
                     </p>
@@ -155,9 +138,7 @@ export default function ContactPage() {
                     <h3 className="font-bricolage font-semibold text-gray-900 text-base mb-1">
                       Live Chat
                     </h3>
-                    <p className="text-gray-600 text-sm mb-2 font-instrument">
-                      Instant Help
-                    </p>
+                    <p className="text-gray-600 text-sm mb-2 font-instrument">Instant Help</p>
                     <p className="text-emerald-600 font-semibold text-base font-instrument">
                       Online Now
                     </p>
@@ -174,9 +155,7 @@ export default function ContactPage() {
                     <h3 className="font-bricolage font-semibold text-gray-900 text-base mb-1">
                       Visit Us
                     </h3>
-                    <p className="text-gray-600 text-sm mb-2 font-instrument">
-                      Main Office
-                    </p>
+                    <p className="text-gray-600 text-sm mb-2 font-instrument">Main Office</p>
                     <p className="text-amber-600 font-semibold text-base font-instrument">
                       123 Travel Street, Adventure City
                     </p>
@@ -210,17 +189,13 @@ export default function ContactPage() {
                   className="text-center py-12"
                 >
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle
-                      className="w-8 h-8 text-green-600"
-                      strokeWidth={2}
-                    />
+                    <CheckCircle className="w-8 h-8 text-green-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bricolage font-bold text-gray-900 mb-2">
                     Message Sent!
                   </h3>
                   <p className="text-gray-600 font-instrument">
-                    Thank you for reaching out. We&apos;ll get back to you
-                    within 24 hours.
+                    Thank you for reaching out. We&apos;ll get back to you within 24 hours.
                   </p>
                 </motion.div>
               ) : (

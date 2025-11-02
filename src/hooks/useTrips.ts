@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { getAllActiveTrips } from "@/actions/user/action";
-import { Trip, RawTrip, FilterState, INITIAL_FILTERS } from "@/types/trips";
-import { parseTrips } from "@/utils/tripUtils";
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { getAllActiveTrips } from '@/actions/user/action';
+import { Trip, RawTrip, FilterState, INITIAL_FILTERS } from '@/types/trips';
+import { parseTrips } from '@/utils/tripUtils';
 
 export const useTripsData = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -25,7 +25,7 @@ export const useTripsData = () => {
         }
       } catch (err) {
         if (!isMounted) return;
-        setError("Failed to load travel plans");
+        setError('Failed to load travel plans');
         console.error(err);
       } finally {
         if (isMounted) {
@@ -47,12 +47,9 @@ export const useTripsData = () => {
 export const useFilters = (trips: Trip[]) => {
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
 
-  const updateFilter = useCallback(
-    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
+  const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  }, []);
 
   const clearAllFilters = useCallback(() => {
     setFilters(INITIAL_FILTERS);
@@ -60,20 +57,20 @@ export const useFilters = (trips: Trip[]) => {
 
   const filterOptions = useMemo(
     () => ({
-      countries: Array.from(new Set(trips.map((t) => t.country))).sort(),
-      languages: Array.from(new Set(trips.flatMap((t) => t.languages))).sort(),
-      vibes: Array.from(new Set(trips.flatMap((t) => t.vibes))).sort(),
+      countries: Array.from(new Set(trips.map(t => t.country))).sort(),
+      languages: Array.from(new Set(trips.flatMap(t => t.languages))).sort(),
+      vibes: Array.from(new Set(trips.flatMap(t => t.vibes))).sort(),
       travellers: [
-        "Solo",
-        "Couple",
-        "With Baby",
-        "Friends",
-        "Family",
-        "Group",
-        "Pet Friendly",
-        "Senior",
-        "Business",
-        "Backpackers",
+        'Solo',
+        'Couple',
+        'With Baby',
+        'Friends',
+        'Family',
+        'Group',
+        'Pet Friendly',
+        'Senior',
+        'Business',
+        'Backpackers',
       ],
     }),
     [trips]
@@ -82,49 +79,40 @@ export const useFilters = (trips: Trip[]) => {
   const filteredTrips = useMemo(() => {
     if (trips.length === 0) return [];
 
-    return trips.filter((trip) => {
+    return trips.filter(trip => {
       if (filters.searchTerm.trim()) {
         const searchLower = filters.searchTerm.toLowerCase();
-        const searchableText = [
-          trip.title,
-          trip.description,
-          trip.city,
-          trip.state,
-          trip.country,
-        ]
-          .join(" ")
+        const searchableText = [trip.title, trip.description, trip.city, trip.state, trip.country]
+          .join(' ')
           .toLowerCase();
 
         if (!searchableText.includes(searchLower)) return false;
       }
 
-      if (
-        trip.price < filters.priceRange[0] ||
-        trip.price > filters.priceRange[1]
-      ) {
+      if (trip.price < filters.priceRange[0] || trip.price > filters.priceRange[1]) {
         return false;
       }
-      if (filters.daysFilter !== "all") {
-        const [min, max] = filters.daysFilter.split("-").map(Number);
+      if (filters.daysFilter !== 'all') {
+        const [min, max] = filters.daysFilter.split('-').map(Number);
         if (trip.noOfDays < min || (max && trip.noOfDays > max)) {
           return false;
         }
       }
       if (
-        filters.countryFilter !== "all" &&
+        filters.countryFilter !== 'all' &&
         trip.country.toLowerCase() !== filters.countryFilter.toLowerCase()
       ) {
         return false;
       }
       if (
         filters.languageFilter.length > 0 &&
-        !filters.languageFilter.some((lang) => trip.languages.includes(lang))
+        !filters.languageFilter.some(lang => trip.languages.includes(lang))
       ) {
         return false;
       }
       if (
         filters.vibeFilter.length > 0 &&
-        !filters.vibeFilter.some((vibe) => trip.vibes.includes(vibe))
+        !filters.vibeFilter.some(vibe => trip.vibes.includes(vibe))
       ) {
         return false;
       }
@@ -137,8 +125,8 @@ export const useFilters = (trips: Trip[]) => {
     let count = 0;
     if (filters.searchTerm.trim()) count++;
     if (filters.priceRange[0] > 0 || filters.priceRange[1] < Infinity) count++;
-    if (filters.daysFilter !== "all") count++;
-    if (filters.countryFilter !== "all") count++;
+    if (filters.daysFilter !== 'all') count++;
+    if (filters.countryFilter !== 'all') count++;
     if (filters.languageFilter.length > 0) count++;
     if (filters.vibeFilter.length > 0) count++;
     return count;

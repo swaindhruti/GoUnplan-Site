@@ -1,84 +1,76 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Trash2,
-  Plus,
-  User,
-  Users,
-  FileText,
-  BriefcaseMedical,
-  ArrowRight
-} from "lucide-react";
-import { z, ZodError } from "zod";
-import { BookingFormData } from "@/types/booking";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Trash2, Plus, User, Users, FileText, BriefcaseMedical, ArrowRight } from 'lucide-react';
+import { z, ZodError } from 'zod';
+import { BookingFormData } from '@/types/booking';
 
 const baseGuestInfoSchema = z.object({
   firstName: z
     .string()
-    .min(1, "First name is required")
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must be less than 50 characters")
+    .min(1, 'First name is required')
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must be less than 50 characters')
     .regex(
       /^[a-zA-Z\s'-]+$/,
-      "First name can only contain letters, spaces, hyphens, and apostrophes"
+      'First name can only contain letters, spaces, hyphens, and apostrophes'
     ),
   lastName: z
     .string()
-    .min(1, "Last name is required")
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must be less than 50 characters")
+    .min(1, 'Last name is required')
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name must be less than 50 characters')
     .regex(
       /^[a-zA-Z\s'-]+$/,
-      "Last name can only contain letters, spaces, hyphens, and apostrophes"
+      'Last name can only contain letters, spaces, hyphens, and apostrophes'
     ),
   memberEmail: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .max(100, "Email must be less than 100 characters"),
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address')
+    .max(100, 'Email must be less than 100 characters'),
   phone: z
     .string()
-    .min(1, "Phone number is required")
-    .regex(/^[+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
-    .min(10, "Phone number must be at least 10 digits")
-    .max(20, "Phone number must be less than 20 characters"),
-  isteamLead: z.boolean().default(false)
+    .min(1, 'Phone number is required')
+    .regex(/^[+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number')
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(20, 'Phone number must be less than 20 characters'),
+  isteamLead: z.boolean().default(false),
 });
 
 const baseGuestInformationFormSchema = z.object({
   participants: z
     .number()
-    .min(1, "At least 1 guest is required")
-    .max(8, "Maximum 8 guests allowed"),
+    .min(1, 'At least 1 guest is required')
+    .max(8, 'Maximum 8 guests allowed'),
   guests: z
     .array(baseGuestInfoSchema)
-    .min(1, "At least one guest is required")
-    .max(8, "Maximum 8 guests allowed"),
+    .min(1, 'At least one guest is required')
+    .max(8, 'Maximum 8 guests allowed'),
   specialRequirements: z
     .string()
-    .max(500, "Special requirements must be less than 500 characters")
-    .optional()
+    .max(500, 'Special requirements must be less than 500 characters')
+    .optional(),
 });
 
 const guestInformationFormSchema = baseGuestInformationFormSchema
-  .refine((data) => data.guests.length === data.participants, {
-    message: "Number of guest forms must match selected number of guests",
-    path: ["guests"]
+  .refine(data => data.guests.length === data.participants, {
+    message: 'Number of guest forms must match selected number of guests',
+    path: ['guests'],
   })
   .refine(
-    (data) => {
+    data => {
       // Ensure exactly one team lead
-      const teamLeads = data.guests.filter((guest) => guest.isteamLead);
+      const teamLeads = data.guests.filter(guest => guest.isteamLead);
       return teamLeads.length === 1;
     },
     {
-      message: "Exactly one guest must be designated as the team lead",
-      path: ["guests"]
+      message: 'Exactly one guest must be designated as the team lead',
+      path: ['guests'],
     }
   );
 
@@ -90,24 +82,19 @@ interface GuestInformationFormProps {
   maxGuests?: number;
 }
 
-export function GuestInformationForm({
-  onContinue,
-  maxGuests = 8
-}: GuestInformationFormProps) {
+export function GuestInformationForm({ onContinue, maxGuests = 8 }: GuestInformationFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
     {
-      firstName: "",
-      lastName: "",
-      memberEmail: "",
-      phone: "",
-      isteamLead: true
-    }
+      firstName: '',
+      lastName: '',
+      memberEmail: '',
+      phone: '',
+      isteamLead: true,
+    },
   ]);
-  const [specialRequirements, setSpecialRequirements] = useState<string>("");
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
-    {}
-  );
+  const [specialRequirements, setSpecialRequirements] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const validateField = (
@@ -126,9 +113,9 @@ export function GuestInformationForm({
           delete newErrors[errorKey];
         }
       } else {
-        if (field === "participants") {
+        if (field === 'participants') {
           baseGuestInformationFormSchema.shape.participants.parse(value);
-        } else if (field === "specialRequirements") {
+        } else if (field === 'specialRequirements') {
           baseGuestInformationFormSchema.shape.specialRequirements.parse(value);
         }
         if (newErrors[field]) {
@@ -137,12 +124,10 @@ export function GuestInformationForm({
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorKey =
-          guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
-        newErrors[errorKey] = error.errors.map((e) => e.message);
+        const errorKey = guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
+        newErrors[errorKey] = error.errors.map(e => e.message);
       } else if (error instanceof Error) {
-        const errorKey =
-          guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
+        const errorKey = guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
         newErrors[errorKey] = [error.message];
       }
     }
@@ -153,17 +138,17 @@ export function GuestInformationForm({
   const handleNumberOfGuestsChange = (value: string): void => {
     const num = Number.parseInt(value, 10);
     setNumberOfGuests(num);
-    validateField("participants", num);
+    validateField('participants', num);
 
     const currentForms = [...guestForms];
     if (num > currentForms.length) {
       for (let i = currentForms.length; i < num; i++) {
         currentForms.push({
-          firstName: "",
-          lastName: "",
-          memberEmail: "",
-          phone: "",
-          isteamLead: false
+          firstName: '',
+          lastName: '',
+          memberEmail: '',
+          phone: '',
+          isteamLead: false,
         });
       }
     } else if (num < currentForms.length) {
@@ -180,12 +165,12 @@ export function GuestInformationForm({
       setGuestForms([
         ...guestForms,
         {
-          firstName: "",
-          lastName: "",
-          memberEmail: "",
-          phone: "",
-          isteamLead: false
-        }
+          firstName: '',
+          lastName: '',
+          memberEmail: '',
+          phone: '',
+          isteamLead: false,
+        },
       ]);
     }
   };
@@ -202,10 +187,10 @@ export function GuestInformationForm({
       setGuestForms(newForms);
       const newCount = newForms.length;
       setNumberOfGuests(newCount);
-      validateField("participants", newCount);
+      validateField('participants', newCount);
 
       const newErrors: ValidationErrors = { ...validationErrors };
-      Object.keys(newErrors).forEach((key) => {
+      Object.keys(newErrors).forEach(key => {
         if (key.startsWith(`guests.${index}.`)) {
           delete newErrors[key];
         }
@@ -222,7 +207,7 @@ export function GuestInformationForm({
     const newForms = [...guestForms];
 
     // Handle team lead selection
-    if (field === "isteamLead" && value === true) {
+    if (field === 'isteamLead' && value === true) {
       // Set all other guests to not be team lead
       newForms.forEach((guest, i) => {
         if (i !== index) {
@@ -238,7 +223,7 @@ export function GuestInformationForm({
 
   const handleSpecialRequirementsChange = (value: string): void => {
     setSpecialRequirements(value);
-    validateField("specialRequirements", value);
+    validateField('specialRequirements', value);
   };
 
   const canAddMoreForms: boolean =
@@ -250,7 +235,7 @@ export function GuestInformationForm({
     const formData: BookingFormData = {
       guests: guestForms,
       specialRequirements: specialRequirements || undefined,
-      participants: numberOfGuests
+      participants: numberOfGuests,
     };
 
     const validation = guestInformationFormSchema.safeParse(formData);
@@ -260,8 +245,8 @@ export function GuestInformationForm({
       onContinue(numberOfGuests, formData);
     } else {
       const errors: ValidationErrors = {};
-      validation.error.errors.forEach((error) => {
-        const path = error.path.join(".");
+      validation.error.errors.forEach(error => {
+        const path = error.path.join('.');
         if (!errors[path]) {
           errors[path] = [];
         }
@@ -273,24 +258,16 @@ export function GuestInformationForm({
     setIsSubmitting(false);
   };
 
-  const getFieldError = (
-    field: string,
-    guestIndex?: number
-  ): string | undefined => {
-    const errorKey =
-      guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
+  const getFieldError = (field: string, guestIndex?: number): string | undefined => {
+    const errorKey = guestIndex !== undefined ? `guests.${guestIndex}.${field}` : field;
     return validationErrors[errorKey]?.[0];
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-2">
-          Guest Information
-        </h2>
-        <p className="text-gray-600 font-instrument">
-          Please provide details for all travelers
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-2">Guest Information</h2>
+        <p className="text-gray-600 font-instrument">Please provide details for all travelers</p>
       </div>
 
       {/* Number of Guests */}
@@ -299,9 +276,7 @@ export function GuestInformationForm({
           <div className="bg-purple-100 p-2 rounded-lg">
             <Users className="w-5 h-5 text-purple-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-            Number of Travelers
-          </h3>
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">Number of Travelers</h3>
         </div>
 
         <div className="space-y-4">
@@ -309,14 +284,14 @@ export function GuestInformationForm({
             Select how many people will be joining this trip
           </Label>
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-            {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+            {Array.from({ length: maxGuests }, (_, i) => i + 1).map(num => (
               <Button
                 key={num}
                 onClick={() => handleNumberOfGuestsChange(num.toString())}
                 className={`h-12 w-12 rounded-lg font-semibold transition-all duration-200 font-instrument ${
                   numberOfGuests === num
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
                 {num}
@@ -326,9 +301,9 @@ export function GuestInformationForm({
           <p className="text-sm text-gray-600 font-instrument">
             Maximum {maxGuests} travelers per booking
           </p>
-          {getFieldError("participants") && (
+          {getFieldError('participants') && (
             <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg font-instrument">
-              {getFieldError("participants")}
+              {getFieldError('participants')}
             </p>
           )}
         </div>
@@ -336,19 +311,14 @@ export function GuestInformationForm({
 
       <div className="space-y-4">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-            Traveler Details
-          </h3>
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">Traveler Details</h3>
           <div className="bg-purple-50 text-purple-700 rounded-lg px-4 py-2 text-sm font-semibold font-instrument">
             {guestForms.length} of {numberOfGuests} completed
           </div>
         </div>
 
         {guestForms.map((guest, index) => (
-          <div
-            key={index}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm"
-          >
+          <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm">
             <div className="bg-gray-50 border-b border-gray-200 flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <div className="bg-purple-100 p-2 rounded-lg">
@@ -386,18 +356,14 @@ export function GuestInformationForm({
                     id={`firstName-${index}`}
                     placeholder="John"
                     value={guest.firstName}
-                    onChange={(e) =>
-                      updateGuestForm(index, "firstName", e.target.value)
-                    }
+                    onChange={e => updateGuestForm(index, 'firstName', e.target.value)}
                     className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
-                      getFieldError("firstName", index)
-                        ? "border-red-400"
-                        : ""
+                      getFieldError('firstName', index) ? 'border-red-400' : ''
                     }`}
                   />
-                  {getFieldError("firstName", index) && (
+                  {getFieldError('firstName', index) && (
                     <p className="text-sm text-red-600 font-instrument">
-                      {getFieldError("firstName", index)}
+                      {getFieldError('firstName', index)}
                     </p>
                   )}
                 </div>
@@ -413,18 +379,14 @@ export function GuestInformationForm({
                     id={`lastName-${index}`}
                     placeholder="Doe"
                     value={guest.lastName}
-                    onChange={(e) =>
-                      updateGuestForm(index, "lastName", e.target.value)
-                    }
+                    onChange={e => updateGuestForm(index, 'lastName', e.target.value)}
                     className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
-                      getFieldError("lastName", index)
-                        ? "border-red-400"
-                        : ""
+                      getFieldError('lastName', index) ? 'border-red-400' : ''
                     }`}
                   />
-                  {getFieldError("lastName", index) && (
+                  {getFieldError('lastName', index) && (
                     <p className="text-sm text-red-600 font-instrument">
-                      {getFieldError("lastName", index)}
+                      {getFieldError('lastName', index)}
                     </p>
                   )}
                 </div>
@@ -443,18 +405,14 @@ export function GuestInformationForm({
                     type="email"
                     placeholder="john@example.com"
                     value={guest.memberEmail}
-                    onChange={(e) =>
-                      updateGuestForm(index, "memberEmail", e.target.value)
-                    }
+                    onChange={e => updateGuestForm(index, 'memberEmail', e.target.value)}
                     className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
-                      getFieldError("memberEmail", index)
-                        ? "border-red-400"
-                        : ""
+                      getFieldError('memberEmail', index) ? 'border-red-400' : ''
                     }`}
                   />
-                  {getFieldError("memberEmail", index) && (
+                  {getFieldError('memberEmail', index) && (
                     <p className="text-sm text-red-600 font-instrument">
-                      {getFieldError("memberEmail", index)}
+                      {getFieldError('memberEmail', index)}
                     </p>
                   )}
                 </div>
@@ -471,18 +429,14 @@ export function GuestInformationForm({
                     type="tel"
                     placeholder="+1 (555) 123-4567"
                     value={guest.phone}
-                    onChange={(e) =>
-                      updateGuestForm(index, "phone", e.target.value)
-                    }
+                    onChange={e => updateGuestForm(index, 'phone', e.target.value)}
                     className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
-                      getFieldError("phone", index)
-                        ? "border-red-400"
-                        : ""
+                      getFieldError('phone', index) ? 'border-red-400' : ''
                     }`}
                   />
-                  {getFieldError("phone", index) && (
+                  {getFieldError('phone', index) && (
                     <p className="text-sm text-red-600 font-instrument">
-                      {getFieldError("phone", index)}
+                      {getFieldError('phone', index)}
                     </p>
                   )}
                 </div>
@@ -495,9 +449,7 @@ export function GuestInformationForm({
                       type="checkbox"
                       id={`teamLead-${index}`}
                       checked={guest.isteamLead}
-                      onChange={(e) =>
-                        updateGuestForm(index, "isteamLead", e.target.checked)
-                      }
+                      onChange={e => updateGuestForm(index, 'isteamLead', e.target.checked)}
                       className="w-4 h-4 border-2 border-gray-300 rounded accent-purple-600"
                     />
                     <Label
@@ -513,7 +465,8 @@ export function GuestInformationForm({
               {(numberOfGuests === 1 || guest.isteamLead) && (
                 <div className="pt-4 border-t border-gray-200">
                   <p className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm text-blue-800 font-instrument">
-                    <strong>Primary Contact:</strong> This person will receive all booking confirmations and updates.
+                    <strong>Primary Contact:</strong> This person will receive all booking
+                    confirmations and updates.
                   </p>
                 </div>
               )}
@@ -535,7 +488,8 @@ export function GuestInformationForm({
         {guestForms.length === numberOfGuests && numberOfGuests < maxGuests && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800 font-instrument">
-              All traveler forms completed. You can increase the number of travelers above to add more.
+              All traveler forms completed. You can increase the number of travelers above to add
+              more.
             </p>
           </div>
         )}
@@ -547,37 +501,31 @@ export function GuestInformationForm({
           <div className="bg-blue-100 p-2 rounded-lg">
             <BriefcaseMedical className="w-5 h-5 text-blue-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-            Special Requirements
-          </h3>
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">Special Requirements</h3>
           <span className="text-sm text-gray-500 font-instrument">(Optional)</span>
         </div>
 
         <div className="space-y-3">
-          <Label
-            htmlFor="requirements"
-            className="text-gray-700 font-instrument"
-          >
-            Any dietary restrictions, accessibility needs, medical conditions, or other special requests
+          <Label htmlFor="requirements" className="text-gray-700 font-instrument">
+            Any dietary restrictions, accessibility needs, medical conditions, or other special
+            requests
           </Label>
           <Textarea
             id="requirements"
             placeholder="Please describe any special requirements we should know about..."
             value={specialRequirements}
-            onChange={(e) => handleSpecialRequirementsChange(e.target.value)}
+            onChange={e => handleSpecialRequirementsChange(e.target.value)}
             rows={3}
             className={`border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 ${
-              getFieldError("specialRequirements")
-                ? "border-red-400"
-                : ""
+              getFieldError('specialRequirements') ? 'border-red-400' : ''
             }`}
           />
           <p className="text-xs text-gray-500 font-instrument">
             {specialRequirements.length}/500 characters
           </p>
-          {getFieldError("specialRequirements") && (
+          {getFieldError('specialRequirements') && (
             <p className="text-sm text-red-600 font-instrument">
-              {getFieldError("specialRequirements")}
+              {getFieldError('specialRequirements')}
             </p>
           )}
         </div>
@@ -589,43 +537,30 @@ export function GuestInformationForm({
           <div className="bg-green-100 p-2 rounded-lg">
             <FileText className="w-5 h-5 text-green-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 font-bricolage">
-            Summary
-          </h3>
+          <h3 className="text-lg font-bold text-gray-900 font-bricolage">Summary</h3>
         </div>
 
         <div className="space-y-3">
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-700 font-instrument">
-              Number of Travelers:
-            </span>
-            <span className="font-semibold text-gray-900 font-instrument">
-              {numberOfGuests}
-            </span>
+            <span className="text-gray-700 font-instrument">Number of Travelers:</span>
+            <span className="font-semibold text-gray-900 font-instrument">{numberOfGuests}</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-700 font-instrument">
-              Forms Completed:
-            </span>
+            <span className="text-gray-700 font-instrument">Forms Completed:</span>
             <span className="font-semibold text-gray-900 font-instrument">
               {
                 guestForms.filter(
-                  (guest) =>
-                    guest.firstName &&
-                    guest.lastName &&
-                    guest.memberEmail &&
-                    guest.phone
+                  guest => guest.firstName && guest.lastName && guest.memberEmail && guest.phone
                 ).length
-              } of {numberOfGuests}
+              }{' '}
+              of {numberOfGuests}
             </span>
           </div>
           {numberOfGuests > 1 && (
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-700 font-instrument">
-                Primary Contact:
-              </span>
+              <span className="text-gray-700 font-instrument">Primary Contact:</span>
               <span className="font-semibold text-gray-900 font-instrument">
-                {guestForms.find((g) => g.isteamLead)?.firstName || "Not selected"}
+                {guestForms.find(g => g.isteamLead)?.firstName || 'Not selected'}
               </span>
             </div>
           )}
@@ -648,7 +583,7 @@ export function GuestInformationForm({
           disabled={isSubmitting || guestForms.length !== numberOfGuests}
           className="w-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-all duration-200 py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-instrument"
         >
-          {isSubmitting ? "Validating..." : "Continue to Payment"}
+          {isSubmitting ? 'Validating...' : 'Continue to Payment'}
           <ArrowRight className="w-5 h-5" />
         </Button>
       </div>

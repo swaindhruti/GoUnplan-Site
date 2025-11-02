@@ -1,10 +1,5 @@
-"use client";
-import {
-  CldUploadWidget,
-  CloudinaryUploadWidgetResults,
-} from "next-cloudinary";
-
-import { Button } from "@/components/ui/button";
+'use client';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -12,23 +7,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm, useFieldArray } from "react-hook-form";
-import { FormComponentProps } from "@/types/form";
-import {
-  createTravelPlan,
-  searchPlaces,
-  updateTravelPlan,
-} from "@/actions/host/action";
-import { useRouter } from "next/navigation";
-import { MultiValue } from "react-select";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { FormComponentProps } from '@/types/form';
+import { createTravelPlan, searchPlaces, updateTravelPlan } from '@/actions/host/action';
+import { useRouter } from 'next/navigation';
+import { MultiValue } from 'react-select';
 import {
   getValidationSchema,
   CreateDestinationSchema,
-} from "@/config/form/formSchemaData/CreateDestinationSchema";
-import { z } from "zod";
+} from '@/config/form/formSchemaData/CreateDestinationSchema';
+import { z } from 'zod';
 
 // Define the form data type
 type FormDataType = z.infer<typeof CreateDestinationSchema>;
@@ -60,18 +51,18 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
-import Image from "next/image";
-import { useEffect, useState, useRef, useMemo } from "react";
-import dynamic from "next/dynamic";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+} from 'lucide-react';
+import { useImageKitUpload } from '@/hooks/use-image-kit-upload';
+import Image from 'next/image';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 // Dynamically import ReactSelect to prevent hydration issues
-const ReactSelect = dynamic(() => import("react-select"), {
+const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
   loading: () => (
     <div className="h-11 border border-gray-200 rounded animate-pulse bg-gray-50"></div>
@@ -84,7 +75,7 @@ type SelectOption = {
 };
 
 const getSelectOptions = (options?: string[]) => {
-  return options?.map((val) => ({ value: val, label: val })) || [];
+  return options?.map(val => ({ value: val, label: val })) || [];
 };
 
 export const CreateDestinationForm = ({
@@ -93,27 +84,31 @@ export const CreateDestinationForm = ({
   isEditMode = false,
 }: FormComponentProps) => {
   const router = useRouter();
-  const { uploadedFile, UploadButton } = useCloudinaryUpload();
+  const { uploadedFile, UploadButton, resetUpload } = useImageKitUpload();
   const { data: session } = useSession();
 
+  // Create separate upload hooks for each day
+  const [dayWiseUploaders, setDayWiseUploaders] = useState<{
+    [key: number]: ReturnType<typeof useImageKitUpload>;
+  }>({});
+
   const formatDateForFormInput = (date: Date | string | null | undefined) => {
-    if (!date) return "";
+    if (!date) return '';
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
   };
 
   const defaultValues = initialData
     ? {
-        tripName: initialData.title || "",
-        destination: initialData.destination || "",
-        country: initialData.country || "",
+        tripName: initialData.title || '',
+        destination: initialData.destination || '',
+        country: initialData.country || '',
         price: initialData.price || 0,
         maxLimit: initialData.maxParticipants || 0,
         minLimit: initialData.minParticipants || 0,
-        description: initialData.description || "",
+        description: initialData.description || '',
         activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
-
         endDate: formatDateForFormInput(initialData.endDate),
         filters: initialData.filters || [],
         stops: initialData.stops || [],
@@ -121,19 +116,19 @@ export const CreateDestinationForm = ({
         includedActivities: initialData.includedActivities || [],
         restrictions: initialData.restrictions || [],
         special: initialData.special || [],
-        tripImage: initialData.tripImage || "",
+        tripImage: initialData.tripImage || '',
         dayWiseData:
           initialData.dayWiseData?.length > 0
             ? initialData.dayWiseData
             : [
                 {
                   dayNumber: 1,
-                  title: "",
-                  description: "",
+                  title: '',
+                  description: '',
                   activities: [],
-                  meals: "",
-                  accommodation: "",
-                  dayWiseImage: "",
+                  meals: '',
+                  accommodation: '',
+                  dayWiseImage: '',
                 },
               ],
       }
@@ -142,52 +137,52 @@ export const CreateDestinationForm = ({
           (acc, field) => ({
             ...acc,
             [field.id]:
-              field.type === "number"
+              field.type === 'number'
                 ? 0
-                : field.type === "date"
-                ? ""
-                : field.type === "multi-select"
-                ? []
-                : field.type === "select"
-                ? ""
-                : "",
+                : field.type === 'date'
+                  ? ''
+                  : field.type === 'multi-select'
+                    ? []
+                    : field.type === 'select'
+                      ? ''
+                      : '',
           }),
           {}
         ),
         dayWiseData: [
           {
             dayNumber: 1,
-            title: "",
-            description: "",
+            title: '',
+            description: '',
             activities: [],
-            meals: "",
-            accommodation: "",
-            dayWiseImage: "",
+            meals: '',
+            accommodation: '',
+            dayWiseImage: '',
           },
         ],
-        tripImage: "",
+        tripImage: '',
         stops: [],
       };
 
   const form = useForm<FormDataType>({
     resolver: undefined,
     defaultValues,
-    mode: "onChange",
+    mode: 'onChange',
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "dayWiseData",
+    name: 'dayWiseData',
   });
 
-  const watchedNoOfDays = form.watch("noofdays") as number | undefined;
-  const watchedStops = (form.watch("stops") as string[]) || [];
-  const watchedStart = form.watch("startDate") as string | undefined;
-  const watchedPrice = form.watch("price") as number | undefined;
-  const watchedCommission = form.watch("commission") as number | undefined;
+  const watchedNoOfDays = form.watch('noofdays') as number | undefined;
+  const watchedStops = (form.watch('stops') as string[]) || [];
+  const watchedStart = form.watch('startDate') as string | undefined;
+  const watchedPrice = form.watch('price') as number | undefined;
+  const watchedCommission = form.watch('commission') as number | undefined;
 
   // Calculate total price per person with commission
   const totalPricePerPerson = useMemo(() => {
-    if (!watchedPrice || typeof watchedPrice !== "number") return 0;
+    if (!watchedPrice || typeof watchedPrice !== 'number') return 0;
     const commission = watchedCommission || 0;
     return watchedPrice + (watchedPrice * commission) / 100;
   }, [watchedPrice, watchedCommission]);
@@ -206,11 +201,8 @@ export const CreateDestinationForm = ({
       const calculatedEnd = new Date(parsedStart);
       calculatedEnd.setDate(calculatedEnd.getDate() + (days - 1));
       const currentEnd = form.getValues().endDate as string | undefined;
-      if (
-        !currentEnd ||
-        new Date(currentEnd).toISOString() !== calculatedEnd.toISOString()
-      ) {
-        form.setValue("endDate", formatDateForFormInput(calculatedEnd));
+      if (!currentEnd || new Date(currentEnd).toISOString() !== calculatedEnd.toISOString()) {
+        form.setValue('endDate', formatDateForFormInput(calculatedEnd));
       }
     } catch {}
   }, [watchedStart, watchedNoOfDays, form]);
@@ -227,11 +219,11 @@ export const CreateDestinationForm = ({
         append({
           dayNumber: i + 1,
           title: `Day ${i + 1}`,
-          description: "",
+          description: '',
           activities: [],
-          meals: "",
-          accommodation: "",
-          dayWiseImage: "",
+          meals: '',
+          accommodation: '',
+          dayWiseImage: '',
         });
       }
     } else if (currentLen > desired) {
@@ -239,20 +231,14 @@ export const CreateDestinationForm = ({
         remove(i);
       }
     }
-    // Ensure dayNumber fields are in sync by updating the whole array
     try {
       const current = (form.getValues().dayWiseData || []) as DayItem[];
       const updated: DayItem[] = current.map((d: DayItem, idx: number) => ({
         ...(d || {}),
         dayNumber: idx + 1,
       }));
-      form.setValue(
-        "dayWiseData",
-        updated as unknown as FormDataType["dayWiseData"]
-      );
-    } catch {
-      // ignore
-    }
+      form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
+    } catch {}
   }, [watchedNoOfDays, append, remove, fields.length, form]);
 
   const [_, setDayWiseImages] = useState<{ [key: number]: string }>({});
@@ -262,11 +248,11 @@ export const CreateDestinationForm = ({
   const [customActivityInput, setCustomActivityInput] = useState<{
     [key: number]: string;
   }>({});
-  const [customIncludedInput, setCustomIncludedInput] = useState<string>("");
-  const [customExcludedInput, setCustomExcludedInput] = useState<string>("");
-  const [customSpecialInput, setCustomSpecialInput] = useState<string>("");
-  const [customFilterInput, setCustomFilterInput] = useState<string>("");
-  const [customStopsInput, setCustomStopsInput] = useState<string>("");
+  const [customIncludedInput, setCustomIncludedInput] = useState<string>('');
+  const [customExcludedInput, setCustomExcludedInput] = useState<string>('');
+  const [customSpecialInput, setCustomSpecialInput] = useState<string>('');
+  const [customFilterInput, setCustomFilterInput] = useState<string>('');
+  const [customStopsInput, setCustomStopsInput] = useState<string>('');
   const [stopSuggestions, setStopSuggestions] = useState<string[]>([]);
 
   const debounceTimer = useRef<number | null>(null);
@@ -295,7 +281,7 @@ export const CreateDestinationForm = ({
         else setStopSuggestions(res.results || []);
       }
     } catch (error) {
-      console.error("Search error:", error);
+      console.error('Search error:', error);
       setStopSuggestions([]);
     }
   };
@@ -305,13 +291,13 @@ export const CreateDestinationForm = ({
   useEffect(() => {
     if (initialData) {
       const formData = {
-        tripName: initialData.title || "",
-        destination: initialData.destination || "",
-        country: initialData.country || "",
+        tripName: initialData.title || '',
+        destination: initialData.destination || '',
+        country: initialData.country || '',
         price: initialData.price || 0,
         maxLimit: initialData.maxParticipants || 0,
         minLimit: initialData.minParticipants || 0,
-        description: initialData.description || "",
+        description: initialData.description || '',
         activities: initialData.activities || [],
         startDate: formatDateForFormInput(initialData.startDate),
         noofdays: initialData.noOfDays || 1,
@@ -322,7 +308,7 @@ export const CreateDestinationForm = ({
         includedActivities: initialData.includedActivities || [],
         restrictions: initialData.restrictions || [],
         special: initialData.special || [],
-        tripImage: initialData.tripImage || "",
+        tripImage: initialData.tripImage || '',
         dayWiseData:
           initialData.dayWiseData?.length > 0
             ? initialData.dayWiseData.map(
@@ -336,25 +322,23 @@ export const CreateDestinationForm = ({
                   dayWiseImage?: string;
                 }) => ({
                   dayNumber: day.dayNumber || 1,
-                  title: day.title || "",
-                  description: day.description || "",
-                  activities: Array.isArray(day.activities)
-                    ? day.activities
-                    : [],
-                  meals: day.meals || "",
-                  accommodation: day.accommodation || "",
-                  dayWiseImage: day.dayWiseImage || "",
+                  title: day.title || '',
+                  description: day.description || '',
+                  activities: Array.isArray(day.activities) ? day.activities : [],
+                  meals: day.meals || '',
+                  accommodation: day.accommodation || '',
+                  dayWiseImage: day.dayWiseImage || '',
                 })
               )
             : [
                 {
                   dayNumber: 1,
-                  title: "",
-                  description: "",
+                  title: '',
+                  description: '',
                   activities: [],
-                  meals: "",
-                  accommodation: "",
-                  dayWiseImage: "",
+                  meals: '',
+                  accommodation: '',
+                  dayWiseImage: '',
                 },
               ],
       };
@@ -401,22 +385,15 @@ export const CreateDestinationForm = ({
 
   const shouldShowField = (fieldId: string) => {
     const step1Fields = [
-      "tripName",
-      "startDate",
-      "endDate",
-      "filters",
-      "tripImage",
-      "noofdays",
-      "genderPreference",
+      'tripName',
+      'startDate',
+      'endDate',
+      'filters',
+      'tripImage',
+      'noofdays',
+      'genderPreference',
     ];
-    const step2Fields = [
-      "destination",
-      "country",
-      "price",
-      "commission",
-      "maxLimit",
-      "stops",
-    ];
+    const step2Fields = ['destination', 'country', 'price', 'commission', 'maxLimit', 'stops'];
 
     switch (currentStep) {
       case 1:
@@ -435,23 +412,28 @@ export const CreateDestinationForm = ({
     append({
       dayNumber: nextDayNumber,
       title: `Day ${nextDayNumber}`,
-      description: "",
+      description: '',
       activities: [],
-      meals: "",
-      accommodation: "",
-      dayWiseImage: "",
+      meals: '',
+      accommodation: '',
+      dayWiseImage: '',
     });
   };
 
   const removeDay = (index: number) => {
     if (fields.length > 1) {
       remove(index);
-      setDayWiseImages((prev) => {
+      setDayWiseImages(prev => {
         const newImages = { ...prev };
         delete newImages[index];
         return newImages;
       });
-      // Reindex dayNumber by updating the entire array
+      // Remove the uploader for this day
+      setDayWiseUploaders(prev => {
+        const newUploaders = { ...prev };
+        delete newUploaders[index];
+        return newUploaders;
+      });
       try {
         const current = (form.getValues().dayWiseData || []) as DayItem[];
         const updated: DayItem[] = current
@@ -460,121 +442,73 @@ export const CreateDestinationForm = ({
             ...(d || {}),
             dayNumber: idx + 1,
           }));
-        form.setValue(
-          "dayWiseData",
-          updated as unknown as FormDataType["dayWiseData"]
-        );
-      } catch {
-        // ignore
-      }
+        form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
+      } catch {}
     }
   };
 
   const removeImage = () => {
-    form.setValue("tripImage", "");
+    form.setValue('tripImage', '');
+    resetUpload();
   };
 
   const removeDayWiseImage = (dayIndex: number) => {
     try {
       const current = (form.getValues().dayWiseData || []) as DayItem[];
       const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
-        idx === dayIndex ? { ...(d || {}), dayWiseImage: "" } : d
+        idx === dayIndex ? { ...(d || {}), dayWiseImage: '' } : d
       );
-      form.setValue(
-        "dayWiseData",
-        updated as unknown as FormDataType["dayWiseData"]
-      );
+      form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
+      // Reset the uploader for this day
+      if (dayWiseUploaders[dayIndex]) {
+        dayWiseUploaders[dayIndex].resetUpload();
+      }
     } catch {
-      // fallback: set back to whatever we have (typed)
       form.setValue(
-        "dayWiseData",
-        (form.getValues().dayWiseData ||
-          []) as unknown as FormDataType["dayWiseData"]
+        'dayWiseData',
+        (form.getValues().dayWiseData || []) as unknown as FormDataType['dayWiseData']
       );
     }
   };
 
+  // Handle main trip image upload
   useEffect(() => {
-    const handleImageUpload = (imageUrl: string) => {
-      form.setValue("tripImage", imageUrl);
-    };
     if (uploadedFile?.secure_url) {
-      handleImageUpload(uploadedFile.secure_url);
+      form.setValue('tripImage', uploadedFile.secure_url);
     }
   }, [uploadedFile, form]);
 
-  // Handle day-wise image upload success
-  const handleDayWiseImageUpload = (dayIndex: number, imageUrl: string) => {
-    setDayWiseImages((prev) => ({
-      ...prev,
-      [dayIndex]: imageUrl,
-    }));
-    try {
-      const current = (form.getValues().dayWiseData || []) as DayItem[];
-      const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
-        idx === dayIndex ? { ...(d || {}), dayWiseImage: imageUrl } : d
-      );
-      form.setValue(
-        "dayWiseData",
-        updated as unknown as FormDataType["dayWiseData"]
-      );
-    } catch {
-      // fallback
-    }
-  };
-
-  const createDayWiseUploadButton = (dayIndex: number, label: string) => (
-    <CldUploadWidget
-      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!}
-      onSuccess={(results: CloudinaryUploadWidgetResults) => {
-        const resultsInfo = results.info;
-        if (
-          resultsInfo &&
-          typeof resultsInfo === "object" &&
-          typeof resultsInfo.secure_url === "string"
-        ) {
-          handleDayWiseImageUpload(dayIndex, resultsInfo.secure_url);
-        }
-      }}
-      onError={(error) => {
-        console.error("Cloudinary upload error:", error);
-      }}
-    >
-      {({ open }) => {
-        // Add null check for the open function
-        if (!open) {
-          console.warn("Cloudinary upload widget not ready");
-          return (
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed font-instrument"
-              disabled
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              Loading...
-            </button>
+  // Handle day-wise image uploads
+  useEffect(() => {
+    Object.entries(dayWiseUploaders).forEach(([dayIndexStr, uploader]) => {
+      const dayIndex = parseInt(dayIndexStr);
+      if (uploader.uploadedFile?.secure_url) {
+        try {
+          const current = (form.getValues().dayWiseData || []) as DayItem[];
+          const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
+            idx === dayIndex ? { ...(d || {}), dayWiseImage: uploader.uploadedFile!.secure_url } : d
           );
-        }
+          form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
+        } catch {}
+      }
+    });
+  }, [dayWiseUploaders, form]);
 
-        return (
-          <button
-            type="button"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors font-instrument"
-            onClick={() => {
-              try {
-                open();
-              } catch (error) {
-                console.error("Error opening upload widget:", error);
-              }
-            }}
-          >
-            <Camera className="h-4 w-4 mr-2" />
-            {label}
-          </button>
-        );
-      }}
-    </CldUploadWidget>
-  );
+  const DayWiseUploadButton = ({ dayIndex, label }: { dayIndex: number; label: string }) => {
+    // Initialize uploader for this day if it doesn't exist
+    if (!dayWiseUploaders[dayIndex]) {
+      const newUploader = useImageKitUpload({ folder: `/day-${dayIndex + 1}` });
+      setDayWiseUploaders(prev => ({
+        ...prev,
+        [dayIndex]: newUploader,
+      }));
+    }
+
+    const uploader = dayWiseUploaders[dayIndex];
+    if (!uploader) return null;
+
+    return <uploader.UploadButton label={label} />;
+  };
 
   // Dynamic validation function
   const validateFormData = (data: Partial<FormDataType>, isDraft: boolean) => {
@@ -582,24 +516,20 @@ export const CreateDestinationForm = ({
     return validationSchema.safeParse(data);
   };
 
-  const onSubmit = async (
-    data: Partial<FormDataType>,
-    isDraft: boolean = false
-  ) => {
-    if (isSubmitting) return; // Prevent multiple submissions
+  const onSubmit = async (data: Partial<FormDataType>, isDraft: boolean = false) => {
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
 
-    // Log the raw form data to check what we're working with (safely)
     try {
-      console.log("Raw form data:", {
+      console.log('Raw form data:', {
         tripName: data.tripName,
-        status: isDraft ? "DRAFT" : "ACTIVE",
+        status: isDraft ? 'DRAFT' : 'ACTIVE',
         dayWiseDataLength: data.dayWiseData?.length || 0,
       });
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
-          "Day-wise data summary:",
+          'Day-wise data summary:',
           data.dayWiseData.map(
             (
               day: {
@@ -610,33 +540,27 @@ export const CreateDestinationForm = ({
             ) => ({
               day: idx + 1,
               title: day.title || `Day ${idx + 1}`,
-              hasActivities:
-                Array.isArray(day.activities) && day.activities.length > 0,
+              hasActivities: Array.isArray(day.activities) && day.activities.length > 0,
             })
           )
         );
       }
     } catch {
-      console.log("Form data logging error, continuing with submission");
+      console.log('Form data logging error, continuing with submission');
     }
-    console.log("Saving as draft:", isDraft);
+    console.log('Saving as draft:', isDraft);
 
-    // Perform dynamic validation
     const validationResult = validateFormData(data, isDraft);
 
     if (!validationResult.success) {
-      console.error("Validation failed:", validationResult.error);
-      // If it's not a draft, show validation errors
+      console.error('Validation failed:', validationResult.error);
       if (!isDraft) {
         setIsSubmitting(false);
-        // The form will handle showing the validation errors
         return;
       }
-      // For drafts, we continue even with validation errors
     }
 
     try {
-      // Handle dates properly for drafts
       let start: Date | null = null;
       let end: Date | null = null;
       let noOfDays = 1;
@@ -645,15 +569,10 @@ export const CreateDestinationForm = ({
         start = new Date(data.startDate);
         end = new Date(data.endDate);
 
-        // Only calculate noOfDays if we have valid dates
         if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          noOfDays =
-            Math.ceil(
-              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
-            ) + 1;
+          noOfDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
         }
       } else if (data.startDate && data.endDate) {
-        // For drafts, still try to set dates if provided
         const tempStart = new Date(data.startDate);
         const tempEnd = new Date(data.endDate);
 
@@ -665,30 +584,25 @@ export const CreateDestinationForm = ({
         }
 
         if (start && end) {
-          noOfDays =
-            Math.ceil(
-              Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)
-            ) + 1;
+          noOfDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
         }
       }
 
-      // For drafts, we can have minimal data
       if (isDraft) {
-        noOfDays = Math.max(noOfDays, 1); // Ensure at least 1 day for drafts
+        noOfDays = Math.max(noOfDays, 1);
       }
 
       try {
-        const desiredDays =
-          Number((data as Partial<FormDataType>).noofdays) || noOfDays;
+        const desiredDays = Number((data as Partial<FormDataType>).noofdays) || noOfDays;
         const actualDays = (data.dayWiseData || []).length;
         if (!isDraft && desiredDays !== actualDays) {
           toast.error(
             `Please provide exactly ${desiredDays} day entries. You have provided ${actualDays}.`,
             {
               style: {
-                background: "rgba(220, 38, 38, 0.95)",
-                color: "white",
-                fontFamily: "var(--font-instrument)",
+                background: 'rgba(220, 38, 38, 0.95)',
+                color: 'white',
+                fontFamily: 'var(--font-instrument)',
               },
               duration: 4000,
             }
@@ -696,11 +610,8 @@ export const CreateDestinationForm = ({
           setIsSubmitting(false);
           return;
         }
-      } catch {
-        // ignore validation errors and continue — fallback below will catch other issues
-      }
+      } catch {}
 
-      // Process dayWiseData to ensure all fields are properly formatted
       let processedDayWiseData: Array<{
         dayNumber: number;
         title: string;
@@ -727,26 +638,25 @@ export const CreateDestinationForm = ({
           ) => ({
             dayNumber: index + 1,
             title: day.title || `Day ${index + 1}`,
-            description: day.description || "",
+            description: day.description || '',
             activities: Array.isArray(day.activities) ? day.activities : [],
-            meals: day.meals || "",
-            accommodation: day.accommodation || "",
-            dayWiseImage: day.dayWiseImage || "",
-            destination: day.destination || "",
+            meals: day.meals || '',
+            accommodation: day.accommodation || '',
+            dayWiseImage: day.dayWiseImage || '',
+            destination: day.destination || '',
           })
         );
       } catch (processingError) {
-        console.error("Error processing day-wise data:", processingError);
-        // Fallback to empty array if processing fails
+        console.error('Error processing day-wise data:', processingError);
         processedDayWiseData = [];
       }
 
-      const statusToSend: "DRAFT" | "INACTIVE" = isDraft ? "DRAFT" : "INACTIVE";
+      const statusToSend: 'DRAFT' | 'INACTIVE' = isDraft ? 'DRAFT' : 'INACTIVE';
 
       const tripData = {
-        title: data.tripName || "",
-        description: data.description || "",
-        destination: data.destination || "",
+        title: data.tripName || '',
+        description: data.description || '',
+        destination: data.destination || '',
         includedActivities: data.includedActivities || [],
         restrictions: data.restrictions || [],
         noOfDays,
@@ -756,15 +666,14 @@ export const CreateDestinationForm = ({
         endDate: end,
         special: data.special || [],
         maxParticipants: data.maxLimit || 0,
-        country: data.country || "",
+        country: data.country || '',
         stops: data.stops || [],
-        // legacy support: state/city may be absent in the new form
-        state: (data as Partial<FormDataType> & { state?: string }).state || "",
-        city: (data as Partial<FormDataType> & { city?: string }).city || "",
+        state: (data as Partial<FormDataType> & { state?: string }).state || '',
+        city: (data as Partial<FormDataType> & { city?: string }).city || '',
         languages: data.languages || [],
         filters: data.filters || [],
         dayWiseData: processedDayWiseData,
-        tripImage: data.tripImage || "",
+        tripImage: data.tripImage || '',
         status: statusToSend,
       };
 
@@ -778,40 +687,37 @@ export const CreateDestinationForm = ({
       if (result?.error) {
         toast.error(result.message || result.error, {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)",
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(196, 181, 253, 0.3)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
           duration: 3000,
         });
-        console.error(
-          `Failed to ${isEditMode ? "update" : "create"} travel plan:`,
-          result.error
-        );
+        console.error(`Failed to ${isEditMode ? 'update' : 'create'} travel plan:`, result.error);
       } else {
-        toast.success(result.message || "Operation completed successfully!", {
+        toast.success(result.message || 'Operation completed successfully!', {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)",
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(196, 181, 253, 0.3)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
           duration: 3000,
         });
-        router.push("/dashboard/host");
+        router.push('/dashboard/host');
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
-      toast.error("An unexpected error occurred. Please try again.", {
+      console.error('Unexpected error:', err);
+      toast.error('An unexpected error occurred. Please try again.', {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 3000,
       });
@@ -822,25 +728,22 @@ export const CreateDestinationForm = ({
 
   const handleDraftSubmit = async () => {
     if (isSubmitting) return;
-
     const formData = form.getValues();
     await onSubmit(formData, true);
   };
 
   const handleFullSubmit = async () => {
     if (isSubmitting) return;
-
     const formData = form.getValues();
-
     const validationResult = validateFormData(formData, false);
 
     if (!validationResult.success) {
       const errors = validationResult.error.flatten().fieldErrors;
-      Object.keys(errors).forEach((field) => {
+      Object.keys(errors).forEach(field => {
         const errorMessage = errors[field as keyof typeof errors];
         if (errorMessage && errorMessage[0]) {
           form.setError(field as keyof FormDataType, {
-            type: "manual",
+            type: 'manual',
             message: errorMessage[0],
           });
         }
@@ -852,34 +755,32 @@ export const CreateDestinationForm = ({
   };
 
   const formatDateForInput = (date: Date | string | number | undefined) => {
-    if (!date) return "";
+    if (!date) return '';
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
   };
 
   const getStepInfo = () => {
     switch (currentStep) {
       case 1:
         return {
-          title: "Basic Trip Information",
-          description:
-            "Let's start with the essentials - trip name, dates, and preferences",
+          title: 'Basic Trip Information',
+          description: "Let's start with the essentials - trip name, dates, and preferences",
         };
       case 2:
         return {
-          title: "Location & Pricing",
-          description:
-            "Tell us where you're going and set your pricing details",
+          title: 'Location & Pricing',
+          description: "Tell us where you're going and set your pricing details",
         };
       case 3:
         return {
-          title: "Trip Details & Activities",
-          description: "Add the finishing touches to make your trip stand out",
+          title: 'Trip Details & Activities',
+          description: 'Add the finishing touches to make your trip stand out',
         };
       default:
         return {
-          title: "Create Trip",
-          description: "Fill in your trip details",
+          title: 'Create Trip',
+          description: 'Fill in your trip details',
         };
     }
   };
@@ -887,24 +788,22 @@ export const CreateDestinationForm = ({
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       <div className="flex items-center space-x-4">
-        {[1, 2, 3].map((step) => (
+        {[1, 2, 3].map(step => (
           <div key={step} className="flex items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                 step === currentStep
-                  ? "bg-purple-600 text-white"
+                  ? 'bg-purple-600 text-white'
                   : step < currentStep
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 text-gray-500"
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-500'
               }`}
             >
-              {step < currentStep ? "✓" : step}
+              {step < currentStep ? '✓' : step}
             </div>
             {step < 3 && (
               <div
-                className={`w-12 h-0.5 ml-4 ${
-                  step < currentStep ? "bg-green-500" : "bg-gray-200"
-                }`}
+                className={`w-12 h-0.5 ml-4 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'}`}
               />
             )}
           </div>
@@ -921,22 +820,22 @@ export const CreateDestinationForm = ({
             <div className="space-y-2">
               <div className="inline-flex items-center px-6 py-2 bg-purple-100 rounded-full mb-4">
                 <span className="text-purple-600 text-sm font-semibold tracking-wide uppercase font-instrument">
-                  {isEditMode ? "Edit Experience" : "Create Experience"}
+                  {isEditMode ? 'Edit Experience' : 'Create Experience'}
                 </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-bricolage leading-[1.05] tracking-tighter">
-                Hello, {session?.user?.name || "Host"}!{" "}
+                Hello, {session?.user?.name || 'Host'}!{' '}
                 {isEditMode ? "Let's update your trip" : "Let's get started"}
               </h1>
               <p className="text-lg text-gray-600 font-instrument mt-2">
                 {isEditMode
-                  ? "Update your travel experience details"
-                  : "Create your new travel experience and share it with the world"}
+                  ? 'Update your travel experience details'
+                  : 'Create your new travel experience and share it with the world'}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push("/dashboard/host")}
+                onClick={() => router.push('/dashboard/host')}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors font-instrument"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -977,9 +876,7 @@ export const CreateDestinationForm = ({
                 <h2 className="text-lg font-semibold text-gray-900 font-bricolage">
                   {getStepInfo().title}
                 </h2>
-                <p className="text-sm text-gray-600 font-instrument">
-                  {getStepInfo().description}
-                </p>
+                <p className="text-sm text-gray-600 font-instrument">{getStepInfo().description}</p>
               </div>
             </div>
           </div>
@@ -987,911 +884,783 @@ export const CreateDestinationForm = ({
           <div className="p-6">
             <Form {...form}>
               <form
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault();
                   handleFullSubmit();
                 }}
                 className="space-y-6"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {FormData.filter((field) => shouldShowField(field.id)).map(
-                    (data) => {
-                      if (
-                        ["text", "email", "tel", "number"].includes(data.type)
-                      ) {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type={data.type}
-                                    placeholder={data.placeholder}
-                                    className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                  {FormData.filter(field => shouldShowField(field.id)).map(data => {
+                    if (['text', 'email', 'tel', 'number'].includes(data.type)) {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type={data.type}
+                                  placeholder={data.placeholder}
+                                  className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                                  {...field}
+                                  value={field.value?.toString() ?? ''}
+                                  {...(data.id === 'noofdays' ? { min: 1, step: 1 } : {})}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                              {data.id === 'commission' && watchedPrice && watchedPrice > 0 && (
+                                <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center text-sm">
+                                      <span className="text-gray-600 font-instrument">
+                                        Trip Price/Person:
+                                      </span>
+                                      <span className="font-semibold text-gray-900 font-instrument">
+                                        ₹{watchedPrice.toLocaleString()}
+                                      </span>
+                                    </div>
+                                    {watchedCommission && watchedCommission > 0 && (
+                                      <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-600 font-instrument">
+                                          Commission ({watchedCommission}
+                                          %):
+                                        </span>
+                                        <span className="font-semibold text-gray-900 font-instrument">
+                                          ₹
+                                          {(
+                                            (watchedPrice * watchedCommission) /
+                                            100
+                                          ).toLocaleString()}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div className="pt-2 border-t border-purple-300">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-sm font-semibold text-purple-900 font-instrument">
+                                          Total Price/Person:
+                                        </span>
+                                        <span className="text-lg font-bold text-purple-900 font-instrument">
+                                          ₹{totalPricePerPerson.toLocaleString()}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    if (data.type === 'date') {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="date"
+                                  className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                                  {...field}
+                                  value={formatDateForInput(
+                                    field.value as string | Date | number | undefined
+                                  )}
+                                  onChange={e =>
+                                    field.onChange(e.target.value ? new Date(e.target.value) : '')
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    if (data.type === 'textarea') {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={`${data.className} md:col-span-2`}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder={data.placeholder}
+                                  className="min-h-[100px] resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
+                                  {...field}
+                                  value={field.value?.toString() ?? ''}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                              <p className="text-xs text-gray-500 mt-1 font-instrument">
+                                Provide a detailed description of your trip experience.
+                              </p>
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    if (data.type === 'select' && data.options && Array.isArray(data.options)) {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <select
                                     {...field}
-                                    value={field.value?.toString() ?? ""}
-                                    {...(data.id === "noofdays"
-                                      ? { min: 1, step: 1 }
-                                      : {})}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                                {data.id === "commission" &&
-                                  watchedPrice &&
-                                  watchedPrice > 0 && (
-                                    <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-sm">
-                                          <span className="text-gray-600 font-instrument">
-                                            Trip Price/Person:
-                                          </span>
-                                          <span className="font-semibold text-gray-900 font-instrument">
-                                            ₹{watchedPrice.toLocaleString()}
-                                          </span>
-                                        </div>
-                                        {watchedCommission &&
-                                          watchedCommission > 0 && (
-                                            <div className="flex justify-between items-center text-sm">
-                                              <span className="text-gray-600 font-instrument">
-                                                Commission ({watchedCommission}
-                                                %):
-                                              </span>
-                                              <span className="font-semibold text-gray-900 font-instrument">
-                                                ₹
-                                                {(
-                                                  (watchedPrice *
-                                                    watchedCommission) /
-                                                  100
-                                                ).toLocaleString()}
-                                              </span>
-                                            </div>
-                                          )}
-                                        <div className="pt-2 border-t border-purple-300">
-                                          <div className="flex justify-between items-center">
-                                            <span className="text-sm font-semibold text-purple-900 font-instrument">
-                                              Total Price/Person:
+                                    value={typeof field.value === 'string' ? field.value : ''}
+                                    onChange={e => field.onChange(e.target.value)}
+                                    className="w-full h-11 px-3 py-2 pr-10 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:outline-none font-instrument bg-white appearance-none cursor-pointer transition-all duration-200 hover:border-gray-300"
+                                  >
+                                    <option value="" className="text-gray-400">
+                                      {data.placeholder}
+                                    </option>
+                                    {(data.options || []).map(option => (
+                                      <option
+                                        key={option}
+                                        value={option}
+                                        className="text-gray-900 py-2"
+                                      >
+                                        {option === 'MALE_ONLY'
+                                          ? '👨 Male Only'
+                                          : option === 'FEMALE_ONLY'
+                                            ? '👩 Female Only'
+                                            : option === 'MIX'
+                                              ? '👥 Mixed Group'
+                                              : option
+                                                  .replace('_', ' ')
+                                                  .toLowerCase()
+                                                  .replace(/\b\w/g, l => l.toUpperCase())}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg
+                                      className="w-4 h-4 text-gray-400"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 9l-7 7-7-7"
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                              {data.id === 'genderPreference' && (
+                                <p className="text-xs text-gray-500 mt-1 font-instrument">
+                                  Choose the gender preference for this trip experience.
+                                </p>
+                              )}
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    if (data.type === 'sectionHead') {
+                      return (
+                        <div key={data.id} className={`${data.className} md:col-span-2 mt-8 mb-6`}>
+                          <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                              <FileText className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
+                              {data.label}
+                            </h3>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (
+                      data.type === 'multi-select' &&
+                      'options' in data &&
+                      Array.isArray(data.options)
+                    ) {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <ReactSelect
+                                  isMulti
+                                  options={getSelectOptions(data.options)}
+                                  value={(field.value as string[])?.map(val => ({
+                                    value: val,
+                                    label: val,
+                                  }))}
+                                  onChange={newValue => {
+                                    const selected = newValue as MultiValue<SelectOption>;
+                                    field.onChange(selected?.map(opt => opt.value) || []);
+                                  }}
+                                  styles={{
+                                    control: base => ({
+                                      ...base,
+                                      minHeight: '44px',
+                                      backgroundColor: 'white',
+                                      border: '1px solid #e5e7eb',
+                                      borderRadius: '0.375rem',
+                                      boxShadow: 'none',
+                                      '&:hover': {
+                                        borderColor: '#a855f7',
+                                      },
+                                      '&:focus-within': {
+                                        borderColor: '#a855f7',
+                                        boxShadow: '0 0 0 3px rgba(168, 85, 247, 0.1)',
+                                      },
+                                    }),
+                                    multiValue: base => ({
+                                      ...base,
+                                      backgroundColor: '#f3e8ff',
+                                      borderRadius: '0.25rem',
+                                    }),
+                                    multiValueLabel: base => ({
+                                      ...base,
+                                      color: '#7c3aed',
+                                      fontWeight: '500',
+                                    }),
+                                    multiValueRemove: base => ({
+                                      ...base,
+                                      color: '#7c3aed',
+                                      '&:hover': {
+                                        backgroundColor: '#e9d5ff',
+                                        color: '#6d28d9',
+                                      },
+                                    }),
+                                    option: (base, state) => ({
+                                      ...base,
+                                      backgroundColor: state.isSelected
+                                        ? '#a855f7'
+                                        : state.isFocused
+                                          ? '#f3e8ff'
+                                          : 'white',
+                                      color: state.isSelected ? 'white' : '#374151',
+                                    }),
+                                    placeholder: base => ({
+                                      ...base,
+                                      color: '#9ca3af',
+                                    }),
+                                  }}
+                                  placeholder={data.placeholder}
+                                  className="font-instrument"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    // Stops field
+                    if (data.id === 'stops') {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <div className="space-y-3 mt-3">
+                                  <div className="flex gap-2">
+                                    <Input
+                                      placeholder={data.placeholder}
+                                      className="flex-1 border-gray-200 font-instrument"
+                                      value={customStopsInput}
+                                      onChange={e => {
+                                        const v = e.target.value;
+                                        setCustomStopsInput(v);
+                                        if (v.trim()) debouncedFetch(v);
+                                      }}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          const val = customStopsInput.trim();
+                                          const currentVals = Array.isArray(field.value)
+                                            ? (field.value as string[])
+                                            : [];
+                                          if (val && !currentVals.includes(val)) {
+                                            field.onChange([...currentVals, val]);
+                                            setCustomStopsInput('');
+                                            setStopSuggestions([]);
+                                          }
+                                        }
+                                      }}
+                                    />
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      onClick={() => {
+                                        const val = customStopsInput.trim();
+                                        const currentVals = Array.isArray(field.value)
+                                          ? (field.value as string[])
+                                          : [];
+                                        if (val && !currentVals.includes(val)) {
+                                          field.onChange([...currentVals, val]);
+                                          setCustomStopsInput('');
+                                        }
+                                      }}
+                                      className="px-3 bg-purple-600 hover:bg-purple-700 text-white"
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+
+                                  {Array.isArray(field.value) &&
+                                    (field.value as string[]).length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {(field.value as string[]).map(
+                                          (item: string, itemIndex: number) => (
+                                            <span
+                                              key={itemIndex}
+                                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                            >
+                                              {item}
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newItems = (field.value as string[]).filter(
+                                                    (_: string, i: number) => i !== itemIndex
+                                                  );
+                                                  field.onChange(newItems);
+                                                }}
+                                                className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                                              >
+                                                <Minus className="h-3 w-3" />
+                                              </button>
                                             </span>
-                                            <span className="text-lg font-bold text-purple-900 font-instrument">
-                                              ₹
-                                              {totalPricePerPerson.toLocaleString()}
-                                            </span>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                  {stopSuggestions.length > 0 && (
+                                    <div className="mt-2 border border-gray-200 rounded bg-white shadow-sm max-h-48 overflow-auto">
+                                      {stopSuggestions.map((sug, i) => (
+                                        <button
+                                          key={i}
+                                          type="button"
+                                          onClick={() => {
+                                            const cur = (field.value || []) as string[];
+                                            if (!cur.includes(sug)) {
+                                              field.onChange([...cur, sug]);
+                                            }
+                                            setCustomStopsInput('');
+                                            setStopSuggestions([]);
+                                          }}
+                                          className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                                        >
+                                          {sug}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
+
+                    // Inclusion/Exclusion List
+                    if (
+                      (data.type === 'inclusion-list' || data.type === 'exclusion-list') &&
+                      'options' in data &&
+                      Array.isArray(data.options)
+                    ) {
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
+                                {data.label}
+                              </FormLabel>
+                              <FormControl>
+                                <div className="space-y-2">
+                                  <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    {(data.options || []).map((option, index) => {
+                                      const isSelected = ((field.value as string[]) || []).includes(
+                                        option
+                                      );
+                                      return (
+                                        <div
+                                          key={index}
+                                          className="flex items-center justify-between p-2 hover:bg-white rounded transition-colors"
+                                        >
+                                          <span className="text-sm text-gray-700 font-instrument">
+                                            {option}
+                                          </span>
+                                          <div className="flex items-center gap-2">
+                                            {isSelected ? (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const newValue = (
+                                                    (field.value as string[]) || []
+                                                  ).filter(item => item !== option);
+                                                  field.onChange(newValue);
+                                                }}
+                                                className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                              >
+                                                −
+                                              </button>
+                                            ) : (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const currentValue =
+                                                    (field.value as string[]) || [];
+                                                  const newValue = [...currentValue, option];
+                                                  field.onChange(newValue);
+                                                }}
+                                                className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-sm transition-colors flex items-center justify-center"
+                                              >
+                                                +
+                                              </button>
+                                            )}
                                           </div>
                                         </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {((field.value as string[]) || []).length > 0 && (
+                                    <div className="mt-3">
+                                      <p className="text-xs text-gray-600 font-instrument mb-2">
+                                        Selected{' '}
+                                        {data.type === 'inclusion-list'
+                                          ? 'inclusions'
+                                          : 'exclusions'}
+                                        :
+                                      </p>
+                                      <div className="flex flex-wrap gap-1">
+                                        {((field.value as string[]) || []).map((item, index) => (
+                                          <span
+                                            key={index}
+                                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                              data.type === 'inclusion-list'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-red-100 text-red-800'
+                                            }`}
+                                          >
+                                            {item}
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                const newValue = (
+                                                  (field.value as string[]) || []
+                                                ).filter(val => val !== item);
+                                                field.onChange(newValue);
+                                              }}
+                                              className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                                            >
+                                              ×
+                                            </button>
+                                          </span>
+                                        ))}
                                       </div>
                                     </div>
                                   )}
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    }
 
-                      if (data.type === "date") {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
+                    // Custom Input List
+                    if (data.type === 'custom-input-list') {
+                      const isIncluded = data.id === 'includedActivities';
+                      const isFilters = data.id === 'filters';
+                      const customInput = isIncluded
+                        ? customIncludedInput
+                        : data.label === 'Not Included'
+                          ? customExcludedInput
+                          : isFilters
+                            ? customFilterInput
+                            : customSpecialInput;
+                      const setCustomInput = isIncluded
+                        ? setCustomIncludedInput
+                        : data.label === 'Not Included'
+                          ? setCustomExcludedInput
+                          : isFilters
+                            ? setCustomFilterInput
+                            : setCustomSpecialInput;
+
+                      return (
+                        <FormField
+                          key={data.id}
+                          control={form.control}
+                          name={data.id as keyof FormDataType}
+                          render={({ field }) => (
+                            <FormItem className={data.className}>
+                              <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                                <div
+                                  className={`w-5 h-5 rounded flex items-center justify-center ${
+                                    isIncluded
+                                      ? 'bg-green-100'
+                                      : data.label === 'Not Included'
+                                        ? 'bg-red-100'
+                                        : isFilters
+                                          ? 'bg-purple-100'
+                                          : 'bg-blue-100'
+                                  }`}
+                                >
+                                  {isIncluded ? (
+                                    <Plus className="h-3 w-3 text-green-600" />
+                                  ) : data.label === 'Not Included' ? (
+                                    <Minus className="h-3 w-3 text-red-600" />
+                                  ) : isFilters ? (
+                                    <Plus className="h-3 w-3 text-purple-600" />
+                                  ) : (
+                                    <Plus className="h-3 w-3 text-blue-600" />
+                                  )}
+                                </div>
                                 <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
                                   {data.label}
                                 </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="date"
-                                    className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
-                                    {...field}
-                                    value={formatDateForInput(
-                                      field.value as
-                                        | string
-                                        | Date
-                                        | number
-                                        | undefined
-                                    )}
-                                    onChange={(e) =>
-                                      field.onChange(
-                                        e.target.value
-                                          ? new Date(e.target.value)
-                                          : ""
-                                      )
-                                    }
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      if (data.type === "textarea") {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem
-                                className={`${data.className} md:col-span-2`}
-                              >
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder={data.placeholder}
-                                    className="min-h-[100px] resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
-                                    {...field}
-                                    value={field.value?.toString() ?? ""}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                                <p className="text-xs text-gray-500 mt-1 font-instrument">
-                                  Provide a detailed description of your trip
-                                  experience.
-                                </p>
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      if (
-                        data.type === "select" &&
-                        data.options &&
-                        Array.isArray(data.options)
-                      ) {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <select
-                                      {...field}
-                                      value={
-                                        typeof field.value === "string"
-                                          ? field.value
-                                          : ""
-                                      }
-                                      onChange={(e) =>
-                                        field.onChange(e.target.value)
-                                      }
-                                      className="w-full h-11 px-3 py-2 pr-10 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:outline-none font-instrument bg-white appearance-none cursor-pointer transition-all duration-200 hover:border-gray-300"
-                                    >
-                                      <option
-                                        value=""
-                                        className="text-gray-400"
-                                      >
-                                        {data.placeholder}
-                                      </option>
-                                      {(data.options || []).map((option) => (
-                                        <option
-                                          key={option}
-                                          value={option}
-                                          className="text-gray-900 py-2"
-                                        >
-                                          {option === "MALE_ONLY"
-                                            ? "👨 Male Only"
-                                            : option === "FEMALE_ONLY"
-                                            ? "👩 Female Only"
-                                            : option === "MIX"
-                                            ? "👥 Mixed Group"
-                                            : option
-                                                .replace("_", " ")
-                                                .toLowerCase()
-                                                .replace(/\b\w/g, (l) =>
-                                                  l.toUpperCase()
-                                                )}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    {/* Custom dropdown arrow */}
-                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                      <svg
-                                        className="w-4 h-4 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M19 9l-7 7-7-7"
-                                        />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                                {data.id === "genderPreference" && (
-                                  <p className="text-xs text-gray-500 mt-1 font-instrument">
-                                    Choose the gender preference for this trip
-                                    experience.
-                                  </p>
-                                )}
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      if (data.type === "sectionHead") {
-                        return (
-                          <div
-                            key={data.id}
-                            className={`${data.className} md:col-span-2 mt-8 mb-6`}
-                          >
-                            <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-                              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <FileText className="h-4 w-4 text-purple-600" />
                               </div>
-                              <h3 className="text-lg font-semibold text-gray-900 font-bricolage">
-                                {data.label}
-                              </h3>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (
-                        data.type === "multi-select" &&
-                        "options" in data &&
-                        Array.isArray(data.options)
-                      ) {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <ReactSelect
-                                    isMulti
-                                    options={getSelectOptions(data.options)}
-                                    value={(field.value as string[])?.map(
-                                      (val) => ({
-                                        value: val,
-                                        label: val,
-                                      })
-                                    )}
-                                    onChange={(newValue) => {
-                                      const selected =
-                                        newValue as MultiValue<SelectOption>;
-                                      field.onChange(
-                                        selected?.map((opt) => opt.value) || []
-                                      );
-                                    }}
-                                    styles={{
-                                      control: (base) => ({
-                                        ...base,
-                                        minHeight: "44px",
-                                        backgroundColor: "white",
-                                        border: "1px solid #e5e7eb",
-                                        borderRadius: "0.375rem",
-                                        boxShadow: "none",
-                                        "&:hover": {
-                                          borderColor: "#a855f7",
-                                        },
-                                        "&:focus-within": {
-                                          borderColor: "#a855f7",
-                                          boxShadow:
-                                            "0 0 0 3px rgba(168, 85, 247, 0.1)",
-                                        },
-                                      }),
-                                      multiValue: (base) => ({
-                                        ...base,
-                                        backgroundColor: "#f3e8ff",
-                                        borderRadius: "0.25rem",
-                                      }),
-                                      multiValueLabel: (base) => ({
-                                        ...base,
-                                        color: "#7c3aed",
-                                        fontWeight: "500",
-                                      }),
-                                      multiValueRemove: (base) => ({
-                                        ...base,
-                                        color: "#7c3aed",
-                                        "&:hover": {
-                                          backgroundColor: "#e9d5ff",
-                                          color: "#6d28d9",
-                                        },
-                                      }),
-                                      option: (base, state) => ({
-                                        ...base,
-                                        backgroundColor: state.isSelected
-                                          ? "#a855f7"
-                                          : state.isFocused
-                                          ? "#f3e8ff"
-                                          : "white",
-                                        color: state.isSelected
-                                          ? "white"
-                                          : "#374151",
-                                      }),
-                                      placeholder: (base) => ({
-                                        ...base,
-                                        color: "#9ca3af",
-                                      }),
-                                    }}
-                                    placeholder={data.placeholder}
-                                    className="font-instrument"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      // Stops field: creatable multi-select with suggestions
-                      if (data.id === "stops") {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <div className="space-y-3 mt-3">
-                                    <div className="flex gap-2">
-                                      <Input
-                                        placeholder={data.placeholder}
-                                        className="flex-1 border-gray-200 font-instrument"
-                                        value={customStopsInput}
-                                        onChange={(e) => {
-                                          const v = e.target.value;
-                                          console.log("Input changed:", v);
-                                          setCustomStopsInput(v);
-                                          console.log(
-                                            "stops input changed:",
-                                            v
-                                          );
-                                          if (v.trim()) debouncedFetch(v);
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            const val = customStopsInput.trim();
-                                            const currentVals = Array.isArray(
-                                              field.value
-                                            )
-                                              ? (field.value as string[])
-                                              : [];
-                                            if (
-                                              val &&
-                                              !currentVals.includes(val)
-                                            ) {
-                                              field.onChange([
-                                                ...currentVals,
-                                                val,
-                                              ]);
-                                              setCustomStopsInput("");
-                                              setStopSuggestions([]);
-                                            }
-                                          }
-                                        }}
-                                      />
-                                      <Button
-                                        type="button"
-                                        size="sm"
-                                        onClick={() => {
-                                          const val = customStopsInput.trim();
-                                          const currentVals = Array.isArray(
-                                            field.value
-                                          )
+                              <FormControl>
+                                <div className="space-y-3 mt-3">
+                                  <div className="flex gap-2">
+                                    <Input
+                                      placeholder={data.placeholder}
+                                      className={`flex-1 border-gray-200 font-instrument ${
+                                        isIncluded
+                                          ? 'focus:border-green-400 focus:ring-green-100'
+                                          : data.label === 'Not Included'
+                                            ? 'focus:border-red-400 focus:ring-red-100'
+                                            : isFilters
+                                              ? 'focus:border-purple-400 focus:ring-purple-100'
+                                              : 'focus:border-blue-400 focus:ring-blue-100'
+                                      }`}
+                                      value={customInput}
+                                      onChange={e => setCustomInput(e.target.value)}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          const item = customInput.trim();
+                                          const currentVals = Array.isArray(field.value)
                                             ? (field.value as string[])
                                             : [];
-                                          if (
-                                            val &&
-                                            !currentVals.includes(val)
-                                          ) {
-                                            field.onChange([
-                                              ...currentVals,
-                                              val,
-                                            ]);
-                                            setCustomStopsInput("");
+                                          if (item && !currentVals.includes(item)) {
+                                            field.onChange([...currentVals, item]);
+                                            setCustomInput('');
                                           }
-                                        }}
-                                        className="px-3 bg-purple-600 hover:bg-purple-700 text-white"
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-
-                                    {Array.isArray(field.value) &&
-                                      (field.value as string[]).length > 0 && (
-                                        <div className="flex flex-wrap gap-2">
-                                          {(field.value as string[]).map(
-                                            (
-                                              item: string,
-                                              itemIndex: number
-                                            ) => (
-                                              <span
-                                                key={itemIndex}
-                                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
-                                              >
-                                                {item}
-                                                <button
-                                                  type="button"
-                                                  onClick={() => {
-                                                    const newItems = (
-                                                      field.value as string[]
-                                                    ).filter(
-                                                      (_: string, i: number) =>
-                                                        i !== itemIndex
-                                                    );
-                                                    field.onChange(newItems);
-                                                  }}
-                                                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
-                                                >
-                                                  <Minus className="h-3 w-3" />
-                                                </button>
-                                              </span>
-                                            )
-                                          )}
-                                        </div>
-                                      )}
-                                    {/* suggestions dropdown */}
-                                    {stopSuggestions.length > 0 && (
-                                      <div className="mt-2 border border-gray-200 rounded bg-white shadow-sm max-h-48 overflow-auto">
-                                        {stopSuggestions.map((sug, i) => (
-                                          <button
-                                            key={i}
-                                            type="button"
-                                            onClick={() => {
-                                              const cur = (field.value ||
-                                                []) as string[];
-                                              if (!cur.includes(sug)) {
-                                                field.onChange([...cur, sug]);
-                                              }
-                                              setCustomStopsInput("");
-                                              setStopSuggestions([]);
-                                            }}
-                                            className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                                          >
-                                            {sug}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      // Inclusion List Component
-                      if (
-                        (data.type === "inclusion-list" ||
-                          data.type === "exclusion-list") &&
-                        "options" in data &&
-                        Array.isArray(data.options)
-                      ) {
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                  {data.label}
-                                </FormLabel>
-                                <FormControl>
-                                  <div className="space-y-2">
-                                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
-                                      {(data.options || []).map(
-                                        (option, index) => {
-                                          const isSelected = (
-                                            (field.value as string[]) || []
-                                          ).includes(option);
-                                          return (
-                                            <div
-                                              key={index}
-                                              className="flex items-center justify-between p-2 hover:bg-white rounded transition-colors"
-                                            >
-                                              <span className="text-sm text-gray-700 font-instrument">
-                                                {option}
-                                              </span>
-                                              <div className="flex items-center gap-2">
-                                                {isSelected ? (
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const newValue = (
-                                                        (field.value as string[]) ||
-                                                        []
-                                                      ).filter(
-                                                        (item) =>
-                                                          item !== option
-                                                      );
-                                                      field.onChange(newValue);
-                                                    }}
-                                                    className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 font-bold text-sm transition-colors flex items-center justify-center"
-                                                  >
-                                                    −
-                                                  </button>
-                                                ) : (
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const currentValue =
-                                                        (field.value as string[]) ||
-                                                        [];
-                                                      const newValue = [
-                                                        ...currentValue,
-                                                        option,
-                                                      ];
-                                                      field.onChange(newValue);
-                                                    }}
-                                                    className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 font-bold text-sm transition-colors flex items-center justify-center"
-                                                  >
-                                                    +
-                                                  </button>
-                                                )}
-                                              </div>
-                                            </div>
-                                          );
                                         }
-                                      )}
+                                      }}
+                                    />
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      onClick={() => {
+                                        const item = customInput.trim();
+                                        const currentVals = Array.isArray(field.value)
+                                          ? (field.value as string[])
+                                          : [];
+                                        if (item && !currentVals.includes(item)) {
+                                          field.onChange([...currentVals, item]);
+                                          setCustomInput('');
+                                        }
+                                      }}
+                                      className={`px-3 text-white ${
+                                        isIncluded
+                                          ? 'bg-green-500 hover:bg-green-600'
+                                          : data.label === 'Not Included'
+                                            ? 'bg-red-500 hover:bg-red-600'
+                                            : isFilters
+                                              ? 'bg-purple-500 hover:bg-purple-600'
+                                              : 'bg-blue-500 hover:bg-blue-600'
+                                      }`}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+
+                                  {/* Quick Add Options */}
+                                  <div className="space-y-2">
+                                    <p className="text-xs text-gray-500 font-instrument">
+                                      Quick add:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {(isIncluded
+                                        ? [
+                                            'Breakfast',
+                                            'Lunch',
+                                            'Dinner',
+                                            'Accommodation',
+                                            'Transportation',
+                                            'Guide',
+                                            'Entry Fees',
+                                            'Activities',
+                                          ]
+                                        : data.label === 'Not Included'
+                                          ? [
+                                              'International Flights',
+                                              'Personal Expenses',
+                                              'Travel Insurance',
+                                              'Visa Fees',
+                                              'Tips',
+                                              'Alcoholic Beverages',
+                                              'Shopping',
+                                            ]
+                                          : isFilters
+                                            ? [
+                                                'Adventure',
+                                                'Cultural',
+                                                'Beach',
+                                                'Mountain',
+                                                'City',
+                                                'Nature',
+                                                'Wildlife',
+                                                'Photography',
+                                              ]
+                                            : [
+                                                'Special Activity',
+                                                'Unique Experience',
+                                                'Local Culture',
+                                                'Scenic Views',
+                                              ]
+                                      ).map(quickOption => {
+                                        const currentVals = Array.isArray(field.value)
+                                          ? (field.value as string[])
+                                          : [];
+                                        const isAlreadyAdded = currentVals.includes(quickOption);
+
+                                        return (
+                                          <Button
+                                            key={quickOption}
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={isAlreadyAdded}
+                                            onClick={() => {
+                                              if (!isAlreadyAdded) {
+                                                field.onChange([...currentVals, quickOption]);
+                                              }
+                                            }}
+                                            className={`text-xs font-instrument ${
+                                              isAlreadyAdded
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : isIncluded
+                                                  ? 'border-green-300 text-green-700 hover:bg-green-50'
+                                                  : data.label === 'Not Included'
+                                                    ? 'border-red-300 text-red-700 hover:bg-red-50'
+                                                    : isFilters
+                                                      ? 'border-purple-300 text-purple-700 hover:bg-purple-50'
+                                                      : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                                            }`}
+                                          >
+                                            {isAlreadyAdded ? '✓ ' : '+ '}
+                                            {quickOption}
+                                          </Button>
+                                        );
+                                      })}
                                     </div>
-                                    {((field.value as string[]) || []).length >
-                                      0 && (
-                                      <div className="mt-3">
-                                        <p className="text-xs text-gray-600 font-instrument mb-2">
-                                          Selected{" "}
-                                          {data.type === "inclusion-list"
-                                            ? "inclusions"
-                                            : "exclusions"}
-                                          :
-                                        </p>
-                                        <div className="flex flex-wrap gap-1">
-                                          {(
-                                            (field.value as string[]) || []
-                                          ).map((item, index) => (
+                                  </div>
+
+                                  {Array.isArray(field.value) &&
+                                    (field.value as string[]).length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {(field.value as string[]).map(
+                                          (item: string, itemIndex: number) => (
                                             <span
-                                              key={index}
-                                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                                                data.type === "inclusion-list"
-                                                  ? "bg-green-100 text-green-800"
-                                                  : "bg-red-100 text-red-800"
+                                              key={itemIndex}
+                                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                                isIncluded
+                                                  ? 'bg-green-100 text-green-800'
+                                                  : data.label === 'Not Included'
+                                                    ? 'bg-red-100 text-red-800'
+                                                    : isFilters
+                                                      ? 'bg-purple-100 text-purple-800'
+                                                      : 'bg-blue-100 text-blue-800'
                                               }`}
                                             >
                                               {item}
                                               <button
                                                 type="button"
                                                 onClick={() => {
-                                                  const newValue = (
-                                                    (field.value as string[]) ||
-                                                    []
-                                                  ).filter(
-                                                    (val) => val !== item
+                                                  const newItems = (field.value as string[]).filter(
+                                                    (_: string, i: number) => i !== itemIndex
                                                   );
-                                                  field.onChange(newValue);
+                                                  field.onChange(newItems);
                                                 }}
-                                                className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
-                                              >
-                                                ×
-                                              </button>
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      if (data.type === "custom-input-list") {
-                        const isIncluded = data.id === "includedActivities";
-                        const isFilters = data.id === "filters";
-                        const customInput = isIncluded
-                          ? customIncludedInput
-                          : data.label === "Not Included"
-                          ? customExcludedInput
-                          : isFilters
-                          ? customFilterInput
-                          : customSpecialInput;
-                        const setCustomInput = isIncluded
-                          ? setCustomIncludedInput
-                          : data.label === "Not Included"
-                          ? setCustomExcludedInput
-                          : isFilters
-                          ? setCustomFilterInput
-                          : setCustomSpecialInput;
-
-                        return (
-                          <FormField
-                            key={data.id}
-                            control={form.control}
-                            name={data.id as keyof FormDataType}
-                            render={({ field }) => (
-                              <FormItem className={data.className}>
-                                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                                  <div
-                                    className={`w-5 h-5 rounded flex items-center justify-center ${
-                                      isIncluded
-                                        ? "bg-green-100"
-                                        : data.label === "Not Included"
-                                        ? "bg-red-100"
-                                        : isFilters
-                                        ? "bg-purple-100"
-                                        : "bg-blue-100"
-                                    }`}
-                                  >
-                                    {isIncluded ? (
-                                      <Plus className="h-3 w-3 text-green-600" />
-                                    ) : data.label === "Not Included" ? (
-                                      <Minus className="h-3 w-3 text-red-600" />
-                                    ) : isFilters ? (
-                                      <Plus className="h-3 w-3 text-purple-600" />
-                                    ) : (
-                                      <Plus className="h-3 w-3 text-blue-600" />
-                                    )}
-                                  </div>
-                                  <FormLabel className="text-sm font-semibold text-gray-700 font-instrument">
-                                    {data.label}
-                                  </FormLabel>
-                                </div>
-                                <FormControl>
-                                  <div className="space-y-3 mt-3">
-                                    <div className="flex gap-2">
-                                      <Input
-                                        placeholder={data.placeholder}
-                                        className={`flex-1 border-gray-200 font-instrument ${
-                                          isIncluded
-                                            ? "focus:border-green-400 focus:ring-green-100"
-                                            : data.label === "Not Included"
-                                            ? "focus:border-red-400 focus:ring-red-100"
-                                            : isFilters
-                                            ? "focus:border-purple-400 focus:ring-purple-100"
-                                            : "focus:border-blue-400 focus:ring-blue-100"
-                                        }`}
-                                        value={customInput}
-                                        onChange={(e) =>
-                                          setCustomInput(e.target.value)
-                                        }
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            const item = customInput.trim();
-                                            const currentVals = Array.isArray(
-                                              field.value
-                                            )
-                                              ? (field.value as string[])
-                                              : [];
-                                            if (
-                                              item &&
-                                              !currentVals.includes(item)
-                                            ) {
-                                              field.onChange([
-                                                ...currentVals,
-                                                item,
-                                              ]);
-                                              setCustomInput("");
-                                            }
-                                          }
-                                        }}
-                                      />
-                                      <Button
-                                        type="button"
-                                        size="sm"
-                                        onClick={() => {
-                                          const item = customInput.trim();
-                                          const currentVals = Array.isArray(
-                                            field.value
-                                          )
-                                            ? (field.value as string[])
-                                            : [];
-                                          if (
-                                            item &&
-                                            !currentVals.includes(item)
-                                          ) {
-                                            field.onChange([
-                                              ...currentVals,
-                                              item,
-                                            ]);
-                                            setCustomInput("");
-                                          }
-                                        }}
-                                        className={`px-3 text-white ${
-                                          isIncluded
-                                            ? "bg-green-500 hover:bg-green-600"
-                                            : data.label === "Not Included"
-                                            ? "bg-red-500 hover:bg-red-600"
-                                            : isFilters
-                                            ? "bg-purple-500 hover:bg-purple-600"
-                                            : "bg-blue-500 hover:bg-blue-600"
-                                        }`}
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-
-                                    {/* Quick Add Options */}
-                                    <div className="space-y-2">
-                                      <p className="text-xs text-gray-500 font-instrument">
-                                        Quick add:
-                                      </p>
-                                      <div className="flex flex-wrap gap-2">
-                                        {(isIncluded
-                                          ? [
-                                              "Breakfast",
-                                              "Lunch",
-                                              "Dinner",
-                                              "Accommodation",
-                                              "Transportation",
-                                              "Guide",
-                                              "Entry Fees",
-                                              "Activities",
-                                            ]
-                                          : data.label === "Not Included"
-                                          ? [
-                                              "International Flights",
-                                              "Personal Expenses",
-                                              "Travel Insurance",
-                                              "Visa Fees",
-                                              "Tips",
-                                              "Alcoholic Beverages",
-                                              "Shopping",
-                                            ]
-                                          : isFilters
-                                          ? [
-                                              "Adventure",
-                                              "Cultural",
-                                              "Beach",
-                                              "Mountain",
-                                              "City",
-                                              "Nature",
-                                              "Wildlife",
-                                              "Photography",
-                                            ]
-                                          : [
-                                              "Special Activity",
-                                              "Unique Experience",
-                                              "Local Culture",
-                                              "Scenic Views",
-                                            ]
-                                        ).map((quickOption) => {
-                                          const currentVals = Array.isArray(
-                                            field.value
-                                          )
-                                            ? (field.value as string[])
-                                            : [];
-                                          const isAlreadyAdded =
-                                            currentVals.includes(quickOption);
-
-                                          return (
-                                            <Button
-                                              key={quickOption}
-                                              type="button"
-                                              variant="outline"
-                                              size="sm"
-                                              disabled={isAlreadyAdded}
-                                              onClick={() => {
-                                                if (!isAlreadyAdded) {
-                                                  field.onChange([
-                                                    ...currentVals,
-                                                    quickOption,
-                                                  ]);
-                                                }
-                                              }}
-                                              className={`text-xs font-instrument ${
-                                                isAlreadyAdded
-                                                  ? "opacity-50 cursor-not-allowed"
-                                                  : isIncluded
-                                                  ? "border-green-300 text-green-700 hover:bg-green-50"
-                                                  : data.label ===
-                                                    "Not Included"
-                                                  ? "border-red-300 text-red-700 hover:bg-red-50"
-                                                  : isFilters
-                                                  ? "border-purple-300 text-purple-700 hover:bg-purple-50"
-                                                  : "border-blue-300 text-blue-700 hover:bg-blue-50"
-                                              }`}
-                                            >
-                                              {isAlreadyAdded ? "✓ " : "+ "}
-                                              {quickOption}
-                                            </Button>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-
-                                    {Array.isArray(field.value) &&
-                                      (field.value as string[]).length > 0 && (
-                                        <div className="flex flex-wrap gap-2">
-                                          {(field.value as string[]).map(
-                                            (
-                                              item: string,
-                                              itemIndex: number
-                                            ) => (
-                                              <span
-                                                key={itemIndex}
-                                                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                                className={`ml-1 rounded-full p-0.5 transition-colors ${
                                                   isIncluded
-                                                    ? "bg-green-100 text-green-800"
-                                                    : data.label ===
-                                                      "Not Included"
-                                                    ? "bg-red-100 text-red-800"
-                                                    : isFilters
-                                                    ? "bg-purple-100 text-purple-800"
-                                                    : "bg-blue-100 text-blue-800"
+                                                    ? 'hover:bg-green-200'
+                                                    : data.label === 'Not Included'
+                                                      ? 'hover:bg-red-200'
+                                                      : isFilters
+                                                        ? 'hover:bg-purple-200'
+                                                        : 'hover:bg-blue-200'
                                                 }`}
                                               >
-                                                {item}
-                                                <button
-                                                  type="button"
-                                                  onClick={() => {
-                                                    const newItems = (
-                                                      field.value as string[]
-                                                    ).filter(
-                                                      (_: string, i: number) =>
-                                                        i !== itemIndex
-                                                    );
-                                                    field.onChange(newItems);
-                                                  }}
-                                                  className={`ml-1 rounded-full p-0.5 transition-colors ${
-                                                    isIncluded
-                                                      ? "hover:bg-green-200"
-                                                      : data.label ===
-                                                        "Not Included"
-                                                      ? "hover:bg-red-200"
-                                                      : isFilters
-                                                      ? "hover:bg-purple-200"
-                                                      : "hover:bg-blue-200"
-                                                  }`}
-                                                >
-                                                  <Minus className="h-3 w-3" />
-                                                </button>
-                                              </span>
-                                            )
-                                          )}
-                                        </div>
-                                      )}
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        );
-                      }
-
-                      return null;
+                                                <Minus className="h-3 w-3" />
+                                              </button>
+                                            </span>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
                     }
-                  )}
+
+                    return null;
+                  })}
                 </div>
 
                 {/* Trip Image Upload Section - Only show in Step 1 */}
@@ -1921,8 +1690,7 @@ export const CreateDestinationForm = ({
                                   <CardContent className="flex flex-col items-center justify-center p-8">
                                     <Camera className="h-12 w-12 text-muted-foreground mb-4" />
                                     <p className="text-sm text-muted-foreground mb-4 text-center">
-                                      Upload a stunning image that showcases
-                                      your trip destination
+                                      Upload a stunning image that showcases your trip destination
                                     </p>
                                     <UploadButton label="Choose Image" />
                                   </CardContent>
@@ -1930,10 +1698,7 @@ export const CreateDestinationForm = ({
                               ) : (
                                 <Card className="overflow-hidden">
                                   <div className="relative group">
-                                    <AspectRatio
-                                      ratio={16 / 9}
-                                      className="bg-muted"
-                                    >
+                                    <AspectRatio ratio={16 / 9} className="bg-muted">
                                       <Image
                                         fill
                                         src={field.value}
@@ -1943,17 +1708,16 @@ export const CreateDestinationForm = ({
                                       />
                                     </AspectRatio>
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                      <div className="flex gap-2">
+                                      <div className="flex gap-2 items-center">
                                         <UploadButton label="Change Image" />
                                         <Button
                                           type="button"
                                           onClick={removeImage}
                                           variant="destructive"
                                           size="sm"
-                                          className="font-instrument"
+                                          className="absolute right-2 top-2 font-instrument border-2 rounded-xl !px-8 !py-6 font-bold transition-all bg-red-600 text-white text-base border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-red-600/80 cursor-pointer"
                                         >
-                                          <X className="h-4 w-4 mr-2" />
-                                          Remove
+                                          <X size={20} strokeWidth={5} />
                                         </Button>
                                       </div>
                                     </div>
@@ -1964,8 +1728,8 @@ export const CreateDestinationForm = ({
                           </FormControl>
                           <FormMessage />
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upload a high-quality image (JPG, PNG, or WEBP) that
-                            represents your trip destination.
+                            Upload a high-quality image (JPG, PNG, or WEBP) that represents your
+                            trip destination.
                           </p>
                         </FormItem>
                       )}
@@ -2016,7 +1780,7 @@ export const CreateDestinationForm = ({
                                   removeDay(index);
                                 }}
                                 className={`text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 font-instrument ${
-                                  watchedNoOfDays ? "opacity-50" : ""
+                                  watchedNoOfDays ? 'opacity-50' : ''
                                 }`}
                               >
                                 <Minus className="h-4 w-4" />
@@ -2060,13 +1824,11 @@ export const CreateDestinationForm = ({
                                       className="h-11 w-full border border-gray-200 rounded px-3 font-instrument"
                                     >
                                       <option value="">Select stop</option>
-                                      {(watchedStops || []).map(
-                                        (s: string, si: number) => (
-                                          <option key={si} value={s}>
-                                            {s}
-                                          </option>
-                                        )
-                                      )}
+                                      {(watchedStops || []).map((s: string, si: number) => (
+                                        <option key={si} value={s}>
+                                          {s}
+                                        </option>
+                                      ))}
                                     </select>
                                   </FormControl>
                                   <FormMessage />
@@ -2148,38 +1910,26 @@ export const CreateDestinationForm = ({
                                         <Input
                                           placeholder="Add an activity..."
                                           className="flex-1 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
-                                          value={
-                                            customActivityInput[index] || ""
-                                          }
-                                          onChange={(e) =>
-                                            setCustomActivityInput((prev) => ({
+                                          value={customActivityInput[index] || ''}
+                                          onChange={e =>
+                                            setCustomActivityInput(prev => ({
                                               ...prev,
                                               [index]: e.target.value,
                                             }))
                                           }
-                                          onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
+                                          onKeyDown={e => {
+                                            if (e.key === 'Enter') {
                                               e.preventDefault();
-                                              const activity =
-                                                customActivityInput[
-                                                  index
-                                                ]?.trim();
+                                              const activity = customActivityInput[index]?.trim();
                                               if (
                                                 activity &&
-                                                !(field.value || []).includes(
-                                                  activity
-                                                )
+                                                !(field.value || []).includes(activity)
                                               ) {
-                                                field.onChange([
-                                                  ...(field.value || []),
-                                                  activity,
-                                                ]);
-                                                setCustomActivityInput(
-                                                  (prev) => ({
-                                                    ...prev,
-                                                    [index]: "",
-                                                  })
-                                                );
+                                                field.onChange([...(field.value || []), activity]);
+                                                setCustomActivityInput(prev => ({
+                                                  ...prev,
+                                                  [index]: '',
+                                                }));
                                               }
                                             }
                                           }}
@@ -2188,26 +1938,16 @@ export const CreateDestinationForm = ({
                                           type="button"
                                           size="sm"
                                           onClick={() => {
-                                            const activity =
-                                              customActivityInput[
-                                                index
-                                              ]?.trim();
+                                            const activity = customActivityInput[index]?.trim();
                                             if (
                                               activity &&
-                                              !(field.value || []).includes(
-                                                activity
-                                              )
+                                              !(field.value || []).includes(activity)
                                             ) {
-                                              field.onChange([
-                                                ...(field.value || []),
-                                                activity,
-                                              ]);
-                                              setCustomActivityInput(
-                                                (prev) => ({
-                                                  ...prev,
-                                                  [index]: "",
-                                                })
-                                              );
+                                              field.onChange([...(field.value || []), activity]);
+                                              setCustomActivityInput(prev => ({
+                                                ...prev,
+                                                [index]: '',
+                                              }));
                                             }
                                           }}
                                           className="bg-purple-600 hover:bg-purple-700 text-white px-3"
@@ -2218,10 +1958,7 @@ export const CreateDestinationForm = ({
                                       {(field.value || []).length > 0 && (
                                         <div className="flex flex-wrap gap-2">
                                           {(field.value || []).map(
-                                            (
-                                              activity: string,
-                                              actIndex: number
-                                            ) => (
+                                            (activity: string, actIndex: number) => (
                                               <span
                                                 key={actIndex}
                                                 className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
@@ -2233,12 +1970,9 @@ export const CreateDestinationForm = ({
                                                     const newActivities = (
                                                       field.value || []
                                                     ).filter(
-                                                      (_: string, i: number) =>
-                                                        i !== actIndex
+                                                      (_: string, i: number) => i !== actIndex
                                                     );
-                                                    field.onChange(
-                                                      newActivities
-                                                    );
+                                                    field.onChange(newActivities);
                                                   }}
                                                   className="ml-1 hover:bg-purple-200 rounded-full p-0.5 transition-colors"
                                                 >
@@ -2283,22 +2017,18 @@ export const CreateDestinationForm = ({
                                           <CardContent className="flex flex-col items-center justify-center p-6">
                                             <Camera className="h-8 w-8 text-muted-foreground mb-2" />
                                             <p className="text-xs text-muted-foreground mb-3 text-center font-instrument">
-                                              Add an image for this day&apos;s
-                                              activities
+                                              Add an image for this day&apos;s activities
                                             </p>
-                                            {createDayWiseUploadButton(
-                                              index,
-                                              "Choose Image"
-                                            )}
+                                            <DayWiseUploadButton
+                                              dayIndex={index}
+                                              label="Choose Image"
+                                            />
                                           </CardContent>
                                         </Card>
                                       ) : (
                                         <Card className="overflow-hidden">
                                           <div className="relative group">
-                                            <AspectRatio
-                                              ratio={4 / 3}
-                                              className="bg-muted"
-                                            >
+                                            <AspectRatio ratio={4 / 3} className="bg-muted">
                                               <Image
                                                 fill
                                                 src={field.value}
@@ -2309,15 +2039,13 @@ export const CreateDestinationForm = ({
                                             </AspectRatio>
                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                               <div className="flex gap-2">
-                                                {createDayWiseUploadButton(
-                                                  index,
-                                                  "Change Image"
-                                                )}
+                                                <DayWiseUploadButton
+                                                  dayIndex={index}
+                                                  label="Change Image"
+                                                />
                                                 <Button
                                                   type="button"
-                                                  onClick={() =>
-                                                    removeDayWiseImage(index)
-                                                  }
+                                                  onClick={() => removeDayWiseImage(index)}
                                                   variant="destructive"
                                                   size="sm"
                                                   className="font-instrument"
@@ -2334,8 +2062,8 @@ export const CreateDestinationForm = ({
                                   </FormControl>
                                   <FormMessage />
                                   <p className="text-xs text-gray-500 mt-1 font-instrument">
-                                    Upload an image that represents this
-                                    day&apos;s activities or destination.
+                                    Upload an image that represents this day&apos;s activities or
+                                    destination.
                                   </p>
                                 </FormItem>
                               )}
@@ -2360,7 +2088,7 @@ export const CreateDestinationForm = ({
                           addDay();
                         }}
                         className={`text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300 font-instrument ${
-                          watchedNoOfDays ? "opacity-50" : ""
+                          watchedNoOfDays ? 'opacity-50' : ''
                         }`}
                       >
                         <Plus className="h-4 w-4 mr-2" />
@@ -2396,9 +2124,7 @@ export const CreateDestinationForm = ({
                       </li>
                       <li className="flex items-start">
                         <span className="mr-3 text-green-500">✓</span>
-                        <span>
-                          Add day-wise images to enhance your itinerary
-                        </span>
+                        <span>Add day-wise images to enhance your itinerary</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-3 text-green-500">✓</span>
@@ -2437,11 +2163,11 @@ export const CreateDestinationForm = ({
                         </svg>
                         {isSubmitting
                           ? isEditMode
-                            ? "Updating..."
-                            : "Saving..."
+                            ? 'Updating...'
+                            : 'Saving...'
                           : isEditMode
-                          ? "Update as Draft"
-                          : "Save as Draft"}
+                            ? 'Update as Draft'
+                            : 'Save as Draft'}
                       </Button>
                     )}
 
@@ -2463,11 +2189,11 @@ export const CreateDestinationForm = ({
                       >
                         {isSubmitting
                           ? isEditMode
-                            ? "Updating..."
-                            : "Creating..."
+                            ? 'Updating...'
+                            : 'Creating...'
                           : isEditMode
-                          ? "Update Travel Experience"
-                          : "Create Travel Experience"}
+                            ? 'Update Travel Experience'
+                            : 'Create Travel Experience'}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"

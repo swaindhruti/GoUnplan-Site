@@ -1,9 +1,9 @@
-import { getUnreadCount } from "@/actions/chat/actions";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { Shrink, RefreshCcw } from "lucide-react";
-import { UnreadcountMessageBox } from "./common";
-import { useRouter } from "next/navigation";
+import { getUnreadCount } from '@/actions/chat/actions';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { Shrink, RefreshCcw } from 'lucide-react';
+import { UnreadcountMessageBox } from './common';
+import { useRouter } from 'next/navigation';
 
 export const MessageComponent = () => {
   const session = useSession();
@@ -21,7 +21,7 @@ export const MessageComponent = () => {
         const result = await getUnreadCount(session.data.user.id);
         setUnreadCount(result.count || 0);
       } catch (error) {
-        console.error("Error fetching unread count:", error);
+        console.error('Error fetching unread count:', error);
         setUnreadCount(0);
       } finally {
         setLoading(false);
@@ -38,14 +38,14 @@ export const MessageComponent = () => {
       const result = await getUnreadCount(session.data.user.id);
       setUnreadCount(result.count || 0);
     } catch (error) {
-      console.error("Error refreshing unread count:", error);
+      console.error('Error refreshing unread count:', error);
     }
   };
   const changeShrinkState = () => {
     setIsShrinked(!isShrinked);
   };
   const chats = () => {
-    router.push("/chat");
+    router.push('/chat');
   };
   return (
     <>
@@ -81,10 +81,7 @@ export const MessageComponent = () => {
             </div>
           </div>
 
-          <div
-            onClick={chats}
-            className="flex items-center cursor-pointer space-x-3"
-          >
+          <div onClick={chats} className="flex items-center cursor-pointer space-x-3">
             <UnreadcountMessageBox unreadCount={unreadCount} />
 
             <div className="flex-1">
@@ -97,15 +94,13 @@ export const MessageComponent = () => {
                 <div>
                   <p className="text-lg font-bricolage  font-semibold text-gray-800">
                     {unreadCount === 0
-                      ? "No unread messages"
+                      ? 'No unread messages'
                       : unreadCount === 1
-                      ? "1 unread message"
-                      : `${unreadCount} unread messages`}
+                        ? '1 unread message'
+                        : `${unreadCount} unread messages`}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {unreadCount > 0
-                      ? "You have new messages waiting"
-                      : "You're all caught up!"}
+                    {unreadCount > 0 ? 'You have new messages waiting' : "You're all caught up!"}
                   </p>
                 </div>
               )}

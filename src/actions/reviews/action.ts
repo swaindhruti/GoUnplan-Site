@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireUser } from "@/lib/roleGaurd";
+import prisma from '@/lib/prisma';
+import { requireUser } from '@/lib/roleGaurd';
 
 export async function submitReview({
   userId,
@@ -16,7 +16,7 @@ export async function submitReview({
 }) {
   const session = await requireUser();
   if (!session || session.user.id !== userId) {
-    return { success: false, message: "Unauthorized" };
+    return { success: false, message: 'Unauthorized' };
   }
 
   try {
@@ -24,7 +24,7 @@ export async function submitReview({
       where: {
         id: bookingId,
         userId,
-        status: "CONFIRMED",
+        status: 'CONFIRMED',
         isReviewed: false,
       },
       include: { travelPlan: true },
@@ -33,11 +33,11 @@ export async function submitReview({
     if (!booking) {
       return {
         success: false,
-        message: "Booking not found or already reviewed",
+        message: 'Booking not found or already reviewed',
       };
     }
 
-    const review = await prisma.$transaction(async (tx) => {
+    const review = await prisma.$transaction(async tx => {
       const newReview = await tx.review.create({
         data: {
           userId,
@@ -59,8 +59,8 @@ export async function submitReview({
 
     return { success: true, review };
   } catch (error) {
-    console.error("Error submitting review:", error);
-    return { success: false, message: "Failed to submit review" };
+    console.error('Error submitting review:', error);
+    return { success: false, message: 'Failed to submit review' };
   }
 }
 
@@ -80,13 +80,13 @@ export async function getTripReviewsAndRating(travelPlanId: string) {
               },
             },
           },
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
         },
       },
     });
 
     if (!travelPlan) {
-      return { success: false, message: "Travel plan not found" };
+      return { success: false, message: 'Travel plan not found' };
     }
 
     return {
@@ -96,8 +96,8 @@ export async function getTripReviewsAndRating(travelPlanId: string) {
       reviewCount: travelPlan.reviewCount,
     };
   } catch (error) {
-    console.error("Error fetching trip reviews:", error);
-    return { success: false, message: "Failed to fetch reviews" };
+    console.error('Error fetching trip reviews:', error);
+    return { success: false, message: 'Failed to fetch reviews' };
   }
 }
 
@@ -123,13 +123,13 @@ export async function getHostRatingAndReviews(hostId: string) {
               },
             },
           },
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
         },
       },
     });
 
     if (!host) {
-      return { success: false, message: "Host not found" };
+      return { success: false, message: 'Host not found' };
     }
 
     return {
@@ -139,22 +139,22 @@ export async function getHostRatingAndReviews(hostId: string) {
       reviewCount: host.reviewCount,
     };
   } catch (error) {
-    console.error("Error fetching host rating:", error);
-    return { success: false, message: "Failed to fetch host rating" };
+    console.error('Error fetching host rating:', error);
+    return { success: false, message: 'Failed to fetch host rating' };
   }
 }
 
 export async function getPendingReviewBookings(userId: string) {
   const session = await requireUser();
   if (!session || session.user.id !== userId) {
-    return { success: false, message: "Unauthorized" };
+    return { success: false, message: 'Unauthorized' };
   }
 
   try {
     const bookings = await prisma.booking.findMany({
       where: {
         userId,
-        status: "CONFIRMED",
+        status: 'CONFIRMED',
         isReviewed: false,
         endDate: { lt: new Date() },
       },
@@ -175,20 +175,20 @@ export async function getPendingReviewBookings(userId: string) {
           },
         },
       },
-      orderBy: { endDate: "desc" },
+      orderBy: { endDate: 'desc' },
     });
 
     return { success: true, bookings };
   } catch (error) {
-    console.error("Error fetching pending reviews:", error);
-    return { success: false, message: "Failed to fetch pending reviews" };
+    console.error('Error fetching pending reviews:', error);
+    return { success: false, message: 'Failed to fetch pending reviews' };
   }
 }
 
 export async function getUserReviews(userId: string) {
   const session = await requireUser();
   if (!session || session.user.id !== userId) {
-    return { success: false, message: "Unauthorized" };
+    return { success: false, message: 'Unauthorized' };
   }
 
   try {
@@ -227,7 +227,7 @@ export async function getUserReviews(userId: string) {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
@@ -238,14 +238,12 @@ export async function getUserReviews(userId: string) {
       averageRating:
         reviews.length > 0
           ? Math.round(
-              (reviews.reduce((sum, review) => sum + review.rating, 0) /
-                reviews.length) *
-                10
+              (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10
             ) / 10
           : 0,
     };
   } catch (error) {
-    console.error("Error fetching user reviews:", error);
-    return { success: false, message: "Failed to fetch user reviews" };
+    console.error('Error fetching user reviews:', error);
+    return { success: false, message: 'Failed to fetch user reviews' };
   }
 }

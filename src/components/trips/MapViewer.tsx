@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useCallback, useEffect, memo, useRef } from 'react';
 import { geocodeLocations } from '@/actions/test-map-action';
@@ -38,7 +38,7 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [zoom, setZoom] = useState(8);
-  
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef<LeafletMarker[]>([]);
@@ -50,13 +50,13 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
     if (markerData.length === 1) {
       return {
         center: { lat: markerData[0].lat, lng: markerData[0].lon },
-        zoom: 12
+        zoom: 12,
       };
     }
 
     const lats = markerData.map(m => m.lat);
     const lons = markerData.map(m => m.lon);
-    
+
     const minLat = Math.min(...lats);
     const maxLat = Math.max(...lats);
     const minLon = Math.min(...lons);
@@ -78,97 +78,94 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
 
     return {
       center: { lat: centerLat, lng: centerLon },
-      zoom: calculatedZoom
+      zoom: calculatedZoom,
     };
   }, []);
 
   // Initialize Leaflet Map with Ola Maps Tiles
-  const initializeMap = useCallback((markerData: Marker[]) => {
-    if (!mapContainerRef.current || !window.L) return;
+  const initializeMap = useCallback(
+    (markerData: Marker[]) => {
+      if (!mapContainerRef.current || !window.L) return;
 
-    const bounds = calculateMapBounds(markerData);
-    if (!bounds) return;
+      const bounds = calculateMapBounds(markerData);
+      if (!bounds) return;
 
-    try {
-      // Create Leaflet map
-      const map = window.L.map(mapContainerRef.current, {
-        center: [bounds.center.lat, bounds.center.lng],
-        zoom: bounds.zoom,
-        zoomControl: false,
-      }) as LeafletMap;
+      try {
+        // Create Leaflet map
+        const map = window.L.map(mapContainerRef.current, {
+          center: [bounds.center.lat, bounds.center.lng],
+          zoom: bounds.zoom,
+          zoomControl: false,
+        }) as LeafletMap;
 
-      const apiKey = process.env.NEXT_PUBLIC_OLA_MAPS_API_KEY;
-      
-      if (apiKey) {
-        window.L.tileLayer(
-          `https://api.olamaps.io/tiles/v1/styles/default/{z}/{x}/{y}.png?api_key=${apiKey}`,
-          {
-            attribution: '© Ola Maps',
-            maxZoom: 19,
-          }
-        ).addTo(map);
-      } else {
-        // Fallback to OpenStreetMap
-        window.L.tileLayer(
-          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          {
+        const apiKey = process.env.NEXT_PUBLIC_OLA_MAPS_API_KEY;
+
+        if (apiKey) {
+          window.L.tileLayer(
+            `https://api.olamaps.io/tiles/v1/styles/default/{z}/{x}/{y}.png?api_key=${apiKey}`,
+            {
+              attribution: '© Ola Maps',
+              maxZoom: 19,
+            }
+          ).addTo(map);
+        } else {
+          // Fallback to OpenStreetMap
+          window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19,
-          }
-        ).addTo(map);
-      }
+          }).addTo(map);
+        }
 
-      // Draw route line connecting markers
-      if (markerData.length > 1) {
-        const routeCoordinates = markerData.map(m => [m.lat, m.lon] as [number, number]);
-        
-        // Create polyline (route)
-        window.L.polyline(routeCoordinates, {
-          color: '#4f46e5',
-          weight: 3,
-          opacity: 0.7,
-          smoothFactor: 1,
-          dashArray: '10, 10', // Dashed line
-        }).addTo(map);
+        // Draw route line connecting markers
+        if (markerData.length > 1) {
+          const routeCoordinates = markerData.map(m => [m.lat, m.lon] as [number, number]);
 
-        // Add arrows to show direction
-        for (let i = 0; i < markerData.length - 1; i++) {
-          const start = markerData[i];
-          const end = markerData[i + 1];
-          const midLat = (start.lat + end.lat) / 2;
-          const midLon = (start.lon + end.lon) / 2;
+          // Create polyline (route)
+          window.L.polyline(routeCoordinates, {
+            color: '#4f46e5',
+            weight: 3,
+            opacity: 0.7,
+            smoothFactor: 1,
+            dashArray: '10, 10', // Dashed line
+          }).addTo(map);
 
-          // Calculate arrow rotation
-          const angle = Math.atan2(end.lon - start.lon, end.lat - start.lat) * 180 / Math.PI;
+          // Add arrows to show direction
+          for (let i = 0; i < markerData.length - 1; i++) {
+            const start = markerData[i];
+            const end = markerData[i + 1];
+            const midLat = (start.lat + end.lat) / 2;
+            const midLon = (start.lon + end.lon) / 2;
 
-          const arrowIcon = window.L.divIcon({
-            html: `
+            // Calculate arrow rotation
+            const angle = (Math.atan2(end.lon - start.lon, end.lat - start.lat) * 180) / Math.PI;
+
+            const arrowIcon = window.L.divIcon({
+              html: `
               <div style="transform: rotate(${angle}deg);">
                 ▼
               </div>
             `,
-            className: 'arrow-marker',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
-            
-          });
+              className: 'arrow-marker',
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
+            });
 
-          window.L.marker([midLat, midLon], {
-            icon: arrowIcon,
-            interactive: false,
-          }).addTo(map);
+            window.L.marker([midLat, midLon], {
+              icon: arrowIcon,
+              interactive: false,
+            }).addTo(map);
+          }
         }
-      }
 
-      // Add custom markers
-      markersRef.current = markerData.map((marker, idx) => {
-        // Create custom icon - all same size with day numbers
-        const isStart = idx === 0;
-        const isEnd = idx === markerData.length - 1;
-        const dayNumber = idx + 1;
-        
-        const customIcon = window.L.divIcon({
-          html: `
+        // Add custom markers
+        markersRef.current = markerData.map((marker, idx) => {
+          // Create custom icon - all same size with day numbers
+          const isStart = idx === 0;
+          const isEnd = idx === markerData.length - 1;
+          const dayNumber = idx + 1;
+
+          const customIcon = window.L.divIcon({
+            html: `
             <div style="
               width: 36px;
               height: 36px;
@@ -186,19 +183,23 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
               ${dayNumber}
             </div>
           `,
-          className: 'custom-marker',
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
-        });
+            className: 'custom-marker',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+          });
 
-        // Create marker
-        const leafletMarker = window.L.marker([marker.lat, marker.lon], {
-          icon: customIcon,
-        }).addTo(map) as LeafletMarker;
+          // Create marker
+          const leafletMarker = window.L.marker([marker.lat, marker.lon], {
+            icon: customIcon,
+          }).addTo(map) as LeafletMarker;
 
-        // Add popup
-        const label = isStart ? 'Day 1 - Start' : isEnd ? `Day ${dayNumber} - End` : `Day ${dayNumber}`;
-        const popupContent = `
+          // Add popup
+          const label = isStart
+            ? 'Day 1 - Start'
+            : isEnd
+              ? `Day ${dayNumber} - End`
+              : `Day ${dayNumber}`;
+          const popupContent = `
           <div style="padding: 8px; min-width: 200px;">
             <div style="display: inline-block; background: ${isStart ? '#10b981' : isEnd ? '#ef4444' : '#4f46e5'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 6px;">
               ${label}
@@ -210,30 +211,32 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
             </p>
           </div>
         `;
-        leafletMarker.bindPopup(popupContent);
+          leafletMarker.bindPopup(popupContent);
 
-        return leafletMarker;
-      });
+          return leafletMarker;
+        });
 
-      // Fit bounds to show all markers
-      if (markerData.length > 1) {
-        const latLngs = markerData.map(m => [m.lat, m.lon] as [number, number]);
-        const bounds = window.L.latLngBounds(latLngs);
-        map.fitBounds(bounds, { padding: [50, 50] });
+        // Fit bounds to show all markers
+        if (markerData.length > 1) {
+          const latLngs = markerData.map(m => [m.lat, m.lon] as [number, number]);
+          const bounds = window.L.latLngBounds(latLngs);
+          map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        // Update zoom on map zoom
+        map.on('zoomend', () => {
+          setZoom(map.getZoom());
+        });
+
+        mapInstanceRef.current = map;
+        setMapLoaded(true);
+      } catch (err) {
+        console.error('Map initialization error:', err);
+        setError('Failed to initialize map');
       }
-
-      // Update zoom on map zoom
-      map.on('zoomend', () => {
-        setZoom(map.getZoom());
-      });
-
-      mapInstanceRef.current = map;
-      setMapLoaded(true);
-    } catch (err) {
-      console.error('Map initialization error:', err);
-      setError('Failed to initialize map');
-    }
-  }, [calculateMapBounds]);
+    },
+    [calculateMapBounds]
+  );
 
   // Load Leaflet library
   useEffect(() => {
@@ -269,7 +272,7 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
   // Handle zoom controls
   const handleZoom = useCallback((direction: 'in' | 'out') => {
     if (!mapInstanceRef.current) return;
-    
+
     if (direction === 'in') {
       mapInstanceRef.current.zoomIn();
     } else {
@@ -280,7 +283,7 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
   // Handle fullscreen
   const handleFullscreen = useCallback(() => {
     if (!mapContainerRef.current) return;
-    
+
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
@@ -316,13 +319,13 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
         const checkLeaflet = setInterval(() => {
           if (window.L) {
             clearInterval(checkLeaflet);
-            
+
             // Destroy previous map
             if (mapInstanceRef.current) {
               mapInstanceRef.current.remove();
               markersRef.current = [];
             }
-            
+
             // Small delay to ensure DOM is ready
             setTimeout(() => {
               initializeMap(result.data);
@@ -339,7 +342,6 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
             setIsLoading(false);
           }
         }, 10000);
-
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err.message : 'An error occurred');
@@ -397,11 +399,11 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
                 >
                   <ZoomIn className="w-5 h-5" />
                 </button>
-                
+
                 <div className="flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-600 border-b">
                   {zoom}
                 </div>
-                
+
                 <button
                   onClick={() => handleZoom('out')}
                   className="flex items-center justify-center w-10 h-10 text-gray-700 hover:bg-gray-100 transition-colors border-b"
@@ -447,9 +449,9 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
             {markers.map((marker, idx) => {
               // const isStart = idx === 0;
               // const isEnd = idx === markers.length - 1;
-              const bgColor = 'bg-purple-600' 
+              const bgColor = 'bg-purple-600';
               const dayNumber = idx + 1;
-              
+
               return (
                 <div
                   key={idx}
@@ -458,7 +460,7 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
                     if (mapInstanceRef.current && markersRef.current[idx]) {
                       // Open popup
                       markersRef.current[idx].openPopup();
-                      
+
                       // Fly to marker
                       mapInstanceRef.current.flyTo([marker.lat, marker.lon], 14, {
                         duration: 1,
@@ -467,13 +469,17 @@ const MapViewer = memo(({ stops, isOpen = true }: MapViewerProps) => {
                   }}
                 >
                   <div className="flex items-start gap-2">
-                    <div className={`w-8 h-8 rounded-full ${bgColor} text-white flex items-center justify-center text-sm font-bold flex-shrink-0`}>
+                    <div
+                      className={`w-8 h-8 rounded-full ${bgColor} text-white flex items-center justify-center text-sm font-bold flex-shrink-0`}
+                    >
                       {dayNumber}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-medium text-gray-900 truncate">{marker.name}</p>
-                        <span className="text-xs text-gray-500 whitespace-nowrap">Day {dayNumber}</span>
+                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                          Day {dayNumber}
+                        </span>
                       </div>
                       {marker.displayName && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">

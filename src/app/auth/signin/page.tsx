@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { signIn, getSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { toast } from "sonner";
+import { useState, useEffect, Suspense } from 'react';
+import { signIn, getSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { toast } from 'sonner';
 import {
   AlertCircle,
   CheckCircle2,
@@ -18,10 +18,10 @@ import {
   Sparkles,
   MapPin,
   User,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface FormData {
   email: string;
@@ -36,28 +36,28 @@ interface FormErrors {
 
 function SignInForm() {
   const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const message = searchParams.get("message");
+    const message = searchParams.get('message');
     if (message) {
       setSuccessMessage(message);
       toast.success(message, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 4000,
       });
@@ -66,13 +66,13 @@ function SignInForm() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [name]: undefined,
       }));
@@ -92,19 +92,19 @@ function SignInForm() {
       //   duration: 2000,
       // });
 
-      await signIn("google", {
-        callbackUrl: "/",
+      await signIn('google', {
+        callbackUrl: '/',
         redirect: true,
       });
     } catch (error) {
-      console.error("Google signin error:", error);
-      toast.error("Failed to sign in with Google. Please try again.", {
+      console.error('Google signin error:', error);
+      toast.error('Failed to sign in with Google. Please try again.', {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 4000,
       });
@@ -115,13 +115,13 @@ function SignInForm() {
     const newErrors: FormErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = 'Email is invalid';
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     }
 
     setErrors(newErrors);
@@ -129,11 +129,11 @@ function SignInForm() {
       const firstError = Object.values(newErrors)[0];
       toast.error(firstError, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 4000,
       });
@@ -149,57 +149,57 @@ function SignInForm() {
 
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage("");
+    setSuccessMessage('');
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn('credentials', {
         email: formData.email.trim(),
         password: formData.password,
         redirect: false,
       });
 
       if (result?.error) {
-        const errorMessage = "Invalid email or password";
+        const errorMessage = 'Invalid email or password';
         setErrors({ general: errorMessage });
         toast.error(errorMessage, {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)",
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(196, 181, 253, 0.3)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
           duration: 4000,
         });
       } else if (result?.ok) {
-        toast.success("Welcome back! Signing you in...", {
+        toast.success('Welcome back! Signing you in...', {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(196, 181, 253, 0.3)",
-            color: "white",
-            fontFamily: "var(--font-instrument)",
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(196, 181, 253, 0.3)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
           duration: 3000,
         });
 
         const session = await getSession();
         if (session) {
-          router.push("/");
+          router.push('/');
           router.refresh();
         }
       }
     } catch (error) {
-      console.error("Signin error:", error);
-      const networkError = "Network error. Please try again.";
+      console.error('Signin error:', error);
+      const networkError = 'Network error. Please try again.';
       setErrors({ general: networkError });
       toast.error(networkError, {
         style: {
-          background: "rgba(147, 51, 234, 0.95)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(196, 181, 253, 0.3)",
-          color: "white",
-          fontFamily: "var(--font-instrument)",
+          background: 'rgba(147, 51, 234, 0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196, 181, 253, 0.3)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
         },
         duration: 4000,
       });
@@ -212,9 +212,7 @@ function SignInForm() {
     <div className="w-full">
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">
-            Welcome Back
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 font-bricolage">Welcome Back</h1>
           <p className="text-gray-600 font-instrument mt-2">
             Sign in to your account to continue your journey
           </p>
@@ -254,15 +252,13 @@ function SignInForm() {
                   value={formData.email}
                   onChange={handleInputChange}
                   className={`w-full pl-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument rounded-md border ${
-                    errors.email ? "border-red-400" : ""
+                    errors.email ? 'border-red-400' : ''
                   }`}
                   placeholder="john@example.com"
                 />
               </div>
               {errors.email && (
-                <p className="text-xs text-red-600 font-instrument mt-1">
-                  {errors.email}
-                </p>
+                <p className="text-xs text-red-600 font-instrument mt-1">{errors.email}</p>
               )}
             </div>
 
@@ -275,12 +271,12 @@ function SignInForm() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={handleInputChange}
                   className={`w-full pl-10 pr-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument rounded-md border ${
-                    errors.password ? "border-red-400" : ""
+                    errors.password ? 'border-red-400' : ''
                   }`}
                   placeholder="••••••••"
                 />
@@ -289,17 +285,11 @@ function SignInForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-red-600 font-instrument mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-xs text-red-600 font-instrument mt-1">{errors.password}</p>
               )}
             </div>
           </div>
@@ -352,9 +342,7 @@ function SignInForm() {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-instrument">
-                Or continue with
-              </span>
+              <span className="px-4 bg-white text-gray-500 font-instrument">Or continue with</span>
             </div>
           </div>
 
@@ -390,24 +378,24 @@ function SignInForm() {
             variant="outline"
             className="w-full h-12 border-gray-200 hover:bg-gray-50 font-instrument"
             onClick={() => {
-              toast.info("redirecting to registering through phone 📱", {
+              toast.info('redirecting to registering through phone 📱', {
                 style: {
-                  background: "rgba(147, 51, 234, 0.95)",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(196, 181, 253, 0.3)",
-                  color: "white",
-                  fontFamily: "var(--font-instrument)",
+                  background: 'rgba(147, 51, 234, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(196, 181, 253, 0.3)',
+                  color: 'white',
+                  fontFamily: 'var(--font-instrument)',
                 },
                 duration: 3000,
               });
-              router.push("/auth/phone");
+              router.push('/auth/phone');
             }}
           >
             Continue with Phone
           </Button>
           <div className="text-center">
             <p className="text-sm text-gray-600 font-instrument">
-              Don&apos;t have an account?{" "}
+              Don&apos;t have an account?{' '}
               <Link
                 href="/auth/signup"
                 className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
@@ -442,9 +430,7 @@ export default function SignInPage() {
           <div className="flex justify-between items-center py-6">
             <Link href="/" className="flex items-center gap-2">
               <Compass className="h-8 w-8 text-purple-600" />
-              <span className="text-2xl font-bold text-gray-900 font-bricolage">
-                GoUnplan
-              </span>
+              <span className="text-2xl font-bold text-gray-900 font-bricolage">GoUnplan</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link
@@ -497,8 +483,8 @@ export default function SignInPage() {
                     Welcome Back, Explorer
                   </h2>
                   <p className="text-white/90 text-lg font-instrument">
-                    Continue your journey and discover amazing new destinations
-                    with trusted local hosts.
+                    Continue your journey and discover amazing new destinations with trusted local
+                    hosts.
                   </p>
                 </div>
 
@@ -512,8 +498,7 @@ export default function SignInPage() {
                         Your Adventures Await
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Pick up where you left off and continue exploring
-                        incredible destinations
+                        Pick up where you left off and continue exploring incredible destinations
                       </p>
                     </div>
                   </div>
@@ -527,8 +512,7 @@ export default function SignInPage() {
                         Trusted Community
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Connect with verified hosts and fellow travelers from
-                        around the world
+                        Connect with verified hosts and fellow travelers from around the world
                       </p>
                     </div>
                   </div>
@@ -542,8 +526,7 @@ export default function SignInPage() {
                         Seamless Experience
                       </h3>
                       <p className="text-white/80 text-sm font-instrument">
-                        Your personalized dashboard with bookings, messages, and
-                        recommendations
+                        Your personalized dashboard with bookings, messages, and recommendations
                       </p>
                     </div>
                   </div>

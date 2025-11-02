@@ -1,7 +1,7 @@
-import { auth } from "@/config/auth";
-import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
-import SupportDashboardClient from "./SupportDashboardClient";
+import { auth } from '@/config/auth';
+import { redirect } from 'next/navigation';
+import prisma from '@/lib/prisma';
+import SupportDashboardClient from './SupportDashboardClient';
 
 export default async function SupportDashboard() {
   // Get current session
@@ -9,7 +9,7 @@ export default async function SupportDashboard() {
 
   // Check if user is authenticated
   if (!session?.user?.email) {
-    redirect("/auth/signin");
+    redirect('/auth/signin');
   }
 
   // Always check role directly from database to avoid JWT cache issues
@@ -19,8 +19,8 @@ export default async function SupportDashboard() {
   });
 
   // Check if user has SUPPORT or ADMIN role in database
-  if (!dbUser || (dbUser.role !== "SUPPORT" && dbUser.role !== "ADMIN")) {
-    redirect("/unauthorized");
+  if (!dbUser || (dbUser.role !== 'SUPPORT' && dbUser.role !== 'ADMIN')) {
+    redirect('/unauthorized');
   }
 
   // If we reach here, the user has proper SUPPORT or ADMIN role

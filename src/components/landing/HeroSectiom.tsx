@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from 'lucide-react';
 
-import { motion } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { handleScroll } from "@/components/global/Handlescroll";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { handleScroll } from '@/components/global/Handlescroll';
+import { Button } from '@/components/ui/button';
 
 export const HeroSection = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -20,57 +20,48 @@ export const HeroSection = () => {
   const slides = [
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610583/pexels-esan-2085998_bcqaqq.jpg",
+        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610583/pexels-esan-2085998_bcqaqq.jpg',
       text: (
         <>
-          your journey&apos;s{" "}
-          <span className="highlight-wavy ">love language</span>
+          your journey&apos;s <span className="highlight-wavy ">love language</span>
         </>
-      )
+      ),
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610582/pexels-pixabay-163872_osxe5v.jpg",
+        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610582/pexels-pixabay-163872_osxe5v.jpg',
       text: (
         <>
           <span className="highlight-circle">crafted</span> for explorers
         </>
-      )
+      ),
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610574/pexels-pixabay-262325_barmtl.jpg",
+        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610574/pexels-pixabay-262325_barmtl.jpg',
       text: (
         <>
-          slow travel is the new{" "}
-          <span className="highlight-stroke">luxury</span>
+          slow travel is the new <span className="highlight-stroke">luxury</span>
         </>
-      )
+      ),
     },
     {
       image:
-        "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610586/sergey-pesterev-_VqyrvQi6do-unsplash_1_k2ygzi.jpg",
+        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610586/sergey-pesterev-_VqyrvQi6do-unsplash_1_k2ygzi.jpg',
       text: (
         <>
-          powered by stories,{" "}
-          <span className="highlight-oval">backed by locals</span>
+          powered by stories, <span className="highlight-oval">backed by locals</span>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   useEffect(() => {
     const handleScrollEvent = () => {
-      const currentScrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-      const scrollDirection =
-        currentScrollTop > lastScrollTop.current ? "down" : "up";
+      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollDirection = currentScrollTop > lastScrollTop.current ? 'down' : 'up';
 
-      if (
-        scrollDirection === "down" &&
-        !hasScrolled &&
-        currentScrollTop >= scrollThreshold
-      ) {
+      if (scrollDirection === 'down' && !hasScrolled && currentScrollTop >= scrollThreshold) {
         setHasScrolled(true);
 
         /*  handleScroll({
@@ -87,10 +78,10 @@ export const HeroSection = () => {
       lastScrollTop.current = currentScrollTop <= 0 ? 0 : currentScrollTop;
     };
 
-    window.addEventListener("scroll", handleScrollEvent, { passive: true });
+    window.addEventListener('scroll', handleScrollEvent, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", handleScrollEvent);
+      window.removeEventListener('scroll', handleScrollEvent);
     };
   }, [hasScrolled]);
 
@@ -103,7 +94,7 @@ export const HeroSection = () => {
         autoplay={{
           delay: 3000,
           disableOnInteraction: false,
-          pauseOnMouseEnter: false
+          pauseOnMouseEnter: false,
         }}
         speed={1000}
         effect="slide"
@@ -133,9 +124,9 @@ export const HeroSection = () => {
         <Button
           onClick={() =>
             handleScroll({
-              location: "#filtertrip",
+              location: '#filtertrip',
               duration: 1.5,
-              ease: "power3.inOut"
+              ease: 'power3.inOut',
             })
           }
           className="group relative bg-black/50 font-instrument backdrop-blur-xl border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-6 rounded-full text-sm sm:text-base font-medium tracking-wide transition-all duration-500 hover:bg-black/30 hover:border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 active:scale-95"
@@ -146,13 +137,13 @@ export const HeroSection = () => {
             <motion.div
               className="ml-3 flex flex-col items-center opacity-70 group-hover:opacity-100 transition-opacity duration-300"
               animate={{
-                y: [0, 4, 0]
+                y: [0, 4, 0],
               }}
               transition={{
                 duration: 0.8,
                 repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut"
+                repeatType: 'reverse',
+                ease: 'easeInOut',
               }}
             >
               <ChevronDown className="h-3 w-3" />

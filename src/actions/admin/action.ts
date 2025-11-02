@@ -1,17 +1,14 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireAdmin } from "@/lib/roleGaurd";
-import { Role } from "@/types/auth";
-import { TravelPlanStatus, BookingStatus, Prisma } from "@prisma/client";
-import {
-  sendHostApprovalEmail,
-  sendHostRejectionEmail,
-} from "@/lib/emailService";
+import prisma from '@/lib/prisma';
+import { requireAdmin } from '@/lib/roleGaurd';
+import { Role } from '@/types/auth';
+import { TravelPlanStatus, BookingStatus, Prisma } from '@prisma/client';
+import { sendHostApprovalEmail, sendHostRejectionEmail } from '@/lib/emailService';
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const users = await prisma.user.findMany({
@@ -25,38 +22,38 @@ export const getAllUsers = async () => {
       },
     });
     if (!users || users.length === 0) {
-      return { message: "No users found" };
+      return { message: 'No users found' };
     }
     return { users };
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return { error: "Failed to fetch users" };
+    console.error('Error fetching users:', error);
+    return { error: 'Failed to fetch users' };
   }
 };
 
 export const deleteUser = async (email: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     await prisma.user.delete({ where: { id: email } });
-    return { success: true, message: "User deleted successfully" };
+    return { success: true, message: 'User deleted successfully' };
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return { error: "Failed to delete user" };
+    console.error('Error deleting user:', error);
+    return { error: 'Failed to delete user' };
   }
 };
 
 export const updateUserRole = async (email: string, role: Role) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -64,18 +61,18 @@ export const updateUserRole = async (email: string, role: Role) => {
     });
 
     // Only create HostProfile for HOST role
-    if (role === "HOST") {
+    if (role === 'HOST') {
       const host = await prisma.hostProfile.findUnique({
         where: { hostEmail: email },
       });
       if (!host) {
         await prisma.hostProfile.create({
           data: {
-            hostEmail: user.email || "",
-            hostMobile: user.phone || "",
+            hostEmail: user.email || '',
+            hostMobile: user.phone || '',
             hostId: user.id,
             image: user.image,
-            description: "",
+            description: '',
           },
         });
       }
@@ -83,14 +80,14 @@ export const updateUserRole = async (email: string, role: Role) => {
 
     return { success: true, user: updatedUser };
   } catch (error) {
-    console.error("Error updating user role:", error);
-    return { error: "Failed to update user role" };
+    console.error('Error updating user role:', error);
+    return { error: 'Failed to update user role' };
   }
 };
 
 export const getHostApplications = async () => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostApplicants = await prisma.user.findMany({
@@ -106,19 +103,19 @@ export const getHostApplications = async () => {
     });
 
     if (!hostApplicants || hostApplicants.length === 0) {
-      return { message: "No host applications found" };
+      return { message: 'No host applications found' };
     }
 
     return { hostApplicants };
   } catch (error) {
-    console.error("Error fetching host applications:", error);
-    return { error: "Failed to fetch host applications" };
+    console.error('Error fetching host applications:', error);
+    return { error: 'Failed to fetch host applications' };
   }
 };
 
 export const getHostApplicationDetails = async (userId: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const applicant = await prisma.user.findUnique({
@@ -150,7 +147,7 @@ export const getHostApplicationDetails = async (userId: string) => {
             },
           },
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           take: 5, // Latest 5 bookings
         },
@@ -167,7 +164,7 @@ export const getHostApplicationDetails = async (userId: string) => {
             },
           },
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           take: 5, // Latest 5 reviews
         },
@@ -181,7 +178,7 @@ export const getHostApplicationDetails = async (userId: string) => {
             createdAt: true,
           },
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           take: 3, // Latest 3 support tickets
         },
@@ -211,32 +208,32 @@ export const getHostApplicationDetails = async (userId: string) => {
     });
 
     if (!applicant) {
-      return { error: "Applicant not found" };
+      return { error: 'Applicant not found' };
     }
 
     if (!applicant.appliedForHost) {
-      return { error: "This user has not applied for host" };
+      return { error: 'This user has not applied for host' };
     }
 
     return { success: true, applicant };
   } catch (error) {
-    console.error("Error fetching host application details:", error);
-    return { error: "Failed to fetch host application details" };
+    console.error('Error fetching host application details:', error);
+    return { error: 'Failed to fetch host application details' };
   }
 };
 
 export const approveHostApplication = async (email: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     // Update user role to HOST
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { role: "HOST", appliedForHost: false },
+      data: { role: 'HOST', appliedForHost: false },
     });
 
     // Send approval email
@@ -244,34 +241,34 @@ export const approveHostApplication = async (email: string) => {
 
     if (!emailResult.success) {
       // Log the email error but don't fail the approval
-      console.error("Email sending failed:", emailResult.error);
+      console.error('Email sending failed:', emailResult.error);
       return {
         success: true,
         user: updatedUser,
         emailError: emailResult.error,
         message:
-          "Host approved successfully, but notification email failed to send. Please inform the user manually.",
+          'Host approved successfully, but notification email failed to send. Please inform the user manually.',
       };
     }
 
     return {
       success: true,
       user: updatedUser,
-      message: "Host approved successfully and notification email sent.",
+      message: 'Host approved successfully and notification email sent.',
     };
   } catch (error) {
-    console.error("Error approving host application:", error);
-    return { error: "Failed to approve host application" };
+    console.error('Error approving host application:', error);
+    return { error: 'Failed to approve host application' };
   }
 };
 
 export const rejectHostApplication = async (email: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     // Update user to remove host application flag
     const updatedUser = await prisma.user.update({
@@ -284,34 +281,34 @@ export const rejectHostApplication = async (email: string) => {
 
     if (!emailResult.success) {
       // Log the email error but don't fail the rejection
-      console.error("Email sending failed:", emailResult.error);
+      console.error('Email sending failed:', emailResult.error);
       return {
         success: true,
         user: updatedUser,
         emailError: emailResult.error,
         message:
-          "Application rejected successfully, but notification email failed to send. Please inform the user manually.",
+          'Application rejected successfully, but notification email failed to send. Please inform the user manually.',
       };
     }
 
     return {
       success: true,
       user: updatedUser,
-      message: "Application rejected successfully and notification email sent.",
+      message: 'Application rejected successfully and notification email sent.',
     };
   } catch (error) {
-    console.error("Error rejecting host application:", error);
-    return { error: "Failed to reject host application" };
+    console.error('Error rejecting host application:', error);
+    return { error: 'Failed to reject host application' };
   }
 };
 
 export const getAllHosts = async () => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hosts = await prisma.user.findMany({
-      where: { role: "HOST" },
+      where: { role: 'HOST' },
       select: {
         id: true,
         name: true,
@@ -322,8 +319,8 @@ export const getAllHosts = async () => {
     });
     return { hosts };
   } catch (error) {
-    console.error("Error fetching hosts:", error);
-    return { error: "Failed to fetch hosts" };
+    console.error('Error fetching hosts:', error);
+    return { error: 'Failed to fetch hosts' };
   }
 };
 
@@ -337,8 +334,8 @@ export const getTotalRevenue = async (
       !totalrevenue && startDate && endDate
         ? {
             createdAt: {
-              gte: new Date(startDate + "T00:00:00.000Z"), // Start of the start date
-              lte: new Date(endDate + "T23:59:59.999Z"), // End of the end date
+              gte: new Date(startDate + 'T00:00:00.000Z'), // Start of the start date
+              lte: new Date(endDate + 'T23:59:59.999Z'), // End of the end date
             },
           }
         : {};
@@ -346,7 +343,7 @@ export const getTotalRevenue = async (
     const totalSales = await prisma.booking.aggregate({
       where: {
         paymentStatus: {
-          in: ["CANCELLED", "REFUNDED", "FULLY_PAID", "PARTIALLY_PAID"],
+          in: ['CANCELLED', 'REFUNDED', 'FULLY_PAID', 'PARTIALLY_PAID'],
         },
         ...dateFilter,
       },
@@ -356,7 +353,7 @@ export const getTotalRevenue = async (
 
     const refundAmount = await prisma.booking.aggregate({
       where: {
-        paymentStatus: { in: ["CANCELLED", "REFUNDED"] },
+        paymentStatus: { in: ['CANCELLED', 'REFUNDED'] },
         ...dateFilter,
       },
       _sum: { refundAmount: true },
@@ -367,20 +364,20 @@ export const getTotalRevenue = async (
       refundAmount,
     };
   } catch (error) {
-    console.error("Error fetching total revenue:", error);
-    return { error: "Failed to fetch revenue data" };
+    console.error('Error fetching total revenue:', error);
+    return { error: 'Failed to fetch revenue data' };
   }
 };
 export const getAllBookings = async (statusFilter?: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     // Build where clause for bookings
     const whereClause: Prisma.BookingWhereInput = {};
 
     // Add status filter if provided
-    if (statusFilter && statusFilter !== "ALL") {
+    if (statusFilter && statusFilter !== 'ALL') {
       whereClause.status = statusFilter as BookingStatus;
     }
 
@@ -422,13 +419,13 @@ export const getAllBookings = async (statusFilter?: string) => {
         guests: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     // Get booking counts by status
     const bookingCounts = await prisma.booking.groupBy({
-      by: ["paymentStatus"],
+      by: ['paymentStatus'],
       _count: {
         id: true,
       },
@@ -444,7 +441,7 @@ export const getAllBookings = async (statusFilter?: string) => {
       OVERDUE: 0,
     };
 
-    bookingCounts.forEach((count) => {
+    bookingCounts.forEach(count => {
       counts[count.paymentStatus] = count._count.id;
       counts.ALL += count._count.id;
     });
@@ -455,40 +452,40 @@ export const getAllBookings = async (statusFilter?: string) => {
       counts,
     };
   } catch (error) {
-    console.error("Error fetching all bookings:", error);
-    return { error: "Failed to fetch bookings" };
+    console.error('Error fetching all bookings:', error);
+    return { error: 'Failed to fetch bookings' };
   }
 };
 
 export const refundBooking = async (bookingId: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
     });
-    if (!booking) return { error: "Booking not found" };
+    if (!booking) return { error: 'Booking not found' };
 
-    if (booking.status !== "CONFIRMED") {
-      return { error: "Only completed bookings can be refunded" };
+    if (booking.status !== 'CONFIRMED') {
+      return { error: 'Only completed bookings can be refunded' };
     }
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
-      data: { status: "REFUNDED", refundAmount: booking.totalPrice },
+      data: { status: 'REFUNDED', refundAmount: booking.totalPrice },
     });
 
     return { success: true, booking: updatedBooking };
   } catch (error) {
-    console.error("Error processing refund:", error);
-    return { error: "Failed to process refund" };
+    console.error('Error processing refund:', error);
+    return { error: 'Failed to process refund' };
   }
 };
 
 export const getAlltravelPlanApplications = async () => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const travelPlans = await prisma.travelPlans.findMany({
@@ -508,19 +505,19 @@ export const getAlltravelPlanApplications = async () => {
     });
 
     if (!travelPlans || travelPlans.length === 0) {
-      return { message: "No travel plan applications found" };
+      return { message: 'No travel plan applications found' };
     }
 
     return { travelPlans };
   } catch (error) {
-    console.error("Error fetching travel plan applications:", error);
-    return { error: "Failed to fetch travel plan applications" };
+    console.error('Error fetching travel plan applications:', error);
+    return { error: 'Failed to fetch travel plan applications' };
   }
 };
 
 export const approveTravelPlan = async (travelPlanId: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const updatedTravelPlan = await prisma.travelPlans.update({
@@ -530,22 +527,17 @@ export const approveTravelPlan = async (travelPlanId: string) => {
 
     return { success: true, travelPlan: updatedTravelPlan };
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2025"
-    ) {
-      return { error: "Travel plan not found" };
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2025') {
+      return { error: 'Travel plan not found' };
     }
-    console.error("Error approving travel plan:", error);
-    return { error: "Failed to approve travel plan" };
+    console.error('Error approving travel plan:', error);
+    return { error: 'Failed to approve travel plan' };
   }
 };
 
 export const getAllActiveTrips = async () => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const activeTrips = await prisma.travelPlans.findMany({
@@ -568,7 +560,7 @@ export const getAllActiveTrips = async () => {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!activeTrips || activeTrips.length === 0) {
@@ -577,14 +569,14 @@ export const getAllActiveTrips = async () => {
 
     return { success: true, activeTrips };
   } catch (error) {
-    console.error("Error fetching active trips:", error);
-    return { error: "Failed to fetch active trips" };
+    console.error('Error fetching active trips:', error);
+    return { error: 'Failed to fetch active trips' };
   }
 };
 
 export const getTravelPlanDetails = async (travelPlanId: string) => {
   const session = await requireAdmin();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const travelPlan = await prisma.travelPlans.findUnique({
@@ -604,40 +596,37 @@ export const getTravelPlanDetails = async (travelPlanId: string) => {
           },
         },
         dayWiseItinerary: {
-          orderBy: { dayNumber: "asc" },
+          orderBy: { dayNumber: 'asc' },
         },
       },
     });
 
     if (!travelPlan) {
-      return { error: "Travel plan not found" };
+      return { error: 'Travel plan not found' };
     }
 
     return { success: true, travelPlan };
   } catch (error) {
-    console.error("Error fetching travel plan details:", error);
-    return { error: "Failed to fetch travel plan details" };
+    console.error('Error fetching travel plan details:', error);
+    return { error: 'Failed to fetch travel plan details' };
   }
 };
 
-export const getTransactionsByDateRange = async (
-  startDate?: string,
-  endDate?: string
-) => {
+export const getTransactionsByDateRange = async (startDate?: string, endDate?: string) => {
   try {
     const dateFilter =
       startDate && endDate
         ? {
             createdAt: {
-              gte: new Date(startDate + "T00:00:00.000Z"),
-              lte: new Date(endDate + "T23:59:59.999Z"),
+              gte: new Date(startDate + 'T00:00:00.000Z'),
+              lte: new Date(endDate + 'T23:59:59.999Z'),
             },
           }
         : {};
 
     const salesTransactions = await prisma.booking.findMany({
       where: {
-        status: "CONFIRMED",
+        status: 'CONFIRMED',
         ...dateFilter,
       },
       include: {
@@ -675,13 +664,13 @@ export const getTransactionsByDateRange = async (
         guests: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     const refundTransactions = await prisma.booking.findMany({
       where: {
-        status: { in: ["CANCELLED", "REFUNDED"] },
+        status: { in: ['CANCELLED', 'REFUNDED'] },
         ...dateFilter,
       },
       include: {
@@ -719,30 +708,30 @@ export const getTransactionsByDateRange = async (
         guests: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
-    const salesData = salesTransactions.map((booking) => ({
+    const salesData = salesTransactions.map(booking => ({
       id: `sale-${booking.id}`,
       bookingId: booking.id,
       userId: booking.userId,
       travelPlanId: booking.travelPlanId,
       amount: booking.totalPrice,
-      type: "SALE" as const,
+      type: 'SALE' as const,
       status: booking.status,
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
       user: {
-        name: booking.user.name || "Unknown",
+        name: booking.user.name || 'Unknown',
         email: booking.user.email,
         phone: booking.user.phone,
       },
       travelPlan: {
         title: booking.travelPlan.title,
-        destination: booking.travelPlan.destination || "Unknown",
+        destination: booking.travelPlan.destination || 'Unknown',
         host: {
-          name: booking.travelPlan.host.user.name || "Unknown Host",
+          name: booking.travelPlan.host.user.name || 'Unknown Host',
         },
       },
       participants: booking.participants,
@@ -750,26 +739,26 @@ export const getTransactionsByDateRange = async (
       pricePerPerson: booking.pricePerPerson,
     }));
 
-    const refundData = refundTransactions.map((booking) => ({
+    const refundData = refundTransactions.map(booking => ({
       id: `refund-${booking.id}`,
       bookingId: booking.id,
       userId: booking.userId,
       travelPlanId: booking.travelPlanId,
       amount: booking.refundAmount || booking.totalPrice,
-      type: "REFUND" as const,
+      type: 'REFUND' as const,
       status: booking.status,
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
       user: {
-        name: booking.user.name || "Unknown",
+        name: booking.user.name || 'Unknown',
         email: booking.user.email,
         phone: booking.user.phone,
       },
       travelPlan: {
         title: booking.travelPlan.title,
-        destination: booking.travelPlan.destination || "Unknown",
+        destination: booking.travelPlan.destination || 'Unknown',
         host: {
-          name: booking.travelPlan.host.user.name || "Unknown Host",
+          name: booking.travelPlan.host.user.name || 'Unknown Host',
         },
       },
       participants: booking.participants,
@@ -779,8 +768,7 @@ export const getTransactionsByDateRange = async (
     }));
 
     const allTransactions = [...salesData, ...refundData].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     return {
@@ -797,10 +785,10 @@ export const getTransactionsByDateRange = async (
       },
     };
   } catch (error) {
-    console.error("Error fetching transactions:", error);
+    console.error('Error fetching transactions:', error);
     return {
       success: false,
-      error: "Failed to fetch transaction data",
+      error: 'Failed to fetch transaction data',
       transactions: [],
       summary: {
         totalSales: 0,
@@ -813,17 +801,14 @@ export const getTransactionsByDateRange = async (
   }
 };
 
-export const getAnalyticsData = async (
-  startDate?: string,
-  endDate?: string
-) => {
+export const getAnalyticsData = async (startDate?: string, endDate?: string) => {
   try {
     const dateFilter =
       startDate && endDate
         ? {
             createdAt: {
-              gte: new Date(startDate + "T00:00:00.000Z"),
-              lte: new Date(endDate + "T23:59:59.999Z"),
+              gte: new Date(startDate + 'T00:00:00.000Z'),
+              lte: new Date(endDate + 'T23:59:59.999Z'),
             },
           }
         : {};
@@ -859,17 +844,17 @@ export const getAnalyticsData = async (
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     // Monthly Revenue Data
     const monthlyData = new Map();
 
-    allBookings.forEach((booking) => {
-      const monthKey = new Date(booking.createdAt).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
+    allBookings.forEach(booking => {
+      const monthKey = new Date(booking.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
       });
 
       if (!monthlyData.has(monthKey)) {
@@ -883,12 +868,9 @@ export const getAnalyticsData = async (
 
       const monthStats = monthlyData.get(monthKey);
 
-      if (booking.paymentStatus === "FULLY_PAID") {
+      if (booking.paymentStatus === 'FULLY_PAID') {
         monthStats.sales += booking.totalPrice;
-      } else if (
-        booking.paymentStatus === "CANCELLED" ||
-        booking.paymentStatus === "REFUNDED"
-      ) {
+      } else if (booking.paymentStatus === 'CANCELLED' || booking.paymentStatus === 'REFUNDED') {
         monthStats.refunds += booking.refundAmount || booking.totalPrice;
       }
 
@@ -896,8 +878,7 @@ export const getAnalyticsData = async (
     });
 
     const monthlyRevenue = Array.from(monthlyData.values()).sort(
-      (a, b) =>
-        new Date(a.month + " 1").getTime() - new Date(b.month + " 1").getTime()
+      (a, b) => new Date(a.month + ' 1').getTime() - new Date(b.month + ' 1').getTime()
     );
 
     // Status Distribution
@@ -910,55 +891,41 @@ export const getAnalyticsData = async (
       OVERDUE: 0,
     };
 
-    allBookings.forEach((booking) => {
+    allBookings.forEach(booking => {
       statusCounts[booking.paymentStatus]++;
     });
 
     const totalBookings = allBookings.length;
     const statusDistribution = [
       {
-        name: "Fully Paid",
-        value:
-          totalBookings > 0
-            ? Math.round((statusCounts.FULLY_PAID / totalBookings) * 100)
-            : 0,
-        color: "#10B981",
+        name: 'Fully Paid',
+        value: totalBookings > 0 ? Math.round((statusCounts.FULLY_PAID / totalBookings) * 100) : 0,
+        color: '#10B981',
         count: statusCounts.FULLY_PAID,
       },
       {
-        name: "Partially Paid",
+        name: 'Partially Paid',
         value:
-          totalBookings > 0
-            ? Math.round((statusCounts.PARTIALLY_PAID / totalBookings) * 100)
-            : 0,
-        color: "#10B981",
+          totalBookings > 0 ? Math.round((statusCounts.PARTIALLY_PAID / totalBookings) * 100) : 0,
+        color: '#10B981',
         count: statusCounts.PARTIALLY_PAID,
       },
       {
-        name: "Cancelled",
-        value:
-          totalBookings > 0
-            ? Math.round((statusCounts.CANCELLED / totalBookings) * 100)
-            : 0,
-        color: "#EF4444",
+        name: 'Cancelled',
+        value: totalBookings > 0 ? Math.round((statusCounts.CANCELLED / totalBookings) * 100) : 0,
+        color: '#EF4444',
         count: statusCounts.CANCELLED,
       },
       {
-        name: "Refunded",
-        value:
-          totalBookings > 0
-            ? Math.round((statusCounts.REFUNDED / totalBookings) * 100)
-            : 0,
-        color: "#F59E0B",
+        name: 'Refunded',
+        value: totalBookings > 0 ? Math.round((statusCounts.REFUNDED / totalBookings) * 100) : 0,
+        color: '#F59E0B',
         count: statusCounts.REFUNDED,
       },
       {
-        name: "Pending",
-        value:
-          totalBookings > 0
-            ? Math.round((statusCounts.PENDING / totalBookings) * 100)
-            : 0,
-        color: "#6B7280",
+        name: 'Pending',
+        value: totalBookings > 0 ? Math.round((statusCounts.PENDING / totalBookings) * 100) : 0,
+        color: '#6B7280',
         count: statusCounts.PENDING,
       },
     ];
@@ -969,20 +936,20 @@ export const getAnalyticsData = async (
     for (let i = 29; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = date.toISOString().split('T')[0];
 
       const dayBookings = allBookings.filter(
-        (booking) => booking.createdAt.toISOString().split("T")[0] === dateStr
+        booking => booking.createdAt.toISOString().split('T')[0] === dateStr
       );
 
       const dayRevenue = dayBookings
-        .filter((b) => b.paymentStatus === "FULLY_PAID")
+        .filter(b => b.paymentStatus === 'FULLY_PAID')
         .reduce((sum, b) => sum + b.totalPrice, 0);
 
       last30Days.push({
-        date: date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
+        date: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
         }),
         transactions: dayBookings.length,
         revenue: dayRevenue,
@@ -993,9 +960,9 @@ export const getAnalyticsData = async (
     const destinationData = new Map();
 
     allBookings
-      .filter((b) => b.paymentStatus === "FULLY_PAID")
-      .forEach((booking) => {
-        const dest = booking.travelPlan.destination || "Unknown";
+      .filter(b => b.paymentStatus === 'FULLY_PAID')
+      .forEach(booking => {
+        const dest = booking.travelPlan.destination || 'Unknown';
 
         if (!destinationData.has(dest)) {
           destinationData.set(dest, {
@@ -1018,8 +985,8 @@ export const getAnalyticsData = async (
     const travelPlanRevenue = new Map();
 
     allBookings
-      .filter((b) => b.paymentStatus === "FULLY_PAID")
-      .forEach((booking) => {
+      .filter(b => b.paymentStatus === 'FULLY_PAID')
+      .forEach(booking => {
         const planTitle = booking.travelPlan.title;
 
         if (!travelPlanRevenue.has(planTitle)) {
@@ -1040,19 +1007,16 @@ export const getAnalyticsData = async (
       .slice(0, 8); // Top 8 travel plans
 
     const confirmedBookings = allBookings.filter(
-      (b) =>
-        b.paymentStatus === "FULLY_PAID" ||
-        b.paymentStatus === "CANCELLED" ||
-        b.paymentStatus === "REFUNDED"
+      b =>
+        b.paymentStatus === 'FULLY_PAID' ||
+        b.paymentStatus === 'CANCELLED' ||
+        b.paymentStatus === 'REFUNDED'
     );
     const refundedBookings = allBookings.filter(
-      (b) => b.paymentStatus === "CANCELLED" || b.paymentStatus === "REFUNDED"
+      b => b.paymentStatus === 'CANCELLED' || b.paymentStatus === 'REFUNDED'
     );
 
-    const totalSales = confirmedBookings.reduce(
-      (sum, b) => sum + b.totalPrice,
-      0
-    );
+    const totalSales = confirmedBookings.reduce((sum, b) => sum + b.totalPrice, 0);
     const totalRefunds = refundedBookings.reduce(
       (sum, b) => sum + (b.refundAmount || b.totalPrice),
       0
@@ -1061,8 +1025,7 @@ export const getAnalyticsData = async (
     const periodDays =
       startDate && endDate
         ? Math.ceil(
-            (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-              (1000 * 60 * 60 * 24)
+            (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
           )
         : 30;
 
@@ -1071,9 +1034,7 @@ export const getAnalyticsData = async (
 
     if (startDate && endDate) {
       previousPeriodEnd.setTime(new Date(startDate).getTime() - 1);
-      previousPeriodStart.setTime(
-        previousPeriodEnd.getTime() - periodDays * 24 * 60 * 60 * 1000
-      );
+      previousPeriodStart.setTime(previousPeriodEnd.getTime() - periodDays * 24 * 60 * 60 * 1000);
     } else {
       previousPeriodStart.setDate(previousPeriodStart.getDate() - 60);
       previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 30);
@@ -1089,17 +1050,14 @@ export const getAnalyticsData = async (
     });
 
     const prevConfirmedBookings = previousBookings.filter(
-      (b) =>
-        b.paymentStatus === "FULLY_PAID" ||
-        b.paymentStatus === "CANCELLED" ||
-        b.paymentStatus === "REFUNDED"
+      b =>
+        b.paymentStatus === 'FULLY_PAID' ||
+        b.paymentStatus === 'CANCELLED' ||
+        b.paymentStatus === 'REFUNDED'
     );
-    const prevTotalSales = prevConfirmedBookings.reduce(
-      (sum, b) => sum + b.totalPrice,
-      0
-    );
+    const prevTotalSales = prevConfirmedBookings.reduce((sum, b) => sum + b.totalPrice, 0);
     const prevRefundedBookings = previousBookings.filter(
-      (b) => b.paymentStatus === "CANCELLED" || b.paymentStatus === "REFUNDED"
+      b => b.paymentStatus === 'CANCELLED' || b.paymentStatus === 'REFUNDED'
     );
     /*   const prevTotalRefunds = prevRefundedBookings.reduce(
       (sum, b) => sum + (b.refundAmount || b.totalPrice),
@@ -1107,19 +1065,14 @@ export const getAnalyticsData = async (
     ); */
 
     const revenueGrowth =
-      prevTotalSales > 0
-        ? ((totalSales - prevTotalSales) / prevTotalSales) * 100
-        : 0;
+      prevTotalSales > 0 ? ((totalSales - prevTotalSales) / prevTotalSales) * 100 : 0;
     const transactionGrowth =
       previousBookings.length > 0
-        ? ((allBookings.length - previousBookings.length) /
-            previousBookings.length) *
-          100
+        ? ((allBookings.length - previousBookings.length) / previousBookings.length) * 100
         : 0;
     const avgOrderValueGrowth =
       prevConfirmedBookings.length > 0
-        ? ((totalSales / confirmedBookings.length -
-            prevTotalSales / prevConfirmedBookings.length) /
+        ? ((totalSales / confirmedBookings.length - prevTotalSales / prevConfirmedBookings.length) /
             (prevTotalSales / prevConfirmedBookings.length)) *
           100
         : 0;
@@ -1144,14 +1097,9 @@ export const getAnalyticsData = async (
           totalTransactions: allBookings.length,
           confirmedBookings: confirmedBookings.length,
           refundedBookings: refundedBookings.length,
-          avgOrderValue:
-            confirmedBookings.length > 0
-              ? totalSales / confirmedBookings.length
-              : 0,
+          avgOrderValue: confirmedBookings.length > 0 ? totalSales / confirmedBookings.length : 0,
           refundRate:
-            allBookings.length > 0
-              ? (refundedBookings.length / allBookings.length) * 100
-              : 0,
+            allBookings.length > 0 ? (refundedBookings.length / allBookings.length) * 100 : 0,
         },
         growth: {
           revenue: revenueGrowth,
@@ -1162,19 +1110,17 @@ export const getAnalyticsData = async (
         period: {
           startDate:
             startDate ||
-            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-              .toISOString()
-              .split("T")[0],
-          endDate: endDate || new Date().toISOString().split("T")[0],
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          endDate: endDate || new Date().toISOString().split('T')[0],
           totalDays: periodDays,
         },
       },
     };
   } catch (error) {
-    console.error("Error fetching analytics data:", error);
+    console.error('Error fetching analytics data:', error);
     return {
       success: false,
-      error: "Failed to fetch analytics data",
+      error: 'Failed to fetch analytics data',
       data: {
         monthlyRevenue: [],
         statusDistribution: [],
@@ -1198,8 +1144,8 @@ export const getAnalyticsData = async (
           refundRate: 0,
         },
         period: {
-          startDate: startDate || new Date().toISOString().split("T")[0],
-          endDate: endDate || new Date().toISOString().split("T")[0],
+          startDate: startDate || new Date().toISOString().split('T')[0],
+          endDate: endDate || new Date().toISOString().split('T')[0],
           totalDays: 0,
         },
       },

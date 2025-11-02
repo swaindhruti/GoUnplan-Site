@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ShieldAlert, Home, ArrowLeft } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 
 export default function UnauthorizedPage() {
   return (
@@ -29,9 +29,7 @@ export default function UnauthorizedPage() {
               </Button>
             </Link>
             <Link href="/auth/signup">
-              <Button className="bg-purple-600 text-white hover:bg-purple-700">
-                Get Started
-              </Button>
+              <Button className="bg-purple-600 text-white hover:bg-purple-700">Get Started</Button>
             </Link>
           </div>
         </div>
@@ -54,29 +52,18 @@ export default function UnauthorizedPage() {
 
           <CardContent className="pt-6 text-center">
             <p className="text-gray-600 mb-4">
-              You don&apos;t have permission to access this page. Please contact
-              an administrator if you believe this is an error.
+              You don&apos;t have permission to access this page. Please contact an administrator if
+              you believe this is an error.
             </p>
             <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-500 border border-gray-200">
-              <p>
-                If you recently registered as a host, your account may still be
-                under review.
-              </p>
-              <p className="mt-2">
-                Please check back later or contact support for assistance.
-              </p>
+              <p>If you recently registered as a host, your account may still be under review.</p>
+              <p className="mt-2">Please check back later or contact support for assistance.</p>
             </div>
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-3 pt-2 border-t border-gray-100 bg-gray-50 rounded-b-lg">
-            <Button
-              asChild
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5"
-            >
-              <Link
-                href="/dashboard/user"
-                className="flex items-center justify-center"
-              >
+            <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 text-white py-5">
+              <Link href="/dashboard/user" className="flex items-center justify-center">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Go to Dashboard
               </Link>
             </Button>

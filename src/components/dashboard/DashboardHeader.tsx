@@ -1,5 +1,5 @@
-import { User } from "lucide-react";
-import { UserProfile } from "@/types/dashboard";
+import { User } from 'lucide-react';
+import { UserProfile } from '@/types/dashboard';
 
 interface DashboardHeaderProps {
   profile: UserProfile | null;
@@ -19,7 +19,7 @@ export function DashboardHeader({ profile }: DashboardHeaderProps) {
             <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-bricolage leading-[1.05] tracking-tighter">
               Welcome back,
               <br />
-              {profile?.name || "Traveler"}
+              {profile?.name || 'Traveler'}
             </h1>
             <p className="text-lg text-gray-600 font-instrument mt-2">
               Manage your profile, track bookings, and explore travel experiences

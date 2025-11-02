@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -8,10 +8,7 @@ interface EmailResponse {
   error?: string;
 }
 
-export async function sendHostApprovalEmail(
-  email: string,
-  name: string
-): Promise<EmailResponse> {
+export async function sendHostApprovalEmail(email: string, name: string): Promise<EmailResponse> {
   try {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
@@ -53,9 +50,7 @@ export async function sendHostApprovalEmail(
 
           <!-- CTA Button -->
           <div style="text-align: center; margin: 40px 0;">
-            <a href="${
-              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-            }/dashboard/host" 
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/host" 
                style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);">
               Go to Host Dashboard →
             </a>
@@ -68,7 +63,7 @@ export async function sendHostApprovalEmail(
             </p>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">
               Check out our <a href="${
-                process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+                process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
               }/support" style="color: #7c3aed; text-decoration: none;">Help Center</a> or contact our support team if you have any questions.
             </p>
           </div>
@@ -87,14 +82,14 @@ export async function sendHostApprovalEmail(
     `;
 
     const { error } = await resend.emails.send({
-      from: "GoUnplan <noreply@gounplan.com>",
+      from: 'GoUnplan <noreply@gounplan.com>',
       to: [email],
-      subject: "🎉 Congratulations! Your Host Application Has Been Approved",
+      subject: '🎉 Congratulations! Your Host Application Has Been Approved',
       html: emailHtml,
     });
 
     if (error) {
-      console.error("Failed to send host approval email:", error);
+      console.error('Failed to send host approval email:', error);
       return {
         success: false,
         error: `Failed to send approval email: ${error.message}`,
@@ -106,21 +101,15 @@ export async function sendHostApprovalEmail(
       message: `Approval email sent successfully to ${email}`,
     };
   } catch (error) {
-    console.error("Error in sendHostApprovalEmail:", error);
+    console.error('Error in sendHostApprovalEmail:', error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unknown error sending approval email",
+      error: error instanceof Error ? error.message : 'Unknown error sending approval email',
     };
   }
 }
 
-export async function sendHostRejectionEmail(
-  email: string,
-  name: string
-): Promise<EmailResponse> {
+export async function sendHostRejectionEmail(email: string, name: string): Promise<EmailResponse> {
   try {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
@@ -175,15 +164,11 @@ export async function sendHostRejectionEmail(
 
           <!-- CTA Buttons -->
           <div style="text-align: center; margin: 40px 0;">
-            <a href="${
-              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-            }/trips" 
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/trips" 
                style="background-color: #7c3aed; color: white; padding: 12px 28px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 14px; margin: 0 8px;">
               Explore Trips
             </a>
-            <a href="${
-              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-            }/support" 
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/support" 
                style="background-color: white; color: #7c3aed; padding: 12px 28px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 14px; border: 2px solid #7c3aed; margin: 0 8px;">
               Contact Support
             </a>
@@ -213,14 +198,14 @@ export async function sendHostRejectionEmail(
     `;
 
     const { error } = await resend.emails.send({
-      from: "GoUnplan <noreply@gounplan.com>",
+      from: 'GoUnplan <noreply@gounplan.com>',
       to: [email],
-      subject: "Update on Your Host Application - GoUnplan",
+      subject: 'Update on Your Host Application - GoUnplan',
       html: emailHtml,
     });
 
     if (error) {
-      console.error("Failed to send host rejection email:", error);
+      console.error('Failed to send host rejection email:', error);
       return {
         success: false,
         error: `Failed to send rejection email: ${error.message}`,
@@ -232,13 +217,10 @@ export async function sendHostRejectionEmail(
       message: `Rejection email sent successfully to ${email}`,
     };
   } catch (error) {
-    console.error("Error in sendHostRejectionEmail:", error);
+    console.error('Error in sendHostRejectionEmail:', error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unknown error sending rejection email",
+      error: error instanceof Error ? error.message : 'Unknown error sending rejection email',
     };
   }
 }

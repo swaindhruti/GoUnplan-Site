@@ -1,16 +1,16 @@
-import { Role, PaymentStatus } from "@prisma/client";
+import { Role, PaymentStatus } from '@prisma/client';
 
 export type BookingStatus =
-  | "PENDING"
-  | "CONFIRMED"
-  | "CANCELLED"
-  | "NOTPAID"
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'CANCELLED'
+  | 'NOTPAID'
   // | "COMPLETED"
-  | "REFUNDED";
+  | 'REFUNDED';
 
 // Use the PaymentStatus enum from Prisma
 export type PaymentSt = PaymentStatus;
-export type TravelPlanStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
+export type TravelPlanStatus = 'ACTIVE' | 'INACTIVE' | 'DRAFT';
 
 export interface TeamMemberInput {
   isteamLead: boolean;
@@ -40,17 +40,17 @@ export interface BookingData {
   specialRequirements?: string | null;
   guests?: TeamMemberInput[];
   formSubmitted: boolean;
-  submissionType?: "individual" | "team";
+  submissionType?: 'individual' | 'team';
   updatedAt?: Date;
   createdAt?: Date;
   paymentStatus?:
     | PaymentStatus
-    | "PENDING"
-    | "PARTIALLY_PAID"
-    | "FULLY_PAID"
-    | "OVERDUE"
-    | "REFUNDED"
-    | "CANCELLED";
+    | 'PENDING'
+    | 'PARTIALLY_PAID'
+    | 'FULLY_PAID'
+    | 'OVERDUE'
+    | 'REFUNDED'
+    | 'CANCELLED';
   paymentDeadline?: Date | null;
   minPaymentAmount?: number | null;
   amountPaid?: number | null;
@@ -96,9 +96,9 @@ export interface TravelPlan {
   country?: string;
   state?: string;
   city?: string;
-  status: "ACTIVE" | "INACTIVE" | "DRAFT";
+  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
   maxParticipants?: number;
-  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
+  genderPreference?: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
   destination?: string | null;
   filters?: string[];
   languages: string[];

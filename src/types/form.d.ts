@@ -1,47 +1,42 @@
 type FieldId =
-  | "tripName"
-  | "destination"
-  | "country"
-  | "stops"
-  | "price"
-  | "commission"
-  | "filters"
-  | "startDate"
-  | "endDate"
-  | "maxLimit"
-  | "genderPreference"
-  | "description"
-  | "languages"
-  | "includedActivities"
-  | "restrictions"
-  | "special"
-  | "sectionhead"
-  | "noofdays"
-  | "dayWiseData";
+  | 'tripName'
+  | 'destination'
+  | 'country'
+  | 'stops'
+  | 'price'
+  | 'commission'
+  | 'filters'
+  | 'startDate'
+  | 'endDate'
+  | 'maxLimit'
+  | 'genderPreference'
+  | 'description'
+  | 'languages'
+  | 'includedActivities'
+  | 'restrictions'
+  | 'special'
+  | 'sectionhead'
+  | 'noofdays'
+  | 'dayWiseData';
 
-type ZodType = "string" | "number" | "enum" | "date" | "enum[]";
+type ZodType = 'string' | 'number' | 'enum' | 'date' | 'enum[]';
 
-type DayWiseFieldId = "title" | "description" | "meals" | "accommodation";
+type DayWiseFieldId = 'title' | 'description' | 'meals' | 'accommodation';
 
-type DayWiseFieldId =
-  | "title"
-  | "description"
-  | "meals"
-  | "accommodation"
-  | "destination";
+type DayWiseFieldId = 'title' | 'description' | 'meals' | 'accommodation' | 'destination';
 
 type InputType =
-  | "text"
-  | "number"
-  | "select"
-  | "textarea"
-  | "date"
-  | "multi-select"
-  | "inclusion-list"
-  | "exclusion-list"
-  | "custom-input-list"
-  | "sectionHead"
-  | "dynamic-group";
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'textarea'
+  | 'date'
+  | 'multi-select'
+  | 'inclusion-list'
+  | 'exclusion-list'
+  | 'custom-input-list'
+  | 'sectionHead'
+  | 'dynamic-group';
 
 type GroupFieldTypes = {
   label: string;
@@ -66,20 +61,15 @@ type BaseFormField = {
 export type FormFields = BaseFormField;
 
 export type FormDataShape = {
-  [K in FieldId]?: K extends "price" | "maxLimit" | "commission"
+  [K in FieldId]?: K extends 'price' | 'maxLimit' | 'commission'
     ? number
-    : K extends "startDate" | "endDate"
-    ? Date
-    : K extends
-        | "filters"
-        | "languages"
-        | "includedActivities"
-        | "restrictions"
-        | "special"
-    ? string[]
-    : K extends "tripImage"
-    ? string // tripImage is now required
-    : string;
+    : K extends 'startDate' | 'endDate'
+      ? Date
+      : K extends 'filters' | 'languages' | 'includedActivities' | 'restrictions' | 'special'
+        ? string[]
+        : K extends 'tripImage'
+          ? string // tripImage is now required
+          : string;
 } & {
   // Make tripImage required in the shape
   tripImage: string;
@@ -95,20 +85,15 @@ export type FormDataShape = {
 };
 
 export type FormInputShape = {
-  [K in FieldId]?: K extends "price" | "maxLimit" | "commission"
+  [K in FieldId]?: K extends 'price' | 'maxLimit' | 'commission'
     ? string | number
-    : K extends "startDate" | "endDate"
-    ? string | Date
-    : K extends
-        | "filters"
-        | "languages"
-        | "includedActivities"
-        | "restrictions"
-        | "special"
-    ? string[]
-    : K extends "tripImage"
-    ? string
-    : string;
+    : K extends 'startDate' | 'endDate'
+      ? string | Date
+      : K extends 'filters' | 'languages' | 'includedActivities' | 'restrictions' | 'special'
+        ? string[]
+        : K extends 'tripImage'
+          ? string
+          : string;
 } & {
   tripImage: string;
   dayWiseData: Array<{
@@ -122,11 +107,7 @@ export type FormInputShape = {
   }>;
 };
 
-export type FormSchemaType = z.ZodType<
-  FormDataShape,
-  z.ZodTypeDef,
-  FormInputShape
->;
+export type FormSchemaType = z.ZodType<FormDataShape, z.ZodTypeDef, FormInputShape>;
 
 export interface FormComponentProps {
   FormData: FormFields[];

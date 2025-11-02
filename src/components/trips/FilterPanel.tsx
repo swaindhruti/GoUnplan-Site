@@ -1,74 +1,59 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import ReactSelect, {
-  StylesConfig,
-  MultiValue,
-  CSSObjectWithLabel
-} from "react-select";
-import { FilterState, SelectOption, DURATION_OPTIONS } from "@/types/trips";
-import {
-  DollarSign,
-  Clock,
-  MapPin,
-  Globe,
-  MessageCircle,
-  Zap,
-  Filter
-} from "lucide-react";
-import { useState } from "react";
+  SelectValue,
+} from '@/components/ui/select';
+import ReactSelect, { StylesConfig, MultiValue, CSSObjectWithLabel } from 'react-select';
+import { FilterState, SelectOption, DURATION_OPTIONS } from '@/types/trips';
+import { DollarSign, Clock, MapPin, Globe, MessageCircle, Zap, Filter } from 'lucide-react';
+import { useState } from 'react';
 
 const INITIAL_LANGUAGES = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Italian",
-  "Mandarin",
-  "Hindi",
-  "Arabic",
-  "Portuguese",
-  "Russian"
+  'English',
+  'Spanish',
+  'French',
+  'German',
+  'Italian',
+  'Mandarin',
+  'Hindi',
+  'Arabic',
+  'Portuguese',
+  'Russian',
 ];
 
 const INITIAL_VIBES = [
-  "Adventure",
-  "Relaxation",
-  "Culture",
-  "Nature",
-  "Nightlife",
-  "Foodie",
-  "Luxury",
-  "Budget",
-  "Wellness",
-  "Family"
+  'Adventure',
+  'Relaxation',
+  'Culture',
+  'Nature',
+  'Nightlife',
+  'Foodie',
+  'Luxury',
+  'Budget',
+  'Wellness',
+  'Family',
 ];
 
 const INITIAL_TRAVELLERS = [
-  "Solo",
-  "Couple",
-  "With Baby",
-  "Friends",
-  "Family",
-  "Group",
-  "Pet Friendly",
-  "Senior",
-  "Business",
-  "Backpackers"
+  'Solo',
+  'Couple',
+  'With Baby',
+  'Friends',
+  'Family',
+  'Group',
+  'Pet Friendly',
+  'Senior',
+  'Business',
+  'Backpackers',
 ];
 
 interface FilterPanelProps {
   filters: FilterState;
-  updateFilter: <K extends keyof FilterState>(
-    key: K,
-    value: FilterState[K]
-  ) => void;
+  updateFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
   filterOptions: {
     countries: string[];
     languages: string[];
@@ -92,23 +77,23 @@ export const FilterPanel = ({
   handleLanguageChange,
   handleVibeChange,
   handleTravellerChange,
-  selectStyles
+  selectStyles,
 }: FilterPanelProps) => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const languageOptions = INITIAL_LANGUAGES.map((l) => ({
+  const languageOptions = INITIAL_LANGUAGES.map(l => ({
     value: l,
-    label: l
+    label: l,
   }));
 
-  const vibeOptions = INITIAL_VIBES.map((v) => ({
+  const vibeOptions = INITIAL_VIBES.map(v => ({
     value: v,
-    label: v
+    label: v,
   }));
 
-  const travellerOptions = INITIAL_TRAVELLERS.map((t) => ({
+  const travellerOptions = INITIAL_TRAVELLERS.map(t => ({
     value: t,
-    label: t
+    label: t,
   }));
 
   const toggleSection = (section: string) => {
@@ -118,8 +103,8 @@ export const FilterPanel = ({
   const menuPortalStyles = {
     menuPortal: (base: CSSObjectWithLabel): CSSObjectWithLabel => ({
       ...base,
-      zIndex: 9999
-    })
+      zIndex: 9999,
+    }),
   };
 
   return (
@@ -129,7 +114,7 @@ export const FilterPanel = ({
         {/* Trip Details Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("trip-details")}
+            onClick={() => toggleSection('trip-details')}
             className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
           >
             <div className="flex items-center gap-3">
@@ -140,16 +125,14 @@ export const FilterPanel = ({
             </div>
             <Filter
               className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
-                activeSection === "trip-details" ? "rotate-180" : ""
+                activeSection === 'trip-details' ? 'rotate-180' : ''
               }`}
             />
           </button>
 
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              activeSection === "trip-details"
-                ? "max-h-96 opacity-100"
-                : "max-h-0 opacity-0"
+              activeSection === 'trip-details' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
             <div className="p-4 space-y-4">
@@ -164,9 +147,7 @@ export const FilterPanel = ({
                     type="number"
                     placeholder="Min"
                     className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
-                    value={
-                      filters.priceRange[0] === 0 ? "" : filters.priceRange[0]
-                    }
+                    value={filters.priceRange[0] === 0 ? '' : filters.priceRange[0]}
                     onChange={handlePriceMinChange}
                   />
                   <span className="font-medium text-gray-500 text-sm">to</span>
@@ -174,11 +155,7 @@ export const FilterPanel = ({
                     type="number"
                     placeholder="Max"
                     className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
-                    value={
-                      filters.priceRange[1] === Infinity
-                        ? ""
-                        : filters.priceRange[1]
-                    }
+                    value={filters.priceRange[1] === Infinity ? '' : filters.priceRange[1]}
                     onChange={handlePriceMaxChange}
                   />
                 </div>
@@ -192,13 +169,13 @@ export const FilterPanel = ({
                 </Label>
                 <Select
                   value={filters.daysFilter}
-                  onValueChange={(value) => updateFilter("daysFilter", value)}
+                  onValueChange={value => updateFilter('daysFilter', value)}
                 >
                   <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                     <SelectValue placeholder="Choose trip length" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
-                    {DURATION_OPTIONS.map((option) => (
+                    {DURATION_OPTIONS.map(option => (
                       <SelectItem
                         key={option.value}
                         value={option.value}
@@ -217,7 +194,7 @@ export const FilterPanel = ({
         {/* Location Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("location")}
+            onClick={() => toggleSection('location')}
             className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
           >
             <div className="flex items-center gap-3">
@@ -228,16 +205,14 @@ export const FilterPanel = ({
             </div>
             <Filter
               className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
-                activeSection === "location" ? "rotate-180" : ""
+                activeSection === 'location' ? 'rotate-180' : ''
               }`}
             />
           </button>
 
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              activeSection === "location"
-                ? "max-h-96 opacity-100"
-                : "max-h-0 opacity-0"
+              activeSection === 'location' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
             <div className="p-4 space-y-4">
@@ -248,9 +223,7 @@ export const FilterPanel = ({
                 </Label>
                 <Select
                   value={filters.countryFilter}
-                  onValueChange={(value) =>
-                    updateFilter("countryFilter", value)
-                  }
+                  onValueChange={value => updateFilter('countryFilter', value)}
                 >
                   <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                     <SelectValue placeholder="Select country" />
@@ -262,7 +235,7 @@ export const FilterPanel = ({
                     >
                       All Countries
                     </SelectItem>
-                    {filterOptions.countries.map((country) => (
+                    {filterOptions.countries.map(country => (
                       <SelectItem
                         key={country}
                         value={country.toLowerCase()}
@@ -281,7 +254,7 @@ export const FilterPanel = ({
         {/* Preferences Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("preferences")}
+            onClick={() => toggleSection('preferences')}
             className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
           >
             <div className="flex items-center gap-3">
@@ -292,16 +265,14 @@ export const FilterPanel = ({
             </div>
             <Filter
               className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
-                activeSection === "preferences" ? "rotate-180" : ""
+                activeSection === 'preferences' ? 'rotate-180' : ''
               }`}
             />
           </button>
 
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              activeSection === "preferences"
-                ? "max-h-96 opacity-100"
-                : "max-h-0 opacity-0"
+              activeSection === 'preferences' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
             <div className="p-4 space-y-4">
@@ -315,14 +286,12 @@ export const FilterPanel = ({
                   isMulti
                   instanceId="language-select-mobile"
                   styles={{ ...selectStyles, ...menuPortalStyles }}
-                  menuPortalTarget={
-                    typeof window !== "undefined" ? document.body : undefined
-                  }
+                  menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                   placeholder="Select languages"
                   options={languageOptions}
-                  value={filters.languageFilter.map((l) => ({
+                  value={filters.languageFilter.map(l => ({
                     value: l,
-                    label: l
+                    label: l,
                   }))}
                   onChange={handleLanguageChange}
                   className="react-select-container"
@@ -341,14 +310,12 @@ export const FilterPanel = ({
                   isMulti
                   instanceId="vibe-select-mobile"
                   styles={{ ...selectStyles, ...menuPortalStyles }}
-                  menuPortalTarget={
-                    typeof window !== "undefined" ? document.body : undefined
-                  }
+                  menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                   placeholder="Select vibes"
                   options={vibeOptions}
-                  value={filters.vibeFilter.map((v) => ({
+                  value={filters.vibeFilter.map(v => ({
                     value: v,
-                    label: v
+                    label: v,
                   }))}
                   onChange={handleVibeChange}
                   className="react-select-container"
@@ -367,15 +334,13 @@ export const FilterPanel = ({
                   isMulti
                   instanceId="traveller-select-mobile"
                   styles={{ ...selectStyles, ...menuPortalStyles }}
-                  menuPortalTarget={
-                    typeof window !== "undefined" ? document.body : undefined
-                  }
+                  menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                   placeholder="Select travellers"
                   options={travellerOptions}
                   value={
                     filters.travellerFilter?.map((t: string) => ({
                       value: t,
-                      label: t
+                      label: t,
                     })) || []
                   }
                   onChange={handleTravellerChange}
@@ -397,9 +362,7 @@ export const FilterPanel = ({
             <div className="bg-purple-600 p-2 rounded-lg">
               <Clock className="h-4 w-4 text-white" />
             </div>
-            <h3 className="font-semibold text-gray-900 text-base">
-              Trip Details
-            </h3>
+            <h3 className="font-semibold text-gray-900 text-base">Trip Details</h3>
           </div>
 
           <div className="space-y-4">
@@ -413,9 +376,7 @@ export const FilterPanel = ({
                   type="number"
                   placeholder="Min"
                   className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
-                  value={
-                    filters.priceRange[0] === 0 ? "" : filters.priceRange[0]
-                  }
+                  value={filters.priceRange[0] === 0 ? '' : filters.priceRange[0]}
                   onChange={handlePriceMinChange}
                 />
                 <span className="font-medium text-gray-500 text-sm">to</span>
@@ -423,11 +384,7 @@ export const FilterPanel = ({
                   type="number"
                   placeholder="Max"
                   className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900"
-                  value={
-                    filters.priceRange[1] === Infinity
-                      ? ""
-                      : filters.priceRange[1]
-                  }
+                  value={filters.priceRange[1] === Infinity ? '' : filters.priceRange[1]}
                   onChange={handlePriceMaxChange}
                 />
               </div>
@@ -440,13 +397,13 @@ export const FilterPanel = ({
               </Label>
               <Select
                 value={filters.daysFilter}
-                onValueChange={(value) => updateFilter("daysFilter", value)}
+                onValueChange={value => updateFilter('daysFilter', value)}
               >
                 <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                   <SelectValue placeholder="Choose trip length" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
-                  {DURATION_OPTIONS.map((option) => (
+                  {DURATION_OPTIONS.map(option => (
                     <SelectItem
                       key={option.value}
                       value={option.value}
@@ -478,7 +435,7 @@ export const FilterPanel = ({
               </Label>
               <Select
                 value={filters.countryFilter}
-                onValueChange={(value) => updateFilter("countryFilter", value)}
+                onValueChange={value => updateFilter('countryFilter', value)}
               >
                 <SelectTrigger className="bg-white border border-gray-300 rounded-lg py-2 px-3 font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 text-gray-900">
                   <SelectValue placeholder="Select country" />
@@ -490,7 +447,7 @@ export const FilterPanel = ({
                   >
                     All Countries
                   </SelectItem>
-                  {filterOptions.countries.map((country) => (
+                  {filterOptions.countries.map(country => (
                     <SelectItem
                       key={country}
                       value={country.toLowerCase()}
@@ -511,9 +468,7 @@ export const FilterPanel = ({
             <div className="bg-purple-600 p-2 rounded-lg">
               <Zap className="h-4 w-4 text-white" />
             </div>
-            <h3 className="font-semibold text-gray-900 text-base">
-              Preferences
-            </h3>
+            <h3 className="font-semibold text-gray-900 text-base">Preferences</h3>
           </div>
 
           <div className="space-y-4">
@@ -527,14 +482,12 @@ export const FilterPanel = ({
                 isMulti
                 instanceId="language-select-desktop"
                 styles={{ ...selectStyles, ...menuPortalStyles }}
-                menuPortalTarget={
-                  typeof window !== "undefined" ? document.body : undefined
-                }
+                menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                 placeholder="Select languages"
                 options={languageOptions}
-                value={filters.languageFilter.map((l) => ({
+                value={filters.languageFilter.map(l => ({
                   value: l,
-                  label: l
+                  label: l,
                 }))}
                 onChange={handleLanguageChange}
                 className="react-select-container"
@@ -552,14 +505,12 @@ export const FilterPanel = ({
                 isMulti
                 instanceId="vibe-select-desktop"
                 styles={{ ...selectStyles, ...menuPortalStyles }}
-                menuPortalTarget={
-                  typeof window !== "undefined" ? document.body : undefined
-                }
+                menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                 placeholder="Select vibes"
                 options={vibeOptions}
-                value={filters.vibeFilter.map((v) => ({
+                value={filters.vibeFilter.map(v => ({
                   value: v,
-                  label: v
+                  label: v,
                 }))}
                 onChange={handleVibeChange}
                 className="react-select-container"
@@ -577,15 +528,13 @@ export const FilterPanel = ({
                 isMulti
                 instanceId="traveller-select-desktop"
                 styles={{ ...selectStyles, ...menuPortalStyles }}
-                menuPortalTarget={
-                  typeof window !== "undefined" ? document.body : undefined
-                }
+                menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                 placeholder="Select travellers"
                 options={travellerOptions}
                 value={
                   filters.travellerFilter?.map((t: string) => ({
                     value: t,
-                    label: t
+                    label: t,
                   })) || []
                 }
                 onChange={handleTravellerChange}

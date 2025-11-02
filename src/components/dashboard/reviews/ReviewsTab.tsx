@@ -1,14 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star } from "lucide-react";
-import { ReviewForm } from "./ReviewForm";
-import { PendingReviewCard } from "./PendingReviewCard";
-import { SubmittedReviewCard } from "./SubmittedReviewCard";
-import {
-  PendingReview,
-  Review,
-  ReviewFormState,
-  ReviewStats,
-} from "@/types/dashboard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Star } from 'lucide-react';
+import { ReviewForm } from './ReviewForm';
+import { PendingReviewCard } from './PendingReviewCard';
+import { SubmittedReviewCard } from './SubmittedReviewCard';
+import { PendingReview, Review, ReviewFormState, ReviewStats } from '@/types/dashboard';
 
 interface ReviewsTabProps {
   pendingReviews: PendingReview[];
@@ -31,9 +26,7 @@ export function ReviewsTab({
     <>
       {/* Header */}
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-1 font-bricolage">
-          Trip Reviews
-        </h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-1 font-bricolage">Trip Reviews</h3>
         <p className="text-gray-600 font-instrument mt-1">
           Share your experiences and see your past reviews
         </p>
@@ -81,7 +74,7 @@ export function ReviewsTab({
               />
             ) : pendingReviews.length > 0 ? (
               <div className="grid gap-8">
-                {pendingReviews.map((booking) => (
+                {pendingReviews.map(booking => (
                   <PendingReviewCard
                     key={booking.id}
                     booking={booking}
@@ -114,8 +107,7 @@ export function ReviewsTab({
                         Your Review Stats
                       </p>
                       <p className="text-gray-600 font-instrument">
-                        You&apos;ve reviewed {reviewStats.count} trips with an
-                        average rating of{" "}
+                        You&apos;ve reviewed {reviewStats.count} trips with an average rating of{' '}
                         <span className="font-semibold text-gray-900">
                           {reviewStats.averageRating}
                         </span>
@@ -123,13 +115,13 @@ export function ReviewsTab({
                       </p>
                     </div>
                     <div className="flex items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
+                      {[1, 2, 3, 4, 5].map(star => (
                         <Star
                           key={star}
                           className={`h-6 w-6 ${
                             star <= Math.round(reviewStats.averageRating)
-                              ? "text-yellow-500 fill-yellow-500"
-                              : "text-gray-300"
+                              ? 'text-yellow-500 fill-yellow-500'
+                              : 'text-gray-300'
                           }`}
                         />
                       ))}
@@ -137,7 +129,7 @@ export function ReviewsTab({
                   </div>
                 </div>
                 <div className="grid gap-8">
-                  {userReviews.map((review) => (
+                  {userReviews.map(review => (
                     <SubmittedReviewCard key={review.id} review={review} />
                   ))}
                 </div>

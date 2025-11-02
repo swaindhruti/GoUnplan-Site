@@ -1,5 +1,5 @@
 // hooks/useRecommendations.ts
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
 // Define proper types
 export interface Trip {
@@ -44,7 +44,7 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
     if (!allTrips || allTrips.length === 0) return [];
 
     // Create scoring algorithm based on user's current filters
-    const scoredTrips = allTrips.map((trip) => {
+    const scoredTrips = allTrips.map(trip => {
       let score = 0;
       const reasons: string[] = [];
 
@@ -56,9 +56,7 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
             trip.activities?.some((activity: string) =>
               activity.toLowerCase().includes(vibe.toLowerCase())
             ) ||
-            trip.tags?.some((tag: string) =>
-              tag.toLowerCase().includes(vibe.toLowerCase())
-            );
+            trip.tags?.some((tag: string) => tag.toLowerCase().includes(vibe.toLowerCase()));
 
           if (vibeMatch) {
             reasons.push(`Perfect for ${vibe} lovers`);
@@ -93,20 +91,20 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
         const [minPrice, maxPrice] = filters.priceRange;
         if (trip.price >= minPrice && trip.price <= maxPrice) {
           score += 25;
-          reasons.push("Within your budget");
+          reasons.push('Within your budget');
         } else if (
           Math.abs(trip.price - (minPrice + maxPrice) / 2) <=
           (maxPrice - minPrice) * 0.3
         ) {
           // Close to budget range (within 30% of range)
           score += 15;
-          reasons.push("Close to your budget");
+          reasons.push('Close to your budget');
         }
       }
 
       // 4. Geographic similarity (30 points)
       if (filters.searchTerm && filters.searchTerm.trim()) {
-        const searchTerms = filters.searchTerm.toLowerCase().split(" ");
+        const searchTerms = filters.searchTerm.toLowerCase().split(' ');
 
         searchTerms.forEach((term: string) => {
           if (term.length > 2) {
@@ -120,8 +118,8 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
 
             if (locationMatch) {
               score += 15;
-              if (!reasons.includes("Similar destination")) {
-                reasons.push("Similar destination");
+              if (!reasons.includes('Similar destination')) {
+                reasons.push('Similar destination');
               }
             }
           }
@@ -133,14 +131,12 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
         const languageMatches = filters.languageFilter.filter(
           (lang: string) =>
             trip.language?.toLowerCase().includes(lang.toLowerCase()) ||
-            trip.spokenLanguages?.some((l: string) =>
-              l.toLowerCase().includes(lang.toLowerCase())
-            )
+            trip.spokenLanguages?.some((l: string) => l.toLowerCase().includes(lang.toLowerCase()))
         );
 
         if (languageMatches.length > 0) {
           score += languageMatches.length * 20;
-          reasons.push("Language-friendly");
+          reasons.push('Language-friendly');
         }
       }
 
@@ -149,7 +145,7 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
         const durationMatch = trip.duration === filters.duration;
         if (durationMatch) {
           score += 15;
-          reasons.push("Perfect duration");
+          reasons.push('Perfect duration');
         }
       }
 
@@ -160,7 +156,7 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
           .includes(filters.travelSeason.toLowerCase());
         if (seasonMatch) {
           score += 10;
-          reasons.push("Great timing");
+          reasons.push('Great timing');
         }
       }
 
@@ -173,13 +169,13 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
 
     // Filter and sort recommendations
     return scoredTrips
-      .filter((trip) => trip.recommendationScore > 0)
+      .filter(trip => trip.recommendationScore > 0)
       .sort((a, b) => b.recommendationScore - a.recommendationScore);
   }, [filters, allTrips]);
 
   // Get top N recommendations
   const getTopRecommendations = (n: number = 3): RecommendationMatch[] => {
-    return recommendations.slice(0, n).map((trip) => ({
+    return recommendations.slice(0, n).map(trip => ({
       trip,
       score: trip.recommendationScore,
       reasons: trip.matchReasons,
@@ -190,33 +186,25 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
   const getRecommendationsByCategory = () => {
     const categories = {
       vibeMatches: recommendations
-        .filter((trip) =>
+        .filter(trip =>
           trip.matchReasons.some(
-            (reason: string) =>
-              reason.includes("lovers") || reason.includes("vibe")
+            (reason: string) => reason.includes('lovers') || reason.includes('vibe')
           )
         )
         .slice(0, 2),
 
       groupMatches: recommendations
-        .filter((trip) =>
-          trip.matchReasons.some((reason: string) =>
-            reason.includes("Great for")
-          )
-        )
+        .filter(trip => trip.matchReasons.some((reason: string) => reason.includes('Great for')))
         .slice(0, 2),
 
       budgetMatches: recommendations
-        .filter((trip) =>
-          trip.matchReasons.some((reason: string) => reason.includes("budget"))
-        )
+        .filter(trip => trip.matchReasons.some((reason: string) => reason.includes('budget')))
         .slice(0, 2),
 
       locationMatches: recommendations
-        .filter((trip) =>
+        .filter(trip =>
           trip.matchReasons.some(
-            (reason: string) =>
-              reason.includes("destination") || reason.includes("Similar")
+            (reason: string) => reason.includes('destination') || reason.includes('Similar')
           )
         )
         .slice(0, 2),
@@ -232,8 +220,7 @@ export const useRecommendations = (filters: Filters, allTrips: Trip[]) => {
       (filters.travellerFilter && filters.travellerFilter.length > 0) ||
       (filters.searchTerm && filters.searchTerm.trim()) ||
       (filters.languageFilter && filters.languageFilter.length > 0) ||
-      (filters.priceRange &&
-        (filters.priceRange[0] > 0 || filters.priceRange[1] < Infinity))
+      (filters.priceRange && (filters.priceRange[0] > 0 || filters.priceRange[1] < Infinity))
     );
   };
 

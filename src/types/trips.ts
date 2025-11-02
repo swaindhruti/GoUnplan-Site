@@ -59,18 +59,18 @@ export type FilterState = {
 };
 
 export const INITIAL_FILTERS: FilterState = {
-  searchTerm: "",
+  searchTerm: '',
   priceRange: [0, Infinity],
-  daysFilter: "all",
-  countryFilter: "all",
+  daysFilter: 'all',
+  countryFilter: 'all',
   languageFilter: [],
   vibeFilter: [],
-  travellerFilter: []
+  travellerFilter: [],
 };
 
 export const DURATION_OPTIONS = [
-  { value: "all", label: "All Durations" },
-  { value: "1-3", label: "Short Trip (1–3 Days)" },
-  { value: "4-7", label: "Medium Trip (4–7 Days)" },
-  { value: "8", label: "Extended Trip (8+ Days)" }
+  { value: 'all', label: 'All Durations' },
+  { value: '1-3', label: 'Short Trip (1–3 Days)' },
+  { value: '4-7', label: 'Medium Trip (4–7 Days)' },
+  { value: '8', label: 'Extended Trip (8+ Days)' },
 ];

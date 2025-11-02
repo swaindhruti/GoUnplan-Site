@@ -1,41 +1,30 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  HelpCircle,
-  MessageSquare,
-  Calendar,
-  MapPin,
-  Plus,
-  Clock,
-} from "lucide-react";
-import {
-  getUserBookingsForSupport,
-  getUserTickets,
-  createTicket,
-} from "@/actions/support/actions";
-import Link from "next/link";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { HelpCircle, MessageSquare, Calendar, MapPin, Plus, Clock } from 'lucide-react';
+import { getUserBookingsForSupport, getUserTickets, createTicket } from '@/actions/support/actions';
+import Link from 'next/link';
 
 interface Booking {
   id: string;
@@ -89,14 +78,14 @@ const SupportPage = () => {
   const [loading, setLoading] = useState(true);
   const [isGeneralTicketOpen, setIsGeneralTicketOpen] = useState(false);
   const [isBookingTicketOpen, setIsBookingTicketOpen] = useState(false);
-  const [selectedBookingId, setSelectedBookingId] = useState<string>("");
+  const [selectedBookingId, setSelectedBookingId] = useState<string>('');
   const [generalTicketForm, setGeneralTicketForm] = useState({
-    title: "",
-    description: "",
+    title: '',
+    description: '',
   });
   const [bookingTicketForm, setBookingTicketForm] = useState({
-    title: "",
-    description: "",
+    title: '',
+    description: '',
   });
 
   const fetchData = useCallback(async () => {
@@ -117,7 +106,7 @@ const SupportPage = () => {
         setTickets(ticketsResult.tickets as UserTicket[]);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -130,28 +119,24 @@ const SupportPage = () => {
   }, [session, fetchData]);
 
   const handleCreateGeneralTicket = async () => {
-    if (
-      !generalTicketForm.title.trim() ||
-      !generalTicketForm.description.trim()
-    )
-      return;
+    if (!generalTicketForm.title.trim() || !generalTicketForm.description.trim()) return;
 
     try {
       const result = await createTicket({
         title: generalTicketForm.title,
         description: generalTicketForm.description,
-        category: "GENERAL",
-        priority: "MEDIUM",
+        category: 'GENERAL',
+        priority: 'MEDIUM',
         bookingId: undefined,
       });
 
       if (result.ticket) {
         setIsGeneralTicketOpen(false);
-        setGeneralTicketForm({ title: "", description: "" });
+        setGeneralTicketForm({ title: '', description: '' });
         fetchData();
       }
     } catch (error) {
-      console.error("Error creating general ticket:", error);
+      console.error('Error creating general ticket:', error);
     }
   };
 
@@ -167,48 +152,46 @@ const SupportPage = () => {
       const result = await createTicket({
         title: bookingTicketForm.title,
         description: bookingTicketForm.description,
-        category: "BOOKING",
-        priority: "MEDIUM",
+        category: 'BOOKING',
+        priority: 'MEDIUM',
         bookingId: selectedBookingId,
       });
 
       if (result.ticket) {
         setIsBookingTicketOpen(false);
-        setBookingTicketForm({ title: "", description: "" });
-        setSelectedBookingId("");
+        setBookingTicketForm({ title: '', description: '' });
+        setSelectedBookingId('');
         fetchData();
       }
     } catch (error) {
-      console.error("Error creating booking ticket:", error);
+      console.error('Error creating booking ticket:', error);
     }
   };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "OPEN":
-        return "destructive";
-      case "IN_PROGRESS":
-        return "default";
-      case "WAITING_FOR_USER":
-        return "secondary";
-      case "RESOLVED":
-        return "outline";
-      case "CLOSED":
-        return "outline";
+      case 'OPEN':
+        return 'destructive';
+      case 'IN_PROGRESS':
+        return 'default';
+      case 'WAITING_FOR_USER':
+        return 'secondary';
+      case 'RESOLVED':
+        return 'outline';
+      case 'CLOSED':
+        return 'outline';
       default:
-        return "default";
+        return 'default';
     }
   };
 
-  if (status === "loading" || loading) {
+  if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
-            <span className="ml-2 font-instrument">
-              Loading support center...
-            </span>
+            <span className="ml-2 font-instrument">Loading support center...</span>
           </div>
         </div>
       </div>
@@ -223,16 +206,12 @@ const SupportPage = () => {
             <div className="bg-purple-50 p-4 rounded-full w-fit mx-auto mb-6">
               <HelpCircle className="h-8 w-8 text-purple-600" />
             </div>
-            <h1 className="text-2xl font-bold mb-4 font-bricolage">
-              Please Sign In
-            </h1>
+            <h1 className="text-2xl font-bold mb-4 font-bricolage">Please Sign In</h1>
             <p className="text-gray-600 font-instrument mb-6">
               You need to be signed in to access the support center.
             </p>
             <Link href="/auth/signin">
-              <Button className="bg-purple-600 hover:bg-purple-700 font-instrument">
-                Sign In
-              </Button>
+              <Button className="bg-purple-600 hover:bg-purple-700 font-instrument">Sign In</Button>
             </Link>
           </div>
         </div>
@@ -278,19 +257,14 @@ const SupportPage = () => {
                 <MessageSquare className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                  General Support
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 font-bricolage">General Support</h3>
                 <p className="text-gray-600 font-instrument">
                   Get help with general questions and issues
                 </p>
               </div>
             </div>
 
-            <Dialog
-              open={isGeneralTicketOpen}
-              onOpenChange={setIsGeneralTicketOpen}
-            >
+            <Dialog open={isGeneralTicketOpen} onOpenChange={setIsGeneralTicketOpen}>
               <DialogTrigger asChild>
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 font-instrument">
                   <Plus className="h-4 w-4 mr-2" />
@@ -311,7 +285,7 @@ const SupportPage = () => {
                     <Input
                       id="general-title"
                       value={generalTicketForm.title}
-                      onChange={(e) =>
+                      onChange={e =>
                         setGeneralTicketForm({
                           ...generalTicketForm,
                           title: e.target.value,
@@ -323,16 +297,13 @@ const SupportPage = () => {
                   </div>
 
                   <div>
-                    <Label
-                      htmlFor="general-description"
-                      className="font-instrument"
-                    >
+                    <Label htmlFor="general-description" className="font-instrument">
                       Description
                     </Label>
                     <Textarea
                       id="general-description"
                       value={generalTicketForm.description}
-                      onChange={(e) =>
+                      onChange={e =>
                         setGeneralTicketForm({
                           ...generalTicketForm,
                           description: e.target.value,
@@ -354,8 +325,7 @@ const SupportPage = () => {
                     <Button
                       onClick={handleCreateGeneralTicket}
                       disabled={
-                        !generalTicketForm.title.trim() ||
-                        !generalTicketForm.description.trim()
+                        !generalTicketForm.title.trim() || !generalTicketForm.description.trim()
                       }
                       className="flex-1 bg-purple-600 hover:bg-purple-700 font-instrument"
                     >
@@ -374,28 +344,21 @@ const SupportPage = () => {
                 <Calendar className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                  Booking Support
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 font-bricolage">Booking Support</h3>
                 <p className="text-gray-600 font-instrument">
                   Get help with your specific bookings
                 </p>
               </div>
             </div>
 
-            <Dialog
-              open={isBookingTicketOpen}
-              onOpenChange={setIsBookingTicketOpen}
-            >
+            <Dialog open={isBookingTicketOpen} onOpenChange={setIsBookingTicketOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 font-instrument"
                   disabled={bookings.length === 0}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  {bookings.length === 0
-                    ? "No Bookings Available"
-                    : "Create Booking Ticket"}
+                  {bookings.length === 0 ? 'No Bookings Available' : 'Create Booking Ticket'}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
@@ -409,20 +372,16 @@ const SupportPage = () => {
                     <Label htmlFor="booking" className="font-instrument">
                       Select Booking
                     </Label>
-                    <Select
-                      value={selectedBookingId}
-                      onValueChange={setSelectedBookingId}
-                    >
+                    <Select value={selectedBookingId} onValueChange={setSelectedBookingId}>
                       <SelectTrigger className="font-instrument">
                         <SelectValue placeholder="Choose your booking" />
                       </SelectTrigger>
                       <SelectContent>
-                        {bookings.map((booking) => (
+                        {bookings.map(booking => (
                           <SelectItem key={booking.id} value={booking.id}>
                             <div className="font-instrument">
-                              {booking.travelPlan.title} -{" "}
-                              {booking.travelPlan.destination ||
-                                booking.travelPlan.city}
+                              {booking.travelPlan.title} -{' '}
+                              {booking.travelPlan.destination || booking.travelPlan.city}
                             </div>
                           </SelectItem>
                         ))}
@@ -437,7 +396,7 @@ const SupportPage = () => {
                     <Input
                       id="booking-title"
                       value={bookingTicketForm.title}
-                      onChange={(e) =>
+                      onChange={e =>
                         setBookingTicketForm({
                           ...bookingTicketForm,
                           title: e.target.value,
@@ -449,16 +408,13 @@ const SupportPage = () => {
                   </div>
 
                   <div>
-                    <Label
-                      htmlFor="booking-description"
-                      className="font-instrument"
-                    >
+                    <Label htmlFor="booking-description" className="font-instrument">
                       Description
                     </Label>
                     <Textarea
                       id="booking-description"
                       value={bookingTicketForm.description}
-                      onChange={(e) =>
+                      onChange={e =>
                         setBookingTicketForm({
                           ...bookingTicketForm,
                           description: e.target.value,
@@ -495,8 +451,7 @@ const SupportPage = () => {
 
             {bookings.length === 0 && (
               <p className="text-sm text-gray-500 mt-3 font-instrument">
-                You need to have bookings to create booking-specific support
-                tickets.
+                You need to have bookings to create booking-specific support tickets.
               </p>
             )}
           </div>
@@ -513,7 +468,7 @@ const SupportPage = () => {
           <CardContent className="p-6">
             {tickets.length > 0 ? (
               <div className="space-y-4">
-                {tickets.map((ticket) => (
+                {tickets.map(ticket => (
                   <div
                     key={ticket.id}
                     className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50 transition-colors duration-200"
@@ -528,7 +483,7 @@ const SupportPage = () => {
                         </Link>
                         <p className="text-gray-600 mt-1 font-instrument">
                           {ticket.description.slice(0, 150)}
-                          {ticket.description.length > 150 && "..."}
+                          {ticket.description.length > 150 && '...'}
                         </p>
                         {ticket.booking && (
                           <p className="text-sm text-blue-600 mt-2 font-instrument">
@@ -555,7 +510,7 @@ const SupportPage = () => {
                       </div>
                       <div className="flex flex-col items-end space-y-2">
                         <Badge variant={getStatusBadgeVariant(ticket.status)}>
-                          {ticket.status.replace("_", " ")}
+                          {ticket.status.replace('_', ' ')}
                         </Badge>
                       </div>
                     </div>

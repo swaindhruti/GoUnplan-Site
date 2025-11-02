@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 type StatCardProps = {
   title: string;
@@ -6,7 +6,7 @@ type StatCardProps = {
   icon: React.ReactNode;
   trend?: { isUp: boolean; value: string } | null;
   subtitle?: string | null;
-  color?: "purple" | "green" | "red" | "blue" | "yellow";
+  color?: 'purple' | 'green' | 'red' | 'blue' | 'yellow';
 };
 
 export const StatCard = ({
@@ -15,28 +15,26 @@ export const StatCard = ({
   icon,
   trend = null,
   subtitle = null,
-  color = "purple",
+  color = 'purple',
 }: StatCardProps) => {
   const colorClasses = {
-    purple: "from-purple-500 to-indigo-600",
-    green: "from-green-500 to-emerald-600",
-    red: "from-red-500 to-rose-600",
-    blue: "from-blue-500 to-sky-600",
-    yellow: "from-yellow-500 to-amber-600",
+    purple: 'from-purple-500 to-indigo-600',
+    green: 'from-green-500 to-emerald-600',
+    red: 'from-red-500 to-rose-600',
+    blue: 'from-blue-500 to-sky-600',
+    yellow: 'from-yellow-500 to-amber-600',
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
-        <div
-          className={`p-3 rounded-full bg-gradient-to-r ${colorClasses[color]} text-white`}
-        >
+        <div className={`p-3 rounded-full bg-gradient-to-r ${colorClasses[color]} text-white`}>
           {icon}
         </div>
         {trend && (
           <div
             className={`flex items-center text-sm font-medium ${
-              trend.isUp ? "text-green-600" : "text-red-600"
+              trend.isUp ? 'text-green-600' : 'text-red-600'
             }`}
           >
             {trend.isUp ? (

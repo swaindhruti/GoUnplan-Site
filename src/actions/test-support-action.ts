@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import { auth } from "@/config/auth";
-import prisma from "@/lib/prisma";
+import { auth } from '@/config/auth';
+import prisma from '@/lib/prisma';
 
 export async function testSupportServerAction() {
   try {
@@ -9,7 +9,7 @@ export async function testSupportServerAction() {
     const session = await auth();
 
     if (!session?.user?.email) {
-      return { error: "No session", step: "auth_check" };
+      return { error: 'No session', step: 'auth_check' };
     }
 
     // Database check
@@ -19,11 +19,11 @@ export async function testSupportServerAction() {
     });
 
     if (!dbUser) {
-      return { error: "User not found in database", step: "db_check" };
+      return { error: 'User not found in database', step: 'db_check' };
     }
 
-    if (dbUser.role !== "SUPPORT" && dbUser.role !== "ADMIN") {
-      return { error: "Invalid role", role: dbUser.role, step: "role_check" };
+    if (dbUser.role !== 'SUPPORT' && dbUser.role !== 'ADMIN') {
+      return { error: 'Invalid role', role: dbUser.role, step: 'role_check' };
     }
 
     return {
@@ -40,7 +40,7 @@ export async function testSupportServerAction() {
       },
     };
   } catch (error) {
-    console.error("🧪 Server action test error:", error);
-    return { error: String(error), step: "exception" };
+    console.error('🧪 Server action test error:', error);
+    return { error: String(error), step: 'exception' };
   }
 }

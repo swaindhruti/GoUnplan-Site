@@ -1,14 +1,10 @@
-import { create } from "zustand";
-import type {
-  BookingData,
-  GuestInfoUpdate,
-  PaymentUpdate,
-} from "@/types/booking";
+import { create } from 'zustand';
+import type { BookingData, GuestInfoUpdate, PaymentUpdate } from '@/types/booking';
 import {
   createBooking,
   updateBookingGuestInfo,
   updateBookingStatus,
-} from "@/actions/booking/actions";
+} from '@/actions/booking/actions';
 
 interface BookingStoreState {
   bookingData: Partial<BookingData>;
@@ -22,18 +18,18 @@ interface BookingStoreState {
 
 export const useBookingStore = create<BookingStoreState>((set, get) => ({
   bookingData: {
-    status: "PENDING",
+    status: 'PENDING',
     participants: 1,
     refundAmount: 0,
   },
   isLoading: false,
   error: null,
 
-  updateBookingData: (update) => {
-    set((state) => ({ bookingData: { ...state.bookingData, ...update } }));
+  updateBookingData: update => {
+    set(state => ({ bookingData: { ...state.bookingData, ...update } }));
   },
 
-  updateGuestInfo: async (update) => {
+  updateGuestInfo: async update => {
     set({ isLoading: true, error: null });
     const { bookingData, updateBookingData } = get();
 
@@ -60,8 +56,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return true;
     } catch (err) {
       set({
-        error:
-          err instanceof Error ? err.message : "Failed to update guest info",
+        error: err instanceof Error ? err.message : 'Failed to update guest info',
       });
       return false;
     } finally {
@@ -69,7 +64,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     }
   },
 
-  updatePaymentInfo: async (update) => {
+  updatePaymentInfo: async update => {
     set({ isLoading: true, error: null });
     const { bookingData, updateBookingData } = get();
 
@@ -92,7 +87,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return true;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to process payment",
+        error: err instanceof Error ? err.message : 'Failed to process payment',
       });
       return false;
     } finally {
@@ -100,13 +95,13 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     }
   },
 
-  createNewBooking: async (data) => {
+  createNewBooking: async data => {
     set({ isLoading: true, error: null });
     const { updateBookingData } = get();
 
     try {
       const payload = {
-        id: data.id || "",
+        id: data.id || '',
         userId: data.userId!,
         travelPlanId: data.travelPlanId!,
         startDate: new Date(data.startDate!),
@@ -132,7 +127,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       return null;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Failed to create booking",
+        error: err instanceof Error ? err.message : 'Failed to create booking',
       });
       return null;
     } finally {

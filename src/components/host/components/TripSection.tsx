@@ -1,11 +1,11 @@
-"use client";
-import { useState, useMemo } from "react";
-import { Trip } from "../types";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { formatDateRange } from "./common/utils";
-import Image from "next/image";
-import { TripDetailsModal } from "./TripDetailsModal";
+'use client';
+import { useState, useMemo } from 'react';
+import { Trip } from '../types';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { formatDateRange } from './common/utils';
+import Image from 'next/image';
+import { TripDetailsModal } from './TripDetailsModal';
 import {
   Plus,
   Map,
@@ -20,7 +20,7 @@ import {
   Edit,
   Eye,
   Activity,
-} from "lucide-react";
+} from 'lucide-react';
 
 type TripSectionProps = {
   trips: Trip[];
@@ -29,7 +29,7 @@ type TripSectionProps = {
 };
 
 export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
@@ -45,23 +45,15 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   };
 
   const filteredTrips = useMemo(() => {
-    if (statusFilter === "all") return trips;
-    return trips.filter(
-      (trip) => trip.status.toLowerCase() === statusFilter.toLowerCase()
-    );
+    if (statusFilter === 'all') return trips;
+    return trips.filter(trip => trip.status.toLowerCase() === statusFilter.toLowerCase());
   }, [trips, statusFilter]);
 
   const stats = useMemo(() => {
     const totalTrips = trips.length;
-    const activeTrips = trips.filter(
-      (t) => t.status.toLowerCase() === "active"
-    ).length;
-    const inactiveTrips = trips.filter(
-      (t) => t.status.toLowerCase() === "inactive"
-    ).length;
-    const draftTrips = trips.filter(
-      (t) => t.status.toLowerCase() === "draft"
-    ).length;
+    const activeTrips = trips.filter(t => t.status.toLowerCase() === 'active').length;
+    const inactiveTrips = trips.filter(t => t.status.toLowerCase() === 'inactive').length;
+    const draftTrips = trips.filter(t => t.status.toLowerCase() === 'draft').length;
     const totalRevenue = trips.reduce((sum, trip) => sum + trip.price, 0);
 
     return { totalTrips, activeTrips, inactiveTrips, draftTrips, totalRevenue };
@@ -69,24 +61,24 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "inactive":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case 'active':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'draft':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case "active":
+      case 'active':
         return <Activity className="h-4 w-4" />;
-      case "inactive":
+      case 'inactive':
         return <Clock className="h-4 w-4" />;
-      case "draft":
+      case 'draft':
         return <FileText className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
@@ -94,9 +86,9 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -106,9 +98,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold text-gray-900 font-bricolage">
-            Travel Experiences
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 font-bricolage">Travel Experiences</h2>
           <p className="text-gray-600 font-instrument">
             Create and manage your curated travel experiences
           </p>
@@ -127,51 +117,37 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600 font-instrument">
-                Total Experiences
-              </p>
-              <p className="text-2xl font-bold text-gray-900 font-bricolage">
-                {stats.totalTrips}
-              </p>
+              <p className="text-sm font-medium text-gray-600 font-instrument">Total Experiences</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">{stats.totalTrips}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-purple-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
-            <span className="text-xs text-gray-500 font-instrument">
-              All your created trips
-            </span>
+            <span className="text-xs text-gray-500 font-instrument">All your created trips</span>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600 font-instrument">
-                Active
-              </p>
-              <p className="text-2xl font-bold text-gray-900 font-bricolage">
-                {stats.activeTrips}
-              </p>
+              <p className="text-sm font-medium text-gray-600 font-instrument">Active</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">{stats.activeTrips}</p>
             </div>
             <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
               <Users className="w-6 h-6 text-emerald-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
-            <span className="text-xs text-gray-500 font-instrument">
-              Currently available
-            </span>
+            <span className="text-xs text-gray-500 font-instrument">Currently available</span>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600 font-instrument">
-                Total Value
-              </p>
+              <p className="text-sm font-medium text-gray-600 font-instrument">Total Value</p>
               <p className="text-2xl font-bold text-gray-900 font-bricolage">
                 {formatCurrency(stats.totalRevenue)}
               </p>
@@ -181,30 +157,22 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
             </div>
           </div>
           <div className="mt-4 flex items-center">
-            <span className="text-xs text-gray-500 font-instrument">
-              Combined trip value
-            </span>
+            <span className="text-xs text-gray-500 font-instrument">Combined trip value</span>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600 font-instrument">
-                Draft
-              </p>
-              <p className="text-2xl font-bold text-gray-900 font-bricolage">
-                {stats.draftTrips}
-              </p>
+              <p className="text-sm font-medium text-gray-600 font-instrument">Draft</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">{stats.draftTrips}</p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
               <FileText className="w-6 h-6 text-orange-600" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
-            <span className="text-xs text-gray-500 font-instrument">
-              In development
-            </span>
+            <span className="text-xs text-gray-500 font-instrument">In development</span>
           </div>
         </div>
       </div>
@@ -223,11 +191,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
             </div>
             <div className="flex space-x-2">
               <button
-                onClick={() => setStatusFilter("all")}
+                onClick={() => setStatusFilter('all')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
-                  statusFilter === "all"
-                    ? "bg-purple-600 text-white"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  statusFilter === 'all'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 All
@@ -236,11 +204,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 </span>
               </button>
               <button
-                onClick={() => setStatusFilter("active")}
+                onClick={() => setStatusFilter('active')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
-                  statusFilter === "active"
-                    ? "bg-purple-600 text-white"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  statusFilter === 'active'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 Active
@@ -249,11 +217,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 </span>
               </button>
               <button
-                onClick={() => setStatusFilter("inactive")}
+                onClick={() => setStatusFilter('inactive')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
-                  statusFilter === "inactive"
-                    ? "bg-purple-600 text-white"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  statusFilter === 'inactive'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 Inactive
@@ -262,11 +230,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 </span>
               </button>
               <button
-                onClick={() => setStatusFilter("draft")}
+                onClick={() => setStatusFilter('draft')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
-                  statusFilter === "draft"
-                    ? "bg-purple-600 text-white"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  statusFilter === 'draft'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 Draft
@@ -306,14 +274,14 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 </div>
                 <p className="text-xl font-semibold text-slate-900">
                   {trips.length === 0
-                    ? "No experiences found. Start by creating your first one!"
+                    ? 'No experiences found. Start by creating your first one!'
                     : `No ${statusFilter} experiences found.`}
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredTrips.map((trip) => (
+              {filteredTrips.map(trip => (
                 <div
                   key={trip.travelPlanId}
                   className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
@@ -323,10 +291,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                     <div className="flex-shrink-0">
                       <div className="relative w-full lg:w-40 h-40">
                         <Image
-                          src={
-                            trip.tripImage ||
-                            "https://avatar.iran.liara.run/public"
-                          }
+                          src={trip.tripImage || 'https://avatar.iran.liara.run/public'}
                           alt={trip.title}
                           fill
                           className="object-cover rounded-lg"
@@ -348,9 +313,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                     <div className="flex-grow space-y-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-grow">
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {trip.title}
-                          </h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{trip.title}</h3>
                           <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                             {trip.description}
                           </p>
@@ -396,16 +359,12 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                           {/* Trip Stats */}
                           <div className="flex gap-4 text-sm">
                             <div className="text-center">
-                              <p className="font-semibold text-gray-900">
-                                {trip.reviewCount || 0}
-                              </p>
+                              <p className="font-semibold text-gray-900">{trip.reviewCount || 0}</p>
                               <p className="text-gray-500">Reviews</p>
                             </div>
                             <div className="text-center">
                               <p className="font-semibold text-gray-900">
-                                {trip.averageRating
-                                  ? trip.averageRating.toFixed(1)
-                                  : "0.0"}
+                                {trip.averageRating ? trip.averageRating.toFixed(1) : '0.0'}
                               </p>
                               <p className="text-gray-500">Rating</p>
                             </div>
@@ -415,7 +374,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 pt-4 border-t">
-                        {trip.status.toLowerCase() === "draft" && (
+                        {trip.status.toLowerCase() === 'draft' && (
                           <button
                             onClick={() =>
                               router.push(
@@ -452,26 +411,22 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                       {((trip.filters && trip.filters.length > 0) ||
                         (trip.languages && trip.languages.length > 0)) && (
                         <div className="flex flex-wrap gap-2 pt-3">
-                          {trip.filters?.map(
-                            (filter: string, index: number) => (
-                              <span
-                                key={index}
-                                className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium"
-                              >
-                                {filter}
-                              </span>
-                            )
-                          )}
-                          {trip.languages?.map(
-                            (language: string, index: number) => (
-                              <span
-                                key={index}
-                                className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
-                              >
-                                {language}
-                              </span>
-                            )
-                          )}
+                          {trip.filters?.map((filter: string, index: number) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium"
+                            >
+                              {filter}
+                            </span>
+                          ))}
+                          {trip.languages?.map((language: string, index: number) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
+                            >
+                              {language}
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -484,11 +439,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
       </div>
 
       {/* Trip Details Modal */}
-      <TripDetailsModal
-        trip={selectedTrip}
-        isOpen={isModalOpen}
-        onClose={closeTripModal}
-      />
+      <TripDetailsModal trip={selectedTrip} isOpen={isModalOpen} onClose={closeTripModal} />
     </div>
   );
 };

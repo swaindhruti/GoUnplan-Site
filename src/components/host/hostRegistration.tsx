@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
@@ -19,62 +19,62 @@ import {
   X,
   MapPin,
   Calendar,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { applyForHost, hasAppliedForHost } from "@/actions/user/action";
-import { Button } from "../ui/button";
-import { Alert, AlertDescription } from "../ui/alert";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import Link from "next/link";
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { applyForHost, hasAppliedForHost } from '@/actions/user/action';
+import { Button } from '../ui/button';
+import { Alert, AlertDescription } from '../ui/alert';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import Link from 'next/link';
 
 // Common languages list
 const COMMON_LANGUAGES = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Italian",
-  "Portuguese",
-  "Russian",
-  "Chinese (Mandarin)",
-  "Japanese",
-  "Korean",
-  "Arabic",
-  "Hindi",
-  "Dutch",
-  "Swedish",
-  "Norwegian",
-  "Danish",
-  "Finnish",
-  "Polish",
-  "Czech",
-  "Hungarian",
-  "Greek",
-  "Turkish",
-  "Hebrew",
-  "Thai",
-  "Vietnamese",
-  "Indonesian",
-  "Malay",
-  "Tagalog",
-  "Swahili",
+  'English',
+  'Spanish',
+  'French',
+  'German',
+  'Italian',
+  'Portuguese',
+  'Russian',
+  'Chinese (Mandarin)',
+  'Japanese',
+  'Korean',
+  'Arabic',
+  'Hindi',
+  'Dutch',
+  'Swedish',
+  'Norwegian',
+  'Danish',
+  'Finnish',
+  'Polish',
+  'Czech',
+  'Hungarian',
+  'Greek',
+  'Turkish',
+  'Hebrew',
+  'Thai',
+  'Vietnamese',
+  'Indonesian',
+  'Malay',
+  'Tagalog',
+  'Swahili',
 ];
 
 // Months for hosting
 const HOSTING_MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
@@ -86,17 +86,17 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   const [isChecking, setIsChecking] = useState(true);
 
   const [formData, setFormData] = useState({
-    description: "",
+    description: '',
     hostEmail: userEmail,
-    hostMobile: "",
-    hostCity: "",
+    hostMobile: '',
+    hostCity: '',
     plannedHostingMonths: [] as string[],
-    plannedHostingLocation: "",
+    plannedHostingLocation: '',
     languages: [] as string[],
-    instagramUrl: "",
-    twitterUrl: "",
-    linkedinUrl: "",
-    websiteUrl: "",
+    instagramUrl: '',
+    twitterUrl: '',
+    linkedinUrl: '',
+    websiteUrl: '',
   });
 
   const [state, setState] = useState({
@@ -108,8 +108,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   // Check if user has already applied to be a host
   useEffect(() => {
     const checkHostApplicationStatus = async () => {
-      if (userEmail === "no session") {
-        router.push("/auth/signin");
+      if (userEmail === 'no session') {
+        router.push('/auth/signin');
         return;
       }
 
@@ -121,7 +121,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
           setAlreadyApplied(true);
         }
       } catch (error) {
-        console.error("Error checking host application status:", error);
+        console.error('Error checking host application status:', error);
       } finally {
         setIsChecking(false);
       }
@@ -130,19 +130,17 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
     checkHostApplicationStatus();
 
     // Update the email in formData when userEmail changes
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       hostEmail: userEmail,
     }));
   }, [userEmail, router]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -150,7 +148,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
   const handleLanguageAdd = (language: string) => {
     if (!formData.languages.includes(language)) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         languages: [...prev.languages, language],
       }));
@@ -158,15 +156,15 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   };
 
   const handleLanguageRemove = (languageToRemove: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      languages: prev.languages.filter((lang) => lang !== languageToRemove),
+      languages: prev.languages.filter(lang => lang !== languageToRemove),
     }));
   };
 
   const handleMonthAdd = (month: string) => {
     if (!formData.plannedHostingMonths.includes(month)) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         plannedHostingMonths: [...prev.plannedHostingMonths, month],
       }));
@@ -174,16 +172,14 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   };
 
   const handleMonthRemove = (monthToRemove: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      plannedHostingMonths: prev.plannedHostingMonths.filter(
-        (month) => month !== monthToRemove
-      ),
+      plannedHostingMonths: prev.plannedHostingMonths.filter(month => month !== monthToRemove),
     }));
   };
 
   const handleRegister = useCallback(async () => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
       isRegistering: true,
     }));
@@ -193,30 +189,28 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
       const register = await applyForHost(userEmail, formData);
 
       if (register.success) {
-        setState((prev) => ({
+        setState(prev => ({
           ...prev,
-          successMessage: "Successfully submitted your host application!",
+          successMessage: 'Successfully submitted your host application!',
         }));
 
         // Move to a success confirmation step instead of redirecting
         setStep(7);
       } else {
-        setState((prev) => ({
+        setState(prev => ({
           ...prev,
-          errorMessage: register.error || "Failed to submit host application.",
+          errorMessage: register.error || 'Failed to submit host application.',
         }));
       }
     } catch (error) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         errorMessage:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong. Please try again.",
+          error instanceof Error ? error.message : 'Something went wrong. Please try again.',
       }));
       console.error(error);
     } finally {
-      setState((prev) => ({ ...prev, isRegistering: false }));
+      setState(prev => ({ ...prev, isRegistering: false }));
     }
   }, [userEmail, formData]);
 
@@ -247,11 +241,11 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
   // Progress indicator component
   const StepProgress = () => {
     const steps = [
-      { num: 2, label: "Basic Info" },
-      { num: 3, label: "Location" },
-      { num: 4, label: "Languages" },
-      { num: 5, label: "Social Media" },
-      { num: 6, label: "Review" },
+      { num: 2, label: 'Basic Info' },
+      { num: 3, label: 'Location' },
+      { num: 4, label: 'Languages' },
+      { num: 5, label: 'Social Media' },
+      { num: 6, label: 'Review' },
     ];
 
     if (step === 1) return null; // Don't show on info page
@@ -265,19 +259,15 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                     step >= s.num
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                      : "bg-gray-200 text-gray-500"
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                      : 'bg-gray-200 text-gray-500'
                   }`}
                 >
-                  {step > s.num ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    s.num - 1
-                  )}
+                  {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num - 1}
                 </div>
                 <span
                   className={`text-xs mt-2 font-instrument font-medium ${
-                    step >= s.num ? "text-purple-600" : "text-gray-500"
+                    step >= s.num ? 'text-purple-600' : 'text-gray-500'
                   }`}
                 >
                   {s.label}
@@ -286,9 +276,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
               {index < steps.length - 1 && (
                 <div
                   className={`h-1 flex-1 mx-2 rounded transition-all duration-300 ${
-                    step > s.num
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600"
-                      : "bg-gray-200"
+                    step > s.num ? 'bg-gradient-to-r from-purple-600 to-blue-600' : 'bg-gray-200'
                   }`}
                 />
               )}
@@ -308,9 +296,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
             <div className="flex justify-between items-center py-6">
               <Link href="/" className="flex items-center gap-2">
                 <Compass className="h-8 w-8 text-purple-600" />
-                <span className="text-2xl font-bold text-gray-900 font-bricolage">
-                  GoUnplan
-                </span>
+                <span className="text-2xl font-bold text-gray-900 font-bricolage">GoUnplan</span>
               </Link>
               <div className="flex items-center gap-4">
                 <Link href="/dashboard/user">
@@ -329,9 +315,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
         <div className="flex flex-1 min-h-0 items-center justify-center">
           <div className="text-center">
             <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full inline-block mb-4"></div>
-            <p className="text-gray-600 font-instrument">
-              Checking application status...
-            </p>
+            <p className="text-gray-600 font-instrument">Checking application status...</p>
           </div>
         </div>
       </div>
@@ -344,7 +328,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
       <div className="flex flex-1 min-h-0 mt-4">
         {/* Form - Full Width */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 mt-26">
-          <div className={`w-full ${step === 6 ? "max-w-6xl" : "max-w-4xl"}`}>
+          <div className={`w-full ${step === 6 ? 'max-w-6xl' : 'max-w-4xl'}`}>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
               {alreadyApplied ? (
                 // Application Already Submitted View
@@ -364,8 +348,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <Clock className="h-8 w-8 text-amber-600" />
                       </div>
                       <p className="text-gray-600 font-instrument mb-6">
-                        We&apos;ll notify you by email once your application is
-                        approved.
+                        We&apos;ll notify you by email once your application is approved.
                       </p>
                     </div>
 
@@ -376,15 +359,11 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="font-instrument">
-                            Review within 1-3 business days
-                          </span>
+                          <span className="font-instrument">Review within 1-3 business days</span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="font-instrument">
-                            Email notification once approved
-                          </span>
+                          <span className="font-instrument">Email notification once approved</span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-4 w-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
@@ -396,7 +375,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                     </div>
 
                     <Button
-                      onClick={() => router.push("/")}
+                      onClick={() => router.push('/')}
                       className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold font-instrument shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <div className="flex items-center gap-2">
@@ -415,8 +394,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         Want to be a Host?
                       </h1>
                       <p className="text-gray-600 font-instrument mt-2">
-                        Join thousands of hosts creating unforgettable
-                        experiences
+                        Join thousands of hosts creating unforgettable experiences
                       </p>
                     </div>
 
@@ -465,10 +443,10 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
                     <div className="text-center">
                       <p className="text-sm text-gray-600 font-instrument">
-                        Already a host?{" "}
+                        Already a host?{' '}
                         <button
                           className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
-                          onClick={() => router.push("/auth/signin")}
+                          onClick={() => router.push('/auth/signin')}
                         >
                           Sign in here
                         </button>
@@ -508,9 +486,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                           />
                         </div>
                         <p className="text-xs text-gray-500 font-instrument mt-1">
-                          A good description helps travelers trust you as a host
-                          (minimum 100 characters).{" "}
-                          {formData.description.length}/100
+                          A good description helps travelers trust you as a host (minimum 100
+                          characters). {formData.description.length}/100
                         </p>
                       </div>
 
@@ -627,7 +604,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <div className="min-h-[60px] p-4 bg-gray-50 rounded-lg border border-gray-200 mt-2 mb-3">
                           {formData.plannedHostingMonths.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
-                              {formData.plannedHostingMonths.map((month) => (
+                              {formData.plannedHostingMonths.map(month => (
                                 <span
                                   key={month}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
@@ -654,10 +631,10 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <div className="mt-1">
                           <select
                             className="w-full h-11 px-4 border border-gray-200 rounded-md focus:border-purple-400 focus:ring-purple-100 bg-white font-instrument text-gray-700"
-                            onChange={(e) => {
+                            onChange={e => {
                               if (e.target.value) {
                                 handleMonthAdd(e.target.value);
-                                e.target.value = ""; // Reset selection
+                                e.target.value = ''; // Reset selection
                               }
                             }}
                             defaultValue=""
@@ -666,9 +643,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                               Select months to add...
                             </option>
                             {HOSTING_MONTHS.filter(
-                              (month) =>
-                                !formData.plannedHostingMonths.includes(month)
-                            ).map((month) => (
+                              month => !formData.plannedHostingMonths.includes(month)
+                            ).map(month => (
                               <option key={month} value={month}>
                                 {month}
                               </option>
@@ -676,8 +652,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                           </select>
                         </div>
                         <p className="text-xs text-gray-500 font-instrument mt-1">
-                          Select the months you plan to host trips (you can
-                          select multiple)
+                          Select the months you plan to host trips (you can select multiple)
                         </p>
                       </div>
 
@@ -705,9 +680,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                         <p className="text-sm text-blue-800 font-instrument">
-                          💡 <strong>Tip:</strong> Being specific about your
-                          location and hosting plans helps us match you with the
-                          right travelers.
+                          💡 <strong>Tip:</strong> Being specific about your location and hosting
+                          plans helps us match you with the right travelers.
                         </p>
                       </div>
                     </div>
@@ -743,8 +717,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         Languages You Speak
                       </h2>
                       <p className="text-gray-600 font-instrument mt-2">
-                        Help travelers know which languages you can communicate
-                        in
+                        Help travelers know which languages you can communicate in
                       </p>
                     </div>
 
@@ -759,7 +732,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <div className="min-h-[60px] p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
                           {formData.languages.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
-                              {formData.languages.map((language) => (
+                              {formData.languages.map(language => (
                                 <span
                                   key={language}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
@@ -767,9 +740,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                                   {language}
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      handleLanguageRemove(language)
-                                    }
+                                    onClick={() => handleLanguageRemove(language)}
                                     className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"
                                   >
                                     <X className="h-3 w-3" />
@@ -788,10 +759,10 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <div className="relative">
                           <select
                             className="w-full px-4 py-3 h-12 border border-gray-300 rounded-md focus:border-purple-400 focus:ring-purple-100 bg-white font-instrument text-gray-700"
-                            onChange={(e) => {
+                            onChange={e => {
                               if (e.target.value) {
                                 handleLanguageAdd(e.target.value);
-                                e.target.value = ""; // Reset selection
+                                e.target.value = ''; // Reset selection
                               }
                             }}
                             defaultValue=""
@@ -800,8 +771,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                               Select a language to add...
                             </option>
                             {COMMON_LANGUAGES.filter(
-                              (lang) => !formData.languages.includes(lang)
-                            ).map((language) => (
+                              lang => !formData.languages.includes(lang)
+                            ).map(language => (
                               <option key={language} value={language}>
                                 {language}
                               </option>
@@ -809,8 +780,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                           </select>
                         </div>
                         <p className="text-xs text-gray-500 font-instrument mt-2">
-                          Select at least one language you can communicate with
-                          guests in
+                          Select at least one language you can communicate with guests in
                         </p>
                       </div>
                     </div>
@@ -846,8 +816,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         Social Media & Links
                       </h2>
                       <p className="text-gray-600 font-instrument mt-2">
-                        Add your social profiles to build trust with travelers
-                        (optional)
+                        Add your social profiles to build trust with travelers (optional)
                       </p>
                     </div>
 
@@ -930,9 +899,8 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                         <p className="text-sm text-blue-800 font-instrument">
-                          💡 <strong>Tip:</strong> Adding social media links
-                          helps build credibility and allows travelers to learn
-                          more about you.
+                          💡 <strong>Tip:</strong> Adding social media links helps build credibility
+                          and allows travelers to learn more about you.
                         </p>
                       </div>
                     </div>
@@ -981,22 +949,20 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         <li className="flex items-start">
                           <CheckCircle2 className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700 font-instrument">
-                            Our team will review your application within 1-3
-                            business days
+                            Our team will review your application within 1-3 business days
                           </span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700 font-instrument">
-                            You&apos;ll receive an email notification once your
-                            application is approved
+                            You&apos;ll receive an email notification once your application is
+                            approved
                           </span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle2 className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700 font-instrument">
-                            After approval, you can start creating amazing
-                            travel experiences
+                            After approval, you can start creating amazing travel experiences
                           </span>
                         </li>
                       </ul>
@@ -1004,15 +970,14 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
 
                     <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                       <p className="text-sm text-blue-800 font-instrument">
-                        💡 <strong>In the meantime:</strong> Explore our
-                        platform, check out existing trips, and start planning
-                        your unique experiences!
+                        💡 <strong>In the meantime:</strong> Explore our platform, check out
+                        existing trips, and start planning your unique experiences!
                       </p>
                     </div>
 
                     <Button
                       onClick={() => {
-                        router.push("/");
+                        router.push('/');
                       }}
                       className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold font-instrument shadow-lg hover:shadow-xl transition-all duration-300"
                     >
@@ -1072,28 +1037,20 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         </div>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="text-gray-600 font-instrument">
-                              Description:
-                            </span>
+                            <span className="text-gray-600 font-instrument">Description:</span>
                             <p className="text-gray-900 mt-1 font-instrument break-words whitespace-pre-wrap">
                               {formData.description}
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600 font-instrument">
-                              Email:
-                            </span>
+                            <span className="text-gray-600 font-instrument">Email:</span>
                             <p className="text-gray-900 font-instrument break-words">
                               {formData.hostEmail}
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600 font-instrument">
-                              Phone:
-                            </span>
-                            <p className="text-gray-900 font-instrument">
-                              {formData.hostMobile}
-                            </p>
+                            <span className="text-gray-600 font-instrument">Phone:</span>
+                            <p className="text-gray-900 font-instrument">{formData.hostMobile}</p>
                           </div>
                         </div>
                       </div>
@@ -1113,9 +1070,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                         </div>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="text-gray-600 font-instrument">
-                              Host City:
-                            </span>
+                            <span className="text-gray-600 font-instrument">Host City:</span>
                             <p className="text-gray-900 font-instrument break-words">
                               {formData.hostCity}
                             </p>
@@ -1126,7 +1081,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                             </span>
                             <div className="flex flex-wrap gap-2 mt-1">
                               {formData.plannedHostingMonths.length > 0 ? (
-                                formData.plannedHostingMonths.map((month) => (
+                                formData.plannedHostingMonths.map(month => (
                                   <span
                                     key={month}
                                     className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
@@ -1155,9 +1110,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                       {/* Languages Section */}
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-semibold text-gray-900 font-instrument">
-                            Languages
-                          </h3>
+                          <h3 className="font-semibold text-gray-900 font-instrument">Languages</h3>
                           <button
                             onClick={() => setStep(4)}
                             className="text-sm text-purple-600 hover:text-purple-700 font-instrument"
@@ -1166,7 +1119,7 @@ export const HostRegistration = ({ userEmail }: { userEmail: string }) => {
                           </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {formData.languages.map((language) => (
+                          {formData.languages.map(language => (
                             <span
                               key={language}
                               className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"

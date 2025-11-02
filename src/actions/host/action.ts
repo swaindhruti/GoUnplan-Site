@@ -1,18 +1,13 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireHost } from "@/lib/roleGaurd";
-import { TravelPlanStatuses } from "@/types/travel";
-import {
-  TravelPlanStatus,
-  BookingStatus,
-  PaymentStatus,
-  Prisma,
-} from "@prisma/client";
+import prisma from '@/lib/prisma';
+import { requireHost } from '@/lib/roleGaurd';
+import { TravelPlanStatuses } from '@/types/travel';
+import { TravelPlanStatus, BookingStatus, PaymentStatus, Prisma } from '@prisma/client';
 
 export const getHostDetails = async () => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const host = await prisma.hostProfile.findUnique({
@@ -34,21 +29,19 @@ export const getHostDetails = async () => {
     });
 
     if (!host) {
-      return { error: "Host not found" };
+      return { error: 'Host not found' };
     }
 
     return { host };
   } catch (error) {
-    console.error("Error fetching host details:", error);
-    return { error: "Failed to fetch host details" };
+    console.error('Error fetching host details:', error);
+    return { error: 'Failed to fetch host details' };
   }
 };
 
-export const getHostTravelPlansByStatus = async (
-  status: TravelPlanStatuses
-) => {
+export const getHostTravelPlansByStatus = async (status: TravelPlanStatuses) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const travelPlans = await prisma.travelPlans.findMany({
@@ -65,13 +58,13 @@ export const getHostTravelPlansByStatus = async (
     });
 
     if (!travelPlans || travelPlans.length === 0) {
-      return { message: "No travel plans found for this status" };
+      return { message: 'No travel plans found for this status' };
     }
 
     return { travelPlans };
   } catch (error) {
-    console.error("Error fetching travel plans:", error);
-    return { error: "Failed to fetch travel plans" };
+    console.error('Error fetching travel plans:', error);
+    return { error: 'Failed to fetch travel plans' };
   }
 };
 
@@ -84,7 +77,7 @@ export const updateHostProfile = async (data: {
   languages?: string[];
 }) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const updatedHost = await prisma.hostProfile.update({
@@ -100,8 +93,8 @@ export const updateHostProfile = async (data: {
 
     return { success: true, host: updatedHost };
   } catch (error) {
-    console.error("Error updating host profile:", error);
-    return { error: "Failed to update host profile" };
+    console.error('Error updating host profile:', error);
+    return { error: 'Failed to update host profile' };
   }
 };
 
@@ -112,21 +105,21 @@ export const createTravelPlan = async (data: {
   includedActivities: string[];
   stops?: string[];
   restrictions: string[];
-  special: string[] | "";
-  activities: string[] | "";
+  special: string[] | '';
+  activities: string[] | '';
   noOfDays: number;
   price: number;
   startDate: Date | null;
   endDate: Date | null;
   filters: string[];
   maxParticipants?: number;
-  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
+  genderPreference?: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
   country: string;
   state: string;
   city: string;
   languages: string[];
   tripImage?: string;
-  status?: "ACTIVE" | "INACTIVE" | "DRAFT";
+  status?: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
   dayWiseData?: Array<{
     dayNumber: number;
     title: string;
@@ -139,8 +132,7 @@ export const createTravelPlan = async (data: {
   }>;
 }) => {
   const session = await requireHost();
-  if (!session)
-    return { error: "Unauthorized", message: "Please login to continue" };
+  if (!session) return { error: 'Unauthorized', message: 'Please login to continue' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -149,8 +141,8 @@ export const createTravelPlan = async (data: {
 
     if (!hostProfile) {
       return {
-        error: "Host profile not found",
-        message: "Please complete your host profile first",
+        error: 'Host profile not found',
+        message: 'Please complete your host profile first',
       };
     }
 
@@ -161,9 +153,9 @@ export const createTravelPlan = async (data: {
     }
 
     let statusToSet;
-    if (data.status === "DRAFT") {
+    if (data.status === 'DRAFT') {
       statusToSet = TravelPlanStatus.DRAFT;
-    } else if (data.status === "ACTIVE") {
+    } else if (data.status === 'ACTIVE') {
       statusToSet = TravelPlanStatus.ACTIVE;
     } else {
       statusToSet = TravelPlanStatus.INACTIVE;
@@ -173,22 +165,19 @@ export const createTravelPlan = async (data: {
     const price = isNaN(Number(data.price)) ? 0 : Number(data.price);
 
     // Handle noOfDays with fallback for drafts
-    const noOfDays =
-      isNaN(data.noOfDays) || data.noOfDays <= 0 ? 1 : data.noOfDays;
+    const noOfDays = isNaN(data.noOfDays) || data.noOfDays <= 0 ? 1 : data.noOfDays;
 
     // Handle maxParticipants with fallback for drafts
-    const maxParticipants = isNaN(Number(data.maxParticipants))
-      ? 0
-      : Number(data.maxParticipants);
+    const maxParticipants = isNaN(Number(data.maxParticipants)) ? 0 : Number(data.maxParticipants);
 
     const travelPlan = await prisma.travelPlans.create({
       data: {
-        title: data.title || "Untitled Trip",
-        description: data.description || "",
+        title: data.title || 'Untitled Trip',
+        description: data.description || '',
         includedActivities: data.includedActivities || [],
         stops: data.stops || [],
         notIncludedActivities: [],
-        destination: data.destination || "",
+        destination: data.destination || '',
         startDate: data.startDate,
         endDate: data.endDate,
         restrictions: data.restrictions || [],
@@ -196,13 +185,13 @@ export const createTravelPlan = async (data: {
         noOfDays: noOfDays,
         price: price,
         maxParticipants: maxParticipants,
-        country: data.country || "",
-        state: data.state || "",
-        city: data.city || "",
+        country: data.country || '',
+        state: data.state || '',
+        city: data.city || '',
         languages: data.languages || [],
         filters: data.filters || [],
-        genderPreference: data.genderPreference || "MIX",
-        tripImage: data.tripImage || "https://avatar.iran.liara.run/public",
+        genderPreference: data.genderPreference || 'MIX',
+        tripImage: data.tripImage || 'https://avatar.iran.liara.run/public',
         status: statusToSet,
         host: {
           connect: { hostId: hostProfile.hostId },
@@ -218,20 +207,17 @@ export const createTravelPlan = async (data: {
               travelPlanId: travelPlan.travelPlanId,
               dayNumber: dayData.dayNumber,
               title: dayData.title || `Day ${dayData.dayNumber}`,
-              description: dayData.description || "",
-              activities: Array.isArray(dayData.activities)
-                ? dayData.activities
-                : [],
-              meals: dayData.meals || "",
-              accommodation: dayData.accommodation || "",
-              dayWiseImage:
-                dayData.dayWiseImage || "https://avatar.iran.liara.run/public",
-              destination: dayData.destination || "",
+              description: dayData.description || '',
+              activities: Array.isArray(dayData.activities) ? dayData.activities : [],
+              meals: dayData.meals || '',
+              accommodation: dayData.accommodation || '',
+              dayWiseImage: dayData.dayWiseImage || 'https://avatar.iran.liara.run/public',
+              destination: dayData.destination || '',
             },
           });
         }
       } catch (dayError) {
-        console.error("Error creating day-wise data:", dayError);
+        console.error('Error creating day-wise data:', dayError);
 
         await prisma.travelPlans.delete({
           where: { travelPlanId: travelPlan.travelPlanId },
@@ -245,38 +231,38 @@ export const createTravelPlan = async (data: {
       success: true,
       travelPlan: { ...travelPlan, stops: travelPlan.stops || [] },
       message:
-        data.status === "DRAFT"
-          ? "Trip saved as draft successfully! You can continue editing it later."
+        data.status === 'DRAFT'
+          ? 'Trip saved as draft successfully! You can continue editing it later.'
           : "Travel plan created successfully! It is currently inactive. Activate it when you're ready to accept bookings.",
     };
   } catch (error) {
-    console.error("Error creating travel plan:", error);
+    console.error('Error creating travel plan:', error);
 
     // Provide more specific error messages
     if (error instanceof Prisma.PrismaClientValidationError) {
       return {
-        error: "Validation error",
-        message: "Please check all required fields and try again.",
+        error: 'Validation error',
+        message: 'Please check all required fields and try again.',
       };
     }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return {
-        error: "Database error",
-        message: "There was a problem saving your trip. Please try again.",
+        error: 'Database error',
+        message: 'There was a problem saving your trip. Please try again.',
       };
     }
 
     return {
-      error: "Failed to create travel plan",
-      message: "An unexpected error occurred. Please try again.",
+      error: 'Failed to create travel plan',
+      message: 'An unexpected error occurred. Please try again.',
     };
   }
 };
 
 export const getAllTrips = async () => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -284,7 +270,7 @@ export const getAllTrips = async () => {
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     const trips = await prisma.travelPlans.findMany({
@@ -294,19 +280,19 @@ export const getAllTrips = async () => {
       include: {
         dayWiseItinerary: {
           orderBy: {
-            dayNumber: "asc",
+            dayNumber: 'asc',
           },
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
-    const transformedTrips = trips.map((trip) => ({
+    const transformedTrips = trips.map(trip => ({
       ...trip,
       dayWiseData:
-        trip.dayWiseItinerary?.map((day) => ({
+        trip.dayWiseItinerary?.map(day => ({
           dayNumber: day.dayNumber,
           title: day.title,
           description: day.description,
@@ -314,14 +300,14 @@ export const getAllTrips = async () => {
           meals: day.meals,
           accommodation: day.accommodation,
           dayWiseImage: day.dayWiseImage,
-          destination: day.destination || "",
+          destination: day.destination || '',
         })) || [],
     }));
 
     return { success: true, trips: transformedTrips };
   } catch (error) {
-    console.error("Error fetching trips:", error);
-    return { error: "Failed to fetch trips" };
+    console.error('Error fetching trips:', error);
+    return { error: 'Failed to fetch trips' };
   }
 };
 
@@ -333,13 +319,13 @@ export const updateTravelPlan = async (
     includedActivities?: string[];
     restrictions?: string[];
     stops?: string[];
-    special?: string[] | "";
+    special?: string[] | '';
     noOfDays?: number;
     price?: number;
     startDate?: Date | null;
     endDate?: Date | null;
     maxParticipants?: number;
-    genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
+    genderPreference?: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
     country?: string;
     state?: string;
     city?: string;
@@ -347,7 +333,7 @@ export const updateTravelPlan = async (
 
     filters?: string[];
     languages?: string[];
-    status?: "ACTIVE" | "INACTIVE" | "DRAFT";
+    status?: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
     destination?: string;
     tripImage?: string;
     dayWiseData?: Array<{
@@ -363,7 +349,7 @@ export const updateTravelPlan = async (
   }
 ) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -371,7 +357,7 @@ export const updateTravelPlan = async (
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     const existingPlan = await prisma.travelPlans.findUnique({
@@ -379,15 +365,14 @@ export const updateTravelPlan = async (
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
-      return { error: "Travel plan not found or unauthorized access" };
+      return { error: 'Travel plan not found or unauthorized access' };
     }
 
     const { dayWiseData, ...travelPlanData } = data;
 
     const updateData: Prisma.TravelPlansUpdateInput = {};
 
-    if (travelPlanData.title !== undefined)
-      updateData.title = travelPlanData.title;
+    if (travelPlanData.title !== undefined) updateData.title = travelPlanData.title;
     if (travelPlanData.description !== undefined)
       updateData.description = travelPlanData.description;
     if (travelPlanData.includedActivities !== undefined)
@@ -395,41 +380,29 @@ export const updateTravelPlan = async (
     if (travelPlanData.restrictions !== undefined)
       updateData.restrictions = travelPlanData.restrictions;
     if (travelPlanData.special !== undefined)
-      updateData.special = Array.isArray(travelPlanData.special)
-        ? travelPlanData.special
-        : [];
+      updateData.special = Array.isArray(travelPlanData.special) ? travelPlanData.special : [];
     if (travelPlanData.noOfDays !== undefined)
       updateData.noOfDays = Number(travelPlanData.noOfDays);
-    if (travelPlanData.price !== undefined)
-      updateData.price = Number(travelPlanData.price);
-    if (travelPlanData.startDate !== undefined)
-      updateData.startDate = travelPlanData.startDate;
-    if (travelPlanData.endDate !== undefined)
-      updateData.endDate = travelPlanData.endDate;
+    if (travelPlanData.price !== undefined) updateData.price = Number(travelPlanData.price);
+    if (travelPlanData.startDate !== undefined) updateData.startDate = travelPlanData.startDate;
+    if (travelPlanData.endDate !== undefined) updateData.endDate = travelPlanData.endDate;
     if (travelPlanData.maxParticipants !== undefined)
       updateData.maxParticipants = Number(travelPlanData.maxParticipants);
-    if (travelPlanData.country !== undefined)
-      updateData.country = travelPlanData.country;
-    if (travelPlanData.stops !== undefined)
-      updateData.stops = travelPlanData.stops;
-    if (travelPlanData.state !== undefined)
-      updateData.state = travelPlanData.state;
-    if (travelPlanData.city !== undefined)
-      updateData.city = travelPlanData.city;
-    if (travelPlanData.filters !== undefined)
-      updateData.filters = travelPlanData.filters;
-    if (travelPlanData.languages !== undefined)
-      updateData.languages = travelPlanData.languages;
+    if (travelPlanData.country !== undefined) updateData.country = travelPlanData.country;
+    if (travelPlanData.stops !== undefined) updateData.stops = travelPlanData.stops;
+    if (travelPlanData.state !== undefined) updateData.state = travelPlanData.state;
+    if (travelPlanData.city !== undefined) updateData.city = travelPlanData.city;
+    if (travelPlanData.filters !== undefined) updateData.filters = travelPlanData.filters;
+    if (travelPlanData.languages !== undefined) updateData.languages = travelPlanData.languages;
     if (travelPlanData.genderPreference !== undefined)
       updateData.genderPreference = travelPlanData.genderPreference;
     if (travelPlanData.destination !== undefined)
       updateData.destination = travelPlanData.destination;
-    if (travelPlanData.tripImage !== undefined)
-      updateData.tripImage = travelPlanData.tripImage;
+    if (travelPlanData.tripImage !== undefined) updateData.tripImage = travelPlanData.tripImage;
     if (travelPlanData.status !== undefined) {
-      if (travelPlanData.status === "DRAFT") {
+      if (travelPlanData.status === 'DRAFT') {
         updateData.status = TravelPlanStatus.DRAFT;
-      } else if (travelPlanData.status === "ACTIVE") {
+      } else if (travelPlanData.status === 'ACTIVE') {
         updateData.status = TravelPlanStatus.ACTIVE;
       } else {
         updateData.status = TravelPlanStatus.INACTIVE;
@@ -449,17 +422,16 @@ export const updateTravelPlan = async (
 
       // Create new day-wise data
       await prisma.dayWiseItinerary.createMany({
-        data: dayWiseData.map((day) => ({
+        data: dayWiseData.map(day => ({
           travelPlanId: id,
           dayNumber: day.dayNumber,
           title: day.title || `Day ${day.dayNumber}`,
-          description: day.description || "",
+          description: day.description || '',
           activities: Array.isArray(day.activities) ? day.activities : [],
-          meals: day.meals || "",
-          accommodation: day.accommodation || "",
-          dayWiseImage:
-            day.dayWiseImage || "https://avatar.iran.liara.run/public",
-          destination: day.destination || "",
+          meals: day.meals || '',
+          accommodation: day.accommodation || '',
+          dayWiseImage: day.dayWiseImage || 'https://avatar.iran.liara.run/public',
+          destination: day.destination || '',
         })),
       });
     }
@@ -468,31 +440,31 @@ export const updateTravelPlan = async (
       success: true,
       updatedPlan,
       message:
-        data.status === "DRAFT"
-          ? "Trip draft updated successfully!"
-          : "Travel plan updated successfully!",
+        data.status === 'DRAFT'
+          ? 'Trip draft updated successfully!'
+          : 'Travel plan updated successfully!',
     };
   } catch (error) {
-    console.error("Error updating travel plan:", error);
+    console.error('Error updating travel plan:', error);
 
     // Provide more specific error messages
     if (error instanceof Prisma.PrismaClientValidationError) {
       return {
-        error: "Validation error",
-        message: "Please check all required fields and try again.",
+        error: 'Validation error',
+        message: 'Please check all required fields and try again.',
       };
     }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return {
-        error: "Database error",
-        message: "There was a problem updating your trip. Please try again.",
+        error: 'Database error',
+        message: 'There was a problem updating your trip. Please try again.',
       };
     }
 
     return {
-      error: "Failed to update travel plan",
-      message: "An unexpected error occurred while updating. Please try again.",
+      error: 'Failed to update travel plan',
+      message: 'An unexpected error occurred while updating. Please try again.',
     };
   }
 };
@@ -519,7 +491,7 @@ export const saveDraftTrip = async (
   }
 ) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -527,7 +499,7 @@ export const saveDraftTrip = async (
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     // Check if the travel plan exists and belongs to the host
@@ -537,7 +509,7 @@ export const saveDraftTrip = async (
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
-      return { error: "Travel plan not found or unauthorized access" };
+      return { error: 'Travel plan not found or unauthorized access' };
     }
 
     // Update the travel plan and keep it as DRAFT
@@ -545,18 +517,18 @@ export const saveDraftTrip = async (
       where: { travelPlanId: id },
       data: {
         ...data,
-        status: "DRAFT", // Keep as draft
+        status: 'DRAFT', // Keep as draft
       },
     });
 
     return {
       success: true,
       updatedPlan,
-      message: "Draft saved successfully",
+      message: 'Draft saved successfully',
     };
   } catch (error) {
-    console.error("Error saving draft trip:", error);
-    return { error: "Failed to save draft" };
+    console.error('Error saving draft trip:', error);
+    return { error: 'Failed to save draft' };
   }
 };
 
@@ -579,11 +551,11 @@ export const submitTripForVerification = async (
     languages?: string[];
     destination?: string;
     tripImage?: string;
-    status?: "ACTIVE" | "INACTIVE" | "DRAFT";
+    status?: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
   }
 ) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -591,7 +563,7 @@ export const submitTripForVerification = async (
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     const existingPlan = await prisma.travelPlans.findUnique({
@@ -599,14 +571,14 @@ export const submitTripForVerification = async (
       include: {
         bookings: {
           where: {
-            status: { in: ["CONFIRMED", "PENDING"] },
+            status: { in: ['CONFIRMED', 'PENDING'] },
           },
         },
       },
     });
 
     if (!existingPlan || existingPlan.hostId !== hostProfile.hostId) {
-      return { error: "Travel plan not found or unauthorized access" };
+      return { error: 'Travel plan not found or unauthorized access' };
     }
 
     // Get the current trip to check its status
@@ -615,7 +587,7 @@ export const submitTripForVerification = async (
     });
 
     if (!currentTrip) {
-      return { error: "Trip not found" };
+      return { error: 'Trip not found' };
     }
 
     // Determine the new status
@@ -624,8 +596,8 @@ export const submitTripForVerification = async (
       // If status is not provided:
       // - If it's a draft being completed, set to INACTIVE for admin review
       // - Otherwise keep current status unless explicitly changing it
-      if (currentTrip.status === "DRAFT") {
-        newStatus = "INACTIVE";
+      if (currentTrip.status === 'DRAFT') {
+        newStatus = 'INACTIVE';
       } else {
         newStatus = currentTrip.status;
       }
@@ -642,9 +614,9 @@ export const submitTripForVerification = async (
     });
 
     const message =
-      currentTrip.status === "DRAFT"
-        ? "Draft trip completed and submitted for admin verification. It will be active after admin approval."
-        : "Travel plan submitted for verification. It will be active after admin approval. Existing bookings remain unaffected.";
+      currentTrip.status === 'DRAFT'
+        ? 'Draft trip completed and submitted for admin verification. It will be active after admin approval.'
+        : 'Travel plan submitted for verification. It will be active after admin approval. Existing bookings remain unaffected.';
 
     return {
       success: true,
@@ -653,14 +625,14 @@ export const submitTripForVerification = async (
       existingBookingsCount: existingPlan.bookings.length,
     };
   } catch (error) {
-    console.error("Error submitting travel plan for verification:", error);
-    return { error: "Failed to submit travel plan for verification" };
+    console.error('Error submitting travel plan for verification:', error);
+    return { error: 'Failed to submit travel plan for verification' };
   }
 };
 
 export const getTripById = async (tripId: string) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -668,7 +640,7 @@ export const getTripById = async (tripId: string) => {
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     const trip = await prisma.travelPlans.findUnique({
@@ -676,45 +648,45 @@ export const getTripById = async (tripId: string) => {
       include: {
         dayWiseItinerary: {
           orderBy: {
-            dayNumber: "asc",
+            dayNumber: 'asc',
           },
         },
       },
     });
 
     if (!trip || trip.hostId !== hostProfile.hostId) {
-      return { error: "Trip not found or access denied" };
+      return { error: 'Trip not found or access denied' };
     }
 
     // Transform the data to match the form structure
     const transformedTrip = {
       ...trip,
-      dayWiseData: trip.dayWiseItinerary.map((day) => ({
+      dayWiseData: trip.dayWiseItinerary.map(day => ({
         dayNumber: day.dayNumber,
         title: day.title,
         description: day.description,
         activities: day.activities,
-        meals: day.meals || "",
-        accommodation: day.accommodation || "",
-        dayWiseImage: day.dayWiseImage || "",
-        destination: day.destination || "",
+        meals: day.meals || '',
+        accommodation: day.accommodation || '',
+        dayWiseImage: day.dayWiseImage || '',
+        destination: day.destination || '',
       })),
     };
 
     return transformedTrip;
   } catch (error) {
-    console.error("Error fetching trip by ID:", error);
-    return { error: "Failed to fetch trip" };
+    console.error('Error fetching trip by ID:', error);
+    return { error: 'Failed to fetch trip' };
   }
 };
 
 export const getHostBookings = async (
   statusFilter?: string,
   selectedTripId?: string,
-  filterType: "booking" | "payment" = "booking"
+  filterType: 'booking' | 'payment' = 'booking'
 ) => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -722,14 +694,14 @@ export const getHostBookings = async (
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     // Get all active travel plans by this host
     const travelPlans = await prisma.travelPlans.findMany({
       where: {
         hostId: hostProfile.hostId,
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: {
         travelPlanId: true,
@@ -741,11 +713,11 @@ export const getHostBookings = async (
         tripImage: true,
       },
       orderBy: {
-        startDate: "asc",
+        startDate: 'asc',
       },
     });
 
-    const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
+    const travelPlanIds = travelPlans.map(plan => plan.travelPlanId);
 
     // Build where clause for bookings
     const whereClause: Prisma.BookingWhereInput = {
@@ -758,8 +730,8 @@ export const getHostBookings = async (
     }
 
     // Add status filter if provided
-    if (statusFilter && statusFilter !== "ALL") {
-      if (filterType === "payment") {
+    if (statusFilter && statusFilter !== 'ALL') {
+      if (filterType === 'payment') {
         whereClause.paymentStatus = statusFilter as PaymentStatus;
       } else {
         whereClause.status = statusFilter as BookingStatus;
@@ -794,7 +766,7 @@ export const getHostBookings = async (
         guests: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
@@ -804,7 +776,7 @@ export const getHostBookings = async (
       : { travelPlanId: { in: travelPlanIds } };
 
     const bookingCounts = await prisma.booking.groupBy({
-      by: ["status"],
+      by: ['status'],
       _count: {
         id: true,
       },
@@ -820,18 +792,18 @@ export const getHostBookings = async (
       NOTPAID: 0,
     };
 
-    bookingCounts.forEach((count) => {
+    bookingCounts.forEach(count => {
       counts[count.status] = count._count.id;
       counts.ALL += count._count.id;
     });
 
     // Calculate confirmed participants for each trip
     const tripsWithBookingData = await Promise.all(
-      travelPlans.map(async (trip) => {
+      travelPlans.map(async trip => {
         const confirmedBookings = await prisma.booking.findMany({
           where: {
             travelPlanId: trip.travelPlanId,
-            status: "CONFIRMED",
+            status: 'CONFIRMED',
           },
           select: {
             participants: true,
@@ -842,10 +814,7 @@ export const getHostBookings = async (
           (sum, booking) => sum + booking.participants,
           0
         );
-        const remainingSeats = Math.max(
-          0,
-          (trip.maxParticipants || 50) - confirmedParticipants
-        );
+        const remainingSeats = Math.max(0, (trip.maxParticipants || 50) - confirmedParticipants);
 
         return {
           ...trip,
@@ -862,14 +831,14 @@ export const getHostBookings = async (
       trips: tripsWithBookingData,
     };
   } catch (error) {
-    console.error("Error fetching host bookings:", error);
-    return { error: "Failed to fetch bookings" };
+    console.error('Error fetching host bookings:', error);
+    return { error: 'Failed to fetch bookings' };
   }
 };
 
 export const getRevenueAnalytics = async () => {
   const session = await requireHost();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const hostProfile = await prisma.hostProfile.findUnique({
@@ -877,7 +846,7 @@ export const getRevenueAnalytics = async () => {
     });
 
     if (!hostProfile) {
-      return { error: "Host profile not found" };
+      return { error: 'Host profile not found' };
     }
 
     // Get all travel plans by this host
@@ -886,7 +855,7 @@ export const getRevenueAnalytics = async () => {
       select: { travelPlanId: true },
     });
 
-    const travelPlanIds = travelPlans.map((plan) => plan.travelPlanId);
+    const travelPlanIds = travelPlans.map(plan => plan.travelPlanId);
 
     // Get bookings by payment status
     const fullyPaidBookings = await prisma.booking.aggregate({
@@ -899,7 +868,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "FULLY_PAID",
+        paymentStatus: 'FULLY_PAID',
       },
     });
 
@@ -914,7 +883,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "PARTIALLY_PAID",
+        paymentStatus: 'PARTIALLY_PAID',
       },
     });
 
@@ -927,7 +896,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "PENDING",
+        paymentStatus: 'PENDING',
       },
     });
 
@@ -940,7 +909,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "OVERDUE",
+        paymentStatus: 'OVERDUE',
       },
     });
 
@@ -954,7 +923,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "CANCELLED",
+        paymentStatus: 'CANCELLED',
       },
     });
 
@@ -967,7 +936,7 @@ export const getRevenueAnalytics = async () => {
       },
       where: {
         travelPlanId: { in: travelPlanIds },
-        paymentStatus: "REFUNDED",
+        paymentStatus: 'REFUNDED',
       },
     });
 
@@ -1010,11 +979,9 @@ export const getRevenueAnalytics = async () => {
       };
     } = {};
 
-    monthlyBookings.forEach((booking) => {
+    monthlyBookings.forEach(booking => {
       const date = new Date(booking.createdAt);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
       if (!monthlyData[monthKey]) {
         monthlyData[monthKey] = {
@@ -1027,11 +994,11 @@ export const getRevenueAnalytics = async () => {
 
       monthlyData[monthKey].totalBookings += 1;
 
-      if (booking.paymentStatus === "FULLY_PAID") {
+      if (booking.paymentStatus === 'FULLY_PAID') {
         monthlyData[monthKey].fullyPaidRevenue += booking.totalPrice || 0;
-      } else if (booking.paymentStatus === "PARTIALLY_PAID") {
+      } else if (booking.paymentStatus === 'PARTIALLY_PAID') {
         monthlyData[monthKey].partiallyPaidRevenue += booking.amountPaid || 0;
-      } else if (booking.paymentStatus === "PENDING") {
+      } else if (booking.paymentStatus === 'PENDING') {
         monthlyData[monthKey].pendingRevenue += booking.totalPrice || 0;
       }
     });
@@ -1040,9 +1007,7 @@ export const getRevenueAnalytics = async () => {
     for (let i = 5; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
       monthlyRevenue.push({
         month: monthKey,
@@ -1059,8 +1024,7 @@ export const getRevenueAnalytics = async () => {
     const totalFullyPaidRevenue = fullyPaidBookings._sum.totalPrice || 0;
     const totalPartiallyPaidValue = partiallyPaidBookings._sum.totalPrice || 0;
     const totalAmountReceived =
-      (fullyPaidBookings._sum.amountPaid || 0) +
-      (partiallyPaidBookings._sum.amountPaid || 0);
+      (fullyPaidBookings._sum.amountPaid || 0) + (partiallyPaidBookings._sum.amountPaid || 0);
     const totalPendingAmount = partiallyPaidBookings._sum.remainingAmount || 0;
     const totalPendingValue = pendingPaymentBookings._sum.totalPrice || 0;
     const totalOverdueValue = overdueBookings._sum.totalPrice || 0;
@@ -1084,8 +1048,7 @@ export const getRevenueAnalytics = async () => {
     const revenueAtRisk = totalOverdueValue + totalCancelledValue;
 
     // Collection efficiency = How much we've collected vs total expected
-    const collectionEfficiency =
-      totalRevenue > 0 ? (receivedRevenue / totalRevenue) * 100 : 0;
+    const collectionEfficiency = totalRevenue > 0 ? (receivedRevenue / totalRevenue) * 100 : 0;
 
     return {
       success: true,
@@ -1128,8 +1091,8 @@ export const getRevenueAnalytics = async () => {
       },
     };
   } catch (error) {
-    console.error("Error calculating revenue analytics:", error);
-    return { error: "Failed to calculate revenue analytics" };
+    console.error('Error calculating revenue analytics:', error);
+    return { error: 'Failed to calculate revenue analytics' };
   }
 };
 
@@ -1148,13 +1111,13 @@ interface SearchPlacesResponse {
 export async function searchPlaces(query: string): Promise<SearchPlacesResponse> {
   try {
     const sanitizedQuery = decodeURIComponent(query).trim();
-    
+
     if (!sanitizedQuery || sanitizedQuery.length < 2) {
       return { results: [], error: null };
     }
 
     const apiKey = process.env.OLA_MAPS_API_KEY;
-    
+
     if (!apiKey) {
       return { results: [], error: 'API key not configured' };
     }
@@ -1189,12 +1152,11 @@ export async function searchPlaces(query: string): Promise<SearchPlacesResponse>
       .slice(0, 6);
 
     return { results: places, error: null };
-
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       return { results: [], error: 'Request timed out' };
     }
-    
+
     console.error('Search error:', err);
     return { results: [], error: 'Failed to search places' };
   }

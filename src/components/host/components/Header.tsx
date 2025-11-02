@@ -1,5 +1,5 @@
-import { User, Crown, TrendingUp } from "lucide-react";
-import { HostData } from "../types";
+import { User, Crown, TrendingUp } from 'lucide-react';
+import { HostData } from '../types';
 
 type HeaderProps = {
   hostData: HostData;
@@ -19,7 +19,7 @@ export const Header = ({ hostData }: HeaderProps) => {
           className="absolute inset-0"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: "20px 20px",
+            backgroundSize: '20px 20px',
           }}
         />
       </div>
@@ -40,8 +40,8 @@ export const Header = ({ hostData }: HeaderProps) => {
               </span>
             </h1>
             <p className="text-xl text-slate-300 font-medium max-w-2xl leading-relaxed">
-              Manage your travel experiences, track performance, and grow your
-              hosting business with precision and style.
+              Manage your travel experiences, track performance, and grow your hosting business with
+              precision and style.
             </p>
           </div>
 
@@ -59,9 +59,7 @@ export const Header = ({ hostData }: HeaderProps) => {
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-2xl">
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
-                <span className="text-2xl font-bold text-white">
-                  {hostData.name}
-                </span>
+                <span className="text-2xl font-bold text-white">{hostData.name}</span>
               </div>
               <p className="text-slate-300 text-sm font-medium">Premium Host</p>
             </div>

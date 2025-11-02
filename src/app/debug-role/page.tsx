@@ -1,5 +1,5 @@
-import { auth } from "@/config/auth";
-import prisma from "@/lib/prisma";
+import { auth } from '@/config/auth';
+import prisma from '@/lib/prisma';
 
 export default async function DebugRolePage() {
   const session = await auth();
@@ -34,20 +34,14 @@ export default async function DebugRolePage() {
         <div className="border p-4 rounded">
           <h2 className="font-semibold text-lg mb-2">Role Comparison:</h2>
           <p>
-            Session Role:{" "}
-            <span className="font-mono">
-              {session?.user?.role || "undefined"}
-            </span>
+            Session Role: <span className="font-mono">{session?.user?.role || 'undefined'}</span>
           </p>
           <p>
-            Database Role:{" "}
-            <span className="font-mono">{dbUser?.role || "undefined"}</span>
+            Database Role: <span className="font-mono">{dbUser?.role || 'undefined'}</span>
           </p>
           <p>
-            Match:{" "}
-            <span className="font-mono">
-              {session?.user?.role === dbUser?.role ? "YES" : "NO"}
-            </span>
+            Match:{' '}
+            <span className="font-mono">{session?.user?.role === dbUser?.role ? 'YES' : 'NO'}</span>
           </p>
         </div>
       </div>

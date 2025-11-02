@@ -1,1 +1,1 @@
-declare module "react-ola-map";
+declare module 'react-ola-map';

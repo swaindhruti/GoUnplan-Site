@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { hashPassword } from "@/utils/passwordUtils";
-import { z } from "zod";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { hashPassword } from '@/utils/passwordUtils';
+import { z } from 'zod';
 
 const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  phone: z.string().min(10, "Phone number is required"),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  phone: z.string().min(10, 'Phone number is required'),
   bio: z.string().optional(),
   image: z.string().url().optional(),
 });
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: validationResult.error.format() },
+        { error: 'Invalid input', details: validationResult.error.format() },
         { status: 400 }
       );
     }
@@ -31,10 +31,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUserByEmail) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
     }
 
     const existingUserByPhone = await prisma.user.findUnique({
@@ -42,10 +39,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUserByPhone) {
-      return NextResponse.json(
-        { error: "Phone number already registered" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Phone number already registered' }, { status: 409 });
     }
 
     const hashedPassword = await hashPassword(userData.password);
@@ -68,10 +62,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: newUser }, { status: 201 });
   } catch (error) {
-    console.error("Error in signup route:", error);
-    return NextResponse.json(
-      { error: "Failed to create account" },
-      { status: 500 }
-    );
+    console.error('Error in signup route:', error);
+    return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
   }
 }

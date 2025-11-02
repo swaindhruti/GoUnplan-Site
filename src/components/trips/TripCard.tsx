@@ -1,16 +1,8 @@
-import Link from "next/link";
-import {
-  Compass,
-  Calendar,
-  Languages,
-  ArrowRight,
-  Users,
-  Star,
-  CalendarDays,
-} from "lucide-react";
-import { Trip } from "@/types/trips";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import Link from 'next/link';
+import { Compass, Calendar, Languages, ArrowRight, Users, Star, CalendarDays } from 'lucide-react';
+import { Trip } from '@/types/trips';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 interface TripCardProps {
   trip: Trip;
@@ -28,10 +20,10 @@ export const TripCard = ({
   // Helper function to format dates
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+    return date.toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
     });
   };
 
@@ -56,13 +48,13 @@ export const TripCard = ({
     >
       <div
         className={`relative ${
-          isTripPage ? "h-72" : "h-40"
+          isTripPage ? 'h-72' : 'h-40'
         } rounded-t-2xl overflow-hidden flex-shrink-0`}
       >
         <Image
           src={
             trip.tripImage ||
-            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
           }
           alt={trip.title}
           fill
@@ -70,12 +62,7 @@ export const TripCard = ({
         />
         {isSelected && (
           <div className="absolute top-3 right-3 bg-purple-600 text-white rounded-full p-1 shadow-md">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -107,9 +94,7 @@ export const TripCard = ({
             </Badge>
           </div>
 
-          <p className="text-sm font-instrument text-gray-600 line-clamp-2">
-            {trip.description}
-          </p>
+          <p className="text-sm font-instrument text-gray-600 line-clamp-2">{trip.description}</p>
 
           {/* Star Rating */}
           <div className="flex items-center gap-2">
@@ -119,16 +104,15 @@ export const TripCard = ({
                   key={i}
                   className={`h-4 w-4 ${
                     i < Math.round(trip.averageRating)
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-300"
+                      ? 'text-yellow-400 fill-yellow-400'
+                      : 'text-gray-300'
                   }`}
                 />
               ))}
             </div>
             <span className="text-sm text-gray-600 font-instrument font-medium">
-              {trip.averageRating > 0 ? trip.averageRating.toFixed(1) : "0.0"} (
-              {trip.reviewCount} {trip.reviewCount === 1 ? "review" : "reviews"}
-              )
+              {trip.averageRating > 0 ? trip.averageRating.toFixed(1) : '0.0'} ({trip.reviewCount}{' '}
+              {trip.reviewCount === 1 ? 'review' : 'reviews'})
             </span>
           </div>
         </div>
@@ -139,15 +123,13 @@ export const TripCard = ({
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-purple-600" />
                 <span>
-                  {trip.noOfDays} {trip.noOfDays === 1 ? "Day" : "Days"}
+                  {trip.noOfDays} {trip.noOfDays === 1 ? 'Day' : 'Days'}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-purple-600" />
-                <span className="truncate">
-                  {trip.country}
-                </span>
+                <span className="truncate">{trip.country}</span>
               </div>
 
               {trip.maxParticipants && (
@@ -162,14 +144,11 @@ export const TripCard = ({
               {trip.languages.length > 0 && (
                 <div className="flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
                   <Languages className="w-3 h-3 mr-1 text-purple-600" />
-                  {trip.languages.join(", ")}
+                  {trip.languages.join(', ')}
                 </div>
               )}
-              {trip.vibes.slice(0, 2).map((vibe) => (
-                <span
-                  key={vibe}
-                  className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full"
-                >
+              {trip.vibes.slice(0, 2).map(vibe => (
+                <span key={vibe} className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
                   {vibe}
                 </span>
               ))}

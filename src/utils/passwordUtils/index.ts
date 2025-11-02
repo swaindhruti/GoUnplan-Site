@@ -1,16 +1,16 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
 export const hashPassword = async (password: string): Promise<string> => {
   try {
     if (!password) {
-      throw new Error("Password is required");
+      throw new Error('Password is required');
     }
 
     const hash = await bcrypt.hash(password, saltRounds);
 
     if (!hash) {
-      throw new Error("Failed to generate password hash");
+      throw new Error('Failed to generate password hash');
     }
 
     return hash;
@@ -25,15 +25,15 @@ export const comparePassword = async (
 ): Promise<boolean> => {
   try {
     if (!password) {
-      throw new Error("Password is required");
+      throw new Error('Password is required');
     }
 
     if (!hashedPassword) {
-      throw new Error("Hashed password is required");
+      throw new Error('Hashed password is required');
     }
 
-    if (typeof password !== "string" || typeof hashedPassword !== "string") {
-      throw new Error("Password and hash must be strings");
+    if (typeof password !== 'string' || typeof hashedPassword !== 'string') {
+      throw new Error('Password and hash must be strings');
     }
 
     return await bcrypt.compare(password, hashedPassword);

@@ -1,9 +1,9 @@
-"use server";
+'use server';
 
-import { prisma } from "@/lib/shared";
-import { requireUser } from "@/lib/roleGaurd";
-import { PaymentStatus } from "@prisma/client";
-import { revalidatePath } from "next/cache";
+import { prisma } from '@/lib/shared';
+import { requireUser } from '@/lib/roleGaurd';
+import { PaymentStatus } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 export const processRazorpayPayment = async (
   bookingId: string,
@@ -15,7 +15,7 @@ export const processRazorpayPayment = async (
   amount: number
 ) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const booking = await prisma.booking.findUnique({
@@ -27,17 +27,17 @@ export const processRazorpayPayment = async (
     });
 
     if (!booking || booking.userId !== session.user.id) {
-      return { error: "Booking not found or unauthorized" };
+      return { error: 'Booking not found or unauthorized' };
     }
 
     // Update booking with Razorpay payment details
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async tx => {
       // Add partial payment record
       const partialPayment = await tx.partialPayment.create({
         data: {
           bookingId,
           amount,
-          paymentType: "PARTIAL",
+          paymentType: 'PARTIAL',
         },
       });
 
@@ -49,10 +49,10 @@ export const processRazorpayPayment = async (
       let newBookingStatus = booking.status;
 
       if (newRemainingAmount <= 0) {
-        newPaymentStatus = "FULLY_PAID";
-        newBookingStatus = "CONFIRMED";
+        newPaymentStatus = 'FULLY_PAID';
+        newBookingStatus = 'CONFIRMED';
       } else {
-        newPaymentStatus = "PARTIALLY_PAID";
+        newPaymentStatus = 'PARTIALLY_PAID';
       }
 
       // Update booking
@@ -77,29 +77,26 @@ export const processRazorpayPayment = async (
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
-    revalidatePath("/my-trips");
+    revalidatePath('/my-trips');
 
     return {
       success: true,
       payment: result.partialPayment,
       booking: result.booking,
       message:
-        result.booking.paymentStatus === "FULLY_PAID"
-          ? "Payment completed successfully! Your booking is confirmed."
+        result.booking.paymentStatus === 'FULLY_PAID'
+          ? 'Payment completed successfully! Your booking is confirmed.'
           : `Payment of ₹${amount} processed successfully. Remaining: ₹${result.booking.remainingAmount}`,
     };
   } catch (error) {
-    console.error("Error processing Razorpay payment:", error);
-    return { error: "Failed to process payment" };
+    console.error('Error processing Razorpay payment:', error);
+    return { error: 'Failed to process payment' };
   }
 };
 
-export const handlePaymentFailure = async (
-  bookingId: string,
-  reason: string
-) => {
+export const handlePaymentFailure = async (bookingId: string, reason: string) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const booking = await prisma.booking.findUnique({
@@ -107,7 +104,7 @@ export const handlePaymentFailure = async (
     });
 
     if (!booking || booking.userId !== session.user.id) {
-      return { error: "Booking not found or unauthorized" };
+      return { error: 'Booking not found or unauthorized' };
     }
 
     // Log the payment failure for admin reference
@@ -118,11 +115,10 @@ export const handlePaymentFailure = async (
 
     return {
       success: false,
-      message:
-        "Payment failed. Please try again or contact support if the issue persists.",
+      message: 'Payment failed. Please try again or contact support if the issue persists.',
     };
   } catch (error) {
-    console.error("Error handling payment failure:", error);
-    return { error: "Failed to handle payment failure" };
+    console.error('Error handling payment failure:', error);
+    return { error: 'Failed to handle payment failure' };
   }
 };

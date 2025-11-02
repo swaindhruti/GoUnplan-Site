@@ -1,17 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
-import { PendingReview, ReviewFormState } from "@/types/dashboard";
-import { formatDateRange } from "@/utils/dateUtils";
+import { Button } from '@/components/ui/button';
+import { Star } from 'lucide-react';
+import { PendingReview, ReviewFormState } from '@/types/dashboard';
+import { formatDateRange } from '@/utils/dateUtils';
 
 interface PendingReviewCardProps {
   booking: PendingReview;
   setReviewForm: React.Dispatch<React.SetStateAction<ReviewFormState>>;
 }
 
-export function PendingReviewCard({
-  booking,
-  setReviewForm,
-}: PendingReviewCardProps) {
+export function PendingReviewCard({ booking, setReviewForm }: PendingReviewCardProps) {
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-md transition-shadow duration-200">
       <div className="flex justify-between items-start mb-4">
@@ -22,18 +19,14 @@ export function PendingReviewCard({
           {formatDateRange(booking.startDate, booking.endDate)}
         </span>
       </div>
-      <p className="text-gray-600 font-instrument mb-4">
-        {booking.travelPlan.destination}
-      </p>
+      <p className="text-gray-600 font-instrument mb-4">{booking.travelPlan.destination}</p>
       <p className="text-sm text-gray-600 font-instrument mb-6">
-        Hosted by{" "}
-        <span className="font-semibold text-gray-900">
-          {booking.travelPlan.host.user.name}
-        </span>
+        Hosted by{' '}
+        <span className="font-semibold text-gray-900">{booking.travelPlan.host.user.name}</span>
       </p>
       <Button
         onClick={() =>
-          setReviewForm((prev) => ({
+          setReviewForm(prev => ({
             ...prev,
             bookingId: booking.id,
           }))

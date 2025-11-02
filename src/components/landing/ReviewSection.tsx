@@ -1,51 +1,50 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import { SectionLabel } from "./common";
+import { useMemo } from 'react';
+import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { SectionLabel } from './common';
 
 const testimonials = [
   {
     id: 1,
-    text: "ADidn’t know 4 strangers could feel like home.",
-    name: "Arjun, Manali",
-    role: "Adventure Enthusiast",
+    text: 'ADidn’t know 4 strangers could feel like home.',
+    name: 'Arjun, Manali',
+    role: 'Adventure Enthusiast',
     rating: 5,
     image:
-      "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Maldives Paradise"
+      'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg',
+    destination: 'Maldives Paradise',
   },
   {
     id: 2,
-    text: "Earned enough from one trip to fund my next one.",
-    name: "Mitali, Host, Gokarna",
-    role: "Travel Blogger",
+    text: 'Earned enough from one trip to fund my next one.',
+    name: 'Mitali, Host, Gokarna',
+    role: 'Travel Blogger',
     rating: 5,
     image:
-      "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Swiss Alps Adventure"
+      'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg',
+    destination: 'Swiss Alps Adventure',
   },
   {
     id: 3,
-    text: "It’s not a trip, it’s a travel family.",
-    name: "Tanvi, Meghalaya",
-    role: "Business Executive",
+    text: 'It’s not a trip, it’s a travel family.',
+    name: 'Tanvi, Meghalaya',
+    role: 'Business Executive',
     rating: 5,
     image:
-      "https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg",
-    destination: "Japanese Cultural Tour"
+      'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg',
+    destination: 'Japanese Cultural Tour',
   },
-  
 ];
 
 export default function ReviewSection() {
   const slides = useMemo(
     () =>
-      testimonials.map((testimonial) => (
+      testimonials.map(testimonial => (
         <SwiperSlide key={testimonial.id}>
           <div className="flex flex-col  items-center justify-center px-4 sm:px-6 lg:px-8">
             {/* Quote Icon */}
@@ -59,19 +58,19 @@ export default function ReviewSection() {
 
             {/* Testimonial Text */}
             <div className="relative mb-4 sm:mb-6">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-purple-100">
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
-                </div>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-purple-100">
+                <Image
+                  src={testimonial.image}
+                  alt={testimonial.name}
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-cover"
+                />
               </div>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+              </div>
+            </div>
             <blockquote className="text-base sm:text-lg lg:text-xl xl:text-2xl font-instrument text-gray-700 mb-6 sm:mb-8 lg:mb-10 max-w-4xl leading-relaxed text-center italic">
               &quot;{testimonial.text}&quot;
             </blockquote>
@@ -95,7 +94,6 @@ export default function ReviewSection() {
 
             {/* Author Info */}
             <div className="flex flex-col items-center">
-              
               <div className="text-center">
                 <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold font-bricolage leading-[1.05] tracking-tighter text-gray-900 mb-1">
                   {testimonial.name}
@@ -138,13 +136,13 @@ export default function ReviewSection() {
             autoplay={{
               delay: 4000,
               disableOnInteraction: false,
-              pauseOnMouseEnter: true
+              pauseOnMouseEnter: true,
             }}
             speed={1000}
             allowTouchMove={true}
             pagination={{
               clickable: true,
-              dynamicBullets: true
+              dynamicBullets: true,
             }}
             className="w-full max-w-4xl mx-auto"
           >

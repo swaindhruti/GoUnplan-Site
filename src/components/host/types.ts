@@ -67,7 +67,7 @@ export type Trip = {
   restrictions?: string[];
   special?: string[];
   notIncludedActivities?: string[];
-  genderPreference?: "MALE_ONLY" | "FEMALE_ONLY" | "MIX";
+  genderPreference?: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
   dayWiseData?: Array<{
     dayNumber: number;
     title: string;
@@ -84,13 +84,13 @@ export type HostData = {
   name?: string;
   email?: string;
   image?: string;
-  role?: "HOST" | "ADMIN" | "USER";
+  role?: 'HOST' | 'ADMIN' | 'USER';
 };
 
 export type TabType =
-  | "trips"
-  | "profile"
-  | "bookings"
-  | "bookingsHistory"
-  | "earnings"
-  | "messages";
+  | 'trips'
+  | 'profile'
+  | 'bookings'
+  | 'bookingsHistory'
+  | 'earnings'
+  | 'messages';

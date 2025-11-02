@@ -1,12 +1,12 @@
-import { auth } from "@/config/auth";
-import { redirect } from "next/navigation";
-import { Role } from "@/types/auth";
-import prisma from "@/lib/prisma";
+import { auth } from '@/config/auth';
+import { redirect } from 'next/navigation';
+import { Role } from '@/types/auth';
+import prisma from '@/lib/prisma';
 
 export async function requireAuth() {
   const session = await auth();
   if (!session) {
-    redirect("/auth/signin");
+    redirect('/auth/signin');
   }
   return session;
 }
@@ -15,22 +15,22 @@ export async function requireRole(allowedRoles: Role[]) {
   const session = await requireAuth();
 
   if (!allowedRoles.includes(session.user.role)) {
-    redirect("/unauthorized");
+    redirect('/unauthorized');
   }
 
   return session;
 }
 
 export async function requireAdmin() {
-  return await requireRole(["ADMIN"]);
+  return await requireRole(['ADMIN']);
 }
 
 export async function requireHost() {
-  return await requireRole(["HOST", "ADMIN"]);
+  return await requireRole(['HOST', 'ADMIN']);
 }
 
 export async function requireUser() {
-  return await requireRole(["USER", "HOST", "ADMIN", "SUPPORT"]);
+  return await requireRole(['USER', 'HOST', 'ADMIN', 'SUPPORT']);
 }
 
 export async function requireSupport() {
@@ -40,7 +40,7 @@ export async function requireSupport() {
 
     // Check if user is authenticated
     if (!session?.user?.email) {
-      redirect("/auth/signin");
+      redirect('/auth/signin');
     }
 
     // Always check role directly from database to avoid JWT cache issues
@@ -50,8 +50,8 @@ export async function requireSupport() {
     });
 
     // Check if user has SUPPORT or ADMIN role in database
-    if (!dbUser || (dbUser.role !== "SUPPORT" && dbUser.role !== "ADMIN")) {
-      redirect("/unauthorized");
+    if (!dbUser || (dbUser.role !== 'SUPPORT' && dbUser.role !== 'ADMIN')) {
+      redirect('/unauthorized');
     }
 
     // Return session with updated role from database
@@ -63,8 +63,8 @@ export async function requireSupport() {
       },
     };
   } catch (error) {
-    console.error("🚨 requireSupport - Error:", error);
-    redirect("/unauthorized");
+    console.error('🚨 requireSupport - Error:', error);
+    redirect('/unauthorized');
   }
 }
 
@@ -78,7 +78,7 @@ export async function checkSupportAccess() {
   try {
     const session = await auth();
     if (!session?.user?.email) {
-      return { error: "No session", code: "NO_SESSION" };
+      return { error: 'No session', code: 'NO_SESSION' };
     }
 
     const dbUser = await prisma.user.findUnique({
@@ -87,13 +87,13 @@ export async function checkSupportAccess() {
     });
 
     if (!dbUser) {
-      return { error: "User not found in database", code: "USER_NOT_FOUND" };
+      return { error: 'User not found in database', code: 'USER_NOT_FOUND' };
     }
 
-    if (dbUser.role !== "SUPPORT" && dbUser.role !== "ADMIN") {
+    if (dbUser.role !== 'SUPPORT' && dbUser.role !== 'ADMIN') {
       return {
-        error: "Insufficient permissions",
-        code: "INVALID_ROLE",
+        error: 'Insufficient permissions',
+        code: 'INVALID_ROLE',
         role: dbUser.role,
       };
     }
@@ -109,10 +109,10 @@ export async function checkSupportAccess() {
       },
     };
   } catch (error) {
-    console.error("🚨 checkSupportAccess - Error:", error);
+    console.error('🚨 checkSupportAccess - Error:', error);
     return {
-      error: "Internal error",
-      code: "INTERNAL_ERROR",
+      error: 'Internal error',
+      code: 'INTERNAL_ERROR',
       details: String(error),
     };
   }
@@ -123,21 +123,21 @@ export function hasRole(userRole: Role, allowedRoles: Role[]): boolean {
 }
 
 export function isAdmin(userRole: Role): boolean {
-  return userRole === "ADMIN";
+  return userRole === 'ADMIN';
 }
 
 export function isHost(userRole: Role): boolean {
-  return userRole === "HOST";
+  return userRole === 'HOST';
 }
 
 export function isUser(userRole: Role): boolean {
-  return userRole === "USER";
+  return userRole === 'USER';
 }
 
 export function isSupport(userRole: Role): boolean {
-  return userRole === "SUPPORT";
+  return userRole === 'SUPPORT';
 }
 
 export function isSupportOrAdmin(userRole: Role): boolean {
-  return userRole === "SUPPORT" || userRole === "ADMIN";
+  return userRole === 'SUPPORT' || userRole === 'ADMIN';
 }

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Download,
   Search,
@@ -12,9 +12,9 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  X
-} from "lucide-react";
-import { getTransactionsByDateRange } from "@/actions/admin/action";
+  X,
+} from 'lucide-react';
+import { getTransactionsByDateRange } from '@/actions/admin/action';
 
 interface Transaction {
   id: string;
@@ -22,8 +22,8 @@ interface Transaction {
   userId: string;
   travelPlanId: string;
   amount: number;
-  type: "SALE" | "REFUND";
-  status: "CONFIRMED" | "CANCELLED" | "REFUNDED" | "PENDING" | "NOTPAID";
+  type: 'SALE' | 'REFUND';
+  status: 'CONFIRMED' | 'CANCELLED' | 'REFUNDED' | 'PENDING' | 'NOTPAID';
   createdAt: Date;
   user: {
     name: string;
@@ -52,29 +52,26 @@ interface RevenueReportProps {
 const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [typeFilter, setTypeFilter] = useState<string>("ALL");
-  const [sortBy, setSortBy] = useState<"date" | "amount">("date");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [typeFilter, setTypeFilter] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        const response = await getTransactionsByDateRange(
-          dateRange.startDate,
-          dateRange.endDate
-        );
+        const response = await getTransactionsByDateRange(dateRange.startDate, dateRange.endDate);
 
         if (response.success) {
           setTransactions(response?.transactions);
         } else {
-          console.error("Error fetching transactions:", response.error);
+          console.error('Error fetching transactions:', response.error);
           setTransactions([]);
         }
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        console.error('Error fetching transactions:', error);
         setTransactions([]);
       } finally {
         setLoading(false);
@@ -85,70 +82,64 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
   }, [dateRange]);
 
   const filteredTransactions = transactions
-    .filter((transaction) => {
+    .filter(transaction => {
       const matchesSearch =
-        transaction.user.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        transaction.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.user.email ||
-        "".toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.travelPlan.title
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        ''.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.travelPlan.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.bookingId.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "ALL" || transaction.status === statusFilter;
-      const matchesType =
-        typeFilter === "ALL" || transaction.type === typeFilter;
+      const matchesStatus = statusFilter === 'ALL' || transaction.status === statusFilter;
+      const matchesType = typeFilter === 'ALL' || transaction.type === typeFilter;
 
       return matchesSearch && matchesStatus && matchesType;
     })
     .sort((a, b) => {
-      if (sortBy === "date") {
+      if (sortBy === 'date') {
         const dateA = new Date(a.createdAt).getTime();
         const dateB = new Date(b.createdAt).getTime();
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       } else {
-        return sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount;
+        return sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount;
       }
     });
 
   const totalSales = filteredTransactions
-    .filter((t) => t.type === "SALE")
+    .filter(t => t.type === 'SALE')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalRefunds = filteredTransactions
-    .filter((t) => t.type === "REFUND")
+    .filter(t => t.type === 'REFUND')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const netRevenue = totalSales - totalRefunds;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "CONFIRMED":
+      case 'CONFIRMED':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "CANCELLED":
+      case 'CANCELLED':
         return <XCircle className="h-4 w-4 text-red-600" />;
-      case "REFUNDED":
+      case 'REFUNDED':
         return <RefreshCw className="h-4 w-4 text-orange-600" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-600" />;
@@ -157,20 +148,20 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "CONFIRMED":
-        return "bg-green-100 text-green-800";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800";
-      case "REFUNDED":
-        return "bg-orange-100 text-orange-800";
+      case 'CONFIRMED':
+        return 'bg-green-100 text-green-800';
+      case 'CANCELLED':
+        return 'bg-red-100 text-red-800';
+      case 'REFUNDED':
+        return 'bg-orange-100 text-orange-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const exportToPDF = () => {
     // Create a new window for printing
-    const printWindow = window.open("", "_blank");
+    const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
     const htmlContent = `
@@ -179,9 +170,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
         <head>
           <title>Revenue Report - ${new Date(
             dateRange.startDate
-          ).toLocaleDateString()} to ${new Date(
-      dateRange.endDate
-    ).toLocaleDateString()}</title>
+          ).toLocaleDateString()} to ${new Date(dateRange.endDate).toLocaleDateString()}</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -264,11 +253,9 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
         <body>
           <div class="header">
             <h1>Revenue Report</h1>
-            <p>${new Date(
-              dateRange.startDate
-            ).toLocaleDateString()} - ${new Date(
-      dateRange.endDate
-    ).toLocaleDateString()}</p>
+            <p>${new Date(dateRange.startDate).toLocaleDateString()} - ${new Date(
+              dateRange.endDate
+            ).toLocaleDateString()}</p>
             <p>Generated on ${new Date().toLocaleString()}</p>
           </div>
 
@@ -306,7 +293,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
             <tbody>
               ${filteredTransactions
                 .map(
-                  (transaction) => `
+                  transaction => `
                 <tr>
                   <td>${formatDate(transaction.createdAt)}</td>
                   <td>${transaction.bookingId}</td>
@@ -319,28 +306,20 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                     <small>${transaction.travelPlan.destination}</small><br>
                     <small>Host: ${transaction.travelPlan.host.name}</small>
                   </td>
-                  <td class="type-${transaction.type.toLowerCase()}">${
-                    transaction.type
-                  }</td>
+                  <td class="type-${transaction.type.toLowerCase()}">${transaction.type}</td>
                   <td class="type-${transaction.type.toLowerCase()}">
-                    ${transaction.type === "SALE" ? "+" : "-"}${formatCurrency(
-                    transaction.amount
-                  )}
+                    ${transaction.type === 'SALE' ? '+' : '-'}${formatCurrency(transaction.amount)}
                   </td>
-                  <td class="status-${transaction.status.toLowerCase()}">${
-                    transaction.status
-                  }</td>
+                  <td class="status-${transaction.status.toLowerCase()}">${transaction.status}</td>
                 </tr>
               `
                 )
-                .join("")}
+                .join('')}
             </tbody>
           </table>
 
           <div class="footer">
-            <p>This report contains ${
-              filteredTransactions.length
-            } transactions</p>
+            <p>This report contains ${filteredTransactions.length} transactions</p>
             <p>Report generated from your revenue management system</p>
           </div>
         </body>
@@ -380,11 +359,9 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                 <X className="h-6 w-6" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Revenue Report
-                </h1>
+                <h1 className="text-2xl font-bold text-gray-900">Revenue Report</h1>
                 <p className="text-gray-600">
-                  {new Date(dateRange.startDate).toLocaleDateString()} -{" "}
+                  {new Date(dateRange.startDate).toLocaleDateString()} -{' '}
                   {new Date(dateRange.endDate).toLocaleDateString()}
                 </p>
               </div>
@@ -407,9 +384,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
               <DollarSign className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm text-gray-600">Total Sales</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(totalSales)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalSales)}</p>
               </div>
             </div>
           </div>
@@ -419,9 +394,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
               <RefreshCw className="h-8 w-8 text-red-600" />
               <div>
                 <p className="text-sm text-gray-600">Total Refunds</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(totalRefunds)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRefunds)}</p>
               </div>
             </div>
           </div>
@@ -431,9 +404,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
               <DollarSign className="h-8 w-8 text-blue-600" />
               <div>
                 <p className="text-sm text-gray-600">Net Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(netRevenue)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(netRevenue)}</p>
               </div>
             </div>
           </div>
@@ -443,9 +414,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
               <Clock className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-sm text-gray-600">Total Transactions</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {filteredTransactions.length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</p>
               </div>
             </div>
           </div>
@@ -460,14 +429,14 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                 type="text"
                 placeholder="Search transactions..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={e => setStatusFilter(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="ALL">All Status</option>
@@ -478,7 +447,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
 
             <select
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
+              onChange={e => setTypeFilter(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="ALL">All Types</option>
@@ -488,10 +457,10 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
 
             <select
               value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split("-");
-                setSortBy(field as "date" | "amount");
-                setSortOrder(order as "asc" | "desc");
+              onChange={e => {
+                const [field, order] = e.target.value.split('-');
+                setSortBy(field as 'date' | 'amount');
+                setSortOrder(order as 'asc' | 'desc');
               }}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
@@ -533,7 +502,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredTransactions.map((transaction) => (
+                {filteredTransactions.map(transaction => (
                   <tr key={transaction.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatDate(transaction.createdAt)}
@@ -550,9 +519,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                           <p className="text-sm font-medium text-gray-900">
                             {transaction.user.name}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            {transaction.user.email}
-                          </p>
+                          <p className="text-sm text-gray-500">{transaction.user.email}</p>
                         </div>
                       </div>
                     </td>
@@ -575,9 +542,9 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          transaction.type === "SALE"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                          transaction.type === 'SALE'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                         }`}
                       >
                         {transaction.type}
@@ -586,12 +553,10 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`text-sm font-medium ${
-                          transaction.type === "SALE"
-                            ? "text-green-600"
-                            : "text-red-600"
+                          transaction.type === 'SALE' ? 'text-green-600' : 'text-red-600'
                         }`}
                       >
-                        {transaction.type === "SALE" ? "+" : "-"}
+                        {transaction.type === 'SALE' ? '+' : '-'}
                         {formatCurrency(transaction.amount)}
                       </span>
                     </td>
@@ -615,9 +580,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ dateRange, onBack }) => {
 
           {filteredTransactions.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">
-                No transactions found for the selected criteria.
-              </p>
+              <p className="text-gray-500">No transactions found for the selected criteria.</p>
             </div>
           )}
         </div>

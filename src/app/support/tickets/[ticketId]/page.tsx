@@ -1,23 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  ArrowLeft,
-  User,
-  MessageSquare,
-  Send,
-  Calendar,
-  MapPin,
-} from "lucide-react";
-import { getTicketById, addTicketMessage } from "@/actions/support/actions";
-import { CreateTicketMessageData } from "@/types/support";
-import Link from "next/link";
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, User, MessageSquare, Send, Calendar, MapPin } from 'lucide-react';
+import { getTicketById, addTicketMessage } from '@/actions/support/actions';
+import { CreateTicketMessageData } from '@/types/support';
+import Link from 'next/link';
 
 interface TicketDetail {
   id: string;
@@ -77,11 +70,11 @@ const UserTicketDetailPage = () => {
 
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
 
   const fetchTicket = useCallback(async () => {
-    if (status === "loading" || !session) return;
+    if (status === 'loading' || !session) return;
 
     setLoading(true);
     try {
@@ -91,7 +84,7 @@ const UserTicketDetailPage = () => {
         setTicket(ticketResult.ticket as TicketDetail);
       }
     } catch (error) {
-      console.error("Error fetching ticket:", error);
+      console.error('Error fetching ticket:', error);
     } finally {
       setLoading(false);
     }
@@ -109,7 +102,7 @@ const UserTicketDetailPage = () => {
     if (!newMessage.trim() || sending || !session?.user) return;
 
     const messageContent = newMessage.trim();
-    setNewMessage("");
+    setNewMessage('');
     setSending(true);
 
     // Optimistic update - add message immediately to UI
@@ -123,14 +116,14 @@ const UserTicketDetailPage = () => {
       createdAt: new Date(),
       sender: {
         id: session.user.id,
-        name: session.user.name || "You",
+        name: session.user.name || 'You',
         email: session.user.email || null,
-        role: "USER",
+        role: 'USER',
         image: session.user.image || null,
       },
     };
 
-    setTicket((prev) => {
+    setTicket(prev => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -152,24 +145,22 @@ const UserTicketDetailPage = () => {
         // Message sent successfully
       } else {
         // Remove optimistic message on error
-        setTicket((prev) => {
+        setTicket(prev => {
           if (!prev) return prev;
           return {
             ...prev,
-            messages: prev.messages.filter(
-              (m) => m.id !== optimisticMessage.id
-            ),
+            messages: prev.messages.filter(m => m.id !== optimisticMessage.id),
           };
         });
       }
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
       // Remove optimistic message on error
-      setTicket((prev) => {
+      setTicket(prev => {
         if (!prev) return prev;
         return {
           ...prev,
-          messages: prev.messages.filter((m) => m.id !== optimisticMessage.id),
+          messages: prev.messages.filter(m => m.id !== optimisticMessage.id),
         };
       });
     } finally {
@@ -179,37 +170,37 @@ const UserTicketDetailPage = () => {
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "OPEN":
-        return "destructive";
-      case "IN_PROGRESS":
-        return "default";
-      case "WAITING_FOR_USER":
-        return "secondary";
-      case "RESOLVED":
-        return "outline";
-      case "CLOSED":
-        return "outline";
+      case 'OPEN':
+        return 'destructive';
+      case 'IN_PROGRESS':
+        return 'default';
+      case 'WAITING_FOR_USER':
+        return 'secondary';
+      case 'RESOLVED':
+        return 'outline';
+      case 'CLOSED':
+        return 'outline';
       default:
-        return "default";
+        return 'default';
     }
   };
 
   const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case "URGENT":
-        return "destructive";
-      case "HIGH":
-        return "destructive";
-      case "MEDIUM":
-        return "default";
-      case "LOW":
-        return "secondary";
+      case 'URGENT':
+        return 'destructive';
+      case 'HIGH':
+        return 'destructive';
+      case 'MEDIUM':
+        return 'default';
+      case 'LOW':
+        return 'secondary';
       default:
-        return "default";
+        return 'default';
     }
   };
 
-  if (status === "loading" || loading) {
+  if (status === 'loading' || loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
@@ -222,9 +213,7 @@ const UserTicketDetailPage = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
-        <p className="text-gray-600">
-          You need to be signed in to view your support tickets.
-        </p>
+        <p className="text-gray-600">You need to be signed in to view your support tickets.</p>
         <Link href="/auth/signin">
           <Button className="mt-4">Sign In</Button>
         </Link>
@@ -237,8 +226,7 @@ const UserTicketDetailPage = () => {
       <div className="container mx-auto px-4 py-8 text-center">
         <h2 className="text-2xl font-bold">Ticket not found</h2>
         <p className="text-gray-600 mt-2">
-          The ticket you&apos;re looking for doesn&apos;t exist or you
-          don&apos;t have access to it.
+          The ticket you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.
         </p>
         <Link href="/support">
           <Button className="mt-4">
@@ -267,11 +255,9 @@ const UserTicketDetailPage = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
-            {ticket.priority}
-          </Badge>
+          <Badge variant={getPriorityBadgeVariant(ticket.priority)}>{ticket.priority}</Badge>
           <Badge variant={getStatusBadgeVariant(ticket.status)}>
-            {ticket.status.replace("_", " ")}
+            {ticket.status.replace('_', ' ')}
           </Badge>
         </div>
       </div>
@@ -295,9 +281,7 @@ const UserTicketDetailPage = () => {
               </div>
               <div>
                 <h3 className="font-semibold">Created</h3>
-                <p className="text-gray-700">
-                  {new Date(ticket.createdAt).toLocaleDateString()}
-                </p>
+                <p className="text-gray-700">{new Date(ticket.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
 
@@ -305,9 +289,7 @@ const UserTicketDetailPage = () => {
               <div>
                 <h3 className="font-semibold">Related Booking</h3>
                 <div className="bg-gray-50 p-4 rounded-lg mt-1">
-                  <h4 className="font-medium">
-                    {ticket.booking.travelPlan.title}
-                  </h4>
+                  <h4 className="font-medium">{ticket.booking.travelPlan.title}</h4>
                   {ticket.booking.travelPlan.destination && (
                     <div className="flex items-center text-sm text-gray-600 mt-1">
                       <MapPin className="h-4 w-4 mr-1" />
@@ -357,32 +339,30 @@ const UserTicketDetailPage = () => {
             <div className="mt-6 pt-6 border-t">
               <h3 className="font-semibold mb-2">Ticket Status</h3>
               <div className="space-y-2 text-sm">
-                {ticket.status === "OPEN" && (
+                {ticket.status === 'OPEN' && (
                   <p className="text-gray-600">
                     Your ticket is waiting to be assigned to a support agent.
                   </p>
                 )}
-                {ticket.status === "IN_PROGRESS" && (
+                {ticket.status === 'IN_PROGRESS' && (
                   <p className="text-gray-600">
                     A support agent is actively working on your ticket.
                   </p>
                 )}
-                {ticket.status === "WAITING_FOR_USER" && (
+                {ticket.status === 'WAITING_FOR_USER' && (
                   <p className="text-yellow-600">
-                    We&apos;re waiting for your response to continue helping
-                    you.
+                    We&apos;re waiting for your response to continue helping you.
                   </p>
                 )}
-                {ticket.status === "RESOLVED" && (
+                {ticket.status === 'RESOLVED' && (
                   <p className="text-green-600">
-                    Your issue has been resolved. If you need further
-                    assistance, please reply below.
+                    Your issue has been resolved. If you need further assistance, please reply
+                    below.
                   </p>
                 )}
-                {ticket.status === "CLOSED" && (
+                {ticket.status === 'CLOSED' && (
                   <p className="text-gray-600">
-                    This ticket has been closed. You can still view the
-                    conversation history.
+                    This ticket has been closed. You can still view the conversation history.
                   </p>
                 )}
               </div>
@@ -396,28 +376,26 @@ const UserTicketDetailPage = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
-            Conversation ({ticket.messages.filter((m) => !m.isInternal).length})
+            Conversation ({ticket.messages.filter(m => !m.isInternal).length})
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4 max-h-96 overflow-y-auto p-2">
             {ticket.messages
-              .filter((m) => !m.isInternal) // Hide internal messages from users
-              .map((message) => {
+              .filter(m => !m.isInternal) // Hide internal messages from users
+              .map(message => {
                 // Customer message = message from the ticket creator (user who opened the ticket)
                 const isCustomerMessage = message.sender.id === ticket.userId;
                 return (
                   <div
                     key={message.id}
-                    className={`flex ${
-                      isCustomerMessage ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex ${isCustomerMessage ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
                       className={`p-4 rounded-lg max-w-xs lg:max-w-md ${
                         isCustomerMessage
-                          ? "bg-orange-100 text-gray-900 border border-orange-200 shadow-sm"
-                          : "bg-green-600 text-white border border-green-700 shadow-md"
+                          ? 'bg-orange-100 text-gray-900 border border-orange-200 shadow-sm'
+                          : 'bg-green-600 text-white border border-green-700 shadow-md'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-2">
@@ -425,8 +403,8 @@ const UserTicketDetailPage = () => {
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center ${
                               isCustomerMessage
-                                ? "bg-orange-200 text-orange-700"
-                                : "bg-green-200 text-green-700"
+                                ? 'bg-orange-200 text-orange-700'
+                                : 'bg-green-200 text-green-700'
                             }`}
                           >
                             <span className="text-xs font-semibold">
@@ -434,11 +412,9 @@ const UserTicketDetailPage = () => {
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium text-sm">
-                              {message.sender.name}
-                            </p>
+                            <p className="font-medium text-sm">{message.sender.name}</p>
                             <p className="text-xs opacity-75">
-                              {isCustomerMessage ? "You" : "Support Team"} •{" "}
+                              {isCustomerMessage ? 'You' : 'Support Team'} •{' '}
                               {new Date(message.createdAt).toLocaleString()}
                             </p>
                           </div>
@@ -452,17 +428,17 @@ const UserTicketDetailPage = () => {
           </div>
 
           {/* New Message Form */}
-          {ticket.status !== "CLOSED" && (
+          {ticket.status !== 'CLOSED' && (
             <div className="mt-6 border-t pt-4">
               <form onSubmit={handleSendMessage} className="space-y-3">
                 <Textarea
                   value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                  onChange={e => setNewMessage(e.target.value)}
                   placeholder="Type your message..."
                   className="min-h-[100px]"
                   disabled={sending}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                       e.preventDefault();
                       handleSendMessage(e);
                     }
@@ -470,23 +446,20 @@ const UserTicketDetailPage = () => {
                 />
 
                 <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    disabled={!newMessage.trim() || sending}
-                  >
+                  <Button type="submit" disabled={!newMessage.trim() || sending}>
                     <Send className="h-4 w-4 mr-2" />
-                    {sending ? "Sending..." : "Send Message"}
+                    {sending ? 'Sending...' : 'Send Message'}
                   </Button>
                 </div>
               </form>
             </div>
           )}
 
-          {ticket.status === "CLOSED" && (
+          {ticket.status === 'CLOSED' && (
             <div className="mt-6 border-t pt-4 text-center">
               <p className="text-gray-600">
-                This ticket has been closed. If you need further assistance,
-                please create a new support ticket.
+                This ticket has been closed. If you need further assistance, please create a new
+                support ticket.
               </p>
               <Link href="/support">
                 <Button variant="outline" className="mt-2">

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { AlertCircle, ArrowLeft, Home, User } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { AlertCircle, ArrowLeft, Home, User } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,7 +13,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 
 // Create a separate component that uses useSearchParams
 function ErrorContent() {
@@ -21,24 +21,20 @@ function ErrorContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const errorParam = searchParams.get("error");
+    const errorParam = searchParams.get('error');
     if (errorParam) {
       switch (errorParam) {
-        case "AccessDenied":
-          setError("You do not have access to this resource.");
+        case 'AccessDenied':
+          setError('You do not have access to this resource.');
           break;
-        case "CredentialsSignin":
-          setError(
-            "Invalid credentials. Please check your email and password."
-          );
+        case 'CredentialsSignin':
+          setError('Invalid credentials. Please check your email and password.');
           break;
-        case "OAuthAccountNotLinked":
-          setError(
-            "To confirm your identity, sign in with the same account you used originally."
-          );
+        case 'OAuthAccountNotLinked':
+          setError('To confirm your identity, sign in with the same account you used originally.');
           break;
         default:
-          setError("An authentication error occurred. Please try again.");
+          setError('An authentication error occurred. Please try again.');
       }
     }
   }, [searchParams]);
@@ -52,17 +48,13 @@ function ErrorContent() {
           </div>
           <div>
             <AlertTitle className="font-black text-black">Error</AlertTitle>
-            <AlertDescription className="font-bold text-black">
-              {error}
-            </AlertDescription>
+            <AlertDescription className="font-bold text-black">{error}</AlertDescription>
           </div>
         </Alert>
       )}
       <div className="bg-white border-3 border-black rounded-xl p-4 text-center font-bold text-black">
         <p>Please try again or contact support if the issue persists.</p>
-        <p className="mt-2">
-          You can also try using a different authentication method.
-        </p>
+        <p className="mt-2">You can also try using a different authentication method.</p>
       </div>
     </CardContent>
   );
@@ -88,10 +80,7 @@ export default function AuthError() {
       {/* Header */}
       <header className="bg-[#e0c6ff] border-b-3 border-black py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="text-2xl font-black text-black flex items-center"
-          >
+          <Link href="/" className="text-2xl font-black text-black flex items-center">
             <div className="bg-white p-2 rounded-md border-2 border-black mr-2">
               <User className="h-6 w-6 text-black" strokeWidth={2.5} />
             </div>
@@ -143,10 +132,7 @@ export default function AuthError() {
                        transition-all duration-200 py-4 h-14
                        rounded-xl"
             >
-              <Link
-                href="/auth/signin"
-                className="flex items-center justify-center gap-2"
-              >
+              <Link href="/auth/signin" className="flex items-center justify-center gap-2">
                 <ArrowLeft className="h-5 w-5" strokeWidth={2.5} />
                 Back to Sign In
               </Link>
@@ -173,9 +159,7 @@ export default function AuthError() {
       <footer className="bg-[#e0c6ff] border-t-3 border-black py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="font-bold text-black">
-              © 2024 Unplan. All rights reserved.
-            </p>
+            <p className="font-bold text-black">© 2024 Unplan. All rights reserved.</p>
             <div className="flex justify-center space-x-6 mt-3">
               <Link
                 href="#"

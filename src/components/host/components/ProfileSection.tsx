@@ -1,44 +1,44 @@
-"use client";
-import { useState, useEffect } from "react";
-import { getHostDetails, updateHostProfile } from "@/actions/host/action";
-import { User, AlertCircle, CheckCircle, Languages, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { HostData } from "../types";
-import Image from "next/image";
+'use client';
+import { useState, useEffect } from 'react';
+import { getHostDetails, updateHostProfile } from '@/actions/host/action';
+import { User, AlertCircle, CheckCircle, Languages, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { HostData } from '../types';
+import Image from 'next/image';
 
 // Common languages list
 const COMMON_LANGUAGES = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Italian",
-  "Portuguese",
-  "Russian",
-  "Chinese (Mandarin)",
-  "Japanese",
-  "Korean",
-  "Arabic",
-  "Hindi",
-  "Dutch",
-  "Swedish",
-  "Norwegian",
-  "Danish",
-  "Finnish",
-  "Polish",
-  "Czech",
-  "Hungarian",
-  "Greek",
-  "Turkish",
-  "Hebrew",
-  "Thai",
-  "Vietnamese",
-  "Indonesian",
-  "Malay",
-  "Tagalog",
-  "Swahili",
+  'English',
+  'Spanish',
+  'French',
+  'German',
+  'Italian',
+  'Portuguese',
+  'Russian',
+  'Chinese (Mandarin)',
+  'Japanese',
+  'Korean',
+  'Arabic',
+  'Hindi',
+  'Dutch',
+  'Swedish',
+  'Norwegian',
+  'Danish',
+  'Finnish',
+  'Polish',
+  'Czech',
+  'Hungarian',
+  'Greek',
+  'Turkish',
+  'Hebrew',
+  'Thai',
+  'Vietnamese',
+  'Indonesian',
+  'Malay',
+  'Tagalog',
+  'Swahili',
 ];
 
 // Define proper interfaces based on the actual API response structure
@@ -75,9 +75,9 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
   const [hostError, setHostError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [formData, setFormData] = useState<ProfileUpdateData>({
-    description: "",
-    image: "",
-    hostMobile: "",
+    description: '',
+    image: '',
+    hostMobile: '',
     languages: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,21 +100,21 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
 
       try {
         const response = await getHostDetails();
-        if ("error" in response) {
+        if ('error' in response) {
           setHostError(response.error as string);
         } else if (response.host) {
           setHostDetails(response.host);
           // Populate form data with current values
           setFormData({
-            description: response.host?.description || "",
-            image: response.host?.image || "",
-            hostMobile: response.host?.user?.phone || "",
+            description: response.host?.description || '',
+            image: response.host?.image || '',
+            hostMobile: response.host?.user?.phone || '',
             languages: response.host?.languages || [],
           });
         }
       } catch (err) {
-        console.error("Error fetching host details:", err);
-        setHostError("Failed to load host profile");
+        console.error('Error fetching host details:', err);
+        setHostError('Failed to load host profile');
       } finally {
         setHostLoading(false);
       }
@@ -123,11 +123,9 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     fetchHostDetails();
   }, [isMounted]);
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -135,7 +133,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
 
   const handleLanguageAdd = (language: string) => {
     if (!formData.languages.includes(language)) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         languages: [...prev.languages, language],
       }));
@@ -143,9 +141,9 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
   };
 
   const handleLanguageRemove = (languageToRemove: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      languages: prev.languages.filter((lang) => lang !== languageToRemove),
+      languages: prev.languages.filter(lang => lang !== languageToRemove),
     }));
   };
 
@@ -156,19 +154,19 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
 
     try {
       const response = await updateHostProfile(formData);
-      if ("error" in response) {
+      if ('error' in response) {
         setHostError(response.error as string);
       } else {
         setUpdateSuccess(true);
         // Refresh host details
         const updatedDetails = await getHostDetails();
-        if (!("error" in updatedDetails) && updatedDetails.host) {
+        if (!('error' in updatedDetails) && updatedDetails.host) {
           setHostDetails(updatedDetails.host);
         }
       }
     } catch (err) {
-      console.error("Error updating profile:", err);
-      setHostError("Failed to update profile");
+      console.error('Error updating profile:', err);
+      setHostError('Failed to update profile');
     } finally {
       setIsSubmitting(false);
       // Reset success message after 3 seconds
@@ -185,9 +183,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
         <div className="mx-auto h-16 w-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4 animate-pulse">
           <User className="h-8 w-8 text-purple-600" />
         </div>
-        <span className="ml-3 text-xl font-semibold text-gray-900">
-          Loading...
-        </span>
+        <span className="ml-3 text-xl font-semibold text-gray-900">Loading...</span>
       </div>
     );
   }
@@ -196,9 +192,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Host Profile
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Host Profile</h2>
           <p className="text-gray-600 font-medium">
             Manage your personal information and host settings
           </p>
@@ -210,9 +204,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           <div className="mx-auto h-16 w-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4 animate-pulse">
             <User className="h-8 w-8 text-purple-600" />
           </div>
-          <span className="text-xl font-semibold text-gray-900">
-            Loading profile data...
-          </span>
+          <span className="text-xl font-semibold text-gray-900">Loading profile data...</span>
         </div>
       ) : hostError ? (
         <div className="flex items-center justify-center py-16">
@@ -239,7 +231,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                     height={112}
                     width={112}
                     src={hostDetails.image}
-                    alt={hostData.name || "Host"}
+                    alt={hostData.name || 'Host'}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -247,10 +239,10 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                 )}
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {hostData.name || hostDetails.user?.name || ""}
+                {hostData.name || hostDetails.user?.name || ''}
               </h3>
               <p className="text-gray-600 mb-6 font-medium">
-                {hostData.email || hostDetails.user?.email || ""}
+                {hostData.email || hostDetails.user?.email || ''}
               </p>
               <div className="w-full border-t border-gray-200 pt-6">
                 <p className="text-sm font-semibold text-gray-500 mb-2 uppercase tracking-wide">
@@ -258,15 +250,12 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                 </p>
                 <p className="font-semibold text-gray-900 text-lg">
                   {hostDetails.createdAt
-                    ? new Date(hostDetails.createdAt).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )
-                    : "N/A"}
+                    ? new Date(hostDetails.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : 'N/A'}
                 </p>
               </div>
             </div>
@@ -275,9 +264,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
           {/* Edit Profile Form */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-2">
             <div className="bg-purple-50 p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900">
-                Edit Host Information
-              </h3>
+              <h3 className="text-xl font-bold text-gray-900">Edit Host Information</h3>
             </div>
             <div className="p-6">
               {updateSuccess && (
@@ -325,7 +312,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                     <div className="space-y-3">
                       {/* Selected Languages */}
                       <div className="flex flex-wrap gap-2">
-                        {formData.languages.map((language) => (
+                        {formData.languages.map(language => (
                           <span
                             key={language}
                             className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-instrument"
@@ -347,10 +334,10 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                         <Languages className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <select
                           className="w-full pl-10 pr-4 py-2 h-11 border border-gray-200 rounded-md focus:border-purple-400 focus:ring-purple-100 bg-white font-instrument"
-                          onChange={(e) => {
+                          onChange={e => {
                             if (e.target.value) {
                               handleLanguageAdd(e.target.value);
-                              e.target.value = ""; // Reset selection
+                              e.target.value = ''; // Reset selection
                             }
                           }}
                           defaultValue=""
@@ -358,13 +345,13 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                           <option value="" disabled>
                             Select a language to add...
                           </option>
-                          {COMMON_LANGUAGES.filter(
-                            (lang) => !formData.languages.includes(lang)
-                          ).map((language) => (
-                            <option key={language} value={language}>
-                              {language}
-                            </option>
-                          ))}
+                          {COMMON_LANGUAGES.filter(lang => !formData.languages.includes(lang)).map(
+                            language => (
+                              <option key={language} value={language}>
+                                {language}
+                              </option>
+                            )
+                          )}
                         </select>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
@@ -392,7 +379,7 @@ export const ProfileSection = ({ hostData }: ProfileSectionProps) => {
                     disabled={isSubmitting}
                     className="w-full bg-purple-700 text-white font-semibold hover:bg-purple-800 shadow-sm"
                   >
-                    {isSubmitting ? "Updating..." : "Update Profile"}
+                    {isSubmitting ? 'Updating...' : 'Update Profile'}
                   </Button>
                 </div>
               </form>
