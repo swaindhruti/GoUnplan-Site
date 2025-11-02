@@ -1,7 +1,7 @@
-import { RawTrip, Trip } from "@/types/trips";
+import { RawTrip, Trip } from '@/types/trips';
 
 // Default vibes to use when no filters are provided
-const DEFAULT_VIBES = ["Adventure", "Cultural", "Nature", "Relaxation"];
+const DEFAULT_VIBES = ['Adventure', 'Cultural', 'Nature', 'Relaxation'];
 
 export const normalizeTrip = (trip: RawTrip): Trip => {
   const safeFilters = Array.isArray(trip.filters) ? trip.filters : [];
@@ -15,40 +15,22 @@ export const normalizeTrip = (trip: RawTrip): Trip => {
     const content = `${trip.title} ${trip.description}`.toLowerCase();
     const generatedVibes: string[] = [];
 
-    if (
-      content.includes("adventure") ||
-      content.includes("trek") ||
-      content.includes("hike")
-    ) {
-      generatedVibes.push("Adventure");
+    if (content.includes('adventure') || content.includes('trek') || content.includes('hike')) {
+      generatedVibes.push('Adventure');
     }
-    if (
-      content.includes("culture") ||
-      content.includes("temple") ||
-      content.includes("museum")
-    ) {
-      generatedVibes.push("Cultural");
+    if (content.includes('culture') || content.includes('temple') || content.includes('museum')) {
+      generatedVibes.push('Cultural');
     }
-    if (
-      content.includes("nature") ||
-      content.includes("forest") ||
-      content.includes("mountain")
-    ) {
-      generatedVibes.push("Nature");
+    if (content.includes('nature') || content.includes('forest') || content.includes('mountain')) {
+      generatedVibes.push('Nature');
     }
-    if (
-      content.includes("beach") ||
-      content.includes("relax") ||
-      content.includes("spa")
-    ) {
-      generatedVibes.push("Relaxation");
+    if (content.includes('beach') || content.includes('relax') || content.includes('spa')) {
+      generatedVibes.push('Relaxation');
     }
 
     // If still no vibes, add a default one
     if (generatedVibes.length === 0) {
-      generatedVibes.push(
-        DEFAULT_VIBES[Math.floor(Math.random() * DEFAULT_VIBES.length)]
-      );
+      generatedVibes.push(DEFAULT_VIBES[Math.floor(Math.random() * DEFAULT_VIBES.length)]);
     }
 
     return generatedVibes;
@@ -64,12 +46,11 @@ export const normalizeTrip = (trip: RawTrip): Trip => {
     averageRating: trip.averageRating || 0,
     reviewCount: trip.reviewCount || 0,
     // Add missing required properties with defaults
-    tripImage: trip.tripImage || "",
+    tripImage: trip.tripImage || '',
     maxParticipants: trip.maxParticipants,
     seatsLeft: trip.seatsLeft,
     bookedSeats: trip.bookedSeats,
   };
 };
 
-export const parseTrips = (rawTrips: RawTrip[]): Trip[] =>
-  rawTrips.map(normalizeTrip);
+export const parseTrips = (rawTrips: RawTrip[]): Trip[] => rawTrips.map(normalizeTrip);

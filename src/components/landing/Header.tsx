@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,8 +9,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+} from '@/components/ui/breadcrumb';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Menu,
   User,
@@ -37,14 +37,14 @@ import {
   UserPlus,
   Clock,
   CheckCircle2,
-} from "lucide-react";
-import { handleScroll } from "../global/Handlescroll";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
-import { Switch } from "@/components/ui/switch";
-import { hasAppliedForHost as checkHostApplication } from "@/actions/user/action";
+} from 'lucide-react';
+import { handleScroll } from '../global/Handlescroll';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import Image from 'next/image';
+import { Switch } from '@/components/ui/switch';
+import { hasAppliedForHost as checkHostApplication } from '@/actions/user/action';
 
 // Define interface for navigation items
 interface NavigationItem {
@@ -70,10 +70,10 @@ export default function Header() {
   const { data: session, status } = useSession();
 
   const navigationItems: NavigationItem[] = [
-    { name: "Home", href: "/", section: "#home" },
-    { name: "Vibes", href: "/vibes", section: "#vibes" },
-    { name: "About", href: "/about", section: "#about" },
-    { name: "Contact", href: "/contact", section: "#contact" },
+    { name: 'Home', href: '/', section: '#home' },
+    { name: 'Vibes', href: '/vibes', section: '#vibes' },
+    { name: 'About', href: '/about', section: '#about' },
+    { name: 'Contact', href: '/contact', section: '#contact' },
   ];
 
   useEffect(() => {
@@ -91,14 +91,14 @@ export default function Header() {
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", handleScrollEvent, { passive: true });
-    return () => window.removeEventListener("scroll", handleScrollEvent);
+    window.addEventListener('scroll', handleScrollEvent, { passive: true });
+    return () => window.removeEventListener('scroll', handleScrollEvent);
   }, [lastScrollY]);
 
   const handleNavClick = (item: NavigationItem) => {
-    if (item.name === "Home") {
-      router.push("/");
-    } else if (item.name === "Trips" || item.name === "Contact") {
+    if (item.name === 'Home') {
+      router.push('/');
+    } else if (item.name === 'Trips' || item.name === 'Contact') {
       router.push(item.href);
     } else {
       handleScroll({ location: item.section });
@@ -108,14 +108,14 @@ export default function Header() {
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
-    router.push("/");
+    router.push('/');
   };
 
   const handleDashboardClick = () => {
-    const userRole = session?.user?.role || "USER";
+    const userRole = session?.user?.role || 'USER';
 
-    if (userRole === "USER") {
-      router.push("/dashboard/user");
+    if (userRole === 'USER') {
+      router.push('/dashboard/user');
       setIsDashboardMenuOpen(false);
       return;
     }
@@ -124,10 +124,10 @@ export default function Header() {
   };
 
   const handleMobileDashboardClick = () => {
-    const userRole = session?.user?.role || "USER";
+    const userRole = session?.user?.role || 'USER';
 
-    if (userRole === "USER") {
-      router.push("/dashboard/user");
+    if (userRole === 'USER') {
+      router.push('/dashboard/user');
       setIsOpen(false);
       return;
     }
@@ -136,37 +136,36 @@ export default function Header() {
   };
 
   const getDashboardMenuItems = () => {
-    const userRole = session?.user?.role || "USER";
-    const items: { label: string; href: string; icon: React.ComponentType }[] =
-      [];
+    const userRole = session?.user?.role || 'USER';
+    const items: { label: string; href: string; icon: React.ComponentType }[] = [];
 
-    if (userRole === "HOST" || userRole === "ADMIN" || userRole === "SUPPORT") {
+    if (userRole === 'HOST' || userRole === 'ADMIN' || userRole === 'SUPPORT') {
       items.push({
-        label: "User Dashboard",
-        href: "/dashboard/user",
+        label: 'User Dashboard',
+        href: '/dashboard/user',
         icon: User,
       });
     }
-    if (userRole === "HOST") {
+    if (userRole === 'HOST') {
       items.push({
-        label: "Host Dashboard",
-        href: "/dashboard/host",
+        label: 'Host Dashboard',
+        href: '/dashboard/host',
         icon: Crown,
       });
     }
 
-    if (userRole === "SUPPORT" || userRole === "ADMIN") {
+    if (userRole === 'SUPPORT' || userRole === 'ADMIN') {
       items.push({
-        label: "Support Dashboard",
-        href: "/dashboard/support",
+        label: 'Support Dashboard',
+        href: '/dashboard/support',
         icon: HelpCircle,
       });
     }
 
-    if (userRole === "ADMIN") {
+    if (userRole === 'ADMIN') {
       items.push({
-        label: "Admin Dashboard",
-        href: "/dashboard/admin",
+        label: 'Admin Dashboard',
+        href: '/dashboard/admin',
         icon: Shield,
       });
     }
@@ -175,23 +174,21 @@ export default function Header() {
   };
 
   const handleApplyForHost = () => {
-    router.push("/dashboard/host");
+    router.push('/dashboard/host');
     setIsDashboardMenuOpen(false);
   };
 
   const generateBreadcrumbs = () => {
-    const pathSegments = pathname
-      .split("/")
-      .filter((segment) => segment !== "");
+    const pathSegments = pathname.split('/').filter(segment => segment !== '');
     const breadcrumbs = [];
 
     breadcrumbs.push({
-      label: "Home",
-      href: "/",
-      isActive: pathname === "/",
+      label: 'Home',
+      href: '/',
+      isActive: pathname === '/',
     });
 
-    let currentPath = "";
+    let currentPath = '';
 
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
@@ -203,27 +200,27 @@ export default function Header() {
       if (isUUID(segment) || isLongId(segment)) {
         const prevSegment = pathSegments[index - 1];
         const prevtoprevSegment = pathSegments[index - 2];
-        if (prevSegment === "booking") {
-          label = "Booking Details";
-        } else if (prevtoprevSegment === "booking") {
-          label = "Guest Details";
-        } else if (prevSegment === "trips" || prevSegment === "trip") {
-          label = "Trip Details";
-        } else if (prevSegment === "user") {
-          label = "Profile";
+        if (prevSegment === 'booking') {
+          label = 'Booking Details';
+        } else if (prevtoprevSegment === 'booking') {
+          label = 'Guest Details';
+        } else if (prevSegment === 'trips' || prevSegment === 'trip') {
+          label = 'Trip Details';
+        } else if (prevSegment === 'user') {
+          label = 'Profile';
         } else {
-          label = ">>";
+          label = '>>';
         }
       } else {
         label = segment.charAt(0).toUpperCase() + segment.slice(1);
 
-        if (label === "Dashboard") {
+        if (label === 'Dashboard') {
           label =
-            session?.user?.role === "ADMIN"
-              ? "Admin Dashboard"
-              : session?.user?.role === "HOST"
-              ? "Host Dashboard"
-              : "Dashboard";
+            session?.user?.role === 'ADMIN'
+              ? 'Admin Dashboard'
+              : session?.user?.role === 'HOST'
+                ? 'Host Dashboard'
+                : 'Dashboard';
         }
       }
 
@@ -240,8 +237,7 @@ export default function Header() {
   };
 
   const isUUID = (str: string) => {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     return uuidRegex.test(str);
   };
 
@@ -251,29 +247,29 @@ export default function Header() {
   };
 
   const breadcrumbs = generateBreadcrumbs();
-  const isHomePage = pathname === "/";
+  const isHomePage = pathname === '/';
   const isDashboardPage =
-    pathname.startsWith("/dashboard/host") ||
-    pathname.startsWith("/dashboard/admin") ||
-    pathname.startsWith("/dashboard/support");
+    pathname.startsWith('/dashboard/host') ||
+    pathname.startsWith('/dashboard/admin') ||
+    pathname.startsWith('/dashboard/support');
 
   const headerClasses = `
     fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
     bg-white backdrop-blur-xl border-b border-gray-200 shadow-sm
-    ${isVisible ? "translate-y-0" : "-translate-y-full"}
+    ${isVisible ? 'translate-y-0' : '-translate-y-full'}
   `;
-  const isRegularUser = session?.user?.role === "USER";
+  const isRegularUser = session?.user?.role === 'USER';
 
-  const isUserHost = session?.user?.role === "HOST";
-  const isUserAdmin = session?.user?.role === "ADMIN";
-  const isUserSupport = session?.user?.role === "SUPPORT";
+  const isUserHost = session?.user?.role === 'HOST';
+  const isUserAdmin = session?.user?.role === 'ADMIN';
+  const isUserSupport = session?.user?.role === 'SUPPORT';
 
   const handleHostModeToggle = (checked: boolean) => {
     setIsHostMode(checked);
     if (checked) {
-      router.push("/dashboard/host");
+      router.push('/dashboard/host');
     } else {
-      router.push("/");
+      router.push('/');
     }
     setIsDashboardMenuOpen(false);
   };
@@ -281,9 +277,9 @@ export default function Header() {
   const handleAdminModeToggle = (checked: boolean) => {
     setIsAdminMode(checked);
     if (checked) {
-      router.push("/dashboard/admin");
+      router.push('/dashboard/admin');
     } else {
-      router.push("/");
+      router.push('/');
     }
     setIsDashboardMenuOpen(false);
   };
@@ -291,23 +287,23 @@ export default function Header() {
   const handleSupportModeToggle = (checked: boolean) => {
     setIsSupportMode(checked);
     if (checked) {
-      router.push("/dashboard/support");
+      router.push('/dashboard/support');
     } else {
-      router.push("/");
+      router.push('/');
     }
     setIsDashboardMenuOpen(false);
   };
 
   useEffect(() => {
-    setIsHostMode(pathname.startsWith("/dashboard/host"));
-    setIsAdminMode(pathname.startsWith("/dashboard/admin"));
-    setIsSupportMode(pathname.startsWith("/dashboard/support"));
+    setIsHostMode(pathname.startsWith('/dashboard/host'));
+    setIsAdminMode(pathname.startsWith('/dashboard/admin'));
+    setIsSupportMode(pathname.startsWith('/dashboard/support'));
   }, [pathname, status]);
 
   // Check if user has applied for host
   useEffect(() => {
     const checkApplicationStatus = async () => {
-      if (status === "authenticated" && session?.user?.email) {
+      if (status === 'authenticated' && session?.user?.email) {
         setIsCheckingHostStatus(true);
         try {
           const result = await checkHostApplication(session.user.email);
@@ -315,7 +311,7 @@ export default function Header() {
             setHasAppliedForHost(result.hasApplied);
           }
         } catch (error) {
-          console.error("Error checking host application status:", error);
+          console.error('Error checking host application status:', error);
         } finally {
           setIsCheckingHostStatus(false);
         }
@@ -329,20 +325,20 @@ export default function Header() {
 
   useEffect(() => {
     if (isDashboardMenuOpen) {
-      document.body.style.overflowX = "hidden";
+      document.body.style.overflowX = 'hidden';
     } else {
-      document.body.style.overflowX = "";
+      document.body.style.overflowX = '';
     }
 
     return () => {
-      document.body.style.overflowX = "";
+      document.body.style.overflowX = '';
     };
   }, [isDashboardMenuOpen]);
 
   const HostApplicationStatusBadge = () => {
-    const userRole = session?.user?.role || "USER";
+    const userRole = session?.user?.role || 'USER';
 
-    if (userRole === "HOST") {
+    if (userRole === 'HOST') {
       return (
         <div className="flex items-center gap-2 bg-green-50 rounded-full px-4 py-2 border border-green-200">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -350,9 +346,7 @@ export default function Header() {
             <span className="font-medium text-gray-700 text-xs font-instrument">
               Application Status
             </span>
-            <span className="font-semibold text-green-700 text-sm font-instrument">
-              Approved
-            </span>
+            <span className="font-semibold text-green-700 text-sm font-instrument">Approved</span>
           </div>
         </div>
       );
@@ -374,10 +368,7 @@ export default function Header() {
   };
 
   const StandardDropdownMenu = () => (
-    <DropdownMenu
-      open={isDashboardMenuOpen}
-      onOpenChange={setIsDashboardMenuOpen}
-    >
+    <DropdownMenu open={isDashboardMenuOpen} onOpenChange={setIsDashboardMenuOpen}>
       <DropdownMenuTrigger asChild>
         <Button className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full">
           <Menu className="h-4 w-4 mr-2" />
@@ -396,9 +387,7 @@ export default function Header() {
               <User className="h-5 w-5 text-white" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">
-                {session?.user?.name || "User"}
-              </p>
+              <p className="font-semibold text-gray-900 text-sm">{session?.user?.name || 'User'}</p>
               <p className="text-gray-500 text-xs">{session?.user?.email}</p>
             </div>
           </div>
@@ -406,15 +395,13 @@ export default function Header() {
 
         <DropdownMenuGroup className="p-2">
           <DropdownMenuItem
-            onClick={() => router.push("/profile")}
+            onClick={() => router.push('/profile')}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <User className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
             <span className="font-medium text-gray-900">My Profile</span>
 
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘P
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-gray-400">⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
 
           <div className="relative">
@@ -423,17 +410,13 @@ export default function Header() {
               className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
               aria-expanded={
                 isDashboardMenuOpen &&
-                (session?.user?.role === "HOST" ||
-                  session?.user?.role === "ADMIN")
+                (session?.user?.role === 'HOST' || session?.user?.role === 'ADMIN')
               }
-              aria-haspopup={session?.user?.role !== "USER"}
+              aria-haspopup={session?.user?.role !== 'USER'}
             >
               <UserCog className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
-              <span className="font-medium text-gray-900 flex-1">
-                Dashboard
-              </span>
-              {(session?.user?.role === "HOST" ||
-                session?.user?.role === "ADMIN") && (
+              <span className="font-medium text-gray-900 flex-1">Dashboard</span>
+              {(session?.user?.role === 'HOST' || session?.user?.role === 'ADMIN') && (
                 <>
                   {isDashboardMenuOpen ? (
                     <ChevronUp className="h-4 w-4 text-gray-400" />
@@ -442,18 +425,15 @@ export default function Header() {
                   )}
                 </>
               )}
-              {session?.user?.role === "USER" && (
-                <DropdownMenuShortcut className="text-gray-400">
-                  ⌘D
-                </DropdownMenuShortcut>
+              {session?.user?.role === 'USER' && (
+                <DropdownMenuShortcut className="text-gray-400">⌘D</DropdownMenuShortcut>
               )}
             </DropdownMenuItem>
 
             {isDashboardMenuOpen &&
-              (session?.user?.role === "HOST" ||
-                session?.user?.role === "ADMIN") && (
+              (session?.user?.role === 'HOST' || session?.user?.role === 'ADMIN') && (
                 <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-100 pl-3">
-                  {getDashboardMenuItems().map((item) => (
+                  {getDashboardMenuItems().map(item => (
                     <DropdownMenuItem
                       key={item.href}
                       onClick={() => {
@@ -463,9 +443,7 @@ export default function Header() {
                       className="flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group text-sm"
                     >
                       <item.icon />
-                      <span className="font-medium text-gray-800">
-                        {item.label}
-                      </span>
+                      <span className="font-medium text-gray-800">{item.label}</span>
                     </DropdownMenuItem>
                   ))}
                 </div>
@@ -473,47 +451,39 @@ export default function Header() {
           </div>
 
           <DropdownMenuItem
-            onClick={() => router.push("/my-trips")}
+            onClick={() => router.push('/my-trips')}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <Calendar className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
             <span className="font-medium text-gray-900">My Trips</span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘T
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-gray-400">⌘T</DropdownMenuShortcut>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => router.push("/support")}
+            onClick={() => router.push('/support')}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <HelpCircle className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
             <span className="font-medium text-gray-900"> Help and FAQ</span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘H
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-gray-400">⌘H</DropdownMenuShortcut>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => router.push("/contact")}
+            onClick={() => router.push('/contact')}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <MapPin className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
             <span className="font-medium text-gray-900">Contact Us</span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘C
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-gray-400">⌘C</DropdownMenuShortcut>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => router.push("/trips")}
+            onClick={() => router.push('/trips')}
             className="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 cursor-pointer group"
           >
             <MapPin className="mr-3 h-4 w-4 text-gray-600 group-hover:text-purple-600" />
             <span className="font-medium text-gray-900">Explore Trips</span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⌘E
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-gray-400">⌘E</DropdownMenuShortcut>
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -521,12 +491,8 @@ export default function Header() {
             className="flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 cursor-pointer group"
           >
             <LogOut className="mr-3 h-4 w-4 text-gray-600 group-hover:text-red-600" />
-            <span className="font-medium text-gray-900 group-hover:text-red-600">
-              Sign Out
-            </span>
-            <DropdownMenuShortcut className="text-gray-400">
-              ⇧⌘Q
-            </DropdownMenuShortcut>
+            <span className="font-medium text-gray-900 group-hover:text-red-600">Sign Out</span>
+            <DropdownMenuShortcut className="text-gray-400">⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
@@ -556,10 +522,7 @@ export default function Header() {
                 <Breadcrumb>
                   <BreadcrumbList className="flex items-center gap-2 text-gray-600">
                     {breadcrumbs.map((crumb, index) => (
-                      <div
-                        key={crumb.href}
-                        className="flex items-center min-w-0"
-                      >
+                      <div key={crumb.href} className="flex items-center min-w-0">
                         <BreadcrumbItem>
                           {crumb.isActive ? (
                             <BreadcrumbPage className="font-semibold text-purple-600 font-instrument">
@@ -570,11 +533,7 @@ export default function Header() {
                               href={crumb.href}
                               className="font-medium text-gray-600 hover:text-purple-600 transition-colors duration-200 font-instrument"
                             >
-                              {index === 0 ? (
-                                <Home className="h-4 w-4" />
-                              ) : (
-                                crumb.label
-                              )}
+                              {index === 0 ? <Home className="h-4 w-4" /> : crumb.label}
                             </BreadcrumbLink>
                           )}
                         </BreadcrumbItem>
@@ -591,7 +550,7 @@ export default function Header() {
             </div>
 
             <div className="flex items-center">
-              {status === "authenticated" ? (
+              {status === 'authenticated' ? (
                 <div className="flex items-center space-x-4">
                   {isHomePage && isRegularUser && !hasAppliedForHost && (
                     <Button
@@ -651,7 +610,7 @@ export default function Header() {
               ) : (
                 !isDashboardPage && (
                   <Button
-                    onClick={() => router.push("/auth/signin")}
+                    onClick={() => router.push('/auth/signin')}
                     className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
@@ -684,7 +643,7 @@ export default function Header() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-x-2 xl:gap-x-4">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item)}
@@ -697,12 +656,10 @@ export default function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            {status === "unauthenticated" ? (
+            {status === 'unauthenticated' ? (
               <div className="flex items-center space-x-3">
                 <Button
-                  onClick={() =>
-                    router.push("/auth/signin?callbackUrl=/dashboard/host")
-                  }
+                  onClick={() => router.push('/auth/signin?callbackUrl=/dashboard/host')}
                   variant="outline"
                   className="border-red-500 text-white bg-red-500 hover:bg-purple-50 font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                 >
@@ -710,7 +667,7 @@ export default function Header() {
                   Apply as Host
                 </Button>
                 <Button
-                  onClick={() => router.push("/auth/signin")}
+                  onClick={() => router.push('/auth/signin')}
                   className="bg-purple-600 hover:bg-purple-700 text-white font-instrument font-semibold transition-colors duration-200 px-6 py-2 rounded-full"
                 >
                   Sign In
@@ -740,9 +697,7 @@ export default function Header() {
                     Apply for Host
                   </Button>
                 )}
-                {isRegularUser && hasAppliedForHost && (
-                  <HostApplicationStatusBadge />
-                )}
+                {isRegularUser && hasAppliedForHost && <HostApplicationStatusBadge />}
 
                 {isUserAdmin && (
                   <div className="flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 border border-red-200">
@@ -802,9 +757,7 @@ export default function Header() {
                         className="group relative p-4 rounded-2xl hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         style={{
                           animationDelay: `${index * 100}ms`,
-                          animation: isOpen
-                            ? "slideInRight 0.6s ease-out forwards"
-                            : "none",
+                          animation: isOpen ? 'slideInRight 0.6s ease-out forwards' : 'none',
                         }}
                       >
                         <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
@@ -814,14 +767,14 @@ export default function Header() {
                       </button>
                     ))}
 
-                    {status === "authenticated" && (
+                    {status === 'authenticated' && (
                       <>
                         <div className="border-t overflow-auto border-gray-200/60 my-6"></div>
 
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/profile");
+                            router.push('/profile');
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg w-full"
                         >
@@ -841,17 +794,16 @@ export default function Header() {
                             className="group relative overflow-hidden p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg w-full"
                             aria-expanded={
                               isMobileDashboardOpen &&
-                              (session?.user?.role === "HOST" ||
-                                session?.user?.role === "ADMIN")
+                              (session?.user?.role === 'HOST' || session?.user?.role === 'ADMIN')
                             }
-                            aria-haspopup={session?.user?.role !== "USER"}
+                            aria-haspopup={session?.user?.role !== 'USER'}
                           >
                             <span className="flex items-center justify-between text-lg font-semibold text-gray-900 relative z-10">
                               <div className="flex items-center">
                                 <UserCog className="mr-3 h-5 w-5 text-purple-600" />
                                 Dashboard
                               </div>
-                              {session?.user?.role === "USER" ? (
+                              {session?.user?.role === 'USER' ? (
                                 <ChevronRight className="h-5 w-5 text-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                               ) : (
                                 <>
@@ -867,8 +819,7 @@ export default function Header() {
                           </button>
 
                           {isMobileDashboardOpen &&
-                            (session?.user?.role === "HOST" ||
-                              session?.user?.role === "ADMIN") && (
+                            (session?.user?.role === 'HOST' || session?.user?.role === 'ADMIN') && (
                               <div className="ml-4 space-y-2 border-l-2 border-purple-200 pl-4">
                                 {getDashboardMenuItems().map((item, index) => (
                                   <button
@@ -882,8 +833,8 @@ export default function Header() {
                                     style={{
                                       animationDelay: `${(index + 1) * 100}ms`,
                                       animation: isMobileDashboardOpen
-                                        ? "slideInRight 0.4s ease-out forwards"
-                                        : "none",
+                                        ? 'slideInRight 0.4s ease-out forwards'
+                                        : 'none',
                                     }}
                                   >
                                     <span className="flex items-center justify-between text-base font-medium text-gray-800 relative z-10">
@@ -903,7 +854,7 @@ export default function Header() {
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/my-trips");
+                            router.push('/my-trips');
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
@@ -920,7 +871,7 @@ export default function Header() {
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/support");
+                            router.push('/support');
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
@@ -937,7 +888,7 @@ export default function Header() {
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/contact");
+                            router.push('/contact');
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
@@ -954,7 +905,7 @@ export default function Header() {
                         <button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/trips");
+                            router.push('/trips');
                           }}
                           className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-gray-200/60 hover:border-purple-300/60 hover:shadow-lg"
                         >
@@ -989,14 +940,12 @@ export default function Header() {
                   </nav>
 
                   <div className="flex flex-col space-y-4 p-6 border-t border-gray-200/60 bg-white/60 backdrop-blur-sm">
-                    {status === "unauthenticated" ? (
+                    {status === 'unauthenticated' ? (
                       <>
                         <Button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push(
-                              "/auth/signin?callbackUrl=/dashboard/host"
-                            );
+                            router.push('/auth/signin?callbackUrl=/dashboard/host');
                           }}
                           className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
                         >
@@ -1006,7 +955,7 @@ export default function Header() {
                         <Button
                           onClick={() => {
                             setIsOpen(false);
-                            router.push("/auth/signin");
+                            router.push('/auth/signin');
                           }}
                           className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg"
                         >
@@ -1049,7 +998,7 @@ export default function Header() {
                       className="w-full bg-purple-600 hover:bg-purple-700 flex justify-center items-center text-white font-semibold py-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 shadow-lg text-center"
                       onClick={() => {
                         setIsOpen(false);
-                        router.push("/trips");
+                        router.push('/trips');
                       }}
                     >
                       <MapPin className="inline mr-2 h-5 w-5" />

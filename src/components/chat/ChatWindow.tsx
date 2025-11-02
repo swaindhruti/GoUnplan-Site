@@ -1,26 +1,15 @@
-"use client";
+'use client';
 
-import type React from "react";
-import {
-  useState,
-  useEffect,
-  useRef,
-  useTransition,
-  useCallback,
-  useMemo
-} from "react";
-import Image from "next/image";
-import { Send, MoreVertical } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  getChatMessages,
-  sendMessage,
-  markMessagesAsRead
-} from "@/actions/chat/actions";
-import type { MessageWithSender, Role } from "@/types/chats";
+import type React from 'react';
+import { useState, useEffect, useRef, useTransition, useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import { Send, MoreVertical } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { getChatMessages, sendMessage, markMessagesAsRead } from '@/actions/chat/actions';
+import type { MessageWithSender, Role } from '@/types/chats';
 
-type IncompleteMessage = Omit<MessageWithSender, "sender"> & {
+type IncompleteMessage = Omit<MessageWithSender, 'sender'> & {
   sender: {
     id: string;
     name: string;
@@ -47,8 +36,8 @@ function transformMessage(msg: IncompleteMessage): MessageWithSender {
     ...msg,
     sender: {
       ...msg.sender,
-      role: "USER" as Role
-    }
+      role: 'USER' as Role,
+    },
   };
 }
 
@@ -56,23 +45,19 @@ export default function ChatWindow({
   chatId,
   currentUserId,
   otherUser,
-  initialMessages = []
+  initialMessages = [],
 }: ChatWindowProps) {
-  const [messages, setMessages] =
-    useState<MessageWithSender[]>(initialMessages);
-  const [newMessage, setNewMessage] = useState("");
+  const [messages, setMessages] = useState<MessageWithSender[]>(initialMessages);
+  const [newMessage, setNewMessage] = useState('');
   const [, startTransition] = useTransition();
   const [isSending, setIsSending] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageTimeRef = useRef<Date>(new Date());
-  const prevChatIdRef = useRef<string>("");
+  const prevChatIdRef = useRef<string>('');
 
-  const memoizedInitialMessages = useMemo(
-    () => initialMessages,
-    [initialMessages]
-  );
+  const memoizedInitialMessages = useMemo(() => initialMessages, [initialMessages]);
 
   useEffect(() => {
     if (prevChatIdRef.current !== chatId) {
@@ -99,8 +84,7 @@ export default function ChatWindow({
       startTransition(async () => {
         const result = await getChatMessages(chatId);
         if (result.success && result.messages) {
-          const incompleteMessages =
-            result.messages as unknown as IncompleteMessage[];
+          const incompleteMessages = result.messages as unknown as IncompleteMessage[];
           const transformedMessages = incompleteMessages.map(transformMessage);
           setMessages(transformedMessages);
           if (transformedMessages.length > 0) {
@@ -132,7 +116,7 @@ export default function ChatWindow({
     if (!newMessage.trim() || isSending) return;
 
     const messageContent = newMessage.trim();
-    setNewMessage("");
+    setNewMessage('');
     setIsSending(true);
 
     const optimisticMsg: MessageWithSender = {
@@ -141,50 +125,45 @@ export default function ChatWindow({
       senderId: currentUserId,
       receiverId: otherUser.id,
       content: messageContent,
-      type: "TEXT",
+      type: 'TEXT',
       isRead: false,
       createdAt: new Date(),
       sender: {
         id: currentUserId,
-        name: "You",
+        name: 'You',
         image: null,
-        role: "USER"
-      }
+        role: 'USER',
+      },
     };
 
-    setMessages((prev) => [...prev, optimisticMsg]);
+    setMessages(prev => [...prev, optimisticMsg]);
 
     try {
       const result = await sendMessage({
         chatId,
         senderId: currentUserId,
         receiverId: otherUser.id,
-        content: messageContent
+        content: messageContent,
       });
 
       if (result.success && result.message) {
-        const incompleteMessage =
-          result.message as unknown as IncompleteMessage;
+        const incompleteMessage = result.message as unknown as IncompleteMessage;
         const transformedMessage = transformMessage(incompleteMessage);
-        setMessages((prev) =>
-          prev
-            .filter((m) => m.id !== optimisticMsg.id)
-            .concat(transformedMessage)
-        );
+        setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id).concat(transformedMessage));
         lastMessageTimeRef.current = new Date(transformedMessage.createdAt);
       } else {
-        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+        setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      console.error('Error sending message:', error);
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
     } finally {
       setIsSending(false);
     }
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -194,8 +173,8 @@ export default function ChatWindow({
         <div className="flex items-center space-x-4">
           <div className="relative overflow-hidden">
             <Image
-              src={otherUser?.image || "/placeholder.svg?height=48&width=48"}
-              alt={otherUser.name || "User"}
+              src={otherUser?.image || '/placeholder.svg?height=48&width=48'}
+              alt={otherUser.name || 'User'}
               width={48}
               height={48}
               className="rounded-full  object-cover border-2 border-slate-200"
@@ -203,9 +182,7 @@ export default function ChatWindow({
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full shadow-sm"></div>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-gray-900 truncate">
-              {otherUser.name}
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900 truncate">{otherUser.name}</h2>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <p className="text-sm text-gray-600 font-medium">Active now</p>
@@ -232,52 +209,47 @@ export default function ChatWindow({
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
               <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center mb-4">
                 <Image
-                  src={
-                    otherUser?.image || "/placeholder.svg?height=32&width=32"
-                  }
-                  alt={otherUser.name || "User"}
+                  src={otherUser?.image || '/placeholder.svg?height=32&width=32'}
+                  alt={otherUser.name || 'User'}
                   width={32}
                   height={32}
                   className="rounded-full"
                 />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Start your conversation
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Start your conversation</h3>
               <p className="text-gray-600 max-w-sm">
-                Send a message to {otherUser.name} to get the conversation
-                started.
+                Send a message to {otherUser.name} to get the conversation started.
               </p>
             </div>
           ) : (
-            messages.map((message) => {
+            messages.map(message => {
               const isCurrentUser = message.senderId === currentUserId;
 
               return (
                 <div
                   key={message.id}
                   className={`flex items-end space-x-2 ${
-                    isCurrentUser ? "justify-end" : "justify-start"
+                    isCurrentUser ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   <div
                     className={`group max-w-xs lg:max-w-md ${
-                      isCurrentUser ? "order-1" : "order-2"
+                      isCurrentUser ? 'order-1' : 'order-2'
                     }`}
                   >
                     <div
                       className={`px-4 py-2 rounded-2xl border ${
                         isCurrentUser
-                          ? "bg-purple-600 text-white border-purple-700 shadow-md"
-                          : "bg-slate-100/80 text-gray-900 border-slate-200/60 shadow-sm"
+                          ? 'bg-purple-600 text-white border-purple-700 shadow-md'
+                          : 'bg-slate-100/80 text-gray-900 border-slate-200/60 shadow-sm'
                       } font-medium`}
                     >
                       {message.content}
                     </div>
                     <div className="text-xs text-gray-400 mt-1 text-right">
                       {new Date(message.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })}
                     </div>
                   </div>
@@ -295,7 +267,7 @@ export default function ChatWindow({
             <Input
               type="text"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={e => setNewMessage(e.target.value)}
               placeholder={`Message ${otherUser.name}...`}
               className="w-full resize-none border border-slate-200 rounded-full px-4 py-3 pr-12 font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
               disabled={isSending}

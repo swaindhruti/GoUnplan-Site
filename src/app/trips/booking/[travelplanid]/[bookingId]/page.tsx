@@ -1,7 +1,7 @@
-import { getTripById } from "@/actions/trips/getTripByIdForBooking";
-import { BookingPage } from "@/components/booking/BookingPage";
+import { getTripById } from '@/actions/trips/getTripByIdForBooking';
+import { BookingPage } from '@/components/booking/BookingPage';
 // import { GetTrip } from "@/hooks/use-get-trip";
-import { requireUser } from "@/lib/roleGaurd";
+import { requireUser } from '@/lib/roleGaurd';
 // import { revalidatePath } from "next/cache";
 type Props = {
   params: Promise<{
@@ -29,7 +29,7 @@ export default async function Booking({ params }: Props) {
         <BookingPage
           bookingId={bookingId}
           existingBookingData={booking || {}}
-          userId={userSession.user.id || ""}
+          userId={userSession.user.id || ''}
           tripData={{
             ...trip,
           }}

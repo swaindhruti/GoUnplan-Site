@@ -1,9 +1,9 @@
-import { getAllActiveTrips } from "@/actions/trips/getAllActiveTrips";
-import { getTripById } from "@/actions/trips/getTripByIdForBookingSummary";
-import BookingSummary from "@/components/booking/Bookingsummary";
+import { getAllActiveTrips } from '@/actions/trips/getAllActiveTrips';
+import { getTripById } from '@/actions/trips/getTripByIdForBookingSummary';
+import BookingSummary from '@/components/booking/Bookingsummary';
 // import { GetTrip } from "@/hooks/use-get-trip";
-import { requireUser } from "@/lib/roleGaurd";
-import { notFound, redirect } from "next/navigation";
+import { requireUser } from '@/lib/roleGaurd';
+import { notFound, redirect } from 'next/navigation';
 // import { BookingSummary } from "@/components/booking/BookingSummary";
 
 type Props = {
@@ -20,12 +20,12 @@ export default async function BookingSummaryPage({ params }: Props) {
   try {
     const [{ trip, booking }, userSession] = await Promise.all([
       getTripById(tripId, bookingId),
-      requireUser()
+      requireUser(),
     ]);
     const result = await getAllActiveTrips();
 
     if (!userSession) {
-      redirect("/auth/signin");
+      redirect('/auth/signin');
     }
     if (!booking?.formSubmitted) {
       redirect(`/trips/booking/${tripId}`);
@@ -35,7 +35,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       <>
         <BookingSummary
           booking={{
-            ...booking
+            ...booking,
           }}
           travelPlan={trip}
           allTrips={result.trips}
@@ -43,7 +43,7 @@ export default async function BookingSummaryPage({ params }: Props) {
       </>
     );
   } catch (error) {
-    console.error("Booking summary error:", error);
+    console.error('Booking summary error:', error);
     return notFound();
   }
 }

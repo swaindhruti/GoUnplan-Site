@@ -1,21 +1,15 @@
-"use client";
+'use client';
 
 // import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import ChatContainer from "@/components/chat/ChatContainer";
-import { getUserChats } from "@/actions/chat/actions";
-import { TransformedChat } from "@/types/chats";
-import { MessageSquare } from "lucide-react";
+import { useEffect, useState } from 'react';
+import ChatContainer from '@/components/chat/ChatContainer';
+import { getUserChats } from '@/actions/chat/actions';
+import { TransformedChat } from '@/types/chats';
+import { MessageSquare } from 'lucide-react';
 
-export const MessageSection = ({
-  userSession,
-  host
-}: {
-  userSession: string;
-  host?: boolean;
-}) => {
+export const MessageSection = ({ userSession, host }: { userSession: string; host?: boolean }) => {
   const [initialChats, setInitialChats] = useState<TransformedChat[]>();
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     async function fetchChats() {
@@ -53,7 +47,7 @@ export const MessageSection = ({
       <div>
         <h2 className="text-2xl font-bold text-gray-900 font-bricolage">Messages</h2>
         <p className="text-gray-600 font-instrument mt-1">
-          Communicate with your{host ? " guests and travelers" : " host"}
+          Communicate with your{host ? ' guests and travelers' : ' host'}
         </p>
       </div>
 

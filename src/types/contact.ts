@@ -1,7 +1,7 @@
 export interface ContactFormData {
   name: string;
   email: string;
-  subject: "general" | "booking" | "custom" | "support" | "partnership";
+  subject: 'general' | 'booking' | 'custom' | 'support' | 'partnership';
   message: string;
 }
 
@@ -19,9 +19,9 @@ export interface Contact {
   id: string;
   name: string;
   email: string;
-  subject: "GENERAL" | "BOOKING" | "CUSTOM" | "SUPPORT" | "PARTNERSHIP";
+  subject: 'GENERAL' | 'BOOKING' | 'CUSTOM' | 'SUPPORT' | 'PARTNERSHIP';
   message: string;
-  status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  status: 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
   createdAt: Date;
   updatedAt: Date;
 }

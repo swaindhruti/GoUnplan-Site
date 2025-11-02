@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { getSuggestedTrips } from "./getSuggestedTrips";
+import { getSuggestedTrips } from './getSuggestedTrips';
 
 interface SearchContext {
   searchTerm?: string;

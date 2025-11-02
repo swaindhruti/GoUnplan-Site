@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState, useCallback } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -11,14 +11,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   AlertCircle,
   Clock,
@@ -28,27 +28,27 @@ import {
   Headphones,
   Search,
   Eye,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   getAllTickets,
   getTicketStats,
   getAllSupportStaff,
   assignTicket,
-} from "@/actions/support/actions";
-import { getMyAssignedTickets } from "@/actions/support/getMyAssignedTickets";
-import Link from "next/link";
+} from '@/actions/support/actions';
+import { getMyAssignedTickets } from '@/actions/support/getMyAssignedTickets';
+import Link from 'next/link';
 
 // Safe date formatting to prevent hydration issues
 const formatDate = (date: Date | string) => {
   try {
     const d = new Date(date);
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   } catch {
-    return "Invalid Date";
+    return 'Invalid Date';
   }
 };
 
@@ -115,9 +115,9 @@ const SupportDashboardClient = () => {
   const [supportStaff, setSupportStaff] = useState<SupportStaff[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterPriority, setFilterPriority] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Prevent hydration issues
   useEffect(() => {
@@ -127,13 +127,12 @@ const SupportDashboardClient = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [ticketsResult, statsResult, staffResult, myTicketsResult] =
-        await Promise.all([
-          getAllTickets(),
-          getTicketStats(),
-          getAllSupportStaff(),
-          getMyAssignedTickets(),
-        ]);
+      const [ticketsResult, statsResult, staffResult, myTicketsResult] = await Promise.all([
+        getAllTickets(),
+        getTicketStats(),
+        getAllSupportStaff(),
+        getMyAssignedTickets(),
+      ]);
 
       if (ticketsResult.tickets) {
         setTickets(ticketsResult.tickets as TicketData[]);
@@ -148,7 +147,7 @@ const SupportDashboardClient = () => {
         setSupportStaff(staffResult.supportStaff as SupportStaff[]);
       }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -165,17 +164,16 @@ const SupportDashboardClient = () => {
         fetchData(); // Refresh data
       }
     } catch (error) {
-      console.error("Error assigning ticket:", error);
+      console.error('Error assigning ticket:', error);
     }
   };
 
-  const filteredTickets = tickets.filter((ticket) => {
+  const filteredTickets = tickets.filter(ticket => {
     // Status filter
-    if (filterStatus !== "all" && ticket.status !== filterStatus) return false;
+    if (filterStatus !== 'all' && ticket.status !== filterStatus) return false;
 
     // Priority filter
-    if (filterPriority !== "all" && ticket.priority !== filterPriority)
-      return false;
+    if (filterPriority !== 'all' && ticket.priority !== filterPriority) return false;
 
     // Search filter
     if (searchTerm) {
@@ -195,37 +193,33 @@ const SupportDashboardClient = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      OPEN: { color: "bg-blue-100 text-blue-800", icon: AlertCircle },
-      IN_PROGRESS: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
-      RESOLVED: { color: "bg-green-100 text-green-800", icon: CheckCircle },
-      CLOSED: { color: "bg-gray-100 text-gray-800", icon: CheckCircle },
+      OPEN: { color: 'bg-blue-100 text-blue-800', icon: AlertCircle },
+      IN_PROGRESS: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+      RESOLVED: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
+      CLOSED: { color: 'bg-gray-100 text-gray-800', icon: CheckCircle },
     };
     const config = statusConfig[status as keyof typeof statusConfig];
     const Icon = config?.icon || AlertCircle;
 
     return (
-      <Badge
-        className={`${config?.color} flex items-center gap-1 font-instrument`}
-      >
+      <Badge className={`${config?.color} flex items-center gap-1 font-instrument`}>
         <Icon className="h-3 w-3" />
-        {status.replace("_", " ")}
+        {status.replace('_', ' ')}
       </Badge>
     );
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors = {
-      LOW: "bg-green-100 text-green-800",
-      MEDIUM: "bg-yellow-100 text-yellow-800",
-      HIGH: "bg-orange-100 text-orange-800",
-      URGENT: "bg-red-100 text-red-800",
+      LOW: 'bg-green-100 text-green-800',
+      MEDIUM: 'bg-yellow-100 text-yellow-800',
+      HIGH: 'bg-orange-100 text-orange-800',
+      URGENT: 'bg-red-100 text-red-800',
     };
 
     return (
       <Badge
-        className={`${
-          priorityColors[priority as keyof typeof priorityColors]
-        } font-instrument`}
+        className={`${priorityColors[priority as keyof typeof priorityColors]} font-instrument`}
       >
         {priority}
       </Badge>
@@ -237,9 +231,7 @@ const SupportDashboardClient = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <span className="text-gray-600 font-instrument">
-            Loading support dashboard...
-          </span>
+          <span className="text-gray-600 font-instrument">Loading support dashboard...</span>
         </div>
       </div>
     );
@@ -279,9 +271,7 @@ const SupportDashboardClient = () => {
                 variant="outline"
                 className="font-instrument"
               >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-                />
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh Data
               </Button>
             </div>
@@ -300,11 +290,9 @@ const SupportDashboardClient = () => {
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
-              {loading ? "..." : stats?.totalTickets ?? 0}
+              {loading ? '...' : (stats?.totalTickets ?? 0)}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Total Tickets
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Total Tickets</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
@@ -314,11 +302,9 @@ const SupportDashboardClient = () => {
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
-              {loading ? "..." : stats?.openTickets ?? 0}
+              {loading ? '...' : (stats?.openTickets ?? 0)}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Open Tickets
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Open Tickets</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
@@ -328,11 +314,9 @@ const SupportDashboardClient = () => {
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
-              {loading ? "..." : stats?.inProgressTickets ?? 0}
+              {loading ? '...' : (stats?.inProgressTickets ?? 0)}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              In Progress
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">In Progress</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
@@ -342,122 +326,99 @@ const SupportDashboardClient = () => {
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900 font-bricolage">
-              {loading ? "..." : stats?.resolvedTickets ?? 0}
+              {loading ? '...' : (stats?.resolvedTickets ?? 0)}
             </div>
-            <p className="text-gray-600 text-sm mt-1 font-instrument">
-              Resolved
-            </p>
+            <p className="text-gray-600 text-sm mt-1 font-instrument">Resolved</p>
           </div>
         </div>
 
         {/* Category & Priority Analytics Cards */}
-        {stats &&
-          (stats.categoryStats.length > 0 ||
-            stats.priorityStats.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {/* Category Breakdown */}
-              {stats.categoryStats.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 font-bricolage">
-                    Tickets by Category
-                  </h3>
-                  <div className="space-y-3">
-                    {stats.categoryStats.map((cat) => (
-                      <div
-                        key={cat.category}
-                        className="flex items-center justify-between"
-                      >
+        {stats && (stats.categoryStats.length > 0 || stats.priorityStats.length > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            {/* Category Breakdown */}
+            {stats.categoryStats.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 font-bricolage">
+                  Tickets by Category
+                </h3>
+                <div className="space-y-3">
+                  {stats.categoryStats.map(cat => (
+                    <div key={cat.category} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <span className="text-sm font-medium text-gray-700 font-instrument">
+                          {cat.category}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-24 bg-gray-100 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full"
+                            style={{
+                              width: `${(cat._count.category / (stats.totalTickets || 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 font-instrument min-w-[3rem] text-right">
+                          {cat._count.category}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Priority Breakdown */}
+            {stats.priorityStats.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 font-bricolage">
+                  Tickets by Priority
+                </h3>
+                <div className="space-y-3">
+                  {stats.priorityStats.map(priority => {
+                    const priorityColors: Record<string, { bg: string; bar: string }> = {
+                      LOW: { bg: 'bg-green-100', bar: 'bg-green-500' },
+                      MEDIUM: { bg: 'bg-yellow-100', bar: 'bg-yellow-500' },
+                      HIGH: { bg: 'bg-orange-100', bar: 'bg-orange-500' },
+                      URGENT: { bg: 'bg-red-100', bar: 'bg-red-500' },
+                    };
+                    const colors = priorityColors[priority.priority] || {
+                      bg: 'bg-gray-100',
+                      bar: 'bg-gray-500',
+                    };
+
+                    return (
+                      <div key={priority.priority} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                          <div className={`h-2 w-2 rounded-full ${colors.bar}`}></div>
                           <span className="text-sm font-medium text-gray-700 font-instrument">
-                            {cat.category}
+                            {priority.priority}
                           </span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="w-24 bg-gray-100 rounded-full h-2">
+                          <div className={`w-24 ${colors.bg} rounded-full h-2`}>
                             <div
-                              className="bg-blue-500 h-2 rounded-full"
+                              className={`${colors.bar} h-2 rounded-full`}
                               style={{
                                 width: `${
-                                  (cat._count.category /
-                                    (stats.totalTickets || 1)) *
-                                  100
+                                  (priority._count.priority / (stats.totalTickets || 1)) * 100
                                 }%`,
                               }}
                             />
                           </div>
                           <span className="text-sm font-semibold text-gray-900 font-instrument min-w-[3rem] text-right">
-                            {cat._count.category}
+                            {priority._count.priority}
                           </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              )}
-
-              {/* Priority Breakdown */}
-              {stats.priorityStats.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 font-bricolage">
-                    Tickets by Priority
-                  </h3>
-                  <div className="space-y-3">
-                    {stats.priorityStats.map((priority) => {
-                      const priorityColors: Record<
-                        string,
-                        { bg: string; bar: string }
-                      > = {
-                        LOW: { bg: "bg-green-100", bar: "bg-green-500" },
-                        MEDIUM: { bg: "bg-yellow-100", bar: "bg-yellow-500" },
-                        HIGH: { bg: "bg-orange-100", bar: "bg-orange-500" },
-                        URGENT: { bg: "bg-red-100", bar: "bg-red-500" },
-                      };
-                      const colors = priorityColors[priority.priority] || {
-                        bg: "bg-gray-100",
-                        bar: "bg-gray-500",
-                      };
-
-                      return (
-                        <div
-                          key={priority.priority}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`h-2 w-2 rounded-full ${colors.bar}`}
-                            ></div>
-                            <span className="text-sm font-medium text-gray-700 font-instrument">
-                              {priority.priority}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-24 ${colors.bg} rounded-full h-2`}
-                            >
-                              <div
-                                className={`${colors.bar} h-2 rounded-full`}
-                                style={{
-                                  width: `${
-                                    (priority._count.priority /
-                                      (stats.totalTickets || 1)) *
-                                    100
-                                  }%`,
-                                }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold text-gray-900 font-instrument min-w-[3rem] text-right">
-                              {priority._count.priority}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* My Assigned Tickets */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-8">
@@ -473,54 +434,30 @@ const SupportDashboardClient = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50/50">
-                  <TableHead className="font-medium text-gray-700 w-24">
-                    ID
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 min-w-[200px]">
-                    Title
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 min-w-[150px]">
-                    User
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 w-28">
-                    Status
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 w-28">
-                    Priority
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 w-32">
-                    Last Update
-                  </TableHead>
-                  <TableHead className="font-medium text-gray-700 w-24">
-                    Actions
-                  </TableHead>
+                  <TableHead className="font-medium text-gray-700 w-24">ID</TableHead>
+                  <TableHead className="font-medium text-gray-700 min-w-[200px]">Title</TableHead>
+                  <TableHead className="font-medium text-gray-700 min-w-[150px]">User</TableHead>
+                  <TableHead className="font-medium text-gray-700 w-28">Status</TableHead>
+                  <TableHead className="font-medium text-gray-700 w-28">Priority</TableHead>
+                  <TableHead className="font-medium text-gray-700 w-32">Last Update</TableHead>
+                  <TableHead className="font-medium text-gray-700 w-24">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center py-8 text-gray-500"
-                    >
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                       Loading your assigned tickets...
                     </TableCell>
                   </TableRow>
                 ) : myAssignedTickets.length > 0 ? (
-                  myAssignedTickets.map((ticket) => (
-                    <TableRow
-                      key={ticket.id}
-                      className="hover:bg-gray-50/50 transition-colors"
-                    >
+                  myAssignedTickets.map(ticket => (
+                    <TableRow key={ticket.id} className="hover:bg-gray-50/50 transition-colors">
                       <TableCell className="font-mono text-sm">
-                        <div className="text-gray-600">
-                          #{ticket.id.substring(0, 8)}
-                        </div>
+                        <div className="text-gray-600">#{ticket.id.substring(0, 8)}</div>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-gray-900 line-clamp-2">
-                          {ticket.title}
-                        </div>
+                        <div className="font-medium text-gray-900 line-clamp-2">{ticket.title}</div>
                       </TableCell>
                       <TableCell>
                         <div className="text-gray-900">{ticket.user.name}</div>
@@ -531,10 +468,7 @@ const SupportDashboardClient = () => {
                         {formatDate(ticket.updatedAt)}
                       </TableCell>
                       <TableCell>
-                        <Link
-                          href={`/chat/support/${ticket.id}`}
-                          className="inline-block"
-                        >
+                        <Link href={`/chat/support/${ticket.id}`} className="inline-block">
                           <Button
                             size="sm"
                             variant="outline"
@@ -552,12 +486,8 @@ const SupportDashboardClient = () => {
                     <TableCell colSpan={7} className="text-center py-12">
                       <div className="flex flex-col items-center justify-center text-gray-500">
                         <CheckCircle className="h-12 w-12 mb-3 text-gray-300" />
-                        <h3 className="font-medium text-gray-900 mb-1">
-                          All caught up!
-                        </h3>
-                        <p className="text-sm">
-                          No tickets are currently assigned to you.
-                        </p>
+                        <h3 className="font-medium text-gray-900 mb-1">All caught up!</h3>
+                        <p className="text-sm">No tickets are currently assigned to you.</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -587,7 +517,7 @@ const SupportDashboardClient = () => {
                   <Input
                     placeholder="Search tickets..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className="pl-10 w-64 font-instrument"
                   />
                 </div>
@@ -605,10 +535,7 @@ const SupportDashboardClient = () => {
                   </SelectContent>
                 </Select>
 
-                <Select
-                  value={filterPriority}
-                  onValueChange={setFilterPriority}
-                >
+                <Select value={filterPriority} onValueChange={setFilterPriority}>
                   <SelectTrigger className="w-40 font-instrument">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
@@ -631,11 +558,9 @@ const SupportDashboardClient = () => {
                   No tickets found
                 </h3>
                 <p className="text-gray-500 font-instrument">
-                  {searchTerm ||
-                  filterStatus !== "all" ||
-                  filterPriority !== "all"
-                    ? "No tickets match your current filters."
-                    : "No tickets have been created yet."}
+                  {searchTerm || filterStatus !== 'all' || filterPriority !== 'all'
+                    ? 'No tickets match your current filters.'
+                    : 'No tickets have been created yet.'}
                 </p>
               </div>
             ) : (
@@ -672,11 +597,8 @@ const SupportDashboardClient = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white divide-y divide-slate-200">
-                  {filteredTickets.map((ticket) => (
-                    <TableRow
-                      key={ticket.id}
-                      className="hover:bg-slate-50 transition-colors"
-                    >
+                  {filteredTickets.map(ticket => (
+                    <TableRow key={ticket.id} className="hover:bg-slate-50 transition-colors">
                       <TableCell className="px-6 py-4">
                         <div className="space-y-1">
                           <div className="font-medium text-gray-900 font-instrument line-clamp-1">
@@ -716,9 +638,7 @@ const SupportDashboardClient = () => {
                       <TableCell className="px-6 py-4">
                         {getPriorityBadge(ticket.priority)}
                       </TableCell>
-                      <TableCell className="px-6 py-4">
-                        {getStatusBadge(ticket.status)}
-                      </TableCell>
+                      <TableCell className="px-6 py-4">{getStatusBadge(ticket.status)}</TableCell>
                       <TableCell className="px-6 py-4">
                         {ticket.assignee ? (
                           <div className="flex items-center space-x-2">
@@ -735,16 +655,12 @@ const SupportDashboardClient = () => {
                             </div>
                           </div>
                         ) : (
-                          <Select
-                            onValueChange={(value) =>
-                              handleAssignTicket(ticket.id, value)
-                            }
-                          >
+                          <Select onValueChange={value => handleAssignTicket(ticket.id, value)}>
                             <SelectTrigger className="w-[140px] h-8 text-xs font-instrument">
                               <SelectValue placeholder="Assign..." />
                             </SelectTrigger>
                             <SelectContent>
-                              {supportStaff.map((staff) => (
+                              {supportStaff.map(staff => (
                                 <SelectItem key={staff.id} value={staff.id}>
                                   {staff.name}
                                 </SelectItem>
@@ -767,10 +683,7 @@ const SupportDashboardClient = () => {
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <Link
-                          href={`/chat/support/${ticket.id}`}
-                          className="inline-block"
-                        >
+                        <Link href={`/chat/support/${ticket.id}`} className="inline-block">
                           <Button
                             size="sm"
                             variant="outline"

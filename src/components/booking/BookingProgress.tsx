@@ -1,6 +1,6 @@
-import { format } from "date-fns";
-import { Calendar, Tag } from "lucide-react";
-import type { BookingData } from "@/types/booking";
+import { format } from 'date-fns';
+import { Calendar, Tag } from 'lucide-react';
+import type { BookingData } from '@/types/booking';
 
 interface BookingProgressProps {
   bookingData: Partial<BookingData>;
@@ -21,9 +21,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900 font-instrument">
-        Booking Details
-      </h4>
+      <h4 className="text-sm font-semibold text-gray-900 font-instrument">Booking Details</h4>
 
       <div className="space-y-3">
         {/* Booking ID */}
@@ -31,9 +29,7 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
           <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">
-                Booking ID:
-              </span>
+              <span className="text-sm text-gray-700 font-instrument">Booking ID:</span>
             </div>
             <span className="text-sm font-semibold text-gray-900 font-instrument">
               #{bookingData.id.slice(-8)}
@@ -69,13 +65,10 @@ export function BookingProgress({ bookingData }: BookingProgressProps) {
           <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700 font-instrument">
-                Dates:
-              </span>
+              <span className="text-sm text-gray-700 font-instrument">Dates:</span>
             </div>
             <span className="text-sm font-semibold text-gray-900 font-instrument">
-              {format(bookingData.startDate, "MMM dd")} -{" "}
-              {format(bookingData.endDate!, "MMM dd")}
+              {format(bookingData.startDate, 'MMM dd')} - {format(bookingData.endDate!, 'MMM dd')}
             </span>
           </div>
         )}

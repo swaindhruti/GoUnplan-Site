@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   TravelLoader,
   CompassLoader,
@@ -6,7 +6,7 @@ import {
   SuitcaseLoader,
   MountainLoader,
   BeachLoader,
-} from "@/components/ui/travel-loader";
+} from '@/components/ui/travel-loader';
 
 export default function HostProfileLoading() {
   return (
@@ -26,7 +26,7 @@ export default function HostProfileLoading() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-6">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3].map(i => (
                 <div
                   key={i}
                   className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 text-white"
@@ -57,13 +57,11 @@ export default function HostProfileLoading() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {[1, 2, 3].map((i) => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="space-y-3">
                     <div className="flex items-center gap-2">
                       <MapLoader size="sm" />
-                      <span className="font-semibold text-gray-900">
-                        Loading...
-                      </span>
+                      <span className="font-semibold text-gray-900">Loading...</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-4 bg-slate-200 rounded animate-pulse"></div>
@@ -82,13 +80,11 @@ export default function HostProfileLoading() {
             <div>
               <div className="flex items-center gap-3 mb-8">
                 <TravelLoader size="lg" />
-                <span className="text-3xl font-bold text-gray-900 font-playfair">
-                  Active Trips
-                </span>
+                <span className="text-3xl font-bold text-gray-900 font-playfair">Active Trips</span>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map((i) => (
+                {[1, 2, 3, 4].map(i => (
                   <Card
                     key={i}
                     className="bg-white/60 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg"
@@ -142,7 +138,7 @@ export default function HostProfileLoading() {
               </div>
 
               <div className="space-y-6">
-                {[1, 2, 3].map((i) => (
+                {[1, 2, 3].map(i => (
                   <Card
                     key={i}
                     className="bg-white/60 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg"

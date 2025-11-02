@@ -1,32 +1,22 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import DotGridBackgroundProvider from "@/components/providers/dotGridBackgroundProvider";
-import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  Mail,
-  Users,
-  Plane,
-  CheckCircle,
-  AlertCircle
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import {
-  addEmailToWaitingList,
-  getWaitingListCount
-} from "@/actions/common/waiting-list/action";
+import React, { useState, useEffect, useRef } from 'react';
+import DotGridBackgroundProvider from '@/components/providers/dotGridBackgroundProvider';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Mail, Users, Plane, CheckCircle, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { addEmailToWaitingList, getWaitingListCount } from '@/actions/common/waiting-list/action';
 
 const BASE_COUNT = 326;
 
 export default function ComingSoonPage() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [waitlistCount, setWaitlistCount] = useState(0);
   const [cursorPosition, setCursorPosition] = useState({ x: -100, y: -100 });
   const [isOverCard, setIsOverCard] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [message, setMessage] = useState({ text: '', type: '' });
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Fetch waiting list count on component mount
@@ -38,10 +28,10 @@ export default function ComingSoonPage() {
           const dbCount = response.count;
           setWaitlistCount(BASE_COUNT + dbCount);
         } else {
-          console.error("Failed to fetch waitlist count:", response.message);
+          console.error('Failed to fetch waitlist count:', response.message);
         }
       } catch (error) {
-        console.error("Error fetching waitlist count:", error);
+        console.error('Error fetching waitlist count:', error);
       }
     };
 
@@ -66,10 +56,10 @@ export default function ComingSoonPage() {
       }
     };
 
-    window.addEventListener("mousemove", updateCursorPosition);
+    window.addEventListener('mousemove', updateCursorPosition);
 
     return () => {
-      window.removeEventListener("mousemove", updateCursorPosition);
+      window.removeEventListener('mousemove', updateCursorPosition);
     };
   }, []);
 
@@ -79,7 +69,7 @@ export default function ComingSoonPage() {
     if (!email) return;
 
     setIsLoading(true);
-    setMessage({ text: "", type: "" });
+    setMessage({ text: '', type: '' });
 
     try {
       const result = await addEmailToWaitingList(email);
@@ -88,7 +78,7 @@ export default function ComingSoonPage() {
         setSubmitted(true);
         setMessage({
           text: "Thanks for joining our waitlist! We'll notify you when we launch.",
-          type: "success"
+          type: 'success',
         });
 
         // Update the count
@@ -102,26 +92,25 @@ export default function ComingSoonPage() {
           }
 
           // Clear the form
-          setEmail("");
+          setEmail('');
 
           // Reset success state after a few seconds
           setTimeout(() => {
             setSubmitted(false);
-            setMessage({ text: "", type: "" });
+            setMessage({ text: '', type: '' });
           }, 5000);
         } else {
           setMessage({
-            text:
-              result.message || "Failed to join waitlist. Please try again.",
-            type: "error"
+            text: result.message || 'Failed to join waitlist. Please try again.',
+            type: 'error',
           });
         }
       }
     } catch (error) {
-      console.error("Error submitting email:", error);
+      console.error('Error submitting email:', error);
       setMessage({
-        text: "Something went wrong. Please try again later.",
-        type: "error"
+        text: 'Something went wrong. Please try again later.',
+        type: 'error',
       });
     } finally {
       setIsLoading(false);
@@ -133,10 +122,10 @@ export default function ComingSoonPage() {
       {/* Custom plane cursor */}
       <div
         className={`fixed pointer-events-none z-50 transition-opacity duration-300 ${
-          isOverCard ? "opacity-0" : "opacity-100"
+          isOverCard ? 'opacity-0' : 'opacity-100'
         }`}
         style={{
-          transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px) translate(-50%, -50%) rotate(-45deg)`
+          transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px) translate(-50%, -50%) rotate(-45deg)`,
         }}
       >
         <div className="relative">
@@ -183,9 +172,7 @@ export default function ComingSoonPage() {
               <div className="absolute -top-5 -right-5 bg-red-500 text-white border-3 border-black rounded-full px-5 py-2 font-bold text-3xl tracking-wide flex items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-3">
                 <Users className="w-5 h-5 mr-2" />
                 <span>{waitlistCount.toLocaleString()}</span>
-                <span className="text-lg ml-1 font-medium tracking-wide">
-                  joined
-                </span>
+                <span className="text-lg ml-1 font-medium tracking-wide">joined</span>
               </div>
 
               {/* Randomly positioned decorative elements */}
@@ -195,12 +182,9 @@ export default function ComingSoonPage() {
               {/* Main content */}
               <div className="p-8 md:p-10 pt-10">
                 <p className="text-xl font-bold mb-10 ml-4 leading-relaxed">
-                  We&apos;re building something{" "}
-                  <span className="underline decoration-wavy decoration-yellow-400">
-                    amazing
-                  </span>{" "}
-                  for your travel adventures. Our new platform is launching
-                  soon.
+                  We&apos;re building something{' '}
+                  <span className="underline decoration-wavy decoration-yellow-400">amazing</span>{' '}
+                  for your travel adventures. Our new platform is launching soon.
                 </p>
 
                 {/* Notification Form */}
@@ -208,16 +192,13 @@ export default function ComingSoonPage() {
                   <h3 className="text-2xl font-extrabold mb-4 uppercase tracking-tight">
                     Get Notified
                   </h3>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="flex flex-col sm:flex-row gap-4"
-                  >
+                  <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-grow">
                       <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5" />
                       <Input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={e => setEmail(e.target.value)}
                         disabled={isLoading}
                         className="pl-12 pr-4 py-7 w-full bg-gray-100 border-3 border-black rounded-md text-lg font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         placeholder="johndoe@gmail.com"
@@ -230,7 +211,7 @@ export default function ComingSoonPage() {
                       className="bg-green-500 hover:bg-green-400 border-3 border-black text-black font-bold text-lg py-7 px-6 rounded-md flex items-center justify-center transition-all duration-150 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
-                        "Submitting..."
+                        'Submitting...'
                       ) : (
                         <>
                           Notify Me <ArrowRight className="ml-2 h-5 w-5" />
@@ -242,12 +223,10 @@ export default function ComingSoonPage() {
                   {message.text && (
                     <div
                       className={`mt-4 ${
-                        message.type === "success"
-                          ? "bg-yellow-300"
-                          : "bg-red-100 text-red-800"
+                        message.type === 'success' ? 'bg-yellow-300' : 'bg-red-100 text-red-800'
                       } border-3 border-black p-3 rounded-md flex items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
                     >
-                      {message.type === "success" ? (
+                      {message.type === 'success' ? (
                         <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
                       ) : (
                         <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
@@ -258,9 +237,8 @@ export default function ComingSoonPage() {
 
                   {submitted && waitlistCount > 0 && (
                     <div className="mt-4 pt-2 text-center font-bold">
-                      You&apos;re number{" "}
-                      <span className="text-purple-600">{waitlistCount}</span>{" "}
-                      on our waitlist! 🚀
+                      You&apos;re number <span className="text-purple-600">{waitlistCount}</span> on
+                      our waitlist! 🚀
                     </div>
                   )}
                 </div>

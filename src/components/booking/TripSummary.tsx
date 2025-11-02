@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Clock } from "lucide-react";
+import { Calendar, MapPin, Clock } from 'lucide-react';
 
 interface TripSummaryProps {
   startDate: string;
@@ -7,12 +7,7 @@ interface TripSummaryProps {
   location: string;
 }
 
-export function TripSummary({
-  startDate,
-  endDate,
-  duration,
-  location,
-}: TripSummaryProps) {
+export function TripSummary({ startDate, endDate, duration, location }: TripSummaryProps) {
   return (
     <div className="font-semibold space-y-4">
       <div className="flex items-center gap-4 border border-purple-100 rounded-xl p-4 bg-white shadow-sm">
@@ -20,9 +15,7 @@ export function TripSummary({
           <Calendar className="w-6 h-6 text-purple-600" strokeWidth={2.5} />
         </div>
         <div>
-          <div className="text-sm uppercase font-bold tracking-wide mb-1 text-gray-700">
-            Dates
-          </div>
+          <div className="text-sm uppercase font-bold tracking-wide mb-1 text-gray-700">Dates</div>
           <div className="text-lg font-semibold text-gray-800">
             {startDate} - {endDate}
           </div>

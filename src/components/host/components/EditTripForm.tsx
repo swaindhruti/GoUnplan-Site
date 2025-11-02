@@ -1,7 +1,7 @@
-"use client";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { submitTripForVerification } from "@/actions/host/action";
+'use client';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { submitTripForVerification } from '@/actions/host/action';
 import {
   ArrowLeft,
   Save,
@@ -13,8 +13,8 @@ import {
   Globe,
   AlertCircle,
   CheckCircle,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import Image from 'next/image';
 
 interface Trip {
   travelPlanId: string;
@@ -50,8 +50,7 @@ interface EditTripFormProps {
 export const EditTripForm = ({ trip }: EditTripFormProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isCompletingDraft =
-    searchParams.get("complete") === "true" && trip.status === "DRAFT";
+  const isCompletingDraft = searchParams.get('complete') === 'true' && trip.status === 'DRAFT';
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -61,38 +60,32 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
   const [formData, setFormData] = useState({
     title: trip.title,
     description: trip.description,
-    destination: trip.destination || "",
+    destination: trip.destination || '',
     country: trip.country,
     state: trip.state,
     city: trip.city,
     price: trip.price,
     maxParticipants: trip.maxParticipants,
     noOfDays: trip.noOfDays,
-    startDate: trip.startDate
-      ? new Date(trip.startDate).toISOString().split("T")[0]
-      : "",
-    endDate: trip.endDate
-      ? new Date(trip.endDate).toISOString().split("T")[0]
-      : "",
-    includedActivities: trip.includedActivities.join("\n"),
-    restrictions: trip.restrictions.join("\n"),
-    filters: trip.filters.join(", "),
-    languages: trip.languages.join(", "),
-    tripImage: trip.tripImage || "",
+    startDate: trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '',
+    endDate: trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '',
+    includedActivities: trip.includedActivities.join('\n'),
+    restrictions: trip.restrictions.join('\n'),
+    filters: trip.filters.join(', '),
+    languages: trip.languages.join(', '),
+    tripImage: trip.tripImage || '',
   });
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
   const handleCancel = () => {
-    router.push("/dashboard/host");
+    router.push('/dashboard/host');
   };
 
   const handleSubmitForVerification = async () => {
@@ -111,31 +104,24 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
         price: Number(formData.price),
         maxParticipants: Number(formData.maxParticipants),
         noOfDays: Number(formData.noOfDays),
-        startDate: formData.startDate
-          ? new Date(formData.startDate)
-          : undefined,
+        startDate: formData.startDate ? new Date(formData.startDate) : undefined,
         endDate: formData.endDate ? new Date(formData.endDate) : undefined,
-        includedActivities: formData.includedActivities
-          .split("\n")
-          .filter((a) => a.trim()),
-        restrictions: formData.restrictions.split("\n").filter((r) => r.trim()),
+        includedActivities: formData.includedActivities.split('\n').filter(a => a.trim()),
+        restrictions: formData.restrictions.split('\n').filter(r => r.trim()),
         filters: formData.filters
-          .split(",")
-          .map((f) => f.trim())
-          .filter((f) => f),
+          .split(',')
+          .map(f => f.trim())
+          .filter(f => f),
         languages: formData.languages
-          .split(",")
-          .map((l) => l.trim())
-          .filter((l) => l),
+          .split(',')
+          .map(l => l.trim())
+          .filter(l => l),
         tripImage: formData.tripImage,
       };
 
-      const response = await submitTripForVerification(
-        trip.travelPlanId,
-        submitData
-      );
+      const response = await submitTripForVerification(trip.travelPlanId, submitData);
 
-      if ("error" in response) {
+      if ('error' in response) {
         setError(response.error as string);
       } else if (response.success) {
         setSuccess(response.message as string);
@@ -143,12 +129,12 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
 
         // Show success message for 3 seconds then redirect
         setTimeout(() => {
-          router.push("/dashboard/host");
+          router.push('/dashboard/host');
         }, 3000);
       }
     } catch (err) {
-      console.error("Error submitting trip for verification:", err);
-      setError("Failed to submit trip for verification");
+      console.error('Error submitting trip for verification:', err);
+      setError('Failed to submit trip for verification');
     } finally {
       setLoading(false);
     }
@@ -160,7 +146,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => router.push("/dashboard/host")}
+            onClick={() => router.push('/dashboard/host')}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -170,21 +156,21 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {isCompletingDraft ? "Complete Draft Trip" : "Edit Trip"}
+                {isCompletingDraft ? 'Complete Draft Trip' : 'Edit Trip'}
               </h1>
               <p className="text-gray-600 mt-2">
                 {isCompletingDraft
-                  ? "Complete your draft trip and submit for admin verification"
-                  : "Update your trip details and submit for admin verification"}
+                  ? 'Complete your draft trip and submit for admin verification'
+                  : 'Update your trip details and submit for admin verification'}
               </p>
             </div>
             <div
               className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                trip.status === "ACTIVE"
-                  ? "bg-green-100 text-green-800 border border-green-200"
-                  : trip.status === "DRAFT"
-                  ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                  : "bg-gray-100 text-gray-800 border border-gray-200"
+                trip.status === 'ACTIVE'
+                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  : trip.status === 'DRAFT'
+                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                    : 'bg-gray-100 text-gray-800 border border-gray-200'
               }`}
             >
               {trip.status}
@@ -199,8 +185,8 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
             <div>
               <h3 className="font-semibold text-blue-900">Completing Draft</h3>
               <p className="text-blue-700">
-                You are completing a draft trip. Review all details carefully
-                and click &quot;Submit for Verification&quot; when ready.
+                You are completing a draft trip. Review all details carefully and click &quot;Submit
+                for Verification&quot; when ready.
               </p>
             </div>
           </div>
@@ -313,9 +299,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Country *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Country *</label>
                   <input
                     type="text"
                     name="country"
@@ -327,9 +311,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
                   <input
                     type="text"
                     name="state"
@@ -341,9 +323,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
                   <input
                     type="text"
                     name="city"
@@ -358,9 +338,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
 
             {/* Trip Details */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b">
-                Trip Details
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b">Trip Details</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
@@ -412,9 +390,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Languages
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <input
@@ -431,9 +407,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <input
@@ -447,9 +421,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Date
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <input
@@ -520,15 +492,11 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-blue-900">
-                    Important Notice
-                  </h3>
+                  <h3 className="font-semibold text-blue-900">Important Notice</h3>
                   <p className="text-blue-700 text-sm mt-1">
-                    When you submit this trip for verification, it will be set
-                    to INACTIVE status and sent to admin for review. Once
-                    approved, it will become ACTIVE again.{" "}
-                    <strong>Existing bookings will not be affected</strong> by
-                    this status change.
+                    When you submit this trip for verification, it will be set to INACTIVE status
+                    and sent to admin for review. Once approved, it will become ACTIVE again.{' '}
+                    <strong>Existing bookings will not be affected</strong> by this status change.
                   </p>
                 </div>
               </div>
@@ -563,12 +531,10 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Confirm Submission
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Submission</h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to submit this trip for verification? The
-              trip will be set to INACTIVE status until admin approval.
+              Are you sure you want to submit this trip for verification? The trip will be set to
+              INACTIVE status until admin approval.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -583,7 +549,7 @@ export const EditTripForm = ({ trip }: EditTripFormProps) => {
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 disabled={loading}
               >
-                {loading ? "Submitting..." : "Confirm"}
+                {loading ? 'Submitting...' : 'Confirm'}
               </button>
             </div>
           </div>

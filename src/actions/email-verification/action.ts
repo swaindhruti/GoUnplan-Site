@@ -1,9 +1,9 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { Resend } from "resend";
-import { requireAuth } from "@/lib/roleGaurd";
-import crypto from "crypto";
+import prisma from '@/lib/prisma';
+import { Resend } from 'resend';
+import { requireAuth } from '@/lib/roleGaurd';
+import crypto from 'crypto';
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -15,14 +15,14 @@ export async function sendVerificationEmail() {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
   if (user.isEmailVerified) {
-    throw new Error("Email is already verified");
+    throw new Error('Email is already verified');
   }
 
   // Generate a secure random token
-  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const verificationToken = crypto.randomBytes(32).toString('hex');
   const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
   // Store token in database
@@ -36,14 +36,12 @@ export async function sendVerificationEmail() {
 
   // Create magic link with token
   const verificationLink = `${
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   }/verify-email?token=${verificationToken}`;
 
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h1 style="color: #7c3aed; text-align: center;">Welcome, ${
-        user.name || "User"
-      }!</h1>
+      <h1 style="color: #7c3aed; text-align: center;">Welcome, ${user.name || 'User'}!</h1>
       <p style="font-size: 16px; line-height: 1.5; color: #374151;">
         Thank you for signing up! Please verify your email address by clicking the button below:
       </p>
@@ -63,9 +61,9 @@ export async function sendVerificationEmail() {
   `;
 
   const { data, error } = await resend.emails.send({
-    from: "Gounplan <noreply@gounplan.com>",
-    to: [user.email || ""],
-    subject: "Verify Your Email - GoUnplan",
+    from: 'Gounplan <noreply@gounplan.com>',
+    to: [user.email || ''],
+    subject: 'Verify Your Email - GoUnplan',
     html: emailHtml,
   });
 
@@ -83,7 +81,7 @@ export async function verifyEmailWithToken(token: string) {
   if (!token) {
     return {
       success: false,
-      error: "Verification token is required",
+      error: 'Verification token is required',
     };
   }
 
@@ -98,19 +96,15 @@ export async function verifyEmailWithToken(token: string) {
     if (!user) {
       return {
         success: false,
-        error: "Invalid verification token",
+        error: 'Invalid verification token',
       };
     }
 
     // Check if token has expired
-    if (
-      user.verificationTokenExpiry &&
-      user.verificationTokenExpiry < new Date()
-    ) {
+    if (user.verificationTokenExpiry && user.verificationTokenExpiry < new Date()) {
       return {
         success: false,
-        error:
-          "Verification token has expired. Please request a new verification email.",
+        error: 'Verification token has expired. Please request a new verification email.',
       };
     }
 
@@ -118,7 +112,7 @@ export async function verifyEmailWithToken(token: string) {
     if (user.isEmailVerified) {
       return {
         success: true,
-        message: "Email is already verified",
+        message: 'Email is already verified',
         alreadyVerified: true,
       };
     }
@@ -135,13 +129,13 @@ export async function verifyEmailWithToken(token: string) {
 
     return {
       success: true,
-      message: "Email verified successfully!",
+      message: 'Email verified successfully!',
     };
   } catch (error) {
-    console.error("Error verifying email:", error);
+    console.error('Error verifying email:', error);
     return {
       success: false,
-      error: "Failed to verify email. Please try again.",
+      error: 'Failed to verify email. Please try again.',
     };
   }
 }
@@ -154,12 +148,12 @@ export async function verifyEmail() {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
   if (user.isEmailVerified) {
     return {
       success: true,
-      message: "Email is already verified",
+      message: 'Email is already verified',
     };
   }
 
@@ -170,6 +164,6 @@ export async function verifyEmail() {
 
   return {
     success: true,
-    message: "Email verified successfully",
+    message: 'Email verified successfully',
   };
 }

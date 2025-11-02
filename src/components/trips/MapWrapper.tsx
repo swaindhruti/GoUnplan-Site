@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { MapPin } from "lucide-react";
-import { Button } from "../ui/button";
-import MapViewer from "./MapViewer";
+import { useState } from 'react';
+import { MapPin } from 'lucide-react';
+import { Button } from '../ui/button';
+import MapViewer from './MapViewer';
 
 interface MapWrapperProps {
   stops: string[];
@@ -16,9 +16,9 @@ export const MapWrapper = ({ stops, startDate }: MapWrapperProps) => {
 
   const toggleMap = () => {
     setLoading(true);
-    setIsOpen((prev) => !prev);
-    
-   if (!isOpen) {
+    setIsOpen(prev => !prev);
+
+    if (!isOpen) {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
@@ -31,16 +31,16 @@ export const MapWrapper = ({ stops, startDate }: MapWrapperProps) => {
     if (!date) return null;
 
     return {
-      dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
-      dayMonth: date.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayMonth: date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
       }),
-      fullDate: date.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      fullDate: date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       }),
     };
   };
@@ -72,7 +72,7 @@ export const MapWrapper = ({ stops, startDate }: MapWrapperProps) => {
               className="w-full sm:w-auto"
             >
               <MapPin className="w-4 h-4 mr-1" />
-              {loading ? "Loading..." :isOpen?"Close Map":"View Map"}
+              {loading ? 'Loading...' : isOpen ? 'Close Map' : 'View Map'}
             </Button>
           </div>
         </div>

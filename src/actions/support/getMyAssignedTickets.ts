@@ -1,14 +1,14 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireSupport } from "@/lib/roleGaurd";
+import prisma from '@/lib/prisma';
+import { requireSupport } from '@/lib/roleGaurd';
 
 export const getMyAssignedTickets = async () => {
   try {
     const session = await requireSupport();
 
     if (!session) {
-      return { error: "Unauthorized" };
+      return { error: 'Unauthorized' };
     }
 
     const tickets = await prisma.supportTicket.findMany({
@@ -47,7 +47,7 @@ export const getMyAssignedTickets = async () => {
         messages: {
           take: 1,
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           include: {
             sender: {
@@ -60,13 +60,13 @@ export const getMyAssignedTickets = async () => {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return { tickets };
   } catch (error) {
-    console.error("🚨 getMyAssignedTickets - Error:", error);
-    return { error: "Failed to fetch tickets" };
+    console.error('🚨 getMyAssignedTickets - Error:', error);
+    return { error: 'Failed to fetch tickets' };
   }
 };

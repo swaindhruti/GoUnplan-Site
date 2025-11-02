@@ -43,10 +43,10 @@ export async function createRazorpayOrder(
   notes?: Record<string, string>
 ) {
   try {
-    const response = await fetch("/api/createOrder", {
-      method: "POST",
+    const response = await fetch('/api/createOrder', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         amount,
@@ -58,12 +58,12 @@ export async function createRazorpayOrder(
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.error || "Failed to create order");
+      throw new Error(data.error || 'Failed to create order');
     }
 
     return data;
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
+    console.error('Error creating Razorpay order:', error);
     throw error;
   }
 }
@@ -74,10 +74,10 @@ export async function verifyRazorpayPayment(paymentData: {
   razorpay_signature: string;
 }) {
   try {
-    const response = await fetch("/api/verifyPayment", {
-      method: "POST",
+    const response = await fetch('/api/verifyPayment', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(paymentData),
     });
@@ -85,25 +85,25 @@ export async function verifyRazorpayPayment(paymentData: {
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.message || "Payment verification failed");
+      throw new Error(data.message || 'Payment verification failed');
     }
 
     return data;
   } catch (error) {
-    console.error("Error verifying payment:", error);
+    console.error('Error verifying payment:', error);
     throw error;
   }
 }
 
 export function loadRazorpayScript(): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (window.Razorpay) {
       resolve(true);
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
@@ -133,7 +133,7 @@ export async function initiateRazorpayPayment({
     // Load Razorpay script
     const isLoaded = await loadRazorpayScript();
     if (!isLoaded) {
-      throw new Error("Failed to load Razorpay script");
+      throw new Error('Failed to load Razorpay script');
     }
 
     // Create order
@@ -146,7 +146,7 @@ export async function initiateRazorpayPayment({
       key: orderData.key,
       amount: orderData.order.amount,
       currency: orderData.order.currency,
-      name: "GoUnplan",
+      name: 'GoUnplan',
       description: `Payment for ${tripTitle}`,
       order_id: orderData.order.id,
       handler: async function (response) {
@@ -155,8 +155,8 @@ export async function initiateRazorpayPayment({
           await verifyRazorpayPayment(response);
           await onSuccess(response);
         } catch (error) {
-          console.error("Payment verification failed:", error);
-          onFailure("Payment verification failed");
+          console.error('Payment verification failed:', error);
+          onFailure('Payment verification failed');
         }
       },
       prefill: {
@@ -165,11 +165,11 @@ export async function initiateRazorpayPayment({
         contact: userDetails.phone,
       },
       theme: {
-        color: "#9333ea", // Purple theme matching your app
+        color: '#9333ea', // Purple theme matching your app
       },
       modal: {
         ondismiss: function () {
-          onFailure("Payment cancelled by user");
+          onFailure('Payment cancelled by user');
         },
       },
     };
@@ -177,9 +177,7 @@ export async function initiateRazorpayPayment({
     const rzp = new window.Razorpay(options);
     rzp.open();
   } catch (error) {
-    console.error("Error initiating Razorpay payment:", error);
-    onFailure(
-      error instanceof Error ? error.message : "Payment initialization failed"
-    );
+    console.error('Error initiating Razorpay payment:', error);
+    onFailure(error instanceof Error ? error.message : 'Payment initialization failed');
   }
 }

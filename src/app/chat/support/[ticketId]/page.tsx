@@ -1,5 +1,5 @@
-import { requireSupportOrAdmin } from "@/lib/roleGaurd";
-import SupportChatClient from "./SupportChatClient";
+import { requireSupportOrAdmin } from '@/lib/roleGaurd';
+import SupportChatClient from './SupportChatClient';
 
 interface SupportChatPageProps {
   params: Promise<{
@@ -7,9 +7,7 @@ interface SupportChatPageProps {
   }>;
 }
 
-export default async function SupportChatPage({
-  params,
-}: SupportChatPageProps) {
+export default async function SupportChatPage({ params }: SupportChatPageProps) {
   // Use role guard to check authentication and authorization
   await requireSupportOrAdmin();
 

@@ -1,4 +1,4 @@
-import { Carousels } from "./common";
+import { Carousels } from './common';
 
 export const TopDestinations = () => {
   return (

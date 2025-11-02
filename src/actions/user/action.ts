@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireUser } from "@/lib/roleGaurd";
-import { BookingStatus } from "@prisma/client";
+import prisma from '@/lib/prisma';
+import { requireUser } from '@/lib/roleGaurd';
+import { BookingStatus } from '@prisma/client';
 
 export const getUserProfile = async (email: string) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({
@@ -29,10 +29,10 @@ export const getUserProfile = async (email: string) => {
       },
     });
 
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     const bookingStats = await prisma.booking.groupBy({
-      by: ["status"],
+      by: ['status'],
       where: {
         userId: user.id,
       },
@@ -42,7 +42,7 @@ export const getUserProfile = async (email: string) => {
     });
 
     const paymentStats = await prisma.booking.groupBy({
-      by: ["paymentStatus"],
+      by: ['paymentStatus'],
       where: {
         userId: user.id,
       },
@@ -68,31 +68,31 @@ export const getUserProfile = async (email: string) => {
       refunded: 0,
     };
 
-    bookingStats.forEach((stat) => {
+    bookingStats.forEach(stat => {
       const status = stat.status.toLowerCase() as keyof typeof bookingCounts;
       if (status in bookingCounts) {
         bookingCounts[status] = stat._count.id;
       }
     });
 
-    paymentStats.forEach((stat) => {
+    paymentStats.forEach(stat => {
       switch (stat.paymentStatus) {
-        case "FULLY_PAID":
+        case 'FULLY_PAID':
           paymentCounts.fullyPaid = stat._count.id;
           break;
-        case "PARTIALLY_PAID":
+        case 'PARTIALLY_PAID':
           paymentCounts.partiallyPaid = stat._count.id;
           break;
-        case "PENDING":
+        case 'PENDING':
           paymentCounts.paymentPending = stat._count.id;
           break;
-        case "OVERDUE":
+        case 'OVERDUE':
           paymentCounts.overdue = stat._count.id;
           break;
-        case "CANCELLED":
+        case 'CANCELLED':
           paymentCounts.cancelled = stat._count.id;
           break;
-        case "REFUNDED":
+        case 'REFUNDED':
           paymentCounts.refunded = stat._count.id;
           break;
       }
@@ -106,8 +106,8 @@ export const getUserProfile = async (email: string) => {
       },
     };
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    return { error: "Failed to fetch user profile" };
+    console.error('Error fetching user profile:', error);
+    return { error: 'Failed to fetch user profile' };
   }
 };
 
@@ -122,18 +122,18 @@ export const updateUserProfile = async (
   } = {}
 ) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     const newEmail = data.newEmail ? data.newEmail.trim() : null;
     if (newEmail && newEmail !== email) {
       const existingUserWithNewMail = await prisma.user.findUnique({
         where: { email: newEmail },
       });
-      if (existingUserWithNewMail) return { error: "Email already in use" };
+      if (existingUserWithNewMail) return { error: 'Email already in use' };
     }
 
     const updatedUser = await prisma.user.update({
@@ -147,12 +147,12 @@ export const updateUserProfile = async (
       },
     });
 
-    if (!updatedUser) return { error: "Failed to update user profile" };
+    if (!updatedUser) return { error: 'Failed to update user profile' };
 
     return { success: true, user: updatedUser };
   } catch (error) {
-    console.error("Error updating user profile:", error);
-    return { error: "Failed to update user profile" };
+    console.error('Error updating user profile:', error);
+    return { error: 'Failed to update user profile' };
   }
 };
 
@@ -175,7 +175,7 @@ export const applyForHost = async (
 ) => {
   const session = await requireUser();
   if (!session) {
-    return { success: false, error: "Authentication required" };
+    return { success: false, error: 'Authentication required' };
   }
 
   try {
@@ -187,10 +187,10 @@ export const applyForHost = async (
         appliedForHost: true,
         hostProfile: {
           create: {
-            description: hostData?.description || "",
+            description: hostData?.description || '',
             hostEmail: email,
-            hostMobile: hostData?.hostMobile || "",
-            hostCity: hostData?.hostCity || "",
+            hostMobile: hostData?.hostMobile || '',
+            hostCity: hostData?.hostCity || '',
             plannedHostingMonths: hostData?.plannedHostingMonths || [],
             plannedHostingLocation: hostData?.plannedHostingLocation || null,
             languages: hostData?.languages || [],
@@ -208,29 +208,29 @@ export const applyForHost = async (
       user,
     };
   } catch (error) {
-    console.error("Error applying for host:", error);
+    console.error('Error applying for host:', error);
     return {
       success: false,
-      error: "Failed to apply for host status",
+      error: 'Failed to apply for host status',
     };
   }
 };
 
 export const hasAppliedForHost = async (email: string) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
   try {
     const user = await prisma.user.findUnique({
       where: { email: email },
       select: { appliedForHost: true },
     });
 
-    if (!user) return { error: "User not found" };
+    if (!user) return { error: 'User not found' };
 
     return { success: true, hasApplied: user.appliedForHost };
   } catch (error) {
-    console.error("Error checking host application status:", error);
-    return { error: "Failed to check host application status" };
+    console.error('Error checking host application status:', error);
+    return { error: 'Failed to check host application status' };
   }
 };
 
@@ -244,8 +244,8 @@ export const bookTravelPlan = async (
   }
 ) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-  if (session.user.id !== userId) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
+  if (session.user.id !== userId) return { error: 'Unauthorized' };
 
   try {
     const travelPlan = await prisma.travelPlans.findUnique({
@@ -253,24 +253,21 @@ export const bookTravelPlan = async (
     });
 
     if (!travelPlan) {
-      return { error: "Travel plan not found" };
+      return { error: 'Travel plan not found' };
     }
 
-    if (travelPlan.status !== "ACTIVE") {
+    if (travelPlan.status !== 'ACTIVE') {
       return {
-        error: "This travel plan is not currently available for booking",
+        error: 'This travel plan is not currently available for booking',
       };
     }
 
     // Validate participants
     if (bookingData.participants && bookingData.participants <= 0) {
-      return { error: "Number of participants must be at least 1" };
+      return { error: 'Number of participants must be at least 1' };
     }
 
-    if (
-      bookingData.participants &&
-      bookingData.participants > travelPlan.maxParticipants
-    ) {
+    if (bookingData.participants && bookingData.participants > travelPlan.maxParticipants) {
       return {
         error: `Maximum ${travelPlan.maxParticipants} participants allowed for this plan`,
       };
@@ -282,11 +279,11 @@ export const bookTravelPlan = async (
     const today = new Date();
 
     if (startDate < today) {
-      return { error: "Start date cannot be in the past" };
+      return { error: 'Start date cannot be in the past' };
     }
 
     if (endDate < startDate) {
-      return { error: "End date cannot be before start date" };
+      return { error: 'End date cannot be before start date' };
     }
 
     let totalPrice = 0;
@@ -305,24 +302,21 @@ export const bookTravelPlan = async (
         participants: bookingData.participants,
         pricePerPerson,
         totalPrice,
-        status: "PENDING",
+        status: 'PENDING',
       },
     });
 
     return { success: true, booking };
   } catch (error) {
-    console.error("Error creating booking:", error);
-    return { error: "Failed to create booking" };
+    console.error('Error creating booking:', error);
+    return { error: 'Failed to create booking' };
   }
 };
 
-export const getUserBookings = async (
-  userId: string,
-  status?: BookingStatus
-) => {
+export const getUserBookings = async (userId: string, status?: BookingStatus) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-  if (session.user.id !== userId) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
+  if (session.user.id !== userId) return { error: 'Unauthorized' };
 
   try {
     const whereClause: { userId: string; status?: BookingStatus } = { userId };
@@ -371,7 +365,7 @@ export const getUserBookings = async (
           },
         },
       },
-      orderBy: status ? { startDate: "desc" } : { createdAt: "desc" },
+      orderBy: status ? { startDate: 'desc' } : { createdAt: 'desc' },
     });
 
     const statusMessage = status
@@ -384,26 +378,21 @@ export const getUserBookings = async (
       message: statusMessage,
     };
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error('Error fetching bookings:', error);
     return {
-      error: status
-        ? `Failed to fetch ${status} bookings`
-        : "Failed to fetch bookings",
+      error: status ? `Failed to fetch ${status} bookings` : 'Failed to fetch bookings',
     };
   }
 };
 
-export const getBookingsByStatus = async (
-  userId: string,
-  status: BookingStatus
-) => {
+export const getBookingsByStatus = async (userId: string, status: BookingStatus) => {
   return getUserBookings(userId, status);
 };
 
 export const getBookingDetails = async (userId: string, bookingId: string) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-  if (session.user.id !== userId) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
+  if (session.user.id !== userId) return { error: 'Unauthorized' };
 
   try {
     const booking = await prisma.booking.findUnique({
@@ -440,24 +429,24 @@ export const getBookingDetails = async (userId: string, bookingId: string) => {
     });
 
     if (!booking) {
-      return { error: "Booking not found" };
+      return { error: 'Booking not found' };
     }
 
     if (booking.userId !== userId) {
-      return { error: "You do not have permission to view this booking" };
+      return { error: 'You do not have permission to view this booking' };
     }
 
     return { success: true, booking };
   } catch (error) {
-    console.error("Error fetching booking details:", error);
-    return { error: "Failed to fetch booking details" };
+    console.error('Error fetching booking details:', error);
+    return { error: 'Failed to fetch booking details' };
   }
 };
 
 export const cancelBooking = async (userId: string, bookingId: string) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
-  if (session.user.id !== userId) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
+  if (session.user.id !== userId) return { error: 'Unauthorized' };
 
   try {
     const booking = await prisma.booking.findUnique({
@@ -468,14 +457,14 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
     });
 
     if (!booking) {
-      return { error: "Booking not found" };
+      return { error: 'Booking not found' };
     }
 
     if (booking.userId !== userId) {
-      return { error: "You do not have permission to cancel this booking" };
+      return { error: 'You do not have permission to cancel this booking' };
     }
 
-    if (booking.status !== "PENDING" && booking.status !== "CONFIRMED") {
+    if (booking.status !== 'PENDING' && booking.status !== 'CONFIRMED') {
       return {
         error: `Cannot cancel a booking that is already ${booking.status}`,
       };
@@ -483,29 +472,26 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
 
     const now = new Date();
     const startDate = new Date(booking.startDate);
-    const daysDifference = Math.ceil(
-      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const daysDifference = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     let refundAmount = 0;
-    let refundMessage = "";
+    let refundMessage = '';
 
     if (daysDifference > 7) {
       refundAmount = booking.totalPrice;
-      refundMessage = "Full refund processed";
+      refundMessage = 'Full refund processed';
     } else if (daysDifference > 3) {
       refundAmount = Math.floor(booking.totalPrice * 0.5);
-      refundMessage = "50% refund processed";
+      refundMessage = '50% refund processed';
     } else {
       refundAmount = 0;
-      refundMessage =
-        "No refund available for cancellations less than 3 days before trip";
+      refundMessage = 'No refund available for cancellations less than 3 days before trip';
     }
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        status: "CANCELLED",
+        status: 'CANCELLED',
         cancelledAt: now,
         refundAmount,
       },
@@ -517,21 +503,21 @@ export const cancelBooking = async (userId: string, bookingId: string) => {
       message: refundMessage,
     };
   } catch (error) {
-    console.error("Error cancelling booking:", error);
-    return { error: "Failed to cancel booking" };
+    console.error('Error cancelling booking:', error);
+    return { error: 'Failed to cancel booking' };
   }
 };
 
 export const getAllActiveTrips = async () => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const currentDate = new Date();
 
     const activeTrips = await prisma.travelPlans.findMany({
       where: {
-        status: "ACTIVE",
+        status: 'ACTIVE',
         startDate: {
           gte: currentDate, // Only show trips that start from today or later
         },
@@ -558,7 +544,7 @@ export const getAllActiveTrips = async () => {
         reviewCount: true,
         bookings: {
           where: {
-            status: { in: ["CONFIRMED", "PENDING"] },
+            status: { in: ['CONFIRMED', 'PENDING'] },
           },
           select: {
             participants: true,
@@ -567,19 +553,16 @@ export const getAllActiveTrips = async () => {
       },
       orderBy: [
         {
-          startDate: "asc",
+          startDate: 'asc',
         },
         {
-          createdAt: "desc",
+          createdAt: 'desc',
         },
       ],
     });
 
-    const tripsWithSeats = activeTrips.map((trip) => {
-      const bookedSeats = trip.bookings.reduce(
-        (sum, b) => sum + b.participants,
-        0
-      );
+    const tripsWithSeats = activeTrips.map(trip => {
+      const bookedSeats = trip.bookings.reduce((sum, b) => sum + b.participants, 0);
       return {
         ...trip,
         bookedSeats,
@@ -589,7 +572,7 @@ export const getAllActiveTrips = async () => {
 
     return { success: true, trips: tripsWithSeats };
   } catch (error) {
-    console.error("Error fetching active trips:", error);
-    return { error: "Failed to fetch active trips" };
+    console.error('Error fetching active trips:', error);
+    return { error: 'Failed to fetch active trips' };
   }
 };

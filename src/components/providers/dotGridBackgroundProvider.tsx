@@ -1,6 +1,6 @@
-"use client";
-import React, { ReactNode } from "react";
-import DotGrid from "../texture-background/dotGrid";
+'use client';
+import React, { ReactNode } from 'react';
+import DotGrid from '../texture-background/dotGrid';
 
 interface DotGridBackgroundProviderProps {
   children: ReactNode;
@@ -20,14 +20,14 @@ const DotGridBackgroundProvider: React.FC<DotGridBackgroundProviderProps> = ({
   children,
   dotSize = 4,
   gap = 15,
-  baseColor = "#c3c3c3",
-  activeColor = "#5227FF",
+  baseColor = '#c3c3c3',
+  activeColor = '#5227FF',
   proximity = 140,
   shockRadius = 250,
   shockStrength = 5,
   resistance = 750,
   returnDuration = 1.5,
-  height = "100vh",
+  height = '100vh',
 }) => {
   return (
     <div className="relative w-full" style={{ minHeight: height }}>

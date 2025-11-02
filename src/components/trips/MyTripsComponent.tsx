@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Calendar,
   Users,
@@ -15,20 +15,20 @@ import {
   Eye,
   AlertTriangle,
   Sparkles,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { format } from "date-fns";
-import { BookingStatus, PaymentStatus } from "@prisma/client";
-import Image from "next/image";
-import { cancelBooking } from "@/actions/booking/actions";
-import { getSuggestedTripsWrapper } from "@/actions/trips/getSuggestedTripsWrapper";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { TripCard } from "./TripCard";
-import { Trip } from "@/types/trips";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { format } from 'date-fns';
+import { BookingStatus, PaymentStatus } from '@prisma/client';
+import Image from 'next/image';
+import { cancelBooking } from '@/actions/booking/actions';
+import { getSuggestedTripsWrapper } from '@/actions/trips/getSuggestedTripsWrapper';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { TripCard } from './TripCard';
+import { Trip } from '@/types/trips';
 import {
   Dialog,
   DialogContent,
@@ -36,7 +36,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface TravelPlan {
   travelPlanId: string;
@@ -79,85 +79,81 @@ interface MyTripsComponentProps {
   user: User;
 }
 
-type FilterStatus = "ALL" | "UPCOMING" | "PAST" | PaymentStatus;
-type SortBy = "ALL_TRIPS" | PaymentStatus;
+type FilterStatus = 'ALL' | 'UPCOMING' | 'PAST' | PaymentStatus;
+type SortBy = 'ALL_TRIPS' | PaymentStatus;
 
 const statusConfig = {
   PENDING: {
-    label: "Pending",
+    label: 'Pending',
     icon: CheckCircle2,
-    color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50",
+    color: 'bg-green-100 text-green-800 border-green-200',
+    bgColor: 'bg-green-50',
   },
   FULLY_PAID: {
-    label: "Fully Paid",
+    label: 'Fully Paid',
     icon: CheckCircle2,
-    color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50",
+    color: 'bg-green-100 text-green-800 border-green-200',
+    bgColor: 'bg-green-50',
   },
   PARTIALLY_PAID: {
-    label: "Partially Paid",
+    label: 'Partially Paid',
     icon: CheckCircle2,
-    color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50",
+    color: 'bg-green-100 text-green-800 border-green-200',
+    bgColor: 'bg-green-50',
   },
   OVERDUE: {
-    label: "Overdue",
+    label: 'Overdue',
     icon: XCircle,
-    color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50",
+    color: 'bg-red-100 text-red-800 border-red-200',
+    bgColor: 'bg-red-50',
   },
   CANCELLED: {
-    label: "Cancelled",
+    label: 'Cancelled',
     icon: XCircle,
-    color: "bg-red-100 text-red-800 border-red-200",
-    bgColor: "bg-red-50",
+    color: 'bg-red-100 text-red-800 border-red-200',
+    bgColor: 'bg-red-50',
   },
   REFUNDED: {
-    label: "Refunded",
+    label: 'Refunded',
     icon: CheckCircle2,
-    color: "bg-green-100 text-green-800 border-green-200",
-    bgColor: "bg-green-50",
+    color: 'bg-green-100 text-green-800 border-green-200',
+    bgColor: 'bg-green-50',
   },
 };
 
 export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
-  const [sortBy, setSortBy] = useState<SortBy>("ALL_TRIPS");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<FilterStatus>('ALL');
+  const [sortBy, setSortBy] = useState<SortBy>('ALL_TRIPS');
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
     const now = new Date();
 
-    let filtered = bookings.filter((booking) => {
+    let filtered = bookings.filter(booking => {
       const matchesSearch =
-        booking.travelPlan.title
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        (booking.travelPlan.destination || "")
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+        booking.travelPlan.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (booking.travelPlan.destination || '').toLowerCase().includes(searchTerm.toLowerCase());
 
       if (!matchesSearch) return false;
 
       // Filter by status
-      if (statusFilter === "ALL") return true;
+      if (statusFilter === 'ALL') return true;
 
       const startDate = new Date(booking.startDate);
 
-      if (statusFilter === "UPCOMING") {
+      if (statusFilter === 'UPCOMING') {
         return (
-          (startDate > now && booking.paymentStatus === "FULLY_PAID") ||
-          (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
+          (startDate > now && booking.paymentStatus === 'FULLY_PAID') ||
+          (startDate > now && booking.paymentStatus === 'PARTIALLY_PAID')
         );
       }
 
-      if (statusFilter === "PAST") {
+      if (statusFilter === 'PAST') {
         return (
           startDate <= now ||
-          booking.paymentStatus === "CANCELLED" ||
-          booking.paymentStatus === "REFUNDED"
+          booking.paymentStatus === 'CANCELLED' ||
+          booking.paymentStatus === 'REFUNDED'
         );
       }
 
@@ -166,8 +162,8 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
     });
 
     // Apply sort filter
-    if (sortBy !== "ALL_TRIPS") {
-      filtered = filtered.filter((booking) => booking.paymentStatus === sortBy);
+    if (sortBy !== 'ALL_TRIPS') {
+      filtered = filtered.filter(booking => booking.paymentStatus === sortBy);
     }
 
     // Sort by date (most recent first)
@@ -181,31 +177,34 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
   // Get status counts for filter buttons
   const statusCounts = useMemo(() => {
     const now = new Date();
-    const counts = bookings.reduce((acc, booking) => {
-      const startDate = new Date(booking.startDate);
+    const counts = bookings.reduce(
+      (acc, booking) => {
+        const startDate = new Date(booking.startDate);
 
-      // Count payment statuses
-      acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
+        // Count payment statuses
+        acc[booking.paymentStatus] = (acc[booking.paymentStatus] || 0) + 1;
 
-      // Count upcoming trips
-      if (
-        (startDate > now && booking.paymentStatus === "FULLY_PAID") ||
-        (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
-      ) {
-        acc.UPCOMING = (acc.UPCOMING || 0) + 1;
-      }
+        // Count upcoming trips
+        if (
+          (startDate > now && booking.paymentStatus === 'FULLY_PAID') ||
+          (startDate > now && booking.paymentStatus === 'PARTIALLY_PAID')
+        ) {
+          acc.UPCOMING = (acc.UPCOMING || 0) + 1;
+        }
 
-      // Count past trips
-      if (
-        startDate <= now ||
-        booking.paymentStatus === "CANCELLED" ||
-        booking.paymentStatus === "REFUNDED"
-      ) {
-        acc.PAST = (acc.PAST || 0) + 1;
-      }
+        // Count past trips
+        if (
+          startDate <= now ||
+          booking.paymentStatus === 'CANCELLED' ||
+          booking.paymentStatus === 'REFUNDED'
+        ) {
+          acc.PAST = (acc.PAST || 0) + 1;
+        }
 
-      return acc;
-    }, {} as Record<string, number>);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       ALL: bookings.length,
@@ -221,11 +220,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
         const startDate = new Date(booking.startDate);
 
         if (
-          (booking.status === "CONFIRMED" && startDate > now) ||
-          (startDate > now && booking.paymentStatus === "PARTIALLY_PAID")
+          (booking.status === 'CONFIRMED' && startDate > now) ||
+          (startDate > now && booking.paymentStatus === 'PARTIALLY_PAID')
         ) {
           acc.upcoming.push(booking);
-        } else if (booking.status === "CONFIRMED" && startDate <= now) {
+        } else if (booking.status === 'CONFIRMED' && startDate <= now) {
           acc.completed.push(booking);
         } else {
           acc.other.push(booking);
@@ -293,9 +292,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
               <div className="bg-purple-100 p-2 rounded-lg">
                 <Filter className="h-5 w-5 text-purple-600" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 font-bricolage">
-                Filter & Search
-              </h2>
+              <h2 className="text-xl font-bold text-gray-900 font-bricolage">Filter & Search</h2>
             </div>
 
             <div className="space-y-6">
@@ -305,7 +302,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                 <Input
                   placeholder="Search trips by destination or title..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-10 w-full h-12 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-purple-500 font-instrument text-base"
                 />
               </div>
@@ -318,41 +315,37 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                     Filter Trips
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(["ALL", "UPCOMING", "PAST"] as FilterStatus[]).map(
-                      (status) => (
-                        <Button
-                          key={status}
-                          variant={
-                            statusFilter === status ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => setStatusFilter(status)}
-                          className={`
+                    {(['ALL', 'UPCOMING', 'PAST'] as FilterStatus[]).map(status => (
+                      <Button
+                        key={status}
+                        variant={statusFilter === status ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setStatusFilter(status)}
+                        className={`
                           ${
                             statusFilter === status
-                              ? "bg-purple-600 text-white border-purple-600 shadow-sm"
-                              : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                              ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                              : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
                           } 
                           rounded-lg font-instrument transition-all duration-200 hover:scale-105
                         `}
+                      >
+                        {status === 'ALL'
+                          ? 'All Trips'
+                          : status === 'UPCOMING'
+                            ? 'Upcoming'
+                            : 'Past'}
+                        <span
+                          className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                            statusFilter === status
+                              ? 'bg-white/20 text-white'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
                         >
-                          {status === "ALL"
-                            ? "All Trips"
-                            : status === "UPCOMING"
-                            ? "Upcoming"
-                            : "Past"}
-                          <span
-                            className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                              statusFilter === status
-                                ? "bg-white/20 text-white"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {statusCounts[status] || 0}
-                          </span>
-                        </Button>
-                      )
-                    )}
+                          {statusCounts[status] || 0}
+                        </span>
+                      </Button>
+                    ))}
                   </div>
                 </div>
 
@@ -364,7 +357,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                   <div className="relative">
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as SortBy)}
+                      onChange={e => setSortBy(e.target.value as SortBy)}
                       className="w-full h-10 border border-gray-300 rounded-lg px-4 pr-10 text-sm font-instrument focus:border-purple-500 focus:ring-purple-500 bg-white appearance-none cursor-pointer"
                     >
                       <option value="ALL_TRIPS">All Trips</option>
@@ -394,7 +387,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
               </div>
 
               {/* Active Filters Summary */}
-              {(searchTerm || statusFilter !== "ALL") && (
+              {(searchTerm || statusFilter !== 'ALL') && (
                 <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="flex items-center gap-2 text-sm text-purple-700 font-instrument">
                     <span className="font-semibold">Active Filters:</span>
@@ -403,18 +396,16 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                         Search: &quot;{searchTerm}&quot;
                       </span>
                     )}
-                    {statusFilter !== "ALL" && (
+                    {statusFilter !== 'ALL' && (
                       <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-xs">
-                        Status:{" "}
-                        {statusConfig[statusFilter as PaymentStatus]?.label ||
-                          statusFilter}
+                        Status: {statusConfig[statusFilter as PaymentStatus]?.label || statusFilter}
                       </span>
                     )}
                   </div>
                   <Button
                     onClick={() => {
-                      setSearchTerm("");
-                      setStatusFilter("ALL");
+                      setSearchTerm('');
+                      setStatusFilter('ALL');
                     }}
                     variant="ghost"
                     size="sm"
@@ -427,15 +418,11 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
 
               {/* Results Summary */}
               <div className="text-sm text-gray-600 font-instrument">
-                Showing{" "}
+                Showing{' '}
                 <span className="font-semibold text-gray-900">
                   {filteredAndSortedBookings.length}
-                </span>{" "}
-                of{" "}
-                <span className="font-semibold text-gray-900">
-                  {bookings.length}
-                </span>{" "}
-                trips
+                </span>{' '}
+                of <span className="font-semibold text-gray-900">{bookings.length}</span> trips
               </div>
             </div>
           </div>
@@ -447,7 +434,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
         {filteredAndSortedBookings.length === 0 ? (
           // Empty State with Suggested Trips
           <EmptyTripState
-            hasFilters={!!(searchTerm || statusFilter !== "ALL")}
+            hasFilters={!!(searchTerm || statusFilter !== 'ALL')}
             searchTerm={searchTerm}
           />
         ) : (
@@ -463,7 +450,7 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
                   Upcoming Trips ({categorizedBookings.upcoming.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {categorizedBookings.upcoming.map((booking) => (
+                  {categorizedBookings.upcoming.map(booking => (
                     <BookingCard key={booking.id} booking={booking} />
                   ))}
                 </div>
@@ -471,23 +458,17 @@ export default function MyTripsComponent({ bookings }: MyTripsComponentProps) {
             )}
 
             {/* Other Trips */}
-            {(categorizedBookings.completed.length > 0 ||
-              categorizedBookings.other.length > 0) && (
+            {(categorizedBookings.completed.length > 0 || categorizedBookings.other.length > 0) && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 font-bricolage mb-6 flex items-center gap-3">
                   <div className="bg-gray-100 p-2 rounded-lg">
                     <Clock className="h-5 w-5 text-gray-600" />
                   </div>
                   Trip History (
-                  {categorizedBookings.completed.length +
-                    categorizedBookings.other.length}
-                  )
+                  {categorizedBookings.completed.length + categorizedBookings.other.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    ...categorizedBookings.completed,
-                    ...categorizedBookings.other,
-                  ].map((booking) => (
+                  {[...categorizedBookings.completed, ...categorizedBookings.other].map(booking => (
                     <BookingCard key={booking.id} booking={booking} />
                   ))}
                 </div>
@@ -509,22 +490,18 @@ function BookingCard({ booking }: { booking: Booking }) {
   const isUpcomingTrip = isUpcoming(booking);
 
   const canCancelBooking = () => {
-    if (booking.paymentStatus !== "FULLY_PAID") return false;
+    if (booking.paymentStatus !== 'FULLY_PAID') return false;
 
     const now = new Date();
     const startDate = new Date(booking.startDate);
-    const daysUntilTrip = Math.ceil(
-      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const daysUntilTrip = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return daysUntilTrip >= 4;
   };
 
   const getDaysUntilTrip = () => {
     const now = new Date();
     const startDate = new Date(booking.startDate);
-    return Math.ceil(
-      (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    return Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   };
 
   const calculateRefundAmount = () => {
@@ -542,18 +519,14 @@ function BookingCard({ booking }: { booking: Booking }) {
     }
 
     return {
-      refundAmount: Math.floor(
-        (booking.amountPaid || booking.totalPrice) * refundPercentage
-      ),
+      refundAmount: Math.floor((booking.amountPaid || booking.totalPrice) * refundPercentage),
       refundPercentage: Math.round(refundPercentage * 100),
     };
   };
 
   const handleOpenCancelModal = () => {
     if (!canCancelBooking()) {
-      toast.error(
-        "Cancellation not allowed less than 4 days prior to the trip"
-      );
+      toast.error('Cancellation not allowed less than 4 days prior to the trip');
       return;
     }
     setShowCancelModal(true);
@@ -567,17 +540,15 @@ function BookingCard({ booking }: { booking: Booking }) {
       const result = await cancelBooking(booking.id);
 
       if (result.success) {
-        toast.success(
-          "Booking cancelled successfully. Refund will be processed shortly."
-        );
+        toast.success('Booking cancelled successfully. Refund will be processed shortly.');
         setShowCancelModal(false);
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to cancel booking");
+        toast.error(result.error || 'Failed to cancel booking');
       }
     } catch (error) {
-      console.error("Frontend: Cancellation error:", error);
-      toast.error("An unexpected error occurred");
+      console.error('Frontend: Cancellation error:', error);
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -587,7 +558,7 @@ function BookingCard({ booking }: { booking: Booking }) {
     <div
       className={`
       bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden
-      ${isUpcomingTrip ? "ring-2 ring-green-200" : ""}
+      ${isUpcomingTrip ? 'ring-2 ring-green-200' : ''}
     `}
     >
       {/* Trip Image */}
@@ -605,9 +576,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 
         {/* Status Badge - Payment Status */}
         <div className="absolute top-4 right-4">
-          <Badge
-            className={`${statusConfig.color} font-instrument flex items-center gap-1`}
-          >
+          <Badge className={`${statusConfig.color} font-instrument flex items-center gap-1`}>
             <StatusIcon className="h-3 w-3" />
             {statusConfig.label}
           </Badge>
@@ -616,9 +585,7 @@ function BookingCard({ booking }: { booking: Booking }) {
         {/* Upcoming Badge */}
         {isUpcomingTrip && (
           <div className="absolute top-4 left-4">
-            <Badge className="bg-green-600 text-white font-instrument">
-              Upcoming
-            </Badge>
+            <Badge className="bg-green-600 text-white font-instrument">Upcoming</Badge>
           </div>
         )}
 
@@ -629,7 +596,7 @@ function BookingCard({ booking }: { booking: Booking }) {
           </h3>
           <div className="flex items-center gap-1 text-white/90 text-sm mt-1">
             <MapPin className="h-3 w-3" />
-            {booking.travelPlan.destination || "Unknown"}
+            {booking.travelPlan.destination || 'Unknown'}
           </div>
         </div>
       </div>
@@ -642,20 +609,18 @@ function BookingCard({ booking }: { booking: Booking }) {
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="h-4 w-4 text-purple-600" />
               <span className="font-instrument">
-                {format(new Date(booking.startDate), "MMM dd")} -{" "}
-                {format(new Date(booking.endDate), "MMM dd")}
+                {format(new Date(booking.startDate), 'MMM dd')} -{' '}
+                {format(new Date(booking.endDate), 'MMM dd')}
               </span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="h-4 w-4 text-purple-600" />
-              <span className="font-instrument">
-                {booking.participants} travelers
-              </span>
+              <span className="font-instrument">{booking.participants} travelers</span>
             </div>
           </div>
 
           {/* Payment Status Info */}
-          {booking.paymentStatus === "PARTIALLY_PAID" && (
+          {booking.paymentStatus === 'PARTIALLY_PAID' && (
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-orange-700 font-medium font-instrument">
@@ -678,11 +643,11 @@ function BookingCard({ booking }: { booking: Booking }) {
                 {formatCurrency(booking.totalPrice)}
               </div>
               <div className="text-xs text-gray-600 font-instrument">
-                {booking.paymentStatus === "FULLY_PAID"
-                  ? "Paid"
-                  : booking.paymentStatus === "PARTIALLY_PAID"
-                  ? `Paid: ${formatCurrency(booking.amountPaid || 0)}`
-                  : "Payment Status: " + statusConfig.label}
+                {booking.paymentStatus === 'FULLY_PAID'
+                  ? 'Paid'
+                  : booking.paymentStatus === 'PARTIALLY_PAID'
+                    ? `Paid: ${formatCurrency(booking.amountPaid || 0)}`
+                    : 'Payment Status: ' + statusConfig.label}
               </div>
             </div>
           </div>
@@ -715,20 +680,18 @@ function BookingCard({ booking }: { booking: Booking }) {
               </Button>
             )}
 
-            {isUpcomingTrip &&
-              !canCancelBooking() &&
-              booking.status === "CONFIRMED" && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled
-                  className="flex-1 border-gray-300 text-gray-400 cursor-not-allowed font-instrument"
-                  title="Cancellation not allowed less than 4 days prior to trip"
-                >
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Cannot Cancel
-                </Button>
-              )}
+            {isUpcomingTrip && !canCancelBooking() && booking.status === 'CONFIRMED' && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled
+                className="flex-1 border-gray-300 text-gray-400 cursor-not-allowed font-instrument"
+                title="Cancellation not allowed less than 4 days prior to trip"
+              >
+                <AlertTriangle className="h-3 w-3 mr-1" />
+                Cannot Cancel
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -742,8 +705,7 @@ function BookingCard({ booking }: { booking: Booking }) {
               Cancel Booking Confirmation
             </DialogTitle>
             <DialogDescription className="text-gray-700 font-instrument">
-              Are you sure you want to cancel this booking? This action cannot
-              be undone.
+              Are you sure you want to cancel this booking? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
@@ -757,15 +719,13 @@ function BookingCard({ booking }: { booking: Booking }) {
                   <strong>Trip:</strong> {booking.travelPlan.title}
                 </div>
                 <div>
-                  <strong>Start Date:</strong>{" "}
-                  {format(new Date(booking.startDate), "MMM dd, yyyy")}
+                  <strong>Start Date:</strong> {format(new Date(booking.startDate), 'MMM dd, yyyy')}
                 </div>
                 <div>
                   <strong>Days until trip:</strong> {getDaysUntilTrip()} days
                 </div>
                 <div>
-                  <strong>Total Amount:</strong>{" "}
-                  {formatCurrency(booking.totalPrice)}
+                  <strong>Total Amount:</strong> {formatCurrency(booking.totalPrice)}
                 </div>
               </div>
             </div>
@@ -780,16 +740,15 @@ function BookingCard({ booking }: { booking: Booking }) {
                   <span>
                     <strong>
                       {calculateRefundAmount().refundPercentage === 100
-                        ? "Full refund"
+                        ? 'Full refund'
                         : `${calculateRefundAmount().refundPercentage}% refund`}
                       :
-                    </strong>{" "}
+                    </strong>{' '}
                     {formatCurrency(calculateRefundAmount().refundAmount)}
                   </span>
                 </div>
                 <div className="mt-1 text-green-700">
-                  The refund amount will be processed shortly after
-                  cancellation.
+                  The refund amount will be processed shortly after cancellation.
                 </div>
               </div>
             </div>
@@ -830,30 +789,24 @@ function BookingCard({ booking }: { booking: Booking }) {
 }
 
 function getStatusConfig(status: PaymentStatus) {
-  return statusConfig[status] || "";
+  return statusConfig[status] || '';
 }
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
   }).format(amount);
 }
 
 function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
-  return booking.paymentStatus === "FULLY_PAID" && startDate > now;
+  return booking.paymentStatus === 'FULLY_PAID' && startDate > now;
 }
 
 // Empty State Component for My Trips
-function EmptyTripState({
-  hasFilters,
-  searchTerm,
-}: {
-  hasFilters: boolean;
-  searchTerm: string;
-}) {
+function EmptyTripState({ hasFilters, searchTerm }: { hasFilters: boolean; searchTerm: string }) {
   const [suggestedTrips, setSuggestedTrips] = useState<Trip[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
@@ -866,7 +819,7 @@ function EmptyTripState({
         const result = await getSuggestedTripsWrapper({ searchTerm }, 6);
         if (result.trips) {
           // Transform the raw trip data to match Trip type
-          const transformedTrips: Trip[] = result.trips.map((trip) => ({
+          const transformedTrips: Trip[] = result.trips.map(trip => ({
             ...trip,
             vibes: trip.filters || [],
             tripImage: `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`,
@@ -875,14 +828,12 @@ function EmptyTripState({
             averageRating: trip.averageRating || 0,
             reviewCount: trip.reviewCount || 0,
             createdAt:
-              typeof trip.createdAt === "string"
-                ? trip.createdAt
-                : trip.createdAt.toISOString(),
+              typeof trip.createdAt === 'string' ? trip.createdAt : trip.createdAt.toISOString(),
           }));
           setSuggestedTrips(transformedTrips);
         }
       } catch (error) {
-        console.error("Error fetching suggested trips:", error);
+        console.error('Error fetching suggested trips:', error);
       } finally {
         setIsLoadingSuggestions(false);
       }
@@ -899,14 +850,14 @@ function EmptyTripState({
           <Plane className="h-12 w-12 text-gray-400" />
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2 font-bricolage">
-          {hasFilters ? "No trips found" : "No trips yet"}
+          {hasFilters ? 'No trips found' : 'No trips yet'}
         </h3>
         <p className="text-gray-600 font-instrument mb-6">
           {hasFilters
             ? suggestedTrips.length > 0
-              ? "No matching trips in your bookings, but here are some similar adventures you might like!"
-              : "Try adjusting your search or filters"
-            : "Start your adventure by exploring our amazing destinations"}
+              ? 'No matching trips in your bookings, but here are some similar adventures you might like!'
+              : 'Try adjusting your search or filters'
+            : 'Start your adventure by exploring our amazing destinations'}
         </p>
         {!hasFilters && (
           <Link href="/trips">
@@ -931,8 +882,8 @@ function EmptyTripState({
                   Discover Similar Adventures
                 </h3>
                 <p className="text-gray-600 font-instrument text-sm">
-                  Since you&apos;re looking for &quot;{searchTerm}&quot;, here
-                  are some trips you might enjoy
+                  Since you&apos;re looking for &quot;{searchTerm}&quot;, here are some trips you
+                  might enjoy
                 </p>
               </div>
             </div>
@@ -958,7 +909,7 @@ function EmptyTripState({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suggestedTrips.map((trip) => (
+              {suggestedTrips.map(trip => (
                 <div key={trip.travelPlanId} className="relative">
                   <div className="absolute -top-2 -right-2 z-10">
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">

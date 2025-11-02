@@ -1,13 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { getUserProfile, getUserBookings } from "@/actions/user/action";
-import {
-  getPendingReviewBookings,
-  getUserReviews,
-  submitReview,
-} from "@/actions/reviews/action";
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { getUserProfile, getUserBookings } from '@/actions/user/action';
+import { getPendingReviewBookings, getUserReviews, submitReview } from '@/actions/reviews/action';
 import {
   UserProfile,
   Booking,
@@ -15,15 +11,15 @@ import {
   PendingReview,
   ReviewFormState,
   ReviewStats,
-} from "@/types/dashboard";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { NavigationTabs } from "@/components/dashboard/NavigationTabs";
-import { StatsCards } from "@/components/dashboard/StatsCards";
-import { ProfileTab } from "@/components/dashboard/ProfileTab";
-import { BookingsTab } from "@/components/dashboard/BookingsTab";
-import { ReviewsTab } from "@/components/dashboard/reviews/ReviewsTab";
-import { MessagesTab } from "@/components/dashboard/MessagesTab";
-import { LoadingAndErrorStates } from "@/components/dashboard/LoadingAndErrorStates";
+} from '@/types/dashboard';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { NavigationTabs } from '@/components/dashboard/NavigationTabs';
+import { StatsCards } from '@/components/dashboard/StatsCards';
+import { ProfileTab } from '@/components/dashboard/ProfileTab';
+import { BookingsTab } from '@/components/dashboard/BookingsTab';
+import { ReviewsTab } from '@/components/dashboard/reviews/ReviewsTab';
+import { MessagesTab } from '@/components/dashboard/MessagesTab';
+import { LoadingAndErrorStates } from '@/components/dashboard/LoadingAndErrorStates';
 
 export default function UserDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -39,17 +35,17 @@ export default function UserDashboard() {
     averageRating: 0,
   });
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({
-    bookingId: "",
+    bookingId: '',
     rating: 5,
-    comment: "",
+    comment: '',
     isSubmitting: false,
     success: null,
     error: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("profile");
-  const [bookingFilter, setBookingFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState('profile');
+  const [bookingFilter, setBookingFilter] = useState('all');
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -65,16 +61,14 @@ export default function UserDashboard() {
           }
 
           if (!profileResponse.user) {
-            setError("User profile not found");
+            setError('User profile not found');
             return;
           }
 
           setProfile(profileResponse.user || null);
 
           // Fetch bookings
-          const bookingsResponse = await getUserBookings(
-            profileResponse.user.id
-          );
+          const bookingsResponse = await getUserBookings(profileResponse.user.id);
           if (bookingsResponse.error) {
             setError(bookingsResponse.error);
             return;
@@ -83,7 +77,7 @@ export default function UserDashboard() {
         }
       } catch (err) {
         console.error(err);
-        setError("Failed to fetch user data");
+        setError('Failed to fetch user data');
       } finally {
         setLoading(false);
       }
@@ -95,7 +89,7 @@ export default function UserDashboard() {
   // Fetch review data when active tab changes
   useEffect(() => {
     const fetchReviewData = async () => {
-      if (activeTab === "reviews" && profile?.id) {
+      if (activeTab === 'reviews' && profile?.id) {
         try {
           // Fetch reviews user has already submitted
           const userReviewsRes = await getUserReviews(profile.id);
@@ -113,7 +107,7 @@ export default function UserDashboard() {
             setPendingReviews(pendingReviewsRes.bookings || []);
           }
         } catch (err) {
-          console.error("Failed to load review data:", err);
+          console.error('Failed to load review data:', err);
         }
       }
     };
@@ -123,14 +117,14 @@ export default function UserDashboard() {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    setReviewForm((prev) => ({
+    setReviewForm(prev => ({
       ...prev,
       isSubmitting: true,
       error: null,
       success: null,
     }));
     try {
-      if (!profile?.id) throw new Error("User not found");
+      if (!profile?.id) throw new Error('User not found');
       const res = await submitReview({
         userId: profile.id,
         bookingId: reviewForm.bookingId,
@@ -139,11 +133,11 @@ export default function UserDashboard() {
       });
       if (res.success) {
         setReviewForm({
-          bookingId: "",
+          bookingId: '',
           rating: 5,
-          comment: "",
+          comment: '',
           isSubmitting: false,
-          success: "Review submitted successfully!",
+          success: 'Review submitted successfully!',
           error: null,
         });
         // Refresh reviews and pending reviews
@@ -162,21 +156,21 @@ export default function UserDashboard() {
           }
         }
       } else {
-        setReviewForm((prev) => ({
+        setReviewForm(prev => ({
           ...prev,
           isSubmitting: false,
-          error: res.message || "Failed to submit review",
+          error: res.message || 'Failed to submit review',
         }));
       }
     } catch (err: unknown) {
-      let errorMsg = "Failed to submit review";
-      if (err && typeof err === "object" && "message" in err) {
+      let errorMsg = 'Failed to submit review';
+      if (err && typeof err === 'object' && 'message' in err) {
         const maybeError = err as { message?: unknown };
-        if (typeof maybeError.message === "string") {
+        if (typeof maybeError.message === 'string') {
           errorMsg = maybeError.message;
         }
       }
-      setReviewForm((prev) => ({
+      setReviewForm(prev => ({
         ...prev,
         isSubmitting: false,
         error: errorMsg,
@@ -204,14 +198,11 @@ export default function UserDashboard() {
 
         {/* Tabbed Content */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          {activeTab === "profile" && (
-            <ProfileTab
-              profile={profile}
-              onProfileUpdate={handleProfileUpdate}
-            />
+          {activeTab === 'profile' && (
+            <ProfileTab profile={profile} onProfileUpdate={handleProfileUpdate} />
           )}
 
-          {activeTab === "bookings" && (
+          {activeTab === 'bookings' && (
             <BookingsTab
               bookings={bookings}
               bookingFilter={bookingFilter}
@@ -219,7 +210,7 @@ export default function UserDashboard() {
             />
           )}
 
-          {activeTab === "reviews" && (
+          {activeTab === 'reviews' && (
             <ReviewsTab
               pendingReviews={pendingReviews}
               userReviews={userReviews}
@@ -229,9 +220,7 @@ export default function UserDashboard() {
               handleSubmitReview={handleSubmitReview}
             />
           )}
-          {activeTab === "messages" && profile && (
-            <MessagesTab userId={profile.id} />
-          )}
+          {activeTab === 'messages' && profile && <MessagesTab userId={profile.id} />}
         </div>
       </div>
     </div>

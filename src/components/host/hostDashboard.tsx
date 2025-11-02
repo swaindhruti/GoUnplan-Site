@@ -1,13 +1,13 @@
-"use client";
-import { useEffect, useState } from "react";
-import { getAllTrips, getRevenueAnalytics } from "@/actions/host/action";
-import { TripSection } from "./components/TripSection";
-import { ProfileSection } from "./components/ProfileSection";
-import { BookingsSection } from "./components/BookingsSection";
-import { BookingsHistory } from "./components/BookingsHistory";
-import { EarningsSection } from "./components/EarningsSection";
-import { MessageSection } from "./components/MessageSection";
-import { HostData, RevenueAnalytics, Trip, TabType } from "./types";
+'use client';
+import { useEffect, useState } from 'react';
+import { getAllTrips, getRevenueAnalytics } from '@/actions/host/action';
+import { TripSection } from './components/TripSection';
+import { ProfileSection } from './components/ProfileSection';
+import { BookingsSection } from './components/BookingsSection';
+import { BookingsHistory } from './components/BookingsHistory';
+import { EarningsSection } from './components/EarningsSection';
+import { MessageSection } from './components/MessageSection';
+import { HostData, RevenueAnalytics, Trip, TabType } from './types';
 
 type HostLandingProps = {
   hostData: HostData;
@@ -18,7 +18,7 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("trips");
+  const [activeTab, setActiveTab] = useState<TabType>('trips');
   const [revenueData, setRevenueData] = useState<RevenueAnalytics | null>(null);
   const [revenueLoading, setRevenueLoading] = useState(false);
   const [revenueError, setRevenueError] = useState<string | null>(null);
@@ -29,14 +29,14 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
       try {
         const response = await getAllTrips();
 
-        if ("error" in response) {
+        if ('error' in response) {
           setError(response?.error || null);
         } else {
           setTrips(response?.trips as Trip[]);
         }
       } catch (err) {
-        console.error("Error fetching trips:", err);
-        setError("Something went wrong while fetching trips.");
+        console.error('Error fetching trips:', err);
+        setError('Something went wrong while fetching trips.');
       } finally {
         setLoading(false);
       }
@@ -46,21 +46,21 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
 
   // Load revenue data when earnings tab is selected
   useEffect(() => {
-    if (activeTab === "earnings") {
+    if (activeTab === 'earnings') {
       const fetchRevenueData = async () => {
         setRevenueLoading(true);
         setRevenueError(null);
 
         try {
           const response = await getRevenueAnalytics();
-          if ("error" in response) {
+          if ('error' in response) {
             setRevenueError(response.error as string);
           } else if (response.success) {
             setRevenueData(response.revenueData as RevenueAnalytics);
           }
         } catch (err) {
-          console.error("Error fetching revenue analytics:", err);
-          setRevenueError("Failed to load revenue data");
+          console.error('Error fetching revenue analytics:', err);
+          setRevenueError('Failed to load revenue data');
         } finally {
           setRevenueLoading(false);
         }
@@ -75,9 +75,7 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <span className="text-gray-600 font-instrument">
-            Loading host dashboard...
-          </span>
+          <span className="text-gray-600 font-instrument">Loading host dashboard...</span>
         </div>
       </div>
     );
@@ -154,42 +152,42 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
           <div className="flex justify-center space-x-2 overflow-x-auto py-4">
             {[
               {
-                id: "trips",
-                label: "TRIPS",
-                icon: "🗺️",
-                description: "Manage Experiences",
+                id: 'trips',
+                label: 'TRIPS',
+                icon: '🗺️',
+                description: 'Manage Experiences',
               },
               {
-                id: "profile",
-                label: "PROFILE",
-                icon: "👤",
-                description: "Personal Settings",
+                id: 'profile',
+                label: 'PROFILE',
+                icon: '👤',
+                description: 'Personal Settings',
               },
               {
-                id: "bookings",
-                label: "BOOKINGS",
-                icon: "📅",
-                description: "Guest Management",
+                id: 'bookings',
+                label: 'BOOKINGS',
+                icon: '📅',
+                description: 'Guest Management',
               },
               {
-                id: "bookingsHistory",
-                label: "HISTORY",
-                icon: "📋",
-                description: "All Bookings",
+                id: 'bookingsHistory',
+                label: 'HISTORY',
+                icon: '📋',
+                description: 'All Bookings',
               },
               {
-                id: "earnings",
-                label: "EARNINGS",
-                icon: "💰",
-                description: "Revenue Analytics",
+                id: 'earnings',
+                label: 'EARNINGS',
+                icon: '💰',
+                description: 'Revenue Analytics',
               },
               {
-                id: "messages",
-                label: "MESSAGES",
-                icon: "💬",
-                description: "Communication",
+                id: 'messages',
+                label: 'MESSAGES',
+                icon: '💬',
+                description: 'Communication',
               },
-            ].map((tab) => (
+            ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
@@ -197,8 +195,8 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
                   px-6 py-3 rounded-full font-instrument font-semibold text-sm transition-all duration-200
                   ${
                     activeTab === tab.id
-                      ? "bg-purple-600 text-white"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }
                 `}
               >
@@ -214,17 +212,15 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {activeTab === "trips" && (
-          <TripSection trips={trips} loading={loading} error={error} />
-        )}
+        {activeTab === 'trips' && <TripSection trips={trips} loading={loading} error={error} />}
 
-        {activeTab === "profile" && <ProfileSection hostData={hostData} />}
+        {activeTab === 'profile' && <ProfileSection hostData={hostData} />}
 
-        {activeTab === "bookings" && <BookingsSection />}
+        {activeTab === 'bookings' && <BookingsSection />}
 
-        {activeTab === "bookingsHistory" && <BookingsHistory />}
+        {activeTab === 'bookingsHistory' && <BookingsHistory />}
 
-        {activeTab === "earnings" && (
+        {activeTab === 'earnings' && (
           <EarningsSection
             revenueData={revenueData}
             revenueLoading={revenueLoading}
@@ -232,9 +228,7 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
           />
         )}
 
-        {activeTab === "messages" && (
-          <MessageSection userSession={hostData.id || ""} />
-        )}
+        {activeTab === 'messages' && <MessageSection userSession={hostData.id || ''} />}
       </div>
     </div>
   );

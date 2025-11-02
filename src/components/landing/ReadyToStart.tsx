@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { PrimaryButton } from "./common";
-import { useRouter } from "next/navigation";
+import Image from 'next/image';
+import { PrimaryButton } from './common';
+import { useRouter } from 'next/navigation';
 
 export const ReadyToStart = () => {
   const router = useRouter();
@@ -17,13 +17,13 @@ export const ReadyToStart = () => {
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 mb-6 sm:mb-8 font-instrument leading-relaxed max-w-lg lg:max-w-none mx-auto lg:mx-0">
-            Let us help you create the perfect journey. Our travel experts are
-            ready to craft your dream vacation.
+            Let us help you create the perfect journey. Our travel experts are ready to craft your
+            dream vacation.
           </p>
 
           <div
             onClick={() => {
-              router.push("/trips");
+              router.push('/trips');
             }}
             className="flex justify-center lg:justify-start"
           >

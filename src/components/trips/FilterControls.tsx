@@ -1,4 +1,4 @@
-import { Filter, ChevronUp, ChevronDown, X } from "lucide-react";
+import { Filter, ChevronUp, ChevronDown, X } from 'lucide-react';
 
 interface FilterControlsProps {
   showFilters: boolean;
@@ -24,8 +24,8 @@ export const FilterControls = ({
             rounded-2xl flex items-center gap-3 transition-all duration-300
             ${
               showFilters
-                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105"
-                : "bg-white/80 backdrop-blur-sm border border-white/40 text-gray-700 hover:bg-white hover:shadow-lg hover:scale-105"
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
+                : 'bg-white/80 backdrop-blur-sm border border-white/40 text-gray-700 hover:bg-white hover:shadow-lg hover:scale-105'
             }
           `}
           onClick={() => setShowFilters(!showFilters)}
@@ -61,12 +61,8 @@ export const FilterControls = ({
       </div>
 
       <div className="bg-white/80 backdrop-blur-sm border border-white/40 px-6 py-4 rounded-2xl font-semibold text-gray-700 shadow-lg">
-        <span className="text-2xl font-bold text-purple-600 mr-2">
-          {filteredTripsCount}
-        </span>
-        <span className="tracking-wide">
-          {filteredTripsCount === 1 ? "trip" : "trips"} found
-        </span>
+        <span className="text-2xl font-bold text-purple-600 mr-2">{filteredTripsCount}</span>
+        <span className="tracking-wide">{filteredTripsCount === 1 ? 'trip' : 'trips'} found</span>
       </div>
     </div>
   );

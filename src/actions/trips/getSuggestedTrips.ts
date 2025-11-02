@@ -1,4 +1,4 @@
-import { prisma, requireUser } from "@/lib/shared";
+import { prisma, requireUser } from '@/lib/shared';
 
 interface SearchContext {
   searchTerm?: string;
@@ -34,18 +34,15 @@ interface TripWithScore extends TripData {
   score: number;
 }
 
-export const getSuggestedTrips = async (
-  context: SearchContext,
-  limit: number = 8
-) => {
+export const getSuggestedTrips = async (context: SearchContext, limit: number = 8) => {
   const session = await requireUser();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     // Get all active trips with additional data for scoring
     const allTrips = await prisma.travelPlans.findMany({
       where: {
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: {
         travelPlanId: true,
@@ -65,7 +62,7 @@ export const getSuggestedTrips = async (
         reviewCount: true,
         bookings: {
           where: {
-            status: "CONFIRMED",
+            status: 'CONFIRMED',
             createdAt: {
               gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Last 90 days
             },
@@ -76,12 +73,12 @@ export const getSuggestedTrips = async (
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     // Calculate similarity scores for each trip
-    const tripsWithScores: TripWithScore[] = allTrips.map((trip) => ({
+    const tripsWithScores: TripWithScore[] = allTrips.map(trip => ({
       ...trip,
       score: calculateSimilarityScore(trip, context),
     }));
@@ -103,8 +100,8 @@ export const getSuggestedTrips = async (
       totalFound: tripsWithScores.length,
     };
   } catch (error) {
-    console.error("Error fetching suggested trips:", error);
-    return { error: "Failed to fetch suggested trips" };
+    console.error('Error fetching suggested trips:', error);
+    return { error: 'Failed to fetch suggested trips' };
   }
 };
 
@@ -131,7 +128,7 @@ function calculateSimilarityScore(trip: TripData, context: SearchContext): numbe
 
 function calculateLocationScore(trip: TripData, context: SearchContext): number {
   let score = 0;
-  const searchTerm = context.searchTerm?.toLowerCase() || "";
+  const searchTerm = context.searchTerm?.toLowerCase() || '';
 
   if (!searchTerm) return score;
 
@@ -146,22 +143,14 @@ function calculateLocationScore(trip: TripData, context: SearchContext): number 
   if (trip.description.toLowerCase().includes(searchTerm)) score += 5;
 
   // Filter-based location matches
-  if (
-    context.selectedCities?.some((city) =>
-      trip.city.toLowerCase().includes(city.toLowerCase())
-    )
-  )
+  if (context.selectedCities?.some(city => trip.city.toLowerCase().includes(city.toLowerCase())))
     score += 20;
 
-  if (
-    context.selectedStates?.some((state) =>
-      trip.state.toLowerCase().includes(state.toLowerCase())
-    )
-  )
+  if (context.selectedStates?.some(state => trip.state.toLowerCase().includes(state.toLowerCase())))
     score += 15;
 
   if (
-    context.selectedCountries?.some((country) =>
+    context.selectedCountries?.some(country =>
       trip.country.toLowerCase().includes(country.toLowerCase())
     )
   )
@@ -177,7 +166,7 @@ function calculateVibeScore(trip: TripData, context: SearchContext): number {
   if (context.vibeFilter && context.vibeFilter.length > 0) {
     const matchingVibes = trip.filters.filter((filter: string) =>
       context.vibeFilter!.some(
-        (vibe) =>
+        vibe =>
           filter.toLowerCase().includes(vibe.toLowerCase()) ||
           vibe.toLowerCase().includes(filter.toLowerCase())
       )
@@ -186,31 +175,20 @@ function calculateVibeScore(trip: TripData, context: SearchContext): number {
   }
 
   // Keyword matching in description for vibes
-  const searchTerm = context.searchTerm?.toLowerCase() || "";
+  const searchTerm = context.searchTerm?.toLowerCase() || '';
   if (searchTerm) {
     const vibeKeywords = {
-      adventure: ["adventure", "trek", "hike", "climb", "extreme", "thrill"],
-      cultural: [
-        "culture",
-        "temple",
-        "museum",
-        "heritage",
-        "history",
-        "tradition",
-      ],
-      nature: ["nature", "forest", "mountain", "wildlife", "national park"],
-      relaxation: ["beach", "relax", "spa", "peaceful", "serene", "calm"],
-      luxury: ["luxury", "premium", "five star", "resort", "villa"],
-      budget: ["budget", "cheap", "affordable", "backpack", "hostel"],
+      adventure: ['adventure', 'trek', 'hike', 'climb', 'extreme', 'thrill'],
+      cultural: ['culture', 'temple', 'museum', 'heritage', 'history', 'tradition'],
+      nature: ['nature', 'forest', 'mountain', 'wildlife', 'national park'],
+      relaxation: ['beach', 'relax', 'spa', 'peaceful', 'serene', 'calm'],
+      luxury: ['luxury', 'premium', 'five star', 'resort', 'villa'],
+      budget: ['budget', 'cheap', 'affordable', 'backpack', 'hostel'],
     };
 
     Object.entries(vibeKeywords).forEach(([vibe, keywords]) => {
-      if (keywords.some((keyword) => searchTerm.includes(keyword))) {
-        if (
-          trip.filters.some((filter: string) =>
-            filter.toLowerCase().includes(vibe)
-          )
-        ) {
+      if (keywords.some(keyword => searchTerm.includes(keyword))) {
+        if (trip.filters.some((filter: string) => filter.toLowerCase().includes(vibe))) {
           score += 15;
         }
       }
@@ -220,33 +198,25 @@ function calculateVibeScore(trip: TripData, context: SearchContext): number {
   return Math.min(score, 25); // Cap at 25 points
 }
 
-function calculateCharacteristicsScore(
-  trip: TripData,
-  context: SearchContext
-): number {
+function calculateCharacteristicsScore(trip: TripData, context: SearchContext): number {
   let score = 0;
 
   // Price range similarity
   if (context.priceRange && context.priceRange[0] > 0) {
     const [minPrice, maxPrice] = context.priceRange;
     const avgSearchPrice = (minPrice + maxPrice) / 2;
-    const priceDifference =
-      Math.abs(trip.price - avgSearchPrice) / avgSearchPrice;
+    const priceDifference = Math.abs(trip.price - avgSearchPrice) / avgSearchPrice;
 
-    if (priceDifference <= 0.3) score += 10; // Within 30%
+    if (priceDifference <= 0.3)
+      score += 10; // Within 30%
     else if (priceDifference <= 0.5) score += 5; // Within 50%
   }
 
   // Duration preferences (if we can infer from search)
-  const searchTerm = context.searchTerm?.toLowerCase() || "";
-  if (searchTerm.includes("weekend") && trip.noOfDays <= 3) score += 10;
-  else if (
-    searchTerm.includes("week") &&
-    trip.noOfDays >= 5 &&
-    trip.noOfDays <= 10
-  )
-    score += 10;
-  else if (searchTerm.includes("long") && trip.noOfDays > 10) score += 10;
+  const searchTerm = context.searchTerm?.toLowerCase() || '';
+  if (searchTerm.includes('weekend') && trip.noOfDays <= 3) score += 10;
+  else if (searchTerm.includes('week') && trip.noOfDays >= 5 && trip.noOfDays <= 10) score += 10;
+  else if (searchTerm.includes('long') && trip.noOfDays > 10) score += 10;
 
   return Math.min(score, 20); // Cap at 20 points
 }
@@ -275,17 +245,17 @@ function calculatePreferencesScore(trip: TripData, context: SearchContext): numb
     // This would require adding traveller type to trip filters
     // For now, we'll use description matching
     const description = trip.description.toLowerCase();
-    context.travellerFilter.forEach((type) => {
+    context.travellerFilter.forEach(type => {
       const typeKeywords = {
-        Solo: ["solo", "individual", "self"],
-        Couple: ["couple", "romantic", "honeymoon"],
-        Family: ["family", "kids", "children"],
-        Friends: ["friends", "group", "gang"],
-        Business: ["business", "corporate", "professional"],
+        Solo: ['solo', 'individual', 'self'],
+        Couple: ['couple', 'romantic', 'honeymoon'],
+        Family: ['family', 'kids', 'children'],
+        Friends: ['friends', 'group', 'gang'],
+        Business: ['business', 'corporate', 'professional'],
       };
 
       const keywords = typeKeywords[type as keyof typeof typeKeywords] || [];
-      if (keywords.some((keyword) => description.includes(keyword))) {
+      if (keywords.some(keyword => description.includes(keyword))) {
         score += 3;
       }
     });

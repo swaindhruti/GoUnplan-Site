@@ -1,20 +1,16 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { requireSupport, requireAuth } from "@/lib/roleGaurd";
-import {
-  CreateTicketData,
-  UpdateTicketData,
-  CreateTicketMessageData,
-} from "@/types/support";
+import prisma from '@/lib/prisma';
+import { requireSupport, requireAuth } from '@/lib/roleGaurd';
+import { CreateTicketData, UpdateTicketData, CreateTicketMessageData } from '@/types/support';
 
 export const getAllSupportStaff = async () => {
   const session = await requireSupport();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const supportStaff = await prisma.user.findMany({
-      where: { role: "SUPPORT" },
+      where: { role: 'SUPPORT' },
       select: {
         id: true,
         name: true,
@@ -31,18 +27,18 @@ export const getAllSupportStaff = async () => {
       },
     });
 
-    const staffWithStats = supportStaff.map((staff) => ({
+    const staffWithStats = supportStaff.map(staff => ({
       ...staff,
       ticketCount: staff.assignedTickets.length,
       openTickets: staff.assignedTickets.filter(
-        (t) => t.status === "OPEN" || t.status === "IN_PROGRESS"
+        t => t.status === 'OPEN' || t.status === 'IN_PROGRESS'
       ).length,
     }));
 
     return { supportStaff: staffWithStats };
   } catch (error) {
-    console.error("Error fetching support staff:", error);
-    return { error: "Failed to fetch support staff" };
+    console.error('Error fetching support staff:', error);
+    return { error: 'Failed to fetch support staff' };
   }
 };
 
@@ -51,7 +47,7 @@ export const getAllTickets = async () => {
     const session = await requireSupport();
 
     if (!session) {
-      return { error: "Unauthorized" };
+      return { error: 'Unauthorized' };
     }
 
     const tickets = await prisma.supportTicket.findMany({
@@ -87,7 +83,7 @@ export const getAllTickets = async () => {
         messages: {
           take: 1,
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
           include: {
             sender: {
@@ -100,20 +96,20 @@ export const getAllTickets = async () => {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return { tickets };
   } catch (error) {
-    console.error("🚨 getAllTickets - Error:", error);
-    return { error: "Failed to fetch tickets" };
+    console.error('🚨 getAllTickets - Error:', error);
+    return { error: 'Failed to fetch tickets' };
   }
 };
 
 export const getTicketById = async (ticketId: string) => {
   const session = await requireAuth();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const ticket = await prisma.supportTicket.findUnique({
@@ -160,31 +156,31 @@ export const getTicketById = async (ticketId: string) => {
             },
           },
           orderBy: {
-            createdAt: "asc",
+            createdAt: 'asc',
           },
         },
       },
     });
 
     if (!ticket) {
-      return { error: "Ticket not found" };
+      return { error: 'Ticket not found' };
     }
 
     // Check if user can access this ticket
-    if (session.user.role === "USER" && ticket.userId !== session.user.id) {
-      return { error: "Access denied" };
+    if (session.user.role === 'USER' && ticket.userId !== session.user.id) {
+      return { error: 'Access denied' };
     }
 
     return { ticket };
   } catch (error) {
-    console.error("Error fetching ticket:", error);
-    return { error: "Failed to fetch ticket" };
+    console.error('Error fetching ticket:', error);
+    return { error: 'Failed to fetch ticket' };
   }
 };
 
 export const createTicket = async (data: CreateTicketData) => {
   const session = await requireAuth();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const ticket = await prisma.supportTicket.create({
@@ -223,22 +219,19 @@ export const createTicket = async (data: CreateTicketData) => {
 
     return { success: true, ticket };
   } catch (error) {
-    console.error("Error creating ticket:", error);
-    return { error: "Failed to create ticket" };
+    console.error('Error creating ticket:', error);
+    return { error: 'Failed to create ticket' };
   }
 };
 
-export const updateTicket = async (
-  ticketId: string,
-  data: UpdateTicketData
-) => {
+export const updateTicket = async (ticketId: string, data: UpdateTicketData) => {
   const session = await requireSupport();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const updateData: Partial<typeof data & { closedAt?: Date }> = { ...data };
 
-    if (data.status === "CLOSED" || data.status === "RESOLVED") {
+    if (data.status === 'CLOSED' || data.status === 'RESOLVED') {
       updateData.closedAt = new Date();
     }
 
@@ -266,21 +259,21 @@ export const updateTicket = async (
 
     return { success: true, ticket };
   } catch (error) {
-    console.error("Error updating ticket:", error);
-    return { error: "Failed to update ticket" };
+    console.error('Error updating ticket:', error);
+    return { error: 'Failed to update ticket' };
   }
 };
 
 export const assignTicket = async (ticketId: string, assigneeId: string) => {
   const session = await requireSupport();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const ticket = await prisma.supportTicket.update({
       where: { id: ticketId },
       data: {
         assignedTo: assigneeId,
-        status: "IN_PROGRESS",
+        status: 'IN_PROGRESS',
       },
       include: {
         assignee: {
@@ -295,14 +288,14 @@ export const assignTicket = async (ticketId: string, assigneeId: string) => {
 
     return { success: true, ticket };
   } catch (error) {
-    console.error("Error assigning ticket:", error);
-    return { error: "Failed to assign ticket" };
+    console.error('Error assigning ticket:', error);
+    return { error: 'Failed to assign ticket' };
   }
 };
 
 export const addTicketMessage = async (data: CreateTicketMessageData) => {
   const session = await requireAuth();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     // Verify the user can access this ticket
@@ -312,18 +305,18 @@ export const addTicketMessage = async (data: CreateTicketMessageData) => {
     });
 
     if (!ticket) {
-      return { error: "Ticket not found" };
+      return { error: 'Ticket not found' };
     }
 
     // Check access permissions
     const canAccess =
-      session.user.role === "ADMIN" ||
-      session.user.role === "SUPPORT" ||
+      session.user.role === 'ADMIN' ||
+      session.user.role === 'SUPPORT' ||
       ticket.userId === session.user.id ||
       ticket.assignedTo === session.user.id;
 
     if (!canAccess) {
-      return { error: "Access denied" };
+      return { error: 'Access denied' };
     }
 
     const message = await prisma.ticketMessage.create({
@@ -355,14 +348,14 @@ export const addTicketMessage = async (data: CreateTicketMessageData) => {
 
     return { success: true, message };
   } catch (error) {
-    console.error("Error adding ticket message:", error);
-    return { error: "Failed to add message" };
+    console.error('Error adding ticket message:', error);
+    return { error: 'Failed to add message' };
   }
 };
 
 export const getUserTickets = async () => {
   const session = await requireAuth();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const tickets = await prisma.supportTicket.findMany({
@@ -391,32 +384,32 @@ export const getUserTickets = async () => {
         messages: {
           take: 1,
           orderBy: {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return { tickets };
   } catch (error) {
-    console.error("Error fetching user tickets:", error);
-    return { error: "Failed to fetch tickets" };
+    console.error('Error fetching user tickets:', error);
+    return { error: 'Failed to fetch tickets' };
   }
 };
 
 export const getUserBookingsForSupport = async () => {
   const session = await requireAuth();
-  if (!session) return { error: "Unauthorized" };
+  if (!session) return { error: 'Unauthorized' };
 
   try {
     const bookings = await prisma.booking.findMany({
       where: {
         userId: session.user.id,
         status: {
-          in: ["CONFIRMED", "PENDING"],
+          in: ['CONFIRMED', 'PENDING'],
         },
       },
       include: {
@@ -430,14 +423,14 @@ export const getUserBookingsForSupport = async () => {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return { bookings };
   } catch (error) {
-    console.error("Error fetching user bookings:", error);
-    return { error: "Failed to fetch bookings" };
+    console.error('Error fetching user bookings:', error);
+    return { error: 'Failed to fetch bookings' };
   }
 };
 
@@ -446,26 +439,25 @@ export const getTicketStats = async () => {
     const session = await requireSupport();
 
     if (!session) {
-      return { error: "Unauthorized" };
+      return { error: 'Unauthorized' };
     }
 
-    const [totalTickets, openTickets, inProgressTickets, resolvedTickets] =
-      await Promise.all([
-        prisma.supportTicket.count(),
-        prisma.supportTicket.count({ where: { status: "OPEN" } }),
-        prisma.supportTicket.count({ where: { status: "IN_PROGRESS" } }),
-        prisma.supportTicket.count({ where: { status: "RESOLVED" } }),
-      ]);
+    const [totalTickets, openTickets, inProgressTickets, resolvedTickets] = await Promise.all([
+      prisma.supportTicket.count(),
+      prisma.supportTicket.count({ where: { status: 'OPEN' } }),
+      prisma.supportTicket.count({ where: { status: 'IN_PROGRESS' } }),
+      prisma.supportTicket.count({ where: { status: 'RESOLVED' } }),
+    ]);
 
     const categoryStats = await prisma.supportTicket.groupBy({
-      by: ["category"],
+      by: ['category'],
       _count: {
         category: true,
       },
     });
 
     const priorityStats = await prisma.supportTicket.groupBy({
-      by: ["priority"],
+      by: ['priority'],
       _count: {
         priority: true,
       },
@@ -480,7 +472,7 @@ export const getTicketStats = async () => {
       priorityStats,
     };
   } catch (error) {
-    console.error("🚨 getTicketStats - Error:", error);
-    return { error: "Failed to fetch stats" };
+    console.error('🚨 getTicketStats - Error:', error);
+    return { error: 'Failed to fetch stats' };
   }
 };

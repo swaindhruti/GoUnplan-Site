@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -6,18 +6,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Mail,
-  Phone,
-  User,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Info,
-} from "lucide-react";
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Mail, Phone, User, Calendar, CheckCircle, XCircle, Info } from 'lucide-react';
 
 interface HostApplicationDetails {
   id: string;
@@ -51,12 +43,12 @@ export default function HostApplicationDetailsModal({
   if (!applicant) return null;
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -81,15 +73,13 @@ export default function HostApplicationDetailsModal({
                 {applicant.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                  {applicant.name}
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 font-bricolage">{applicant.name}</h3>
                 <div className="flex items-center gap-2 mt-2">
                   <Badge
                     className={
-                      applicant.role === "USER"
-                        ? "bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
-                        : "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
+                      applicant.role === 'USER'
+                        ? 'bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
+                        : 'bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
                     }
                   >
                     {applicant.role}
@@ -97,8 +87,8 @@ export default function HostApplicationDetailsModal({
                   <Badge
                     className={
                       applicant.isEmailVerified
-                        ? "bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
-                        : "bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium font-instrument"
+                        ? 'bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
+                        : 'bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium font-instrument'
                     }
                   >
                     {applicant.isEmailVerified ? (
@@ -127,24 +117,20 @@ export default function HostApplicationDetailsModal({
                 <div className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-2 text-gray-600 mb-2">
                     <Mail className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-semibold font-instrument">
-                      Email
-                    </span>
+                    <span className="text-sm font-semibold font-instrument">Email</span>
                   </div>
                   <p className="text-gray-900 font-instrument font-medium break-all">
-                    {applicant.email || "Not provided"}
+                    {applicant.email || 'Not provided'}
                   </p>
                 </div>
 
                 <div className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-2 text-gray-600 mb-2">
                     <Phone className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-semibold font-instrument">
-                      Phone
-                    </span>
+                    <span className="text-sm font-semibold font-instrument">Phone</span>
                   </div>
                   <p className="text-gray-900 font-instrument font-medium">
-                    {applicant.phone || "Not provided"}
+                    {applicant.phone || 'Not provided'}
                   </p>
                 </div>
               </div>
@@ -158,7 +144,7 @@ export default function HostApplicationDetailsModal({
               </h4>
               <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <p className="text-gray-700 font-instrument leading-relaxed">
-                  {applicant.bio || "No biography provided"}
+                  {applicant.bio || 'No biography provided'}
                 </p>
               </div>
             </div>
@@ -199,8 +185,8 @@ export default function HostApplicationDetailsModal({
                     Application Status
                   </h4>
                   <p className="text-amber-800 font-instrument text-sm">
-                    This user has applied to become a host. Review their
-                    information carefully before making a decision.
+                    This user has applied to become a host. Review their information carefully
+                    before making a decision.
                   </p>
                 </div>
               </div>
@@ -221,7 +207,7 @@ export default function HostApplicationDetailsModal({
             variant="outline"
             className="bg-red-600 text-white hover:bg-red-700 border-0 font-instrument font-medium"
             onClick={() => {
-              onReject(applicant.email || "");
+              onReject(applicant.email || '');
               onClose();
             }}
           >
@@ -230,7 +216,7 @@ export default function HostApplicationDetailsModal({
           <Button
             className="bg-green-600 text-white hover:bg-green-700 font-instrument font-medium"
             onClick={() => {
-              onApprove(applicant.email || "");
+              onApprove(applicant.email || '');
               onClose();
             }}
           >

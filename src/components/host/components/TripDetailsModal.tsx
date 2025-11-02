@@ -1,6 +1,6 @@
-"use client";
-import React from "react";
-import { Trip } from "../types";
+'use client';
+import React from 'react';
+import { Trip } from '../types';
 import {
   X,
   MapPin,
@@ -16,9 +16,9 @@ import {
   Languages,
   Filter,
   FileText,
-} from "lucide-react";
-import Image from "next/image";
-import { formatDateRange } from "./common/utils";
+} from 'lucide-react';
+import Image from 'next/image';
+import { formatDateRange } from './common/utils';
 
 type TripDetailsModalProps = {
   trip: Trip | null;
@@ -26,37 +26,33 @@ type TripDetailsModalProps = {
   onClose: () => void;
 };
 
-export const TripDetailsModal = ({
-  trip,
-  isOpen,
-  onClose,
-}: TripDetailsModalProps) => {
+export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProps) => {
   // Prevent background scroll when modal is open
   React.useEffect(() => {
     if (isOpen) {
       // Prevent scrolling on both body and html
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       // Prevent touch scrolling on mobile
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = "0";
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = '0';
     } else {
       // Restore scrolling
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
     }
 
     // Cleanup on unmount
     return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
     };
   }, [isOpen]);
 
@@ -64,24 +60,24 @@ export const TripDetailsModal = ({
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "inactive":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case 'active':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'draft':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case "active":
+      case 'active':
         return <CheckCircle className="h-4 w-4" />;
-      case "inactive":
+      case 'inactive':
         return <Clock className="h-4 w-4" />;
-      case "draft":
+      case 'draft':
         return <FileText className="h-4 w-4" />;
       default:
         return <AlertCircle className="h-4 w-4" />;
@@ -89,9 +85,9 @@ export const TripDetailsModal = ({
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -106,8 +102,8 @@ export const TripDetailsModal = ({
           left: 0,
           right: 0,
           bottom: 0,
-          minHeight: "100vh",
-          minWidth: "100vw",
+          minHeight: '100vh',
+          minWidth: '100vw',
         }}
         onClick={onClose}
       />
@@ -120,20 +116,20 @@ export const TripDetailsModal = ({
           left: 0,
           right: 0,
           bottom: 0,
-          minHeight: "100vh",
-          minWidth: "100vw",
+          minHeight: '100vh',
+          minWidth: '100vw',
         }}
       >
         <div className="w-full max-w-4xl h-full flex items-center justify-center">
           <div
             className="bg-white rounded-2xl shadow-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             {/* Modal Header with Image - Fixed height */}
             <div className="relative flex-shrink-0">
               <div className="relative h-56 w-full">
                 <Image
-                  src={trip.tripImage || "https://avatar.iran.liara.run/public"}
+                  src={trip.tripImage || 'https://avatar.iran.liara.run/public'}
                   alt={trip.title}
                   fill
                   className="object-cover rounded-t-2xl"
@@ -192,9 +188,7 @@ export const TripDetailsModal = ({
                   <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600 font-instrument">
-                          Price per person
-                        </p>
+                        <p className="text-sm text-gray-600 font-instrument">Price per person</p>
                         <p className="text-2xl font-bold text-purple-700 font-bricolage">
                           {formatCurrency(trip.price)}
                         </p>
@@ -209,11 +203,9 @@ export const TripDetailsModal = ({
                   <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600 font-instrument">
-                          Max Participants
-                        </p>
+                        <p className="text-sm text-gray-600 font-instrument">Max Participants</p>
                         <p className="text-2xl font-bold text-emerald-700 font-bricolage">
-                          {trip.maxParticipants || "N/A"}
+                          {trip.maxParticipants || 'N/A'}
                         </p>
                       </div>
                       <div className="h-10 w-10 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -226,14 +218,10 @@ export const TripDetailsModal = ({
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600 font-instrument">
-                          Average Rating
-                        </p>
+                        <p className="text-sm text-gray-600 font-instrument">Average Rating</p>
                         <div className="flex items-center gap-2">
                           <p className="text-2xl font-bold text-amber-700 font-bricolage">
-                            {trip.averageRating
-                              ? trip.averageRating.toFixed(1)
-                              : "0.0"}
+                            {trip.averageRating ? trip.averageRating.toFixed(1) : '0.0'}
                           </p>
                           <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
                         </div>
@@ -254,7 +242,7 @@ export const TripDetailsModal = ({
                     Description
                   </h3>
                   <p className="text-gray-700 leading-relaxed font-instrument">
-                    {trip.description || "No description available."}
+                    {trip.description || 'No description available.'}
                   </p>
                 </div>
 
@@ -269,28 +257,20 @@ export const TripDetailsModal = ({
                     <div className="space-y-2">
                       {trip.city && (
                         <div className="flex items-center gap-2 text-gray-700">
-                          <span className="font-medium font-instrument">
-                            City:
-                          </span>
+                          <span className="font-medium font-instrument">City:</span>
                           <span className="font-instrument">{trip.city}</span>
                         </div>
                       )}
                       {trip.state && (
                         <div className="flex items-center gap-2 text-gray-700">
-                          <span className="font-medium font-instrument">
-                            State:
-                          </span>
+                          <span className="font-medium font-instrument">State:</span>
                           <span className="font-instrument">{trip.state}</span>
                         </div>
                       )}
                       {trip.destination && (
                         <div className="flex items-center gap-2 text-gray-700">
-                          <span className="font-medium font-instrument">
-                            Destination:
-                          </span>
-                          <span className="font-instrument">
-                            {trip.destination}
-                          </span>
+                          <span className="font-medium font-instrument">Destination:</span>
+                          <span className="font-instrument">{trip.destination}</span>
                         </div>
                       )}
                     </div>
@@ -306,18 +286,15 @@ export const TripDetailsModal = ({
                       {trip.startDate && trip.endDate ? (
                         <>
                           <div className="text-gray-700 font-instrument">
-                            <span className="font-medium">Duration:</span>{" "}
+                            <span className="font-medium">Duration:</span>{' '}
                             {formatDateRange(trip.startDate, trip.endDate)}
                           </div>
                           <div className="text-gray-700 font-instrument">
-                            <span className="font-medium">Total Days:</span>{" "}
-                            {trip.noOfDays}
+                            <span className="font-medium">Total Days:</span> {trip.noOfDays}
                           </div>
                         </>
                       ) : (
-                        <p className="text-gray-500 font-instrument">
-                          Dates not specified
-                        </p>
+                        <p className="text-gray-500 font-instrument">Dates not specified</p>
                       )}
                     </div>
                   </div>
@@ -332,14 +309,11 @@ export const TripDetailsModal = ({
                       What&apos;s Included
                     </h3>
                     <div className="space-y-2">
-                      {trip.includedActivities &&
-                      trip.includedActivities.length > 0 ? (
+                      {trip.includedActivities && trip.includedActivities.length > 0 ? (
                         trip.includedActivities.map((activity, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span className="text-gray-700 font-instrument">
-                              {activity}
-                            </span>
+                            <span className="text-gray-700 font-instrument">{activity}</span>
                           </div>
                         ))
                       ) : (
@@ -361,9 +335,7 @@ export const TripDetailsModal = ({
                         trip.restrictions.map((item, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span className="text-gray-700 font-instrument">
-                              {item}
-                            </span>
+                            <span className="text-gray-700 font-instrument">{item}</span>
                           </div>
                         ))
                       ) : (
@@ -385,9 +357,7 @@ export const TripDetailsModal = ({
                         trip.special.map((item, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                            <span className="text-gray-700 font-instrument">
-                              {item}
-                            </span>
+                            <span className="text-gray-700 font-instrument">{item}</span>
                           </div>
                         ))
                       ) : (
@@ -407,20 +377,17 @@ export const TripDetailsModal = ({
                     <div className="flex items-center gap-2">
                       <div
                         className={`px-3 py-1 rounded-full text-sm font-medium font-instrument ${
-                          trip.genderPreference === "MALE_ONLY"
-                            ? "bg-blue-100 text-blue-800"
-                            : trip.genderPreference === "FEMALE_ONLY"
-                            ? "bg-pink-100 text-pink-800"
-                            : "bg-purple-100 text-purple-800"
+                          trip.genderPreference === 'MALE_ONLY'
+                            ? 'bg-blue-100 text-blue-800'
+                            : trip.genderPreference === 'FEMALE_ONLY'
+                              ? 'bg-pink-100 text-pink-800'
+                              : 'bg-purple-100 text-purple-800'
                         }`}
                       >
-                        {trip.genderPreference === "MALE_ONLY" &&
-                          "👨 Male Only"}
-                        {trip.genderPreference === "FEMALE_ONLY" &&
-                          "👩 Female Only"}
-                        {(trip.genderPreference === "MIX" ||
-                          !trip.genderPreference) &&
-                          "👥 Mixed Group"}
+                        {trip.genderPreference === 'MALE_ONLY' && '👨 Male Only'}
+                        {trip.genderPreference === 'FEMALE_ONLY' && '👩 Female Only'}
+                        {(trip.genderPreference === 'MIX' || !trip.genderPreference) &&
+                          '👥 Mixed Group'}
                       </div>
                     </div>
                   </div>
@@ -456,35 +423,30 @@ export const TripDetailsModal = ({
 
                               {/* Day Description */}
                               {day.description && (
-                                <p className="text-gray-700 font-instrument">
-                                  {day.description}
-                                </p>
+                                <p className="text-gray-700 font-instrument">{day.description}</p>
                               )}
 
                               {/* Day Details Grid */}
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 {/* Activities */}
-                                {day.activities &&
-                                  day.activities.length > 0 && (
-                                    <div className="bg-white/60 rounded-lg p-3">
-                                      <h5 className="font-medium text-gray-800 mb-2 text-sm font-instrument flex items-center gap-1.5">
-                                        <Activity className="h-4 w-4 text-green-600" />
-                                        Activities
-                                      </h5>
-                                      <div className="space-y-1">
-                                        {day.activities.map(
-                                          (activity, actIndex) => (
-                                            <span
-                                              key={actIndex}
-                                              className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-instrument mr-1 mb-1"
-                                            >
-                                              {activity}
-                                            </span>
-                                          )
-                                        )}
-                                      </div>
+                                {day.activities && day.activities.length > 0 && (
+                                  <div className="bg-white/60 rounded-lg p-3">
+                                    <h5 className="font-medium text-gray-800 mb-2 text-sm font-instrument flex items-center gap-1.5">
+                                      <Activity className="h-4 w-4 text-green-600" />
+                                      Activities
+                                    </h5>
+                                    <div className="space-y-1">
+                                      {day.activities.map((activity, actIndex) => (
+                                        <span
+                                          key={actIndex}
+                                          className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-instrument mr-1 mb-1"
+                                        >
+                                          {activity}
+                                        </span>
+                                      ))}
                                     </div>
-                                  )}
+                                  </div>
+                                )}
 
                                 {/* Meals */}
                                 {day.meals && (
@@ -566,16 +528,14 @@ export const TripDetailsModal = ({
                           Languages Supported
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          {trip.languages.map(
-                            (language: string, index: number) => (
-                              <span
-                                key={index}
-                                className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium font-instrument"
-                              >
-                                {language}
-                              </span>
-                            )
-                          )}
+                          {trip.languages.map((language: string, index: number) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium font-instrument"
+                            >
+                              {language}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}

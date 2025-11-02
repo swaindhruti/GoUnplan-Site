@@ -1,17 +1,17 @@
-"use client";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { PrimaryButton, SectionLabel } from "./common";
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { ArrowRight } from "lucide-react";
+'use client';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { PrimaryButton, SectionLabel } from './common';
+import { useState } from 'react';
+import { Button } from '../ui/button';
+import { ArrowRight } from 'lucide-react';
 
 const vibeDescriptions: Record<string, string> = {
   Cultural:
-    "Immerse yourself in local traditions, art, and history for a truly authentic experience.",
-  Adventure: "Thrilling activities and wild landscapes for adrenaline seekers.",
-  Relaxation: "Unwind in serene destinations designed for peace and comfort.",
-  Nature: "Explore breathtaking natural wonders and scenic escapes."
+    'Immerse yourself in local traditions, art, and history for a truly authentic experience.',
+  Adventure: 'Thrilling activities and wild landscapes for adrenaline seekers.',
+  Relaxation: 'Unwind in serene destinations designed for peace and comfort.',
+  Nature: 'Explore breathtaking natural wonders and scenic escapes.',
 };
 
 export const FindMyVibe = () => {
@@ -20,21 +20,21 @@ export const FindMyVibe = () => {
 
   const vibes = [
     {
-      label: "Cultural",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791020/pexels-emre-simsek-27565013-33041565_uqwqch.jpg"
+      label: 'Cultural',
+      src: 'https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791020/pexels-emre-simsek-27565013-33041565_uqwqch.jpg',
     },
     {
-      label: "Adventure",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791121/pexels-marius-mann-772581-33021041_fvxvqj.jpg"
+      label: 'Adventure',
+      src: 'https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791121/pexels-marius-mann-772581-33021041_fvxvqj.jpg',
     },
     {
-      label: "Relaxation",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791236/pexels-kubra-ercan-2154019843-33019785_qdfrky.jpg"
+      label: 'Relaxation',
+      src: 'https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791236/pexels-kubra-ercan-2154019843-33019785_qdfrky.jpg',
     },
     {
-      label: "Nature",
-      src: "https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791316/pexels-ishahidsultan-33048368_vwox3l.jpg"
-    }
+      label: 'Nature',
+      src: 'https://res.cloudinary.com/dz4b2cmjo/image/upload/v1752791316/pexels-ishahidsultan-33048368_vwox3l.jpg',
+    },
   ];
 
   const handleVibeClick = (vibeLabel: string) => {
@@ -46,10 +46,7 @@ export const FindMyVibe = () => {
   };
 
   return (
-    <div
-      id="find-my-vibe"
-      className="bg-purple-500/[0.05] relative min-h-screen w-full "
-    >
+    <div id="find-my-vibe" className="bg-purple-500/[0.05] relative min-h-screen w-full ">
       {myVibes && (
         <div className="w-screen flex justify-center -mt-3 lg:-mt-6 pt-6 lg:pt-12">
           <SectionLabel label="Choose Your Vibe!" />
@@ -61,10 +58,10 @@ export const FindMyVibe = () => {
       >
         <div
           className={`relative w-full lg:w-1/4 flex flex-col items-center ${
-            myVibes ? "h-full justify-center" : "gap-y-16"
+            myVibes ? 'h-full justify-center' : 'gap-y-16'
           }`}
         >
-          {" "}
+          {' '}
           {!myVibes && (
             <div className="space-y-4 max-w-md text-center lg:text-left mt-16">
               <SectionLabel label="Choose Your Vibe!" />
@@ -74,23 +71,17 @@ export const FindMyVibe = () => {
                 <span className="text-gray-800 ml-3">Vibes</span>
               </h1>
               <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
-                Join us as we explore the wonders of the globe, one incredible
-                journey at a time.
+                Join us as we explore the wonders of the globe, one incredible journey at a time.
               </p>
-              <div
-                onClick={handleVibeButtonClick}
-                className="flex justify-center lg:justify-start"
-              >
+              <div onClick={handleVibeButtonClick} className="flex justify-center lg:justify-start">
                 <PrimaryButton label="Find your Vibe" />
               </div>
             </div>
           )}
           <div
-            onClick={() => handleVibeClick("Adventure")}
+            onClick={() => handleVibeClick('Adventure')}
             className={`w-full cursor-pointer ${
-              myVibes
-                ? "flex-1 min-h-[400px]"
-                : "h-[140px] sm:h-[190px] md:h-[240px] "
+              myVibes ? 'flex-1 min-h-[400px]' : 'h-[140px] sm:h-[190px] md:h-[240px] '
             } relative group`}
           >
             <Image
@@ -102,14 +93,14 @@ export const FindMyVibe = () => {
 
             <div
               className={`absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md ${
-                myVibes ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                myVibes ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               } transition-opacity flex flex-col justify-center items-center px-6`}
             >
               <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
                 Adventure
               </div>
               <div className="text-base sm:text-lg text-white/90 font-instrument text-center">
-                {vibeDescriptions["Adventure"]}
+                {vibeDescriptions['Adventure']}
               </div>
             </div>
           </div>
@@ -121,15 +112,10 @@ export const FindMyVibe = () => {
               onClick={() => handleVibeClick(vibe.label)}
               className="relative h-[140px] sm:h-[190px] md:h-[240px] w-full rounded-[60px] sm:rounded-[80px] overflow-hidden shadow-lg cursor-pointer hover:scale-[102%] duration-300 transition-transform group"
             >
-              <Image
-                src={vibe.src}
-                alt={vibe.label}
-                fill
-                className="object-cover"
-              />
+              <Image src={vibe.src} alt={vibe.label} fill className="object-cover" />
               <div
                 className={`absolute inset-0 rounded-[60px] sm:rounded-[80px] bg-black/40 backdrop-blur-md ${
-                  myVibes ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  myVibes ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                 } transition-opacity flex flex-col justify-center items-center px-6`}
               >
                 <div className="text-2xl sm:text-3xl md:text-4xl font-bricolage leading-[1.05] tracking-tighter font-semibold text-white mb-2">
@@ -144,7 +130,7 @@ export const FindMyVibe = () => {
         </div>
         <Button
           variant="outline"
-          onClick={() => router.push("/trips")}
+          onClick={() => router.push('/trips')}
           className="flex mb-4 items-center group rounded-full  font-poppins absolute bottom-0 gap-2 px-6 py-5 text-lg font-medium text-purple-500 hover:text-purple-600 hover:bg-purple-50 border-purple-500 cursor-pointer  transition-all duration-200"
         >
           View All Vibes

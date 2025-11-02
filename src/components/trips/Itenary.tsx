@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { MapPin, Calendar, Car, ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import { useState } from 'react';
+import { MapPin, Calendar, Car, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 type DayWiseItinerary = {
   id: string;
@@ -18,14 +18,8 @@ type DayWiseItinerary = {
   startDate?: Date | null;
 };
 
-export default function TripItinerary({
-  itinerary
-}: {
-  itinerary: DayWiseItinerary[];
-}) {
-  const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>(
-    {}
-  );
+export default function TripItinerary({ itinerary }: { itinerary: DayWiseItinerary[] }) {
+  const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({});
 
   const calculateDate = (dayNumber: number, baseStartDate?: Date | null) => {
     if (!baseStartDate) return null;
@@ -39,36 +33,33 @@ export default function TripItinerary({
     if (!date) return null;
 
     return {
-      dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
-      dayMonth: date.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short"
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayMonth: date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
       }),
-      fullDate: date.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      })
+      fullDate: date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
     };
   };
 
-  const baseStartDate = itinerary.find(
-    (item) => item.dayNumber === 1
-  )?.startDate;
+  const baseStartDate = itinerary.find(item => item.dayNumber === 1)?.startDate;
 
   const nextImage = (itemId: string, totalImages: number) => {
-    setImageIndexes((prev) => ({
+    setImageIndexes(prev => ({
       ...prev,
-      [itemId]: ((prev[itemId] || 0) + 1) % totalImages
+      [itemId]: ((prev[itemId] || 0) + 1) % totalImages,
     }));
   };
 
   const prevImage = (itemId: string, totalImages: number) => {
-    setImageIndexes((prev) => ({
+    setImageIndexes(prev => ({
       ...prev,
-      [itemId]:
-        prev[itemId] === 0 || !prev[itemId] ? totalImages - 1 : prev[itemId] - 1
+      [itemId]: prev[itemId] === 0 || !prev[itemId] ? totalImages - 1 : prev[itemId] - 1,
     }));
   };
 
@@ -76,14 +67,13 @@ export default function TripItinerary({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-12">
-   
       <div className="relative mt-6 sm:mt-10">
         <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-red-500 to-blue-500"></div>
 
         {itinerary.map((item, index) => {
           const images = Array.isArray(item.dayWiseImage)
             ? item.dayWiseImage
-            : [item.dayWiseImage || "https://avatar.iran.liara.run/public"];
+            : [item.dayWiseImage || 'https://avatar.iran.liara.run/public'];
 
           const currentDate = calculateDate(item.dayNumber, baseStartDate);
           const formattedDate = formatDate(currentDate);
@@ -109,10 +99,7 @@ export default function TripItinerary({
                             {item.title}
                           </h3>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge
-                              variant="outline"
-                              className="text-xs sm:text-sm"
-                            >
+                            <Badge variant="outline" className="text-xs sm:text-sm">
                               <Calendar className="w-3 h-3 mr-1" />
                               Day {item.dayNumber}
                             </Badge>
@@ -121,8 +108,7 @@ export default function TripItinerary({
                                 variant="secondary"
                                 className="text-xs sm:text-sm bg-purple-50 text-purple-700 border-purple-200"
                               >
-                                {formattedDate.dayName},{" "}
-                                {formattedDate.dayMonth}
+                                {formattedDate.dayName}, {formattedDate.dayMonth}
                               </Badge>
                             )}
                           </div>
@@ -173,15 +159,15 @@ export default function TripItinerary({
                             <button
                               key={imgIndex}
                               onClick={() =>
-                                setImageIndexes((prev) => ({
+                                setImageIndexes(prev => ({
                                   ...prev,
-                                  [item.id]: imgIndex
+                                  [item.id]: imgIndex,
                                 }))
                               }
                               className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-colors ${
                                 imgIndex === getCurrentImageIndex(item.id)
-                                  ? "bg-white"
-                                  : "bg-white/50"
+                                  ? 'bg-white'
+                                  : 'bg-white/50'
                               }`}
                             />
                           ))}
@@ -208,9 +194,7 @@ export default function TripItinerary({
                       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-3 border border-purple-100">
                         <div className="flex items-center gap-2 text-purple-700">
                           <Calendar className="w-4 h-4" />
-                          <span className="font-medium text-sm">
-                            {formattedDate.fullDate}
-                          </span>
+                          <span className="font-medium text-sm">{formattedDate.fullDate}</span>
                         </div>
                       </div>
                     )}
@@ -225,7 +209,7 @@ export default function TripItinerary({
                           Activities
                         </h5>
                         <ul className="space-y-1">
-                          {item.activities.map((act) => (
+                          {item.activities.map(act => (
                             <li
                               key={act}
                               className="flex items-center gap-2 text-gray-700 text-sm sm:text-base"
@@ -243,9 +227,7 @@ export default function TripItinerary({
                         <h5 className="font-semibold text-gray-800 mb-1 text-sm sm:text-base">
                           Meals
                         </h5>
-                        <p className="text-gray-700 text-sm sm:text-base">
-                          {item.meals}
-                        </p>
+                        <p className="text-gray-700 text-sm sm:text-base">{item.meals}</p>
                       </div>
                     )}
 
@@ -254,9 +236,7 @@ export default function TripItinerary({
                         <h5 className="font-semibold text-gray-800 mb-1 text-sm sm:text-base">
                           Accommodation
                         </h5>
-                        <p className="text-gray-700 text-sm sm:text-base">
-                          {item.accommodation}
-                        </p>
+                        <p className="text-gray-700 text-sm sm:text-base">{item.accommodation}</p>
                       </div>
                     )}
                   </div>

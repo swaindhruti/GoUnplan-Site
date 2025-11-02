@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { CreateChatResult } from "@/types/chats";
-import { revalidatePath } from "next/cache";
+import prisma from '@/lib/prisma';
+import { CreateChatResult } from '@/types/chats';
+import { revalidatePath } from 'next/cache';
 
 interface CreateChatParams {
   userId: string;
@@ -15,29 +15,29 @@ interface SendMessageParams {
   senderId: string;
   receiverId: string;
   content: string;
-  type?: "TEXT" | "FILE" | "IMAGE";
+  type?: 'TEXT' | 'FILE' | 'IMAGE';
 }
 
 export async function createOrGetChat({
   userId,
   hostId,
-  travelPlanId
+  travelPlanId,
 }: CreateChatParams): Promise<CreateChatResult> {
   try {
     const existingChat = await prisma.chat.findFirst({
       where: {
         participants: {
           some: {
-            userId: userId
-          }
+            userId: userId,
+          },
         },
         AND: {
           participants: {
             some: {
-              userId: hostId
-            }
-          }
-        }
+              userId: hostId,
+            },
+          },
+        },
       },
       include: {
         participants: {
@@ -47,13 +47,13 @@ export async function createOrGetChat({
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
-            }
-          }
+                role: true,
+              },
+            },
+          },
         },
         messages: {
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
             sender: {
@@ -61,20 +61,20 @@ export async function createOrGetChat({
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
+                role: true,
+              },
             },
             receiver: {
               select: {
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
-            }
-          }
-        }
-      }
+                role: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (existingChat) {
@@ -82,11 +82,8 @@ export async function createOrGetChat({
         success: true as const,
         chat: {
           ...existingChat,
-          lastMessageAt:
-            existingChat.lastMessageAt ??
-            existingChat.messages[0]?.createdAt ??
-            null // ✅ Fix: coalesce to null, not undefined
-        }
+          lastMessageAt: existingChat.lastMessageAt ?? existingChat.messages[0]?.createdAt ?? null, // ✅ Fix: coalesce to null, not undefined
+        },
       };
     }
 
@@ -94,8 +91,8 @@ export async function createOrGetChat({
       data: {
         travelPlanId,
         participants: {
-          create: [{ userId }, { userId: hostId }]
-        }
+          create: [{ userId }, { userId: hostId }],
+        },
       },
       include: {
         participants: {
@@ -105,13 +102,13 @@ export async function createOrGetChat({
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
-            }
-          }
+                role: true,
+              },
+            },
+          },
         },
         messages: {
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
             sender: {
@@ -119,34 +116,34 @@ export async function createOrGetChat({
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
+                role: true,
+              },
             },
             receiver: {
               select: {
                 id: true,
                 name: true,
                 image: true,
-                role: true
-              }
-            }
-          }
-        }
-      }
+                role: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return {
       success: true as const,
       chat: {
         ...newChat,
-        lastMessageAt: null
-      }
+        lastMessageAt: null,
+      },
     };
   } catch (error) {
-    console.error("Error creating/getting chat:", error);
+    console.error('Error creating/getting chat:', error);
     return {
       success: false as const,
-      error: "Failed to create chat"
+      error: 'Failed to create chat',
     };
   }
 }
@@ -157,7 +154,7 @@ export async function sendMessage({
   senderId,
   receiverId,
   content,
-  type = "TEXT"
+  type = 'TEXT',
 }: SendMessageParams) {
   try {
     const message = await prisma.message.create({
@@ -166,26 +163,26 @@ export async function sendMessage({
         senderId,
         receiverId,
         content,
-        type
+        type,
       },
       include: {
         sender: {
-          select: { id: true, name: true, image: true }
-        }
-      }
+          select: { id: true, name: true, image: true },
+        },
+      },
     });
 
     // Update chat's lastMessageAt
     await prisma.chat.update({
       where: { id: chatId },
-      data: { lastMessageAt: new Date() }
+      data: { lastMessageAt: new Date() },
     });
 
-    revalidatePath("/chat");
+    revalidatePath('/chat');
     return { success: true, message };
   } catch (error) {
-    console.error("Error sending message:", error);
-    return { success: false, error: "Failed to send message" };
+    console.error('Error sending message:', error);
+    return { success: false, error: 'Failed to send message' };
   }
 }
 
@@ -196,20 +193,20 @@ export async function getChatMessages(chatId: string, page = 1, limit = 20) {
 
     const messages = await prisma.message.findMany({
       where: { chatId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
       include: {
         sender: {
-          select: { id: true, name: true, image: true }
-        }
-      }
+          select: { id: true, name: true, image: true },
+        },
+      },
     });
 
     return { success: true, messages: messages.reverse() };
   } catch (error) {
-    console.error("Error fetching messages:", error);
-    return { success: false, error: "Failed to fetch messages" };
+    console.error('Error fetching messages:', error);
+    return { success: false, error: 'Failed to fetch messages' };
   }
 }
 
@@ -218,49 +215,47 @@ export async function getUserChats(userId: string) {
     const chats = await prisma.chat.findMany({
       where: {
         participants: {
-          some: { userId }
-        }
+          some: { userId },
+        },
       },
       include: {
         participants: {
           include: {
             user: {
-              select: { id: true, name: true, image: true, role: true }
-            }
-          }
+              select: { id: true, name: true, image: true, role: true },
+            },
+          },
         },
         messages: {
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
             sender: {
-              select: { id: true, name: true, image: true, role: true }
+              select: { id: true, name: true, image: true, role: true },
             },
             receiver: {
-              select: { id: true, name: true, image: true, role: true }
-            }
-          }
+              select: { id: true, name: true, image: true, role: true },
+            },
+          },
         },
         _count: {
           select: {
             messages: {
               where: {
                 receiverId: userId,
-                isRead: false
-              }
-            }
-          }
-        }
+                isRead: false,
+              },
+            },
+          },
+        },
       },
       orderBy: {
-        lastMessageAt: "desc"
-      }
+        lastMessageAt: 'desc',
+      },
     });
 
-    const transformedChats = chats.map((chat) => {
-      const otherParticipant = chat.participants.find(
-        (p) => p.userId !== userId
-      );
+    const transformedChats = chats.map(chat => {
+      const otherParticipant = chat.participants.find(p => p.userId !== userId);
 
       const lastMessage = chat.messages[0];
 
@@ -278,18 +273,18 @@ export async function getUserChats(userId: string) {
               isRead: lastMessage.isRead,
               createdAt: lastMessage.createdAt,
               sender: lastMessage.sender,
-              receiver: lastMessage.receiver
+              receiver: lastMessage.receiver,
             }
           : undefined,
         unreadCount: chat._count.messages,
-        lastMessageAt: chat.lastMessageAt
+        lastMessageAt: chat.lastMessageAt,
       };
     });
 
     return { success: true, chats: transformedChats };
   } catch (error) {
-    console.error("Error fetching chats:", error);
-    return { success: false, error: "Failed to fetch chats" };
+    console.error('Error fetching chats:', error);
+    return { success: false, error: 'Failed to fetch chats' };
   }
 }
 
@@ -300,21 +295,21 @@ export async function pollMessages(chatId: string, lastMessageId?: string) {
       where: {
         chatId,
         ...(lastMessageId && {
-          id: { gt: lastMessageId }
-        })
+          id: { gt: lastMessageId },
+        }),
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: 'asc' },
       include: {
         sender: {
-          select: { id: true, name: true, image: true }
-        }
-      }
+          select: { id: true, name: true, image: true },
+        },
+      },
     });
 
     return { success: true, messages };
   } catch (error) {
-    console.error("Error polling messages:", error);
-    return { success: false, error: "Failed to poll messages" };
+    console.error('Error polling messages:', error);
+    return { success: false, error: 'Failed to poll messages' };
   }
 }
 
@@ -325,23 +320,23 @@ export async function batchMarkAsRead(userId: string, chatIds: string[]) {
       where: {
         chatId: { in: chatIds },
         receiverId: userId,
-        isRead: false
+        isRead: false,
       },
-      data: { isRead: true }
+      data: { isRead: true },
     });
 
     await prisma.chatParticipant.updateMany({
       where: {
         chatId: { in: chatIds },
-        userId
+        userId,
       },
-      data: { lastReadAt: new Date() }
+      data: { lastReadAt: new Date() },
     });
 
     return { success: true };
   } catch (error) {
-    console.error("Error batch marking as read:", error);
-    return { success: false, error: "Failed to mark messages as read" };
+    console.error('Error batch marking as read:', error);
+    return { success: false, error: 'Failed to mark messages as read' };
   }
 }
 
@@ -352,29 +347,29 @@ export async function markMessagesAsRead(chatId: string, userId: string) {
       where: {
         chatId,
         receiverId: userId,
-        isRead: false
+        isRead: false,
       },
       data: {
-        isRead: true
-      }
+        isRead: true,
+      },
     });
 
     // Update participant's lastReadAt
     await prisma.chatParticipant.updateMany({
       where: {
         chatId,
-        userId
+        userId,
       },
       data: {
-        lastReadAt: new Date()
-      }
+        lastReadAt: new Date(),
+      },
     });
 
-    revalidatePath("/chat");
+    revalidatePath('/chat');
     return { success: true };
   } catch (error) {
-    console.error("Error marking messages as read:", error);
-    return { success: false, error: "Failed to mark messages as read" };
+    console.error('Error marking messages as read:', error);
+    return { success: false, error: 'Failed to mark messages as read' };
   }
 }
 
@@ -383,14 +378,14 @@ export async function getUnreadCount(userId: string) {
     const unreadCount = await prisma.message.count({
       where: {
         receiverId: userId,
-        isRead: false
-      }
+        isRead: false,
+      },
     });
 
     return { success: true, count: unreadCount };
   } catch (error) {
-    console.error("Error getting unread count:", error);
-    return { success: false, error: "Failed to get unread count" };
+    console.error('Error getting unread count:', error);
+    return { success: false, error: 'Failed to get unread count' };
   }
 }
 
@@ -400,31 +395,31 @@ export async function searchChats(userId: string, query: string) {
     const chats = await prisma.chat.findMany({
       where: {
         participants: {
-          some: { userId }
-        }
+          some: { userId },
+        },
       },
       include: {
         participants: {
           include: {
             user: {
-              select: { id: true, name: true, image: true, role: true }
-            }
+              select: { id: true, name: true, image: true, role: true },
+            },
           },
           where: {
             user: {
               name: {
                 contains: query,
-                mode: "insensitive"
-              }
-            }
-          }
-        }
-      }
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      },
     });
 
     return { success: true, chats };
   } catch (error) {
-    console.error("Error searching chats:", error);
-    return { success: false, error: "Failed to search chats" };
+    console.error('Error searching chats:', error);
+    return { success: false, error: 'Failed to search chats' };
   }
 }

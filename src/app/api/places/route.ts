@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const q = url.searchParams.get("q") || "";
+    const q = url.searchParams.get('q') || '';
 
     if (!q) return NextResponse.json({ results: [] });
 
     const token = process.env.LOCATIONIQ_ACCESS_TOKEN;
     if (!token) {
       return NextResponse.json(
-        { error: "LOCATIONIQ_ACCESS_TOKEN environment variable not set" },
+        { error: 'LOCATIONIQ_ACCESS_TOKEN environment variable not set' },
         { status: 500 }
       );
     }
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
     const res = await fetch(apiUrl);
 
     if (!res.ok) {
-      console.error("LocationIQ error:", res.status);
+      console.error('LocationIQ error:', res.status);
       return NextResponse.json({ results: [] }, { status: res.status });
     }
 
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ results: places });
   } catch (err) {
-    console.error("LocationIQ API error:", err);
+    console.error('LocationIQ API error:', err);
     return NextResponse.json({ results: [] });
   }
 }

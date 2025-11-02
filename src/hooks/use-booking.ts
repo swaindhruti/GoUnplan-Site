@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 import {
   createBooking,
   updateBookingGuestInfo,
   updateBookingStatus,
-} from "@/actions/booking/actions";
+} from '@/actions/booking/actions';
 import type {
   BookingData,
   DateSelectorUpdate,
   GuestInfoUpdate,
   PaymentUpdate,
-} from "@/types/booking";
-import { Booking } from "@prisma/client";
+} from '@/types/booking';
+import { Booking } from '@prisma/client';
 
 interface UseBookingStateProps {
   userId?: string;
@@ -38,7 +38,7 @@ export function useBookingState({
   const [bookingData, setBookingData] = useState<Partial<BookingData>>({
     userId,
     travelPlanId,
-    status: "PENDING",
+    status: 'PENDING',
     participants: 1,
     refundAmount: 0,
     ...initialData,
@@ -48,18 +48,14 @@ export function useBookingState({
   const [error, setError] = useState<string | null>(null);
 
   const updateBookingData = useCallback((updates: Partial<BookingData>) => {
-    setBookingData((prev) => ({ ...prev, ...updates }));
+    setBookingData(prev => ({ ...prev, ...updates }));
   }, []);
   const convertPrismaBookingToBookingData = useCallback(
     (prismaBooking: Booking): Partial<BookingData> => {
       const { status, ...rest } = prismaBooking;
 
-      let mappedStatus: BookingData["status"] | undefined;
-      if (
-        status === "PENDING" ||
-        status === "CONFIRMED" ||
-        status === "CANCELLED"
-      ) {
+      let mappedStatus: BookingData['status'] | undefined;
+      if (status === 'PENDING' || status === 'CONFIRMED' || status === 'CANCELLED') {
         mappedStatus = status;
       }
 
@@ -81,7 +77,7 @@ export function useBookingState({
 
         return true;
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to update dates");
+        setError(err instanceof Error ? err.message : 'Failed to update dates');
         return false;
       } finally {
         setIsLoading(false);
@@ -111,20 +107,14 @@ export function useBookingState({
             return false;
           }
           if (result.booking) {
-            const convertedBooking = convertPrismaBookingToBookingData(
-              result.booking
-            );
+            const convertedBooking = convertPrismaBookingToBookingData(result.booking);
             updateBookingData(convertedBooking);
           }
         }
 
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to update guest information"
-        );
+        setError(err instanceof Error ? err.message : 'Failed to update guest information');
         return false;
       } finally {
         setIsLoading(false);
@@ -141,27 +131,20 @@ export function useBookingState({
       try {
         updateBookingData(update);
         if (bookingData.id) {
-          const result = await updateBookingStatus(
-            bookingData.id,
-            update.status
-          );
+          const result = await updateBookingStatus(bookingData.id, update.status);
           if (result.error) {
             setError(result.error);
             return false;
           }
           if (result.booking) {
-            const convertedBooking = convertPrismaBookingToBookingData(
-              result.booking
-            );
+            const convertedBooking = convertPrismaBookingToBookingData(result.booking);
             updateBookingData(convertedBooking);
           }
         }
 
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to process payment"
-        );
+        setError(err instanceof Error ? err.message : 'Failed to process payment');
         return false;
       } finally {
         setIsLoading(false);
@@ -177,7 +160,7 @@ export function useBookingState({
 
       try {
         const bookingPayload = {
-          id: bookingData.id || "",
+          id: bookingData.id || '',
           userId: userId || bookingData.userId!,
           travelPlanId: travelPlanId || bookingData.travelPlanId!,
           startDate: data.startDate || bookingData.startDate!,
@@ -196,30 +179,20 @@ export function useBookingState({
         }
 
         if (result.booking) {
-          const convertedBooking = convertPrismaBookingToBookingData(
-            result.booking
-          );
+          const convertedBooking = convertPrismaBookingToBookingData(result.booking);
           updateBookingData(convertedBooking);
           return convertedBooking as BookingData;
         }
 
         return null;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to create booking"
-        );
+        setError(err instanceof Error ? err.message : 'Failed to create booking');
         return null;
       } finally {
         setIsLoading(false);
       }
     },
-    [
-      bookingData,
-      userId,
-      travelPlanId,
-      updateBookingData,
-      convertPrismaBookingToBookingData,
-    ]
+    [bookingData, userId, travelPlanId, updateBookingData, convertPrismaBookingToBookingData]
   );
 
   return {

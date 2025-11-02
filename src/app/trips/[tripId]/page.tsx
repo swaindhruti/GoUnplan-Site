@@ -1,24 +1,16 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getTripById } from "@/actions/trips/getTripByIdForTripDetail";
-import {
-  Calendar,
-  Users,
-  Star,
-  MessageCircle,
-  Map,
-  ArrowRightCircle,
-  Dot,
-} from "lucide-react";
-import { ChatButton } from "@/components/chat/ChatButton";
-import { requireUser } from "@/lib/roleGaurd";
-import Image from "next/image";
-import { Separator } from "@/components/ui/separator";
-import { v4 as uuidv4 } from "uuid";
-import TripItinerary from "@/components/trips/Itenary";
-import React from "react";
-import { MapWrapper } from "@/components/trips/MapWrapper";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { getTripById } from '@/actions/trips/getTripByIdForTripDetail';
+import { Calendar, Users, Star, MessageCircle, Map, ArrowRightCircle, Dot } from 'lucide-react';
+import { ChatButton } from '@/components/chat/ChatButton';
+import { requireUser } from '@/lib/roleGaurd';
+import Image from 'next/image';
+import { Separator } from '@/components/ui/separator';
+import { v4 as uuidv4 } from 'uuid';
+import TripItinerary from '@/components/trips/Itenary';
+import React from 'react';
+import { MapWrapper } from '@/components/trips/MapWrapper';
 
 type Props = {
   params: Promise<{
@@ -32,17 +24,17 @@ export default async function TripDetailsPage({ params }: Props) {
   const UserSession = await requireUser();
   const bookingId = uuidv4();
 
-  if (!trip || "error" in trip) return notFound();
+  if (!trip || 'error' in trip) return notFound();
 
   const createdYear = new Date(trip.createdAt).getFullYear();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "2-digit",
+      .toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: '2-digit',
       })
       .toUpperCase();
   };
@@ -68,11 +60,7 @@ export default async function TripDetailsPage({ params }: Props) {
 
     const tripRestrictions: string[] = trip.restrictions?.length
       ? trip.restrictions.slice(0, 3)
-      : [
-          "No pets allowed",
-          "Suitable for ages 12+",
-          "Not wheelchair accessible",
-        ];
+      : ['No pets allowed', 'Suitable for ages 12+', 'Not wheelchair accessible'];
 
     result.push(tripRestrictions);
 
@@ -85,9 +73,9 @@ export default async function TripDetailsPage({ params }: Props) {
     const tripSpecials: string[] = trip.special?.length
       ? trip.special.slice(0, 3)
       : [
-          "Exclusive local experiences",
-          "Personalized guided tours",
-          "Scenic hidden spots included",
+          'Exclusive local experiences',
+          'Personalized guided tours',
+          'Scenic hidden spots included',
         ];
 
     result.push(tripSpecials);
@@ -123,7 +111,7 @@ export default async function TripDetailsPage({ params }: Props) {
   }); */
   const hostInfo = {
     name: trip.host.user.name,
-    image: trip.host.image || "https://via.placeholder.com/60",
+    image: trip.host.image || 'https://via.placeholder.com/60',
     email: trip.host.hostEmail,
     description: trip.host.description,
     createdYear,
@@ -133,27 +121,27 @@ export default async function TripDetailsPage({ params }: Props) {
     price: trip.price,
     noOfDays: trip.noOfDays,
     maxParticipants: trip.maxParticipants,
-    languages: trip.languages.join(", "),
+    languages: trip.languages.join(', '),
   };
 
   const sections = [
     {
       title: "What's Special",
       items: specials,
-      icon: "★",
-      iconColor: "text-yellow-400",
+      icon: '★',
+      iconColor: 'text-yellow-400',
     },
     {
       title: "What's Included",
       items: highlights,
-      icon: "✓",
-      iconColor: "text-green-400",
+      icon: '✓',
+      iconColor: 'text-green-400',
     },
     {
       title: "What's Not Included",
       items: restrictions,
-      icon: "✗",
-      iconColor: "text-red-400",
+      icon: '✗',
+      iconColor: 'text-red-400',
     },
   ];
 
@@ -164,7 +152,7 @@ export default async function TripDetailsPage({ params }: Props) {
       <div className="relative w-full h-screen overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={trip.tripImage || ""}
+            src={trip.tripImage || ''}
             alt="Trip Background"
             fill
             className="object-cover opacity-40 blur-sm scale-110"
@@ -175,7 +163,7 @@ export default async function TripDetailsPage({ params }: Props) {
         <div className="relative bg-transparent z-10 h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="relative w-full bg-transparent  max-w-6xl h-[100vh]">
             <Image
-              src={trip.tripImage || ""}
+              src={trip.tripImage || ''}
               alt="Trip Experience"
               fill
               className="object-contain rounded-xl shadow-2xl bg-transparent"
@@ -192,7 +180,7 @@ export default async function TripDetailsPage({ params }: Props) {
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div className="flex items-start gap-4">
                 <Image
-                  src={trip.host.image || "https://via.placeholder.com/48"}
+                  src={trip.host.image || 'https://via.placeholder.com/48'}
                   alt="Host"
                   width={64}
                   height={64}
@@ -206,10 +194,8 @@ export default async function TripDetailsPage({ params }: Props) {
                   {/* Languages Display */}
                   {trip.host.languages && trip.host.languages.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
-                      <span className="text-sm text-gray-600 mr-1 font-medium">
-                        Speaks:
-                      </span>
-                      {trip.host.languages.slice(0, 3).map((language) => (
+                      <span className="text-sm text-gray-600 mr-1 font-medium">Speaks:</span>
+                      {trip.host.languages.slice(0, 3).map(language => (
                         <span
                           key={language}
                           className="inline-flex items-center px-2.5 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium"
@@ -253,9 +239,7 @@ export default async function TripDetailsPage({ params }: Props) {
 
               <div className="flex items-center gap-2">
                 <span>👥</span>
-                <span className="truncate">
-                  {tripStats.maxParticipants} Mates
-                </span>
+                <span className="truncate">{tripStats.maxParticipants} Mates</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -284,9 +268,7 @@ export default async function TripDetailsPage({ params }: Props) {
                         >
                           {section.icon}
                         </span>
-                        <span className="text-gray-700 text-sm leading-relaxed">
-                          {item}
-                        </span>
+                        <span className="text-gray-700 text-sm leading-relaxed">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -304,7 +286,7 @@ export default async function TripDetailsPage({ params }: Props) {
             <MapWrapper stops={trip.stops} startDate={trip.startDate!} />
 
             <TripItinerary
-              itinerary={trip.dayWiseItinerary.map((day) => ({
+              itinerary={trip.dayWiseItinerary.map(day => ({
                 ...day,
                 startDate: trip.startDate ?? null,
                 accommodation: day.accommodation ?? undefined,
@@ -317,25 +299,21 @@ export default async function TripDetailsPage({ params }: Props) {
             <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm lg:sticky lg:top-2 overflow-hidden">
               {/* Date Range */}
               <div className="text-sm sm:text-base font-medium p-3 bg-black/5 rounded-xl mb-4 sm:mb-6 text-center">
-                {formatDate(trip.startDate?.toString() || "")} →{" "}
-                {formatDate(trip.endDate?.toString() || "")}
+                {formatDate(trip.startDate?.toString() || '')} →{' '}
+                {formatDate(trip.endDate?.toString() || '')}
               </div>
 
               {/* Guided Trip Indicator */}
               <div className="flex gap-2 items-center mb-4 sm:mb-6">
                 <Map className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-                <div className="text-gray-600 text-sm sm:text-base">
-                  Guided trip
-                </div>
+                <div className="text-gray-600 text-sm sm:text-base">Guided trip</div>
               </div>
 
               {/* Price Section */}
               <div className="mb-4 sm:mb-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                   <div>
-                    <div className="text-lg sm:text-xl font-bold">
-                      TOTAL PRICE
-                    </div>
+                    <div className="text-lg sm:text-xl font-bold">TOTAL PRICE</div>
                     <div className="text-gray-600 text-xs sm:text-sm">
                       Includes all taxes and fees
                     </div>
@@ -401,7 +379,7 @@ export default async function TripDetailsPage({ params }: Props) {
                   <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-purple-200 flex-shrink-0">
                     <AvatarImage src={hostInfo.image} />
                     <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-bold">
-                      {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                      {hostInfo.name?.charAt(0).toUpperCase() ?? 'H'}
                     </AvatarFallback>
                   </Avatar>
 
@@ -417,8 +395,8 @@ export default async function TripDetailsPage({ params }: Props) {
                             key={i}
                             className={`h-3 w-3 ${
                               i < Math.round(trip.host.averageRating)
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300"
+                                ? 'text-yellow-400 fill-yellow-400'
+                                : 'text-gray-300'
                             }`}
                           />
                         ))}
@@ -426,13 +404,11 @@ export default async function TripDetailsPage({ params }: Props) {
                       <span className="text-xs text-gray-600">
                         {trip.host.averageRating > 0
                           ? trip.host.averageRating.toFixed(1)
-                          : "No ratings"}
+                          : 'No ratings'}
                       </span>
                     </div>
 
-                    <p className="text-xs text-gray-600">
-                      Host since {hostInfo.createdYear}
-                    </p>
+                    <p className="text-xs text-gray-600">Host since {hostInfo.createdYear}</p>
                   </div>
                 </div>
 

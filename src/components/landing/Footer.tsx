@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   MapPin,
   Phone,
@@ -15,7 +15,7 @@ import {
   Users,
   Star,
   ArrowRight,
-} from "lucide-react";
+} from 'lucide-react';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -40,9 +40,7 @@ export const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-                  GoUnplan
-                </h3>
+                <h3 className="text-2xl font-bold text-gray-900 font-bricolage">GoUnplan</h3>
                 <p className="text-sm text-purple-600 font-medium font-instrument">
                   Discover. Experience. Remember.
                 </p>
@@ -51,8 +49,8 @@ export const Footer = () => {
 
             {/* Description */}
             <p className="text-gray-600 font-instrument leading-relaxed">
-              Your gateway to extraordinary travel experiences. Connect with
-              local hosts and discover hidden gems around the world.
+              Your gateway to extraordinary travel experiences. Connect with local hosts and
+              discover hidden gems around the world.
             </p>
 
             {/* Social Links */}
@@ -62,11 +60,11 @@ export const Footer = () => {
               </h4>
               <div className="flex gap-3">
                 {[
-                  { icon: Facebook, href: "#", color: "hover:bg-blue-600" },
-                  { icon: Instagram, href: "#", color: "hover:bg-pink-600" },
-                  { icon: Twitter, href: "#", color: "hover:bg-sky-500" },
-                  { icon: Linkedin, href: "#", color: "hover:bg-blue-700" },
-                  { icon: Youtube, href: "#", color: "hover:bg-red-600" },
+                  { icon: Facebook, href: '#', color: 'hover:bg-blue-600' },
+                  { icon: Instagram, href: '#', color: 'hover:bg-pink-600' },
+                  { icon: Twitter, href: '#', color: 'hover:bg-sky-500' },
+                  { icon: Linkedin, href: '#', color: 'hover:bg-blue-700' },
+                  { icon: Youtube, href: '#', color: 'hover:bg-red-600' },
                 ].map((social, index) => (
                   <a
                     key={index}
@@ -82,19 +80,17 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900 font-bricolage">
-              Quick Links
-            </h4>
+            <h4 className="text-lg font-semibold text-gray-900 font-bricolage">Quick Links</h4>
             <nav className="space-y-3">
               {[
-                { name: "Browse Trips", href: "/trips" },
-                { name: "My Trips", href: "/my-trips" },
-                { name: "Profile", href: "/profile" },
-                { name: "Chat", href: "/chat" },
-                { name: "Contact Us", href: "/contact" },
-                { name: "Support", href: "/support" },
-                { name: "Coming Soon", href: "/coming-soon" },
-              ].map((link) => (
+                { name: 'Browse Trips', href: '/trips' },
+                { name: 'My Trips', href: '/my-trips' },
+                { name: 'Profile', href: '/profile' },
+                { name: 'Chat', href: '/chat' },
+                { name: 'Contact Us', href: '/contact' },
+                { name: 'Support', href: '/support' },
+                { name: 'Coming Soon', href: '/coming-soon' },
+              ].map(link => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -118,11 +114,11 @@ export const Footer = () => {
                 </h4>
                 <nav className="space-y-2">
                   {[
-                    { name: "Browse Trips", href: "/trips" },
-                    { name: "My Bookings", href: "/my-trips" },
-                    { name: "Trip Planning", href: "/trips" },
-                    { name: "Customer Support", href: "/support" },
-                  ].map((link) => (
+                    { name: 'Browse Trips', href: '/trips' },
+                    { name: 'My Bookings', href: '/my-trips' },
+                    { name: 'Trip Planning', href: '/trips' },
+                    { name: 'Customer Support', href: '/support' },
+                  ].map(link => (
                     <Link
                       key={link.name}
                       href={link.href}
@@ -142,11 +138,11 @@ export const Footer = () => {
                 </h4>
                 <nav className="space-y-2">
                   {[
-                    { name: "Become a Host", href: "/dashboard/host" },
-                    { name: "Host Dashboard", href: "/dashboard/host" },
-                    { name: "Host Resources", href: "/support" },
-                    { name: "Host Support", href: "/support" },
-                  ].map((link) => (
+                    { name: 'Become a Host', href: '/dashboard/host' },
+                    { name: 'Host Dashboard', href: '/dashboard/host' },
+                    { name: 'Host Resources', href: '/support' },
+                    { name: 'Host Support', href: '/support' },
+                  ].map(link => (
                     <Link
                       key={link.name}
                       href={link.href}
@@ -172,9 +168,7 @@ export const Footer = () => {
                 </div>
                 <div>
                   <p className="font-instrument text-sm">Mumbai, India</p>
-                  <p className="font-instrument text-xs text-gray-500">
-                    Global Operations
-                  </p>
+                  <p className="font-instrument text-xs text-gray-500">Global Operations</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-600">
@@ -183,9 +177,7 @@ export const Footer = () => {
                 </div>
                 <div>
                   <p className="font-instrument text-sm">hello@gounplan.com</p>
-                  <p className="font-instrument text-xs text-gray-500">
-                    24/7 Support
-                  </p>
+                  <p className="font-instrument text-xs text-gray-500">24/7 Support</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-600">
@@ -194,9 +186,7 @@ export const Footer = () => {
                 </div>
                 <div>
                   <p className="font-instrument text-sm">+91 98765 43210</p>
-                  <p className="font-instrument text-xs text-gray-500">
-                    Call us anytime
-                  </p>
+                  <p className="font-instrument text-xs text-gray-500">Call us anytime</p>
                 </div>
               </div>
             </div>
@@ -207,13 +197,13 @@ export const Footer = () => {
         <div className="border-t border-gray-200 pt-8 mt-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             {[
-              { icon: Shield, title: "Secure Payments", desc: "SSL Encrypted" },
-              { icon: Users, title: "50K+ Travelers", desc: "Happy Customers" },
-              { icon: Globe, title: "100+ Destinations", desc: "Worldwide" },
+              { icon: Shield, title: 'Secure Payments', desc: 'SSL Encrypted' },
+              { icon: Users, title: '50K+ Travelers', desc: 'Happy Customers' },
+              { icon: Globe, title: '100+ Destinations', desc: 'Worldwide' },
               {
                 icon: Star,
-                title: "4.9/5 Rating",
-                desc: "Customer Satisfaction",
+                title: '4.9/5 Rating',
+                desc: 'Customer Satisfaction',
               },
             ].map((item, index) => (
               <div key={index} className="flex flex-col items-center gap-2">
@@ -221,12 +211,8 @@ export const Footer = () => {
                   <item.icon className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 font-bricolage text-sm">
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-gray-500 font-instrument">
-                    {item.desc}
-                  </p>
+                  <p className="font-semibold text-gray-900 font-bricolage text-sm">{item.title}</p>
+                  <p className="text-xs text-gray-500 font-instrument">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -249,26 +235,26 @@ export const Footer = () => {
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               {[
                 {
-                  name: "Privacy Policy",
-                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  name: 'Privacy Policy',
+                  href: 'https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing',
                   external: true,
                 },
                 {
-                  name: "Terms of Service",
-                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  name: 'Terms of Service',
+                  href: 'https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing',
                   external: true,
                 },
                 {
-                  name: "Payment Policy",
-                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  name: 'Payment Policy',
+                  href: 'https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing',
                   external: true,
                 },
                 {
-                  name: "Refund Policy",
-                  href: "https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing",
+                  name: 'Refund Policy',
+                  href: 'https://drive.google.com/drive/folders/1dWzpb7yvPQYGFJnljtsBOu6wxzTdjxru?usp=sharing',
                   external: true,
                 },
-              ].map((link) =>
+              ].map(link =>
                 link.external ? (
                   <a
                     key={link.name}

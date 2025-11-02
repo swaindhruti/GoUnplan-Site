@@ -1,22 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { BookingProgress } from "./BookingProgress";
-import { GuestInformationForm } from "./GuestInformation";
-import { useBookingStore } from "@/store/booking-store";
-import type { TravelPlan, BookingFormData, BookingData } from "@/types/booking";
-import {
-  Loader2,
-  Calendar,
-  Users,
-  DollarSign,
-  MessageCircle,
-  Languages,
-  Star,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useState, useEffect, useCallback } from 'react';
+import { BookingProgress } from './BookingProgress';
+import { GuestInformationForm } from './GuestInformation';
+import { useBookingStore } from '@/store/booking-store';
+import type { TravelPlan, BookingFormData, BookingData } from '@/types/booking';
+import { Loader2, Calendar, Users, DollarSign, MessageCircle, Languages, Star } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface BookingPageProps {
   userId: string;
@@ -28,15 +20,15 @@ interface BookingPageProps {
 }
 
 const EnhancedLoadingState = () => {
-  const [loadingText, setLoadingText] = useState("Preparing your booking...");
+  const [loadingText, setLoadingText] = useState('Preparing your booking...');
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const messages = [
-      "Preparing your booking...",
-      "Processing guest information...",
-      "Securing your spot...",
-      "Almost ready...",
+      'Preparing your booking...',
+      'Processing guest information...',
+      'Securing your spot...',
+      'Almost ready...',
     ];
     let messageIndex = 0;
     let progressValue = 0;
@@ -50,7 +42,7 @@ const EnhancedLoadingState = () => {
       }
       if (progressValue >= 100) {
         clearInterval(interval);
-        setLoadingText("Finalizing booking...");
+        setLoadingText('Finalizing booking...');
       }
     }, 800);
 
@@ -67,9 +59,7 @@ const EnhancedLoadingState = () => {
             </div>
           </div>
         </div>
-        <h2 className="text-xl font-bold mb-2 text-gray-900 font-bricolage">
-          {loadingText}
-        </h2>
+        <h2 className="text-xl font-bold mb-2 text-gray-900 font-bricolage">{loadingText}</h2>
         <p className="text-gray-600 text-sm font-instrument mb-6">
           Please don&apos;t close this page while we create your booking
         </p>
@@ -79,9 +69,7 @@ const EnhancedLoadingState = () => {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs text-gray-500 font-instrument">
-          {progress}% complete
-        </p>
+        <p className="text-xs text-gray-500 font-instrument">{progress}% complete</p>
       </div>
     </div>
   );
@@ -96,15 +84,13 @@ export function BookingPage({
 }: BookingPageProps) {
   const [currentStep, setCurrentStep] = useState(Step || 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const bookingData = useBookingStore((state) => state.bookingData);
+  const bookingData = useBookingStore(state => state.bookingData);
   const router = useRouter();
-  const isLoading = useBookingStore((state) => state.isLoading);
-  const updateBookingData = useBookingStore((state) => state.updateBookingData);
-  const createNewBooking = useBookingStore((state) => state.createNewBooking);
+  const isLoading = useBookingStore(state => state.isLoading);
+  const updateBookingData = useBookingStore(state => state.updateBookingData);
+  const createNewBooking = useBookingStore(state => state.createNewBooking);
 
-  const [_numberOfGuests, setNumberOfGuests] = useState<number>(
-    bookingData.participants || 1
-  );
+  const [_numberOfGuests, setNumberOfGuests] = useState<number>(bookingData.participants || 1);
 
   useEffect(() => {
     updateBookingData({
@@ -143,7 +129,7 @@ export function BookingPage({
           participants: guestCount,
           guests: guestData.guests,
           specialRequirements: guestData.specialRequirements,
-          status: "PENDING" as const,
+          status: 'PENDING' as const,
           totalPrice: (tripData?.price || 0) * guestCount,
         };
 
@@ -151,36 +137,34 @@ export function BookingPage({
 
         if (newBooking) {
           setTimeout(() => {
-            setCurrentStep((prev) => prev + 1);
+            setCurrentStep(prev => prev + 1);
             setIsTransitioning(false);
           }, 300);
-          toast.success("Guest info submitted successfully...!!", {
+          toast.success('Guest info submitted successfully...!!', {
             style: {
-              background: "rgba(147, 51, 234, 0.95)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(196, 181, 253, 0.3)",
-              color: "white",
-              fontFamily: "var(--font-instrument)",
+              background: 'rgba(147, 51, 234, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(196, 181, 253, 0.3)',
+              color: 'white',
+              fontFamily: 'var(--font-instrument)',
             },
             duration: 3000,
           });
-          router.push(
-            `/trips/booking/${tripData.travelPlanId}/booking-summary/${newBooking.id}`
-          );
+          router.push(`/trips/booking/${tripData.travelPlanId}/booking-summary/${newBooking.id}`);
         } else {
           setIsTransitioning(false);
         }
       } catch (error) {
         toast.success(`${error}`, {
           style: {
-            background: "rgba(147, 51, 234, 0.95)",
-            backdropFilter: "blur(12px)",
-            color: "white",
-            fontFamily: "var(--font-instrument)",
+            background: 'rgba(147, 51, 234, 0.95)',
+            backdropFilter: 'blur(12px)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
           },
           duration: 3000,
         });
-        console.error("Failed to create booking:", error);
+        console.error('Failed to create booking:', error);
         setIsTransitioning(false);
       }
     },
@@ -188,25 +172,23 @@ export function BookingPage({
   );
 
   const formatDate = (date?: string | Date | null) => {
-    if (!date) return "";
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
     });
   };
 
-  const heroTags = [
-    `${formatDate(tripData.startDate)} - ${formatDate(tripData.endDate)}`,
-  ];
+  const heroTags = [`${formatDate(tripData.startDate)} - ${formatDate(tripData.endDate)}`];
 
   const createdYear = new Date(tripData.createdAt || new Date()).getFullYear();
 
   const hostInfo = {
-    name: tripData.host?.user.name || "Host",
-    image: tripData.host?.image || "https://via.placeholder.com/60",
-    email: tripData.host?.hostEmail || "",
-    description: tripData.host?.description || "",
+    name: tripData.host?.user.name || 'Host',
+    image: tripData.host?.image || 'https://via.placeholder.com/60',
+    email: tripData.host?.hostEmail || '',
+    description: tripData.host?.description || '',
     createdYear,
     averageRating: tripData.host?.averageRating || 0,
   };
@@ -215,7 +197,7 @@ export function BookingPage({
     price: tripData.price || 0,
     noOfDays: tripData.noOfDays || 0,
     maxParticipants: tripData.maxParticipants || 0,
-    languages: tripData.languages?.join(", ") || "English",
+    languages: tripData.languages?.join(', ') || 'English',
   };
 
   if (isLoading) {
@@ -230,7 +212,7 @@ export function BookingPage({
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('${
             tripData.tripImage ||
-            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'
           }')`,
         }}
       >
@@ -244,13 +226,10 @@ export function BookingPage({
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-white font-bricolage leading-[1.05] tracking-tighter drop-shadow-lg">
                 Reserve Your Spot
-                <span className="block text-purple-300 mt-2">
-                  {tripData.title}
-                </span>
+                <span className="block text-purple-300 mt-2">{tripData.title}</span>
               </h1>
               <p className="text-lg text-white/90 font-instrument mt-2 drop-shadow-md">
-                Secure your adventure in {tripData.destination} with our easy
-                booking process
+                Secure your adventure in {tripData.destination} with our easy booking process
               </p>
 
               <div className="flex flex-wrap gap-3 mt-6">
@@ -279,9 +258,7 @@ export function BookingPage({
             <div className="lg:col-span-2">
               <div
                 className={`backdrop-blur-xl bg-white/95 border border-white/20 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 ${
-                  isTransitioning
-                    ? "opacity-50 scale-95"
-                    : "opacity-100 scale-100"
+                  isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
                 }`}
               >
                 {/* Progress Indicator */}
@@ -302,9 +279,7 @@ export function BookingPage({
                 </div>
 
                 <div className="border-t border-gray-200 pt-8">
-                  {currentStep === 1 && (
-                    <GuestInformationForm onContinue={handleGuestInfoSubmit} />
-                  )}
+                  {currentStep === 1 && <GuestInformationForm onContinue={handleGuestInfoSubmit} />}
                   {/* Add other steps here as needed */}
                   {currentStep === 2 && (
                     <div className="text-center py-8">
@@ -312,8 +287,7 @@ export function BookingPage({
                         Booking Created Successfully!
                       </h3>
                       <p className="text-gray-600 font-instrument">
-                        Your booking has been created with all guest
-                        information.
+                        Your booking has been created with all guest information.
                       </p>
                     </div>
                   )}
@@ -328,9 +302,7 @@ export function BookingPage({
                     <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 rounded-xl text-white shadow-sm">
                       <DollarSign className="h-5 w-5" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 font-bricolage">
-                      Trip Summary
-                    </h3>
+                    <h3 className="text-xl font-bold text-gray-900 font-bricolage">Trip Summary</h3>
                   </div>
 
                   <div className="mb-6">
@@ -338,9 +310,7 @@ export function BookingPage({
                       <span className="text-3xl font-bold text-gray-900 font-bricolage">
                         ₹{tripStats.price.toLocaleString()}
                       </span>
-                      <span className="text-gray-600 font-instrument">
-                        per person
-                      </span>
+                      <span className="text-gray-600 font-instrument">per person</span>
                     </div>
                   </div>
 
@@ -357,9 +327,7 @@ export function BookingPage({
                       <div className="bg-blue-50 p-2 rounded-lg">
                         <Languages className="h-4 w-4 text-blue-600" />
                       </div>
-                      <span className="text-gray-700 font-instrument">
-                        {tripStats.languages}
-                      </span>
+                      <span className="text-gray-700 font-instrument">{tripStats.languages}</span>
                     </div>
                   </div>
 
@@ -383,13 +351,11 @@ export function BookingPage({
                     <Avatar className="h-12 w-12 border-2 border-purple-200">
                       <AvatarImage src={hostInfo.image} />
                       <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold">
-                        {hostInfo.name?.charAt(0).toUpperCase() ?? "H"}
+                        {hostInfo.name?.charAt(0).toUpperCase() ?? 'H'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="font-bold text-gray-900 font-instrument">
-                        {hostInfo.name}
-                      </p>
+                      <p className="font-bold text-gray-900 font-instrument">{hostInfo.name}</p>
                       <div className="flex items-center gap-1 mb-1">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
@@ -397,8 +363,8 @@ export function BookingPage({
                               key={i}
                               className={`h-3 w-3 ${
                                 i < Math.round(hostInfo.averageRating)
-                                  ? "text-yellow-400 fill-yellow-400"
-                                  : "text-gray-300"
+                                  ? 'text-yellow-400 fill-yellow-400'
+                                  : 'text-gray-300'
                               }`}
                             />
                           ))}
@@ -406,7 +372,7 @@ export function BookingPage({
                         <span className="text-xs text-gray-600">
                           {hostInfo.averageRating > 0
                             ? hostInfo.averageRating.toFixed(1)
-                            : "No ratings"}
+                            : 'No ratings'}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 font-instrument">
@@ -418,7 +384,7 @@ export function BookingPage({
                   <div className="bg-gray-50 rounded-lg p-4 mb-4">
                     <p className="text-sm text-gray-700 font-instrument leading-relaxed">
                       {hostInfo.description ||
-                        "Experienced travel guide passionate about sharing local culture and creating unforgettable experiences."}
+                        'Experienced travel guide passionate about sharing local culture and creating unforgettable experiences.'}
                     </p>
                   </div>
 

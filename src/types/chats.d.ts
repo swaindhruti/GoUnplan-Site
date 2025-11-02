@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
 // Base Prisma types
 export type User = Prisma.UserGetPayload<object>;
@@ -61,7 +61,7 @@ export type ChatWithParticipants = Prisma.ChatGetPayload<{
 export type ChatWithMessages = Prisma.ChatGetPayload<{
   include: {
     messages: {
-      orderBy: { createdAt: "desc" };
+      orderBy: { createdAt: 'desc' };
       take: 10;
       include: {
         sender: {
@@ -82,7 +82,7 @@ export type ChatWithLastMessage = Prisma.ChatGetPayload<{
       };
     };
     messages: {
-      orderBy: { createdAt: "desc" };
+      orderBy: { createdAt: 'desc' };
       take: 1;
       include: {
         sender: {
@@ -106,7 +106,7 @@ export type ChatWithFullDetails = Prisma.ChatGetPayload<{
       };
     };
     messages: {
-      orderBy: { createdAt: "desc" };
+      orderBy: { createdAt: 'desc' };
       take: 1;
       include: {
         sender: {
@@ -149,11 +149,11 @@ export type UserWithChats = Prisma.UserGetPayload<{
 export type UserWithMessages = Prisma.UserGetPayload<{
   include: {
     sentMessages: {
-      orderBy: { createdAt: "desc" };
+      orderBy: { createdAt: 'desc' };
       take: 10;
     };
     receivedMessages: {
-      orderBy: { createdAt: "desc" };
+      orderBy: { createdAt: 'desc' };
       take: 10;
     };
   };
@@ -265,9 +265,7 @@ export type PollMessagesResult =
   | { success: true; messages: MessageWithSender[] }
   | { success: false; error: string };
 
-export type GenericSuccessResult =
-  | { success: true }
-  | { success: false; error: string };
+export type GenericSuccessResult = { success: true } | { success: false; error: string };
 
 export type UnreadCountResult =
   | { success: true; count: number }
@@ -347,7 +345,7 @@ export interface UserAvatarProps {
     image: string | null;
     role: Prisma.$Enums.Role;
   };
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
 // Pagination types
@@ -370,12 +368,7 @@ export interface PaginatedResult<T> {
 }
 
 export interface RealtimeMessage {
-  type:
-    | "NEW_MESSAGE"
-    | "MESSAGE_READ"
-    | "USER_TYPING"
-    | "USER_ONLINE"
-    | "USER_OFFLINE";
+  type: 'NEW_MESSAGE' | 'MESSAGE_READ' | 'USER_TYPING' | 'USER_ONLINE' | 'USER_OFFLINE';
   data: Message;
   chatId?: string;
   userId?: string;
@@ -412,4 +405,4 @@ export interface ChatStats {
 //     allowedTypes: string[];
 //   };
 // }
-export type ChatUser = Pick<User, "id" | "name" | "image" | "role">;
+export type ChatUser = Pick<User, 'id' | 'name' | 'image' | 'role'>;

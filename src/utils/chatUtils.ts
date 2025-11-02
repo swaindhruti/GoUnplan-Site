@@ -4,18 +4,15 @@ export function formatMessageTime(dateString: string): string {
   const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
   if (diffInHours < 24) {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   } else if (diffInHours < 24 * 7) {
-    return date.toLocaleDateString([], { weekday: "short" });
+    return date.toLocaleDateString([], { weekday: 'short' });
   } else {
-    return date.toLocaleDateString([], { month: "short", day: "numeric" });
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   }
 }
 
-export function truncateMessage(
-  message: string,
-  maxLength: number = 50
-): string {
+export function truncateMessage(message: string, maxLength: number = 50): string {
   if (message.length <= maxLength) return message;
-  return message.substring(0, maxLength).trim() + "...";
+  return message.substring(0, maxLength).trim() + '...';
 }

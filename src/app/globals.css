@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -145,23 +145,22 @@
   font-family: var(--font-playfair), serif;
 }
 .font-roboto-condensed {
-  font-family: var(--font-roboto-condensed), "Roboto Condensed", Arial,
-    sans-serif;
+  font-family: var(--font-roboto-condensed), 'Roboto Condensed', Arial, sans-serif;
 }
 .font-roboto {
-  font-family: var(--font-roboto), "Roboto", Arial, sans-serif;
+  font-family: var(--font-roboto), 'Roboto', Arial, sans-serif;
 }
 .font-poppins {
-  font-family: var(--font-poppins), "Poppins", Arial, sans-serif;
+  font-family: var(--font-poppins), 'Poppins', Arial, sans-serif;
 }
 .font-montserrat {
-  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
+  font-family: var(--font-montserrat), 'Montserrat', Arial, sans-serif;
 }
 .font-bricolage {
-  font-family: var(--font-bricolage), "Bricolage Grotesque", Arial, sans-serif;
+  font-family: var(--font-bricolage), 'Bricolage Grotesque', Arial, sans-serif;
 }
 .font-instrument {
-  font-family: var(--font-instrument), "Instrument Sans", Arial, sans-serif;
+  font-family: var(--font-instrument), 'Instrument Sans', Arial, sans-serif;
 }
 /* Sketch highlight effect */
 .highlight-wavy,
@@ -175,49 +174,49 @@
 
 /* Wavy Underline */
 .highlight-wavy::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   bottom: 0.05em;
   width: 100%;
   height: 0.6em;
-  background: url("/underline-wavy.svg") no-repeat center/contain;
+  background: url('/underline-wavy.svg') no-repeat center/contain;
   z-index: -1;
 }
 
 /* Circular Sketch */
 .highlight-circle::after {
-  content: "";
+  content: '';
   position: absolute;
   left: -10%;
   bottom: -30%;
   width: 120%;
   height: 140%;
-  background: url("/circle-sketch.svg") no-repeat center/contain;
+  background: url('/circle-sketch.svg') no-repeat center/contain;
   z-index: -1;
 }
 
 /* Highlighter Stroke */
 .highlight-stroke::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   bottom: 0.05em;
   width: 100%;
   height: 0.8em;
-  background: url("/highlight-stroke.svg") no-repeat center/contain;
+  background: url('/highlight-stroke.svg') no-repeat center/contain;
   z-index: -1;
 }
 
 /* Oval Sketch */
 .highlight-oval::after {
-  content: "";
+  content: '';
   position: absolute;
   left: -70%;
   bottom: -80%;
   width: 230%;
   height: 250%;
-  background: url("/oval-sketch.svg") no-repeat center/contain;
+  background: url('/oval-sketch.svg') no-repeat center/contain;
   z-index: -1;
 }
 

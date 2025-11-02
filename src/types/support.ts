@@ -1,20 +1,20 @@
 export type SupportCategory =
-  | "GENERAL"
-  | "BOOKING"
-  | "PAYMENT"
-  | "TECHNICAL"
-  | "REFUND"
-  | "CANCELLATION"
-  | "OTHER";
+  | 'GENERAL'
+  | 'BOOKING'
+  | 'PAYMENT'
+  | 'TECHNICAL'
+  | 'REFUND'
+  | 'CANCELLATION'
+  | 'OTHER';
 
-export type SupportPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type SupportPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
 export type SupportTicketStatus =
-  | "OPEN"
-  | "IN_PROGRESS"
-  | "WAITING_FOR_USER"
-  | "RESOLVED"
-  | "CLOSED";
+  | 'OPEN'
+  | 'IN_PROGRESS'
+  | 'WAITING_FOR_USER'
+  | 'RESOLVED'
+  | 'CLOSED';
 
 export interface SupportTicket {
   id: string;

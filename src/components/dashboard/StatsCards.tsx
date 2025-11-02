@@ -1,5 +1,5 @@
-import { ShoppingBag, Calendar, DollarSign, MapPin } from "lucide-react";
-import { UserProfile, Booking } from "@/types/dashboard";
+import { ShoppingBag, Calendar, DollarSign, MapPin } from 'lucide-react';
+import { UserProfile, Booking } from '@/types/dashboard';
 
 interface StatsCardsProps {
   profile: UserProfile | null;
@@ -7,13 +7,9 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ profile, bookings }: StatsCardsProps) {
-  const totalSpent = bookings.reduce(
-    (sum, booking) => sum + booking.totalPrice,
-    0
-  );
+  const totalSpent = bookings.reduce((sum, booking) => sum + booking.totalPrice, 0);
   const upcomingTrips = bookings.filter(
-    (booking) =>
-      new Date(booking.startDate) > new Date() && booking.status === "confirmed"
+    booking => new Date(booking.startDate) > new Date() && booking.status === 'confirmed'
   ).length;
 
   return (
@@ -28,9 +24,7 @@ export function StatsCards({ profile, bookings }: StatsCardsProps) {
         <div className="text-2xl font-bold text-gray-900 font-bricolage">
           {profile?.bookingCounts.total || 0}
         </div>
-        <p className="text-gray-600 text-sm mt-1 font-instrument">
-          Total Bookings
-        </p>
+        <p className="text-gray-600 text-sm mt-1 font-instrument">Total Bookings</p>
       </div>
 
       {/* Upcoming Trips Card */}
@@ -40,12 +34,8 @@ export function StatsCards({ profile, bookings }: StatsCardsProps) {
             <Calendar className="h-5 w-5 text-green-600" />
           </div>
         </div>
-        <div className="text-2xl font-bold text-gray-900 font-bricolage">
-          {upcomingTrips}
-        </div>
-        <p className="text-gray-600 text-sm mt-1 font-instrument">
-          Upcoming Trips
-        </p>
+        <div className="text-2xl font-bold text-gray-900 font-bricolage">{upcomingTrips}</div>
+        <p className="text-gray-600 text-sm mt-1 font-instrument">Upcoming Trips</p>
       </div>
 
       {/* Completed Trips Card */}
@@ -58,9 +48,7 @@ export function StatsCards({ profile, bookings }: StatsCardsProps) {
         <div className="text-2xl font-bold text-gray-900 font-bricolage">
           {profile?.bookingCounts.completed || 0}
         </div>
-        <p className="text-gray-600 text-sm mt-1 font-instrument">
-          Completed Trips
-        </p>
+        <p className="text-gray-600 text-sm mt-1 font-instrument">Completed Trips</p>
       </div>
 
       {/* Spent on Travel Card */}
@@ -73,9 +61,7 @@ export function StatsCards({ profile, bookings }: StatsCardsProps) {
         <div className="text-2xl font-bold text-gray-900 font-bricolage">
           ${totalSpent.toLocaleString()}
         </div>
-        <p className="text-gray-600 text-sm mt-1 font-instrument">
-          Total Spent
-        </p>
+        <p className="text-gray-600 text-sm mt-1 font-instrument">Total Spent</p>
       </div>
     </div>
   );

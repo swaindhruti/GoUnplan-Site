@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import prisma from "@/lib/prisma";
-import { comparePassword } from "@/utils/passwordUtils";
-import { Role } from "@/types/auth";
-import { verifyOtp } from "@/actions/phone/action";
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import prisma from '@/lib/prisma';
+import { comparePassword } from '@/utils/passwordUtils';
+import { Role } from '@/types/auth';
+import { verifyOtp } from '@/actions/phone/action';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -13,26 +13,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
         },
       },
     }),
     // Email/Password Credentials
     Credentials({
-      id: "credentials",
-      name: "credentials",
+      id: 'credentials',
+      name: 'credentials',
       credentials: {
         email: {
-          type: "email",
-          label: "Email",
-          placeholder: "johndoe@gmail.com",
+          type: 'email',
+          label: 'Email',
+          placeholder: 'johndoe@gmail.com',
         },
         password: {
-          type: "password",
-          label: "Password",
-          placeholder: "********",
+          type: 'password',
+          label: 'Password',
+          placeholder: '********',
         },
       },
       async authorize(credentials) {
@@ -47,31 +47,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           if (!user || !user.password) return null;
 
-          const isValidPassword = await comparePassword(
-            password as string,
-            user.password
-          );
+          const isValidPassword = await comparePassword(password as string, user.password);
 
           return isValidPassword ? user : null;
         } catch (error) {
-          console.error("Error in credentials authorize:", error);
+          console.error('Error in credentials authorize:', error);
           return null;
         }
       },
     }),
     Credentials({
-      id: "phone",
-      name: "phone",
+      id: 'phone',
+      name: 'phone',
       credentials: {
         phone: {
-          type: "text",
-          label: "Phone",
-          placeholder: "+1234567890",
+          type: 'text',
+          label: 'Phone',
+          placeholder: '+1234567890',
         },
         otp: {
-          type: "text",
-          label: "OTP",
-          placeholder: "123456",
+          type: 'text',
+          label: 'OTP',
+          placeholder: '123456',
         },
       },
       async authorize(credentials) {
@@ -91,23 +88,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user = await prisma.user.create({
               data: {
                 phone: phone as string,
-                name: "",
+                name: '',
                 password: null,
-                role: "USER" as Role,
+                role: 'USER' as Role,
               },
             });
           }
 
           return user;
         } catch (error) {
-          console.error("Error in phone authorize:", error);
+          console.error('Error in phone authorize:', error);
           return null;
         }
       },
     }),
   ],
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -117,7 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.phone = user.phone;
         token.name = user.name;
 
-        if (account?.provider === "google") {
+        if (account?.provider === 'google') {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
           });
@@ -125,7 +122,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.role = existingUser.role;
             token.id = existingUser.id;
           } else {
-            token.role = "USER" as Role;
+            token.role = 'USER' as Role;
           }
         } else {
           token.role = user.role;
@@ -155,7 +152,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
+      if (account?.provider === 'google') {
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
@@ -164,10 +161,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
-                name: user.name || "",
+                name: user.name || '',
                 image: user.image,
                 password: null,
-                role: "USER" as Role,
+                role: 'USER' as Role,
               },
             });
             user.id = newUser.id;
@@ -176,7 +173,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
           return true;
         } catch (error) {
-          console.error("Error handling Google user:", error);
+          console.error('Error handling Google user:', error);
           return false;
         }
       }
@@ -184,11 +181,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    signOut: "/auth/signout",
-    error: "/auth/error",
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
+    error: '/auth/error',
   },
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   trustHost: true,
-  debug: process.env.NODE_ENV === "development",
+  debug: process.env.NODE_ENV === 'development',
 });

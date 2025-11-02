@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
 
 export default function Loading() {
   return (
@@ -55,7 +55,7 @@ export default function Loading() {
 
           {/* Cards Skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map(i => (
               <div
                 key={i}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden"

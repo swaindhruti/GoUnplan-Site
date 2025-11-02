@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, User, MessageSquare, Send, Paperclip } from "lucide-react";
+} from '@/components/ui/select';
+import { ArrowLeft, User, MessageSquare, Send, Paperclip } from 'lucide-react';
 import {
   getTicketById,
   updateTicket,
   addTicketMessage,
   getAllSupportStaff,
-} from "@/actions/support/actions";
-import { UpdateTicketData, CreateTicketMessageData } from "@/types/support";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
+} from '@/actions/support/actions';
+import { UpdateTicketData, CreateTicketMessageData } from '@/types/support';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 interface TicketDetail {
   id: string;
@@ -85,7 +85,7 @@ const TicketDetailPage = () => {
     Array<{ id: string; name: string; email: string | null }>
   >([]);
   const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [isInternalMessage, setIsInternalMessage] = useState(false);
   const [updating, setUpdating] = useState(false);
 
@@ -105,7 +105,7 @@ const TicketDetailPage = () => {
         setSupportStaff(staffResult.supportStaff);
       }
     } catch (error) {
-      console.error("Error fetching ticket:", error);
+      console.error('Error fetching ticket:', error);
     } finally {
       setLoading(false);
     }
@@ -125,7 +125,7 @@ const TicketDetailPage = () => {
         fetchTicket(); // Refresh ticket data
       }
     } catch (error) {
-      console.error("Error updating ticket:", error);
+      console.error('Error updating ticket:', error);
     } finally {
       setUpdating(false);
     }
@@ -143,55 +143,54 @@ const TicketDetailPage = () => {
 
       const result = await addTicketMessage(messageData);
       if (result.success) {
-        setNewMessage("");
+        setNewMessage('');
         setIsInternalMessage(false);
         fetchTicket(); // Refresh to show new message
       }
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
     }
   };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "OPEN":
-        return "destructive";
-      case "IN_PROGRESS":
-        return "default";
-      case "WAITING_FOR_USER":
-        return "secondary";
-      case "RESOLVED":
-        return "outline";
-      case "CLOSED":
-        return "outline";
+      case 'OPEN':
+        return 'destructive';
+      case 'IN_PROGRESS':
+        return 'default';
+      case 'WAITING_FOR_USER':
+        return 'secondary';
+      case 'RESOLVED':
+        return 'outline';
+      case 'CLOSED':
+        return 'outline';
       default:
-        return "default";
+        return 'default';
     }
   };
 
   const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case "URGENT":
-        return "destructive";
-      case "HIGH":
-        return "destructive";
-      case "MEDIUM":
-        return "default";
-      case "LOW":
-        return "secondary";
+      case 'URGENT':
+        return 'destructive';
+      case 'HIGH':
+        return 'destructive';
+      case 'MEDIUM':
+        return 'default';
+      case 'LOW':
+        return 'secondary';
       default:
-        return "default";
+        return 'default';
     }
   };
 
-  const canModifyTicket =
-    session?.user?.role === "SUPPORT" || session?.user?.role === "ADMIN";
+  const canModifyTicket = session?.user?.role === 'SUPPORT' || session?.user?.role === 'ADMIN';
 
   if (loading) {
     return (
       <div className="min-h-screen">
         {/* Spacer to push content below navbar */}
-        <div style={{ height: "120px" }}></div>
+        <div style={{ height: '120px' }}></div>
         <div className="px-4 md:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
@@ -206,13 +205,13 @@ const TicketDetailPage = () => {
     return (
       <div className="min-h-screen">
         {/* Spacer to push content below navbar */}
-        <div style={{ height: "120px" }}></div>
+        <div style={{ height: '120px' }}></div>
         <div className="px-4 md:px-6 lg:px-8 py-6">
           <div className="text-center py-8">
             <h2 className="text-2xl font-bold">Ticket not found</h2>
             <p className="text-gray-600 mt-2">
-              The ticket you&apos;re looking for doesn&apos;t exist or you
-              don&apos;t have access to it.
+              The ticket you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to
+              it.
             </p>
             <Link href="/dashboard/support">
               <Button className="mt-4">
@@ -229,7 +228,7 @@ const TicketDetailPage = () => {
   return (
     <div className="min-h-screen">
       {/* Spacer to push content below navbar */}
-      <div style={{ height: "120px" }}></div>
+      <div style={{ height: '120px' }}></div>
       <div className="px-4 md:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Header */}
@@ -247,11 +246,9 @@ const TicketDetailPage = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
-                {ticket.priority}
-              </Badge>
+              <Badge variant={getPriorityBadgeVariant(ticket.priority)}>{ticket.priority}</Badge>
               <Badge variant={getStatusBadgeVariant(ticket.status)}>
-                {ticket.status.replace("_", " ")}
+                {ticket.status.replace('_', ' ')}
               </Badge>
             </div>
           </div>
@@ -285,17 +282,13 @@ const TicketDetailPage = () => {
                   <div>
                     <h3 className="font-semibold">Related Booking</h3>
                     <div className="bg-gray-50 p-3 rounded-lg mt-1">
-                      <p className="font-medium">
-                        {ticket.booking.travelPlan.title}
-                      </p>
+                      <p className="font-medium">{ticket.booking.travelPlan.title}</p>
                       <p className="text-sm text-gray-600">
                         {ticket.booking.travelPlan.destination}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {new Date(
-                          ticket.booking.startDate
-                        ).toLocaleDateString()}{" "}
-                        -{new Date(ticket.booking.endDate).toLocaleDateString()}
+                        {new Date(ticket.booking.startDate).toLocaleDateString()} -
+                        {new Date(ticket.booking.endDate).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -307,14 +300,14 @@ const TicketDetailPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <Select
                         value={ticket.status}
-                        onValueChange={(value) =>
+                        onValueChange={value =>
                           handleUpdateTicket({
                             status: value as
-                              | "OPEN"
-                              | "IN_PROGRESS"
-                              | "WAITING_FOR_USER"
-                              | "RESOLVED"
-                              | "CLOSED",
+                              | 'OPEN'
+                              | 'IN_PROGRESS'
+                              | 'WAITING_FOR_USER'
+                              | 'RESOLVED'
+                              | 'CLOSED',
                           })
                         }
                         disabled={updating}
@@ -324,12 +317,8 @@ const TicketDetailPage = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="OPEN">Open</SelectItem>
-                          <SelectItem value="IN_PROGRESS">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="WAITING_FOR_USER">
-                            Waiting for User
-                          </SelectItem>
+                          <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                          <SelectItem value="WAITING_FOR_USER">Waiting for User</SelectItem>
                           <SelectItem value="RESOLVED">Resolved</SelectItem>
                           <SelectItem value="CLOSED">Closed</SelectItem>
                         </SelectContent>
@@ -337,13 +326,9 @@ const TicketDetailPage = () => {
 
                       <Select
                         value={ticket.priority}
-                        onValueChange={(value) =>
+                        onValueChange={value =>
                           handleUpdateTicket({
-                            priority: value as
-                              | "LOW"
-                              | "MEDIUM"
-                              | "HIGH"
-                              | "URGENT",
+                            priority: value as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT',
                           })
                         }
                         disabled={updating}
@@ -360,10 +345,8 @@ const TicketDetailPage = () => {
                       </Select>
 
                       <Select
-                        value={ticket.assignedTo || ""}
-                        onValueChange={(value) =>
-                          handleUpdateTicket({ assignedTo: value })
-                        }
+                        value={ticket.assignedTo || ''}
+                        onValueChange={value => handleUpdateTicket({ assignedTo: value })}
                         disabled={updating}
                       >
                         <SelectTrigger>
@@ -371,7 +354,7 @@ const TicketDetailPage = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Unassigned</SelectItem>
-                          {supportStaff.map((staff) => (
+                          {supportStaff.map(staff => (
                             <SelectItem key={staff.id} value={staff.id}>
                               {staff.name}
                             </SelectItem>
@@ -409,9 +392,7 @@ const TicketDetailPage = () => {
                       </div>
                       <div>
                         <p className="font-medium">{ticket.assignee.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {ticket.assignee.email}
-                        </p>
+                        <p className="text-sm text-gray-600">{ticket.assignee.email}</p>
                       </div>
                     </div>
                   </div>
@@ -430,13 +411,13 @@ const TicketDetailPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {ticket.messages.map((message) => (
+                {ticket.messages.map(message => (
                   <div
                     key={message.id}
                     className={`p-4 rounded-lg ${
                       message.isInternal
-                        ? "bg-yellow-50 border-l-4 border-yellow-400"
-                        : "bg-gray-50"
+                        ? 'bg-yellow-50 border-l-4 border-yellow-400'
+                        : 'bg-gray-50'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -447,12 +428,9 @@ const TicketDetailPage = () => {
                         <div>
                           <p className="font-medium">{message.sender.name}</p>
                           <p className="text-xs text-gray-500">
-                            {message.sender.role} •{" "}
-                            {new Date(message.createdAt).toLocaleString()}
+                            {message.sender.role} • {new Date(message.createdAt).toLocaleString()}
                             {message.isInternal && (
-                              <span className="ml-2 text-yellow-600 font-medium">
-                                Internal
-                              </span>
+                              <span className="ml-2 text-yellow-600 font-medium">Internal</span>
                             )}
                           </p>
                         </div>
@@ -468,7 +446,7 @@ const TicketDetailPage = () => {
                 <div className="space-y-3">
                   <Textarea
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={e => setNewMessage(e.target.value)}
                     placeholder="Type your message..."
                     className="min-h-[100px]"
                   />
@@ -479,13 +457,10 @@ const TicketDetailPage = () => {
                         type="checkbox"
                         id="internal"
                         checked={isInternalMessage}
-                        onChange={(e) => setIsInternalMessage(e.target.checked)}
+                        onChange={e => setIsInternalMessage(e.target.checked)}
                         className="h-4 w-4"
                       />
-                      <label
-                        htmlFor="internal"
-                        className="text-sm text-gray-600"
-                      >
+                      <label htmlFor="internal" className="text-sm text-gray-600">
                         Internal message (only visible to support team)
                       </label>
                     </div>
@@ -496,10 +471,7 @@ const TicketDetailPage = () => {
                       <Paperclip className="h-4 w-4 mr-2" />
                       Attach File
                     </Button>
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!newMessage.trim()}
-                    >
+                    <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
                       <Send className="h-4 w-4 mr-2" />
                       Send Message
                     </Button>

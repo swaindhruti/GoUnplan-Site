@@ -1,6 +1,6 @@
-import { Search, Calendar, MapPin } from "lucide-react";
+import { Search, Calendar, MapPin } from 'lucide-react';
 
-import Image from "next/image";
+import Image from 'next/image';
 
 export const HowItWorksSection = () => {
   return (
@@ -30,13 +30,12 @@ export const HowItWorksSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
-                   Explore trips designed by real hosts.
+                    Explore trips designed by real hosts.
                   </h3>
-                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Browse through our curated collection of unique destinations
-                    and experiences tailored to your interests and preferences.
+                  <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
+                    Browse through our curated collection of unique destinations and experiences
+                    tailored to your interests and preferences.
                   </p>
-                 
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -46,12 +45,10 @@ export const HowItWorksSection = () => {
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
                     Match with people your age who vibe like you.
-
                   </h3>
                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Work with our expert team to customize your itinerary,
-                    select accommodations, and plan activities that match your
-                    style.
+                    Work with our expert team to customize your itinerary, select accommodations,
+                    and plan activities that match your style.
                   </p>
                 </div>
               </div>
@@ -61,11 +58,11 @@ export const HowItWorksSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
-                   Go. Experience. Belong.
+                    Go. Experience. Belong.
                   </h3>
                   <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Confirm your booking and embark on your unforgettable
-                    journey with 24/7 support throughout your adventure.
+                    Confirm your booking and embark on your unforgettable journey with 24/7 support
+                    throughout your adventure.
                   </p>
                 </div>
               </div>

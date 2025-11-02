@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Shield,
   Calendar,
@@ -23,14 +23,14 @@ import {
   Activity,
   Briefcase,
   Globe,
-  X
-} from "lucide-react";
-import { sendVerificationEmail } from "@/actions/email-verification/action";
-import { getUserProfile, updateUserProfile } from "@/actions/user/action";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { toast } from "sonner";
+  X,
+} from 'lucide-react';
+import { sendVerificationEmail } from '@/actions/email-verification/action';
+import { getUserProfile, updateUserProfile } from '@/actions/user/action';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -61,9 +61,9 @@ export default function ProfilePage() {
 
   // Edit form state
   const [editForm, setEditForm] = useState({
-    name: "",
-    phone: "",
-    bio: ""
+    name: '',
+    phone: '',
+    bio: '',
   });
 
   const fetchUserProfile = useCallback(async () => {
@@ -74,13 +74,13 @@ export default function ProfilePage() {
       if (result.user) {
         setProfile(result.user);
         setEditForm({
-          name: result.user.name || "",
-          phone: result.user.phone || "",
-          bio: result.user.bio || ""
+          name: result.user.name || '',
+          phone: result.user.phone || '',
+          bio: result.user.bio || '',
         });
       }
     } catch {
-      toast.error("Failed to fetch profile");
+      toast.error('Failed to fetch profile');
     } finally {
       setIsLoading(false);
     }
@@ -97,10 +97,10 @@ export default function ProfilePage() {
     try {
       const result = await sendVerificationEmail();
       if (result.success) {
-        toast.success("Verification email sent! Check your inbox.");
+        toast.success('Verification email sent! Check your inbox.');
       }
     } catch {
-      toast.error("Failed to send verification email");
+      toast.error('Failed to send verification email');
     } finally {
       setIsSendingVerification(false);
     }
@@ -126,19 +126,19 @@ export default function ProfilePage() {
         name: editForm.name,
         phone: editForm.phone || undefined,
         bio: editForm.bio || undefined,
-        image: imagePreview || undefined
+        image: imagePreview || undefined,
       });
 
       if (result.success) {
-        toast.success("Profile updated successfully!");
+        toast.success('Profile updated successfully!');
         setIsEditMode(false);
         fetchUserProfile();
         setImagePreview(null);
       } else {
-        toast.error(result.error || "Failed to update profile");
+        toast.error(result.error || 'Failed to update profile');
       }
     } catch {
-      toast.error("Failed to update profile");
+      toast.error('Failed to update profile');
     } finally {
       setIsUpdating(false);
     }
@@ -149,18 +149,18 @@ export default function ProfilePage() {
     setImagePreview(null);
     if (profile) {
       setEditForm({
-        name: profile.name || "",
-        phone: profile.phone || "",
-        bio: profile.bio || ""
+        name: profile.name || '',
+        phone: profile.phone || '',
+        bio: profile.bio || '',
       });
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "ADMIN":
+      case 'ADMIN':
         return <Shield className="h-4 w-4" />;
-      case "HOST":
+      case 'HOST':
         return <Crown className="h-4 w-4" />;
       default:
         return <UserCog className="h-4 w-4" />;
@@ -169,12 +169,12 @@ export default function ProfilePage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case "ADMIN":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "HOST":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+      case 'ADMIN':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'HOST':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       default:
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
 
@@ -183,9 +183,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <span className="text-gray-600 font-instrument">
-            Loading profile...
-          </span>
+          <span className="text-gray-600 font-instrument">Loading profile...</span>
         </div>
       </div>
     );
@@ -217,12 +215,12 @@ export default function ProfilePage() {
                 </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-bricolage leading-[1.05] tracking-tighter">
-                {isEditMode ? "Edit Profile" : `Welcome, ${profile.name}`}
+                {isEditMode ? 'Edit Profile' : `Welcome, ${profile.name}`}
               </h1>
               <p className="text-lg text-gray-600 font-instrument mt-2">
                 {isEditMode
-                  ? "Update your personal information"
-                  : "Manage your account information"}
+                  ? 'Update your personal information'
+                  : 'Manage your account information'}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -251,9 +249,7 @@ export default function ProfilePage() {
             <div className="space-y-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
-                    Edit Profile
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">Edit Profile</h3>
                   <p className="text-gray-600 font-instrument mt-1">
                     Update your personal information
                   </p>
@@ -272,11 +268,7 @@ export default function ProfilePage() {
                         <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
                           {imagePreview || profile.image ? (
                             <Image
-                              src={
-                                imagePreview ||
-                                profile.image ||
-                                "/default-avatar.png"
-                              }
+                              src={imagePreview || profile.image || '/default-avatar.png'}
                               alt="Profile"
                               width={128}
                               height={128}
@@ -313,36 +305,26 @@ export default function ProfilePage() {
                 <div className="lg:col-span-2 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="name"
-                        className="text-sm font-semibold text-gray-700"
-                      >
+                      <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
                         Full Name
                       </Label>
                       <Input
                         id="name"
                         value={editForm.name}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, name: e.target.value })
-                        }
+                        onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                         className="h-12 rounded-xl border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                         placeholder="Enter your full name"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="phone"
-                        className="text-sm font-semibold text-gray-700"
-                      >
+                      <Label htmlFor="phone" className="text-sm font-semibold text-gray-700">
                         Phone Number
                       </Label>
                       <Input
                         id="phone"
                         value={editForm.phone}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, phone: e.target.value })
-                        }
+                        onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
                         className="h-12 rounded-xl border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                         placeholder="+1234567890"
                       />
@@ -350,23 +332,18 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="email"
-                      className="text-sm font-semibold text-gray-700"
-                    >
+                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
                       Email Address
                     </Label>
                     <div className="relative">
                       <Input
                         id="email"
-                        value={profile.email || ""}
+                        value={profile.email || ''}
                         disabled
                         className="h-12 rounded-xl bg-gray-50 border-gray-300"
                       />
                       <Badge
-                        variant={
-                          profile.isEmailVerified ? "default" : "secondary"
-                        }
+                        variant={profile.isEmailVerified ? 'default' : 'secondary'}
                         className="absolute right-3 top-1/2 -translate-y-1/2"
                       >
                         {profile.isEmailVerified ? (
@@ -385,18 +362,13 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="bio"
-                      className="text-sm font-semibold text-gray-700"
-                    >
+                    <Label htmlFor="bio" className="text-sm font-semibold text-gray-700">
                       Bio
                     </Label>
                     <Textarea
                       id="bio"
                       value={editForm.bio}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, bio: e.target.value })
-                      }
+                      onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
                       placeholder="Tell us about yourself..."
                       className="min-h-[120px] rounded-xl border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                     />
@@ -453,7 +425,7 @@ export default function ProfilePage() {
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">
                             <span className="text-3xl font-bold text-purple-600 font-bricolage">
-                              {profile.name?.charAt(0).toUpperCase() || "U"}
+                              {profile.name?.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
                         )}
@@ -465,28 +437,21 @@ export default function ProfilePage() {
                         </h2>
                         <Badge className={`mt-2 ${getRoleColor(profile.role)}`}>
                           {getRoleIcon(profile.role)}
-                          <span className="ml-1 font-instrument">
-                            {profile.role}
-                          </span>
+                          <span className="ml-1 font-instrument">{profile.role}</span>
                         </Badge>
                       </div>
 
                       {profile.bio && (
-                        <p className="text-sm text-gray-600 font-instrument">
-                          {profile.bio}
-                        </p>
+                        <p className="text-sm text-gray-600 font-instrument">{profile.bio}</p>
                       )}
 
                       <div className="pt-4 border-t border-purple-200 text-sm text-gray-600 font-instrument">
                         <Calendar className="h-4 w-4 inline mr-1" />
-                        Member since{" "}
-                        {new Date(profile.createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "long",
-                            year: "numeric"
-                          }
-                        )}
+                        Member since{' '}
+                        {new Date(profile.createdAt).toLocaleDateString('en-US', {
+                          month: 'long',
+                          year: 'numeric',
+                        })}
                       </div>
                     </div>
                   </div>
@@ -498,41 +463,31 @@ export default function ProfilePage() {
                     </h3>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-instrument">
-                          Total Bookings
-                        </span>
+                        <span className="text-gray-600 font-instrument">Total Bookings</span>
                         <span className="font-semibold text-gray-900">
                           {profile.bookingCounts?.total || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-instrument">
-                          Completed
-                        </span>
+                        <span className="text-gray-600 font-instrument">Completed</span>
                         <span className="font-semibold text-green-600">
                           {profile.bookingCounts?.completed || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-instrument">
-                          Confirmed
-                        </span>
+                        <span className="text-gray-600 font-instrument">Confirmed</span>
                         <span className="font-semibold text-blue-600">
                           {profile.bookingCounts?.confirmed || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-instrument">
-                          Pending
-                        </span>
+                        <span className="text-gray-600 font-instrument">Pending</span>
                         <span className="font-semibold text-yellow-600">
                           {profile.bookingCounts?.pending || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-instrument">
-                          Cancelled
-                        </span>
+                        <span className="text-gray-600 font-instrument">Cancelled</span>
                         <span className="font-semibold text-red-600">
                           {profile.bookingCounts?.cancelled || 0}
                         </span>
@@ -554,13 +509,9 @@ export default function ProfilePage() {
                           <Mail className="h-5 w-5 text-purple-600" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-500 font-instrument">
-                            Email
-                          </p>
+                          <p className="text-sm text-gray-500 font-instrument">Email</p>
                           <div className="flex items-center gap-2">
-                            <p className="text-gray-900 font-medium">
-                              {profile.email}
-                            </p>
+                            <p className="text-gray-900 font-medium">{profile.email}</p>
                             {profile.isEmailVerified && (
                               <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
                                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -578,7 +529,7 @@ export default function ProfilePage() {
                             className="border-amber-300 text-amber-700 hover:bg-amber-50"
                           >
                             <Send className="h-3 w-3 mr-2" />
-                            {isSendingVerification ? "Sending..." : "Verify"}
+                            {isSendingVerification ? 'Sending...' : 'Verify'}
                           </Button>
                         )}
                       </div>
@@ -588,11 +539,9 @@ export default function ProfilePage() {
                           <Phone className="h-5 w-5 text-purple-600" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-500 font-instrument">
-                            Phone
-                          </p>
+                          <p className="text-sm text-gray-500 font-instrument">Phone</p>
                           <p className="text-gray-900 font-medium">
-                            {profile.phone || "Not provided"}
+                            {profile.phone || 'Not provided'}
                           </p>
                         </div>
                       </div>
@@ -607,8 +556,7 @@ export default function ProfilePage() {
                               Email verification required
                             </p>
                             <p className="text-sm text-amber-700 mt-1">
-                              Verify your email to access all features and
-                              secure your account.
+                              Verify your email to access all features and secure your account.
                             </p>
                           </div>
                         </div>
@@ -625,7 +573,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="flex flex-col items-center justify-center h-20 p-4 border-gray-300 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200 group"
-                        onClick={() => router.push("/my-trips")}
+                        onClick={() => router.push('/my-trips')}
                       >
                         <Briefcase className="h-6 w-6 mb-2 text-purple-600 group-hover:text-purple-700" />
                         <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
@@ -635,7 +583,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="flex flex-col items-center justify-center h-20 p-4 border-gray-300 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200 group"
-                        onClick={() => router.push("/trips")}
+                        onClick={() => router.push('/trips')}
                       >
                         <Globe className="h-6 w-6 mb-2 text-purple-600 group-hover:text-purple-700" />
                         <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
@@ -645,7 +593,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="flex flex-col items-center justify-center h-20 p-4 border-gray-300 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200 group"
-                        onClick={() => router.push("/dashboard/user")}
+                        onClick={() => router.push('/dashboard/user')}
                       >
                         <Activity className="h-6 w-6 mb-2 text-purple-600 group-hover:text-purple-700" />
                         <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
