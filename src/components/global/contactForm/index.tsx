@@ -60,6 +60,7 @@ import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { DayWiseImageUpload } from '@/components/host/components/DayWiseImageUpload';
 
 // Dynamically import ReactSelect to prevent hydration issues
 const ReactSelect = dynamic(() => import('react-select'), {
@@ -86,11 +87,6 @@ export const CreateDestinationForm = ({
   const router = useRouter();
   const { uploadedFile, UploadButton, resetUpload } = useImageKitUpload();
   const { data: session } = useSession();
-
-  // Create separate upload hooks for each day
-  const [dayWiseUploaders, setDayWiseUploaders] = useState<{
-    [key: number]: ReturnType<typeof useImageKitUpload>;
-  }>({});
 
   const formatDateForFormInput = (date: Date | string | null | undefined) => {
     if (!date) return '';
@@ -428,12 +424,7 @@ export const CreateDestinationForm = ({
         delete newImages[index];
         return newImages;
       });
-      // Remove the uploader for this day
-      setDayWiseUploaders(prev => {
-        const newUploaders = { ...prev };
-        delete newUploaders[index];
-        return newUploaders;
-      });
+
       try {
         const current = (form.getValues().dayWiseData || []) as DayItem[];
         const updated: DayItem[] = current
@@ -452,63 +443,11 @@ export const CreateDestinationForm = ({
     resetUpload();
   };
 
-  const removeDayWiseImage = (dayIndex: number) => {
-    try {
-      const current = (form.getValues().dayWiseData || []) as DayItem[];
-      const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
-        idx === dayIndex ? { ...(d || {}), dayWiseImage: '' } : d
-      );
-      form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
-      // Reset the uploader for this day
-      if (dayWiseUploaders[dayIndex]) {
-        dayWiseUploaders[dayIndex].resetUpload();
-      }
-    } catch {
-      form.setValue(
-        'dayWiseData',
-        (form.getValues().dayWiseData || []) as unknown as FormDataType['dayWiseData']
-      );
-    }
-  };
-
-  // Handle main trip image upload
   useEffect(() => {
     if (uploadedFile?.secure_url) {
       form.setValue('tripImage', uploadedFile.secure_url);
     }
   }, [uploadedFile, form]);
-
-  // Handle day-wise image uploads
-  useEffect(() => {
-    Object.entries(dayWiseUploaders).forEach(([dayIndexStr, uploader]) => {
-      const dayIndex = parseInt(dayIndexStr);
-      if (uploader.uploadedFile?.secure_url) {
-        try {
-          const current = (form.getValues().dayWiseData || []) as DayItem[];
-          const updated: DayItem[] = current.map((d: DayItem, idx: number) =>
-            idx === dayIndex ? { ...(d || {}), dayWiseImage: uploader.uploadedFile!.secure_url } : d
-          );
-          form.setValue('dayWiseData', updated as unknown as FormDataType['dayWiseData']);
-        } catch {}
-      }
-    });
-  }, [dayWiseUploaders, form]);
-
-  const DayWiseUploadButton = ({ dayIndex, label }: { dayIndex: number; label: string }) => {
-    // Initialize uploader for this day if it doesn't exist
-    if (!dayWiseUploaders[dayIndex]) {
-      const newUploader = useImageKitUpload({ folder: `/day-${dayIndex + 1}` });
-      setDayWiseUploaders(prev => ({
-        ...prev,
-        [dayIndex]: newUploader,
-      }));
-    }
-
-    const uploader = dayWiseUploaders[dayIndex];
-    if (!uploader) return null;
-
-    return <uploader.UploadButton label={label} />;
-  };
 
   // Dynamic validation function
   const validateFormData = (data: Partial<FormDataType>, isDraft: boolean) => {
@@ -2011,54 +1950,16 @@ export const CreateDestinationForm = ({
                                     Upload Day Image
                                   </FormLabel>
                                   <FormControl>
-                                    <div className="space-y-4">
-                                      {!field.value ? (
-                                        <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
-                                          <CardContent className="flex flex-col items-center justify-center p-6">
-                                            <Camera className="h-8 w-8 text-muted-foreground mb-2" />
-                                            <p className="text-xs text-muted-foreground mb-3 text-center font-instrument">
-                                              Add an image for this day&apos;s activities
-                                            </p>
-                                            <DayWiseUploadButton
-                                              dayIndex={index}
-                                              label="Choose Image"
-                                            />
-                                          </CardContent>
-                                        </Card>
-                                      ) : (
-                                        <Card className="overflow-hidden">
-                                          <div className="relative group">
-                                            <AspectRatio ratio={4 / 3} className="bg-muted">
-                                              <Image
-                                                fill
-                                                src={field.value}
-                                                alt={`Day ${index + 1} image`}
-                                                className="object-cover"
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                              />
-                                            </AspectRatio>
-                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                              <div className="flex gap-2">
-                                                <DayWiseUploadButton
-                                                  dayIndex={index}
-                                                  label="Change Image"
-                                                />
-                                                <Button
-                                                  type="button"
-                                                  onClick={() => removeDayWiseImage(index)}
-                                                  variant="destructive"
-                                                  size="sm"
-                                                  className="font-instrument"
-                                                >
-                                                  <X className="h-3 w-3 mr-1" />
-                                                  Remove
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </Card>
-                                      )}
-                                    </div>
+                                    <DayWiseImageUpload
+                                      dayIndex={index}
+                                      currentImage={field.value}
+                                      onImageChange={imageUrl => {
+                                        field.onChange(imageUrl);
+                                      }}
+                                      onImageRemove={() => {
+                                        field.onChange('');
+                                      }}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                   <p className="text-xs text-gray-500 mt-1 font-instrument">

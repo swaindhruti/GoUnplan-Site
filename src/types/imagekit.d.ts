@@ -5,7 +5,7 @@ export type ImageKitUploadResponse = UploadResponse;
 export type ImageKitFileObject = FileObject;
 
 // Custom response wrapper
-export interface ActionResponse<T = any> {
+export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -33,8 +33,11 @@ export interface UpdateFileDetails {
   customCoordinates?: string;
   removeAITags?: string[];
   webhookUrl?: string;
-  extensions?: Array<{ name: string; options: Record<string, any> }>;
-  customMetadata?: Record<string, any>;
+  extensions?: Array<{
+    name: string;
+    options: Record<string, unknown>;
+  }>;
+  customMetadata?: Record<string, unknown>;
 }
 
 // Simplified upload data for client use
