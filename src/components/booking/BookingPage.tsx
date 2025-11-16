@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { BookingProgress } from './BookingProgress';
 import { GuestInformationForm } from './GuestInformation';
 import { useBookingStore } from '@/store/booking-store';
@@ -91,6 +91,14 @@ export function BookingPage({
   const createNewBooking = useBookingStore(state => state.createNewBooking);
 
   const [_numberOfGuests, setNumberOfGuests] = useState<number>(bookingData.participants || 1);
+  const bookedSeats = useMemo(() => {
+    if (!tripData) return 0;
+    return tripData.bookings.reduce((sum, b) => sum + (b.participants ?? 0), 0);
+  }, [tripData]);
+
+  const seatsLeft = useMemo(() => {
+    return (tripData?.maxParticipants ?? 0) - bookedSeats;
+  }, [tripData, bookedSeats]);
 
   useEffect(() => {
     updateBookingData({
@@ -279,8 +287,12 @@ export function BookingPage({
                 </div>
 
                 <div className="border-t border-gray-200 pt-8">
-                  {currentStep === 1 && <GuestInformationForm onContinue={handleGuestInfoSubmit} />}
-                  {/* Add other steps here as needed */}
+                  {currentStep === 1 && (
+                    <GuestInformationForm
+                      onContinue={handleGuestInfoSubmit}
+                      maxGuests={seatsLeft}
+                    />
+                  )}
                   {currentStep === 2 && (
                     <div className="text-center py-8">
                       <h3 className="text-2xl font-bold text-gray-900 font-bricolage mb-4">

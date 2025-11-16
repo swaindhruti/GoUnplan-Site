@@ -514,15 +514,16 @@ export const getAllActiveTrips = async () => {
 
   try {
     const currentDate = new Date();
-
     const activeTrips = await prisma.travelPlans.findMany({
       where: {
         status: 'ACTIVE',
         startDate: {
-          gte: currentDate, // Only show trips that start from today or later
+          gte: currentDate,
+        },
+        endDate: {
+          gte: currentDate,
         },
       },
-
       select: {
         travelPlanId: true,
         title: true,
@@ -544,7 +545,7 @@ export const getAllActiveTrips = async () => {
         reviewCount: true,
         bookings: {
           where: {
-            status: { in: ['CONFIRMED', 'PENDING'] },
+            paymentStatus: { in: ['PARTIALLY_PAID', 'FULLY_PAID'] },
           },
           select: {
             participants: true,
@@ -563,6 +564,7 @@ export const getAllActiveTrips = async () => {
 
     const tripsWithSeats = activeTrips.map(trip => {
       const bookedSeats = trip.bookings.reduce((sum, b) => sum + b.participants, 0);
+      console.log(bookedSeats);
       return {
         ...trip,
         bookedSeats,

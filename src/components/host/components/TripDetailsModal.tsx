@@ -27,6 +27,21 @@ type TripDetailsModalProps = {
 };
 
 export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProps) => {
+  const getTripStatus = (trip: Trip) => {
+    if (trip.endDate) {
+      const endDate = new Date(trip.endDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (endDate < today) {
+        return 'completed';
+      }
+    }
+    return trip.status.toLowerCase();
+  };
+
+  const computedStatus = trip ? getTripStatus(trip) : '';
+
   // Prevent background scroll when modal is open
   React.useEffect(() => {
     if (isOpen) {
@@ -66,6 +81,8 @@ export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProp
         return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'draft':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -79,6 +96,8 @@ export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProp
         return <Clock className="h-4 w-4" />;
       case 'draft':
         return <FileText className="h-4 w-4" />;
+      case 'completed':
+        return <CheckCircle className="h-4 w-4" />;
       default:
         return <AlertCircle className="h-4 w-4" />;
     }
@@ -140,15 +159,14 @@ export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProp
                 <div className="absolute top-4 left-4">
                   <span
                     className={`px-3 py-1.5 rounded-full border text-sm font-semibold flex items-center gap-1.5 ${getStatusColor(
-                      trip.status
+                      computedStatus
                     )}`}
                   >
-                    {getStatusIcon(trip.status)}
-                    {trip.status}
+                    {getStatusIcon(computedStatus)}
+                    {computedStatus}
                   </span>
                 </div>
 
-                {/* Close Button */}
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
@@ -156,7 +174,6 @@ export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProp
                   <X className="h-5 w-5 text-gray-700" />
                 </button>
 
-                {/* Title Overlay */}
                 <div className="absolute bottom-4 left-4 right-4">
                   <h2 className="text-2xl font-bold text-white font-bricolage mb-2">
                     {trip.title}
@@ -550,14 +567,16 @@ export const TripDetailsModal = ({ trip, isOpen, onClose }: TripDetailsModalProp
                   >
                     Close
                   </button>
-                  <button
-                    onClick={() => {
-                      window.location.href = `/dashboard/host/create-new-task?tripId=${trip.travelPlanId}`;
-                    }}
-                    className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium font-instrument"
-                  >
-                    Edit Trip
-                  </button>
+                  {computedStatus !== 'completed' && (
+                    <button
+                      onClick={() => {
+                        window.location.href = `/dashboard/host/create-new-trip?tripId=${trip.travelPlanId}`;
+                      }}
+                      className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium font-instrument"
+                    >
+                      Edit Trip
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

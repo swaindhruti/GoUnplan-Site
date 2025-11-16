@@ -20,6 +20,7 @@ import {
   Edit,
   Eye,
   Activity,
+  CheckCircle,
 } from 'lucide-react';
 
 type TripSectionProps = {
@@ -34,6 +35,28 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
+  // Function to check if trip is completed based on end date
+  const getTripStatus = (trip: Trip) => {
+    if (trip.endDate) {
+      const endDate = new Date(trip.endDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
+
+      if (endDate < today) {
+        return 'completed';
+      }
+    }
+    return trip.status.toLowerCase();
+  };
+
+  // Process trips with computed status
+  const processedTrips = useMemo(() => {
+    return trips.map(trip => ({
+      ...trip,
+      computedStatus: getTripStatus(trip),
+    }));
+  }, [trips]);
+
   const openTripModal = (trip: Trip) => {
     setSelectedTrip(trip);
     setIsModalOpen(true);
@@ -45,19 +68,20 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
   };
 
   const filteredTrips = useMemo(() => {
-    if (statusFilter === 'all') return trips;
-    return trips.filter(trip => trip.status.toLowerCase() === statusFilter.toLowerCase());
-  }, [trips, statusFilter]);
+    if (statusFilter === 'all') return processedTrips;
+    return processedTrips.filter(trip => trip.computedStatus === statusFilter.toLowerCase());
+  }, [processedTrips, statusFilter]);
 
   const stats = useMemo(() => {
-    const totalTrips = trips.length;
-    const activeTrips = trips.filter(t => t.status.toLowerCase() === 'active').length;
-    const inactiveTrips = trips.filter(t => t.status.toLowerCase() === 'inactive').length;
-    const draftTrips = trips.filter(t => t.status.toLowerCase() === 'draft').length;
-    const totalRevenue = trips.reduce((sum, trip) => sum + trip.price, 0);
+    const totalTrips = processedTrips.length;
+    const activeTrips = processedTrips.filter(t => t.computedStatus === 'active').length;
+    const inactiveTrips = processedTrips.filter(t => t.computedStatus === 'inactive').length;
+    const draftTrips = processedTrips.filter(t => t.computedStatus === 'draft').length;
+    const completedTrips = processedTrips.filter(t => t.computedStatus === 'completed').length;
+    const totalRevenue = processedTrips.reduce((sum, trip) => sum + trip.price, 0);
 
-    return { totalTrips, activeTrips, inactiveTrips, draftTrips, totalRevenue };
-  }, [trips]);
+    return { totalTrips, activeTrips, inactiveTrips, draftTrips, completedTrips, totalRevenue };
+  }, [processedTrips]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -67,6 +91,8 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'draft':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -80,6 +106,8 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
         return <Clock className="h-4 w-4" />;
       case 'draft':
         return <FileText className="h-4 w-4" />;
+      case 'completed':
+        return <CheckCircle className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
     }
@@ -104,7 +132,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
           </p>
         </div>
         <Link
-          href="/dashboard/host/create-new-task"
+          href="/dashboard/host/create-new-trip"
           className="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors font-instrument"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -113,7 +141,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
@@ -175,6 +203,23 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
             <span className="text-xs text-gray-500 font-instrument">In development</span>
           </div>
         </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-600 font-instrument">Completed</p>
+              <p className="text-2xl font-bold text-gray-900 font-bricolage">
+                {stats.completedTrips}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-sky-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center">
+            <span className="text-xs text-gray-500 font-instrument">Past trips</span>
+          </div>
+        </div>
       </div>
 
       {/* Filter Section */}
@@ -189,7 +234,7 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 Manage your travel experiences
               </p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
@@ -240,6 +285,19 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                 Draft
                 <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
                   {stats.draftTrips}
+                </span>
+              </button>
+              <button
+                onClick={() => setStatusFilter('completed')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors font-instrument ${
+                  statusFilter === 'completed'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Completed
+                <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
+                  {stats.completedTrips}
                 </span>
               </button>
             </div>
@@ -299,11 +357,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                         <div className="absolute top-2 left-2">
                           <span
                             className={`px-2 py-1 rounded-full border text-xs font-semibold flex items-center gap-1 ${getStatusColor(
-                              trip.status
+                              trip.computedStatus
                             )}`}
                           >
-                            {getStatusIcon(trip.status)}
-                            {trip.status}
+                            {getStatusIcon(trip.computedStatus)}
+                            {trip.computedStatus}
                           </span>
                         </div>
                       </div>
@@ -374,11 +432,11 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 pt-4 border-t">
-                        {trip.status.toLowerCase() === 'draft' && (
+                        {trip.computedStatus === 'draft' && (
                           <button
                             onClick={() =>
                               router.push(
-                                `/dashboard/host/create-new-task?tripId=${trip.travelPlanId}&complete=true`
+                                `/dashboard/host/create-new-trip?tripId=${trip.travelPlanId}&complete=true`
                               )
                             }
                             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
@@ -387,17 +445,19 @@ export const TripSection = ({ trips, loading, error }: TripSectionProps) => {
                             Complete Trip
                           </button>
                         )}
-                        <button
-                          onClick={() =>
-                            router.push(
-                              `/dashboard/host/create-new-task?tripId=${trip.travelPlanId}`
-                            )
-                          }
-                          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Edit Trip
-                        </button>
+                        {trip.computedStatus !== 'completed' && (
+                          <button
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/host/create-new-trip?tripId=${trip.travelPlanId}`
+                              )
+                            }
+                            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit Trip
+                          </button>
+                        )}
                         <button
                           onClick={() => openTripModal(trip)}
                           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"

@@ -28,18 +28,18 @@ export interface BookingFormData {
 
 export interface BookingData {
   id?: string;
-  userId: string;
-  travelPlanId: string;
-  startDate: Date;
-  endDate: Date;
-  totalPrice: number;
-  participants: number;
-  status: BookingStatus;
-  pricePerPerson: number;
+  userId?: string;
+  travelPlanId?: string;
+  startDate?: Date;
+  endDate?: Date;
+  totalPrice?: number;
+  participants?: number;
+  status?: BookingStatus;
+  pricePerPerson?: number;
   refundAmount?: number;
   specialRequirements?: string | null;
   guests?: TeamMemberInput[];
-  formSubmitted: boolean;
+  formSubmitted?: boolean;
   submissionType?: 'individual' | 'team';
   updatedAt?: Date;
   createdAt?: Date;
@@ -97,6 +97,7 @@ export interface TravelPlan {
   state?: string;
   city?: string;
   status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
+  bookings: BookingData[];
   maxParticipants?: number;
   genderPreference?: 'MALE_ONLY' | 'FEMALE_ONLY' | 'MIX';
   destination?: string | null;

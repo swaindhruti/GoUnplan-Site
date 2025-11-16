@@ -18,6 +18,12 @@ export const getTripById = async (tripId: string, bookingId: string) => {
             user: true,
           },
         },
+        bookings: {
+          where: {
+            travelPlanId: tripId,
+            paymentStatus: { in: ['PARTIALLY_PAID', 'FULLY_PAID'] },
+          },
+        },
       },
     });
 
@@ -52,6 +58,8 @@ export const getTripById = async (tripId: string, bookingId: string) => {
         createdAt: true,
       },
     });
+
+    console.log('bookigs', trip);
     return { trip, booking };
   } catch (error) {
     console.error('Error fetching trip by ID:', error);

@@ -146,6 +146,7 @@ export default async function TripDetailsPage({ params }: Props) {
   ];
 
   const bookedSeats = trip.bookings.reduce((sum, b) => sum + b.participants, 0);
+  const seatsLeft = trip.maxParticipants - bookedSeats;
 
   return (
     <div className="min-h-screen bg-gray-50 font-instrument">
@@ -329,17 +330,26 @@ export default async function TripDetailsPage({ params }: Props) {
                 href={`/trips/booking/${trip.travelPlanId}/${bookingId}`}
                 className="block mb-4 sm:mb-6"
               >
-                <button className="w-full bg-purple-600 flex items-center justify-center gap-2 hover:bg-purple-700 text-white font-semibold py-4 sm:py-6 lg:py-7 px-4 sm:px-6 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] text-sm sm:text-base lg:text-lg">
+                <button
+                  disabled={seatsLeft <= 0}
+                  className="w-full bg-purple-600 flex items-center justify-center gap-2 hover:bg-purple-700 text-white font-semibold py-4 sm:py-6 lg:py-7 px-4 sm:px-6 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:bg-gray-400"
+                >
                   Reserve a Spot
-                  <ArrowRightCircle className="w-5 h-5 sm:w-6  lg:w-7 lg:h-7" />
+                  <ArrowRightCircle className="w-5 h-5 sm:w-6 lg:w-7 lg:h-7" />
                 </button>
               </Link>
 
               {/* Seats Left */}
-              <div className="py-4 sm:py-5 rounded-xl bg-green-50/75 flex items-center justify-center mb-4 sm:mb-6">
-                <Dot className="w-8 h-8 sm:w-10 sm:h-10 text-green-700 animate-pulse -mr-2" />
-                <div className="text-green-700 font-semibold text-sm sm:text-base lg:text-lg">
-                  {tripStats.maxParticipants - bookedSeats} seats left
+              <div
+                className={`py-4 sm:py-5 rounded-xl flex items-center justify-center mb-4 sm:mb-6 
+                  ${seatsLeft <= 0 ? 'bg-red-50 text-red-700' : 'bg-green-50/75 text-green-700'}`}
+              >
+                <Dot
+                  className={`w-8 h-8 sm:w-10 sm:h-10 animate-pulse -mr-2 
+                   ${seatsLeft <= 0 ? 'text-red-700' : 'text-green-700'}`}
+                />
+                <div className="font-semibold text-sm sm:text-base lg:text-lg">
+                  {seatsLeft <= 0 ? 'Occupied' : `${seatsLeft} seats left`}
                 </div>
               </div>
 

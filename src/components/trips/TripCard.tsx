@@ -134,8 +134,24 @@ export const TripCard = ({
 
               {trip.maxParticipants && (
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm">{trip.seatsLeft} Seats Left</span>
+                  <Users
+                    className={`w-4 h-4 ${trip.seatsLeft && trip.seatsLeft <= 0 ? 'text-red-600' : trip.seatsLeft && trip.seatsLeft <= 5 ? 'text-orange-600' : 'text-purple-600'}`}
+                  />
+                  <span
+                    className={`text-sm font-medium ${
+                      trip.seatsLeft && trip.seatsLeft <= 0
+                        ? 'text-red-600'
+                        : trip.seatsLeft && trip.seatsLeft <= 5
+                          ? 'text-orange-600'
+                          : 'text-purple-600'
+                    }`}
+                  >
+                    {trip.seatsLeft && trip?.seatsLeft <= 0
+                      ? 'Fully Occupied'
+                      : trip.seatsLeft && trip.seatsLeft <= 5
+                        ? `Only ${trip.seatsLeft} Seats Left!`
+                        : `${trip.seatsLeft} Seats Available`}
+                  </span>
                 </div>
               )}
             </div>
