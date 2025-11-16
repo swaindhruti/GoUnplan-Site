@@ -8,7 +8,6 @@ import {
   DollarSign,
   MapPin,
   CreditCard,
-  Shield,
   CheckCircle,
   Users,
   AlertCircle,
@@ -440,11 +439,19 @@ export function PaymentForm({
                         {formatCurrency(total)}
                       </span>
                     </div>
+                    <Button
+                      onClick={handlePaymentClick}
+                      disabled={isProcessing}
+                      className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Pay {formatCurrency(total)}
+                    </Button>
                   </div>
                 </div>
 
                 {/* Payment Method Card */}
-                <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
+                {/* <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="bg-green-100 p-2 rounded-lg">
                       <CreditCard className="w-5 h-5 text-green-600" />
@@ -480,16 +487,7 @@ export function PaymentForm({
                       <div className="text-xs font-medium text-gray-600 mb-1">NET BANKING</div>
                     </div>
                   </div>
-
-                  <Button
-                    onClick={handlePaymentClick}
-                    disabled={isProcessing}
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Pay {formatCurrency(total)}
-                  </Button>
-                </div>
+                </div> */}
 
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 shadow-xl transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="flex items-start gap-3">
@@ -563,7 +561,7 @@ export function PaymentForm({
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
+                  {/* <div className="bg-white rounded-xl shadow-xl border p-6 transform translate-y-0 hover:translate-y-[-2px] transition-transform duration-300">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="bg-green-100 p-2 rounded-lg">
                         <Shield className="w-5 h-5 text-green-600" />
@@ -589,7 +587,7 @@ export function PaymentForm({
                         <span className="text-sm text-gray-700">24/7 fraud monitoring</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

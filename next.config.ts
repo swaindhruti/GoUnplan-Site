@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       'oq7nempxaa.ufs.sh',
       'drive.google.com',
       'i.pravatar.cc',
+      'ik.imagekit.io',
     ],
   },
 };

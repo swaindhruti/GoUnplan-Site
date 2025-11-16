@@ -20,6 +20,8 @@ import {
   CreateDestinationSchema,
 } from '@/config/form/formSchemaData/CreateDestinationSchema';
 import { z } from 'zod';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Define the form data type
 type FormDataType = z.infer<typeof CreateDestinationSchema>;
@@ -502,28 +504,21 @@ export const CreateDestinationForm = ({
     try {
       let start: Date | null = null;
       let end: Date | null = null;
-      let noOfDays = 1;
+      let noOfDays = data.noofdays || 1;
 
-      if (data.startDate && data.endDate && !isDraft) {
+      if (data.startDate && !isDraft) {
         start = new Date(data.startDate);
-        end = new Date(data.endDate);
-
-        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          noOfDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
-        }
-      } else if (data.startDate && data.endDate) {
+        // Calculate end date based on start date and number of days
+        end = new Date(start);
+        end.setDate(start.getDate() + noOfDays - 1); // -1 because the start date is day 1
+      } else if (data.startDate) {
         const tempStart = new Date(data.startDate);
-        const tempEnd = new Date(data.endDate);
 
         if (!isNaN(tempStart.getTime())) {
           start = tempStart;
-        }
-        if (!isNaN(tempEnd.getTime())) {
-          end = tempEnd;
-        }
-
-        if (start && end) {
-          noOfDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+          // Calculate end date based on start date and number of days
+          end = new Date(start);
+          end.setDate(start.getDate() + noOfDays - 1);
         }
       }
 
@@ -626,9 +621,9 @@ export const CreateDestinationForm = ({
       if (result?.error) {
         toast.error(result.message || result.error, {
           style: {
-            background: 'rgba(147, 51, 234, 0.95)',
+            background: 'rgba(220, 38, 38, 0.95)', // Changed to red for error
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(196, 181, 253, 0.3)',
+            border: '1px solid rgba(254, 202, 202, 0.3)', // Light red border
             color: 'white',
             fontFamily: 'var(--font-instrument)',
           },
@@ -691,12 +686,6 @@ export const CreateDestinationForm = ({
     }
 
     await onSubmit(formData, false);
-  };
-
-  const formatDateForInput = (date: Date | string | number | undefined) => {
-    if (!date) return '';
-    const d = new Date(date);
-    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
   };
 
   const getStepInfo = () => {
@@ -910,16 +899,22 @@ export const CreateDestinationForm = ({
                                 {data.label}
                               </FormLabel>
                               <FormControl>
-                                <Input
-                                  type="date"
-                                  className="h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-100 font-instrument"
-                                  {...field}
-                                  value={formatDateForInput(
-                                    field.value as string | Date | number | undefined
-                                  )}
-                                  onChange={e =>
-                                    field.onChange(e.target.value ? new Date(e.target.value) : '')
+                                <DatePicker
+                                  selected={
+                                    field.value &&
+                                    (typeof field.value === 'string' ||
+                                      typeof field.value === 'number' ||
+                                      field.value instanceof Date)
+                                      ? new Date(field.value as string | number | Date)
+                                      : null
                                   }
+                                  onChange={date => field.onChange(date)}
+                                  dateFormat="dd/MM/yyyy"
+                                  className="h-11 w-full border border-gray-200 rounded-md px-3 focus:border-purple-400 focus:ring-purple-100 focus:outline-none font-instrument"
+                                  placeholderText="DD/MM/YYYY"
+                                  showYearDropdown
+                                  showMonthDropdown
+                                  dropdownMode="select"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -928,7 +923,6 @@ export const CreateDestinationForm = ({
                         />
                       );
                     }
-
                     if (data.type === 'textarea') {
                       return (
                         <FormField

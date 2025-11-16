@@ -23,6 +23,8 @@ export default async function Booking({ params }: Props) {
     redirect(`/trips/booking/${trip.travelPlanId}/booking-summary`);
   } */
 
+  console.log('mm:', trip.bookings);
+
   return (
     <>
       {
@@ -32,6 +34,7 @@ export default async function Booking({ params }: Props) {
           userId={userSession.user.id || ''}
           tripData={{
             ...trip,
+            bookings: trip.bookings,
           }}
         />
       }

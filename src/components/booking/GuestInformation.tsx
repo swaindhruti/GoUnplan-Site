@@ -79,10 +79,10 @@ type ValidationErrors = Record<string, string[]>;
 
 interface GuestInformationFormProps {
   onContinue: (guestCount: number, guestData: BookingFormData) => Promise<void>;
-  maxGuests?: number;
+  maxGuests: number;
 }
 
-export function GuestInformationForm({ onContinue, maxGuests = 8 }: GuestInformationFormProps) {
+export function GuestInformationForm({ onContinue, maxGuests }: GuestInformationFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
   const [guestForms, setGuestForms] = useState<GuestInfo[]>([
     {
@@ -299,7 +299,7 @@ export function GuestInformationForm({ onContinue, maxGuests = 8 }: GuestInforma
             ))}
           </div>
           <p className="text-sm text-gray-600 font-instrument">
-            Maximum {maxGuests} travelers per booking
+            Only {maxGuests} travelers booking left
           </p>
           {getFieldError('participants') && (
             <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg font-instrument">
