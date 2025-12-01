@@ -21,12 +21,10 @@ import {
 } from '@/config/form/formSchemaData/CreateDestinationSchema';
 import { z } from 'zod';
 import DatePicker from 'react-datepicker';
+import { toast } from 'sonner';
 import 'react-datepicker/dist/react-datepicker.css';
-
-// Define the form data type
 type FormDataType = z.infer<typeof CreateDestinationSchema>;
 
-// Day item type inferred from schema (explicit to avoid `any` and satisfy ESLint)
 type DayItem = {
   dayNumber?: number;
   title?: string;
@@ -59,7 +57,6 @@ import Image from 'next/image';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
-import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { DayWiseImageUpload } from '@/components/host/components/DayWiseImageUpload';
@@ -93,7 +90,39 @@ export const CreateDestinationForm = ({
   const formatDateForFormInput = (date: Date | string | null | undefined) => {
     if (!date) return '';
     const d = new Date(date);
-    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+    if (isNaN(d.getTime())) return '';
+    // Use local date components to avoid timezone offsets that toISOString introduces
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  // Parse various date inputs into a local date-only Date (midnight local) to avoid
+  // `new Date('YYYY-MM-DD')` being interpreted as UTC and shifting the day in some timezones.
+  const parseLocalDate = (v: Date | string | undefined | null): Date | null => {
+    if (v == null) return null;
+    try {
+      if (v instanceof Date && !isNaN(v.getTime())) {
+        return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+      }
+      if (typeof v === 'string') {
+        const match = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (match) {
+          const y = Number(match[1]);
+          const m = Number(match[2]) - 1;
+          const d = Number(match[3]);
+          return new Date(y, m, d);
+        }
+        const parsed = new Date(v);
+        if (!isNaN(parsed.getTime())) {
+          return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+        }
+      }
+    } catch {
+      // fallthrough
+    }
+    return null;
   };
 
   const defaultValues = initialData
@@ -175,10 +204,9 @@ export const CreateDestinationForm = ({
   const watchedNoOfDays = form.watch('noofdays') as number | undefined;
   const watchedStops = (form.watch('stops') as string[]) || [];
   const watchedStart = form.watch('startDate') as string | undefined;
-  const watchedPrice = form.watch('price') as number | undefined;
+  const watchedPrice = Number(form.watch('price')) as number | undefined;
   const watchedCommission = form.watch('commission') as number | undefined;
 
-  // Calculate total price per person with commission
   const totalPricePerPerson = useMemo(() => {
     if (!watchedPrice || typeof watchedPrice !== 'number') return 0;
     const commission = watchedCommission || 0;
@@ -192,15 +220,35 @@ export const CreateDestinationForm = ({
       const noOfDaysVal = allVals.noofdays as number | string | undefined;
       if (!startVal || !noOfDaysVal) return;
 
-      const parsedStart = new Date(startVal);
+      const parsedStart = parseLocalDate(startVal);
       const days = Number(noOfDaysVal);
+      if (!parsedStart) return;
       if (isNaN(parsedStart.getTime()) || isNaN(days) || days < 1) return;
 
       const calculatedEnd = new Date(parsedStart);
       calculatedEnd.setDate(calculatedEnd.getDate() + (days - 1));
       const currentEnd = form.getValues().endDate as string | undefined;
-      if (!currentEnd || new Date(currentEnd).toISOString() !== calculatedEnd.toISOString()) {
-        form.setValue('endDate', formatDateForFormInput(calculatedEnd));
+      const calculatedStr = formatDateForFormInput(calculatedEnd);
+
+      try {
+        console.debug(
+          '[date-sync] startVal:',
+          startVal,
+          'parsedStart:',
+          parsedStart,
+          'noOfDaysVal:',
+          noOfDaysVal,
+          'days:',
+          days,
+          'calculatedStr:',
+          calculatedStr,
+          'currentEnd:',
+          currentEnd
+        );
+      } catch {}
+
+      if (!currentEnd || currentEnd !== calculatedStr) {
+        form.setValue('endDate', calculatedStr);
       }
     } catch {}
   }, [watchedStart, watchedNoOfDays, form]);
@@ -457,6 +505,117 @@ export const CreateDestinationForm = ({
     return validationSchema.safeParse(data);
   };
 
+  // Show zod validation errors as toasts
+  const showZodErrors = (zodError: z.ZodError) => {
+    try {
+      const issues = zodError.errors || [];
+      issues.forEach(issue => {
+        const path =
+          Array.isArray(issue.path) && issue.path.length ? issue.path.join('.') : undefined;
+        const message = path ? `${path}: ${issue.message}` : issue.message;
+        toast.error(message, {
+          style: {
+            background: 'rgba(220, 38, 38, 0.95)',
+            color: 'white',
+            fontFamily: 'var(--font-instrument)',
+          },
+          duration: 4000,
+        });
+      });
+    } catch {
+      // Fallback single toast
+      toast.error('Validation failed. Please check the form.', {
+        style: {
+          background: 'rgba(220, 38, 38, 0.95)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
+        },
+        duration: 4000,
+      });
+    }
+  };
+
+  // Show API errors (support array or single message)
+  const showApiErrors = (res: unknown) => {
+    try {
+      const r = res as Record<string, unknown> | null;
+
+      // If server returned an errors array
+      if (r && Array.isArray(r['errors']) && (r['errors'] as unknown[]).length > 0) {
+        (r['errors'] as unknown[]).forEach(err => {
+          const msg =
+            typeof err === 'string'
+              ? err
+              : err && typeof (err as Record<string, unknown>).message === 'string'
+                ? String((err as Record<string, unknown>).message)
+                : JSON.stringify(err);
+          toast.error(msg, {
+            style: {
+              background: 'rgba(220, 38, 38, 0.95)',
+              color: 'white',
+              fontFamily: 'var(--font-instrument)',
+            },
+            duration: 3500,
+          });
+        });
+        return;
+      }
+
+      // If server returned structured field errors
+      if (r && r['fieldErrors'] && typeof r['fieldErrors'] === 'object') {
+        const fe = r['fieldErrors'] as Record<string, unknown>;
+        Object.keys(fe).forEach(key => {
+          const msgs = fe[key];
+          if (Array.isArray(msgs)) {
+            (msgs as unknown[]).forEach(m =>
+              toast.error(`${key}: ${String(m)}`, {
+                style: {
+                  background: 'rgba(220, 38, 38, 0.95)',
+                  color: 'white',
+                  fontFamily: 'var(--font-instrument)',
+                },
+                duration: 3500,
+              })
+            );
+          } else {
+            toast.error(`${key}: ${String(msgs)}`, {
+              style: {
+                background: 'rgba(220, 38, 38, 0.95)',
+                color: 'white',
+                fontFamily: 'var(--font-instrument)',
+              },
+              duration: 3500,
+            });
+          }
+        });
+        return;
+      }
+
+      // Fallback single message
+      const message =
+        (r && ((r['message'] as string) || (r['error'] as string))) || 'Something went wrong';
+      toast.error(message, {
+        style: {
+          background: 'rgba(220, 38, 38, 0.95)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
+        },
+        duration: 3500,
+      });
+    } catch {
+      toast.error('An error occurred. Please try again.', {
+        style: {
+          background: 'rgba(220, 38, 38, 0.95)',
+          color: 'white',
+          fontFamily: 'var(--font-instrument)',
+        },
+        duration: 3500,
+      });
+    }
+  };
+
+  // ...existing code...
+
   const onSubmit = async (data: Partial<FormDataType>, isDraft: boolean = false) => {
     if (isSubmitting) return;
 
@@ -468,6 +627,18 @@ export const CreateDestinationForm = ({
         status: isDraft ? 'DRAFT' : 'ACTIVE',
         dayWiseDataLength: data.dayWiseData?.length || 0,
       });
+      // Debug: log raw date values and types to help track timezone/format issues
+      try {
+        console.log(
+          'DEBUG dates -> startDate, type, endDate, type:',
+          data.startDate,
+          typeof data.startDate,
+          data.endDate,
+          typeof data.endDate
+        );
+      } catch {
+        // ignore
+      }
       if (data.dayWiseData && data.dayWiseData.length > 0) {
         console.log(
           'Day-wise data summary:',
@@ -495,36 +666,96 @@ export const CreateDestinationForm = ({
 
     if (!validationResult.success) {
       console.error('Validation failed:', validationResult.error);
+
+      // For non-draft (full) submissions show Zod errors and abort.
       if (!isDraft) {
+        try {
+          showZodErrors(validationResult.error as z.ZodError);
+        } catch (e) {
+          console.error('Error showing zod errors', e);
+        }
+
         setIsSubmitting(false);
         return;
       }
+
+      // If saving as draft, skip showing Zod validation errors and continue.
     }
 
     try {
       let start: Date | null = null;
       let end: Date | null = null;
-      let noOfDays = data.noofdays || 1;
+      // Coerce noOfDays to a safe integer and clamp to reasonable range to avoid accidental huge jumps
+      const rawNoOfDays = (data.noofdays as number | string | undefined) ?? 1;
+      let noOfDays = Math.floor(Number(rawNoOfDays) || 1);
+      if (isNaN(noOfDays) || noOfDays < 1) noOfDays = 1;
+      // clamp to max 365 days to prevent multi-month accidental values
+      noOfDays = Math.min(noOfDays, 365);
 
       if (data.startDate && !isDraft) {
-        start = new Date(data.startDate);
-        // Calculate end date based on start date and number of days
-        end = new Date(start);
-        end.setDate(start.getDate() + noOfDays - 1); // -1 because the start date is day 1
-      } else if (data.startDate) {
-        const tempStart = new Date(data.startDate);
+        start = parseLocalDate(data.startDate);
+        // If start is invalid, fallthrough and let validation handle it
+        if (start && !isNaN(start.getTime())) {
+          // Enforce start date to be at least 30 days from today
+          try {
+            const minStart = new Date();
+            minStart.setHours(0, 0, 0, 0);
+            minStart.setDate(minStart.getDate() + 30);
 
-        if (!isNaN(tempStart.getTime())) {
+            const startDateOnly = new Date(start);
+            startDateOnly.setHours(0, 0, 0, 0);
+
+            if (startDateOnly < minStart) {
+              toast.error('Start date must be at least 30 days from today.', {
+                style: {
+                  background: 'rgba(220, 38, 38, 0.95)',
+                  color: 'white',
+                  fontFamily: 'var(--font-instrument)',
+                },
+                duration: 4000,
+              });
+              setIsSubmitting(false);
+              return;
+            }
+          } catch (e) {
+            // If something goes wrong in the check, log and continue (validation will catch bad dates)
+            console.error('Start date check error:', e);
+          }
+
+          // Calculate end date based on start date and number of days
+          end = new Date(start as Date);
+          end.setDate(start.getDate() + noOfDays - 1); // -1 because the start date is day 1
+          // console.log('Calculated end date:', end);
+        }
+      } else if (data.startDate) {
+        const tempStart = parseLocalDate(data.startDate);
+
+        if (tempStart && !isNaN(tempStart.getTime())) {
           start = tempStart;
           // Calculate end date based on start date and number of days
-          end = new Date(start);
-          end.setDate(start.getDate() + noOfDays - 1);
+          end = new Date(start as Date);
+          end.setDate(start.getDate() + (noOfDays - 1));
         }
       }
 
       if (isDraft) {
         noOfDays = Math.max(noOfDays, 1);
       }
+
+      // Ensure the form's endDate field matches our calculated end date (date-only string)
+      try {
+        if (end) {
+          const endStr = formatDateForFormInput(end);
+          const currentEndStr = form.getValues().endDate as string | undefined;
+          if (!currentEndStr || currentEndStr !== endStr) {
+            form.setValue('endDate', endStr);
+          }
+        }
+      } catch {
+        // ignore
+      }
+      // console.log('Final start date:', start);
+      // console.log('Final end date:', end);
 
       try {
         const desiredDays = Number((data as Partial<FormDataType>).noofdays) || noOfDays;
@@ -587,6 +818,11 @@ export const CreateDestinationForm = ({
 
       const statusToSend: 'DRAFT' | 'INACTIVE' = isDraft ? 'DRAFT' : 'INACTIVE';
 
+      const basePrice = Number(data.price) || 0;
+      const commissionPercent = Number(data.commission) || 0;
+      const priceWithCommission =
+        Math.round((basePrice + (basePrice * commissionPercent) / 100) * 100) / 100;
+
       const tripData = {
         title: data.tripName || '',
         description: data.description || '',
@@ -595,7 +831,9 @@ export const CreateDestinationForm = ({
         restrictions: data.restrictions || [],
         noOfDays,
         activities: data.activities || [],
-        price: data.price || 0,
+        // Send price as total price per person including commission
+        price: priceWithCommission,
+        // Keep sending Date objects (local date-only) as the API expects Date | null.
         startDate: start,
         endDate: end,
         special: data.special || [],
@@ -610,7 +848,7 @@ export const CreateDestinationForm = ({
         tripImage: data.tripImage || '',
         status: statusToSend,
       };
-
+      // console.log(tripData);
       let result;
       if (isEditMode && initialData?.travelPlanId) {
         result = await updateTravelPlan(initialData.travelPlanId, tripData);
@@ -619,16 +857,22 @@ export const CreateDestinationForm = ({
       }
 
       if (result?.error) {
-        toast.error(result.message || result.error, {
-          style: {
-            background: 'rgba(220, 38, 38, 0.95)', // Changed to red for error
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(254, 202, 202, 0.3)', // Light red border
-            color: 'white',
-            fontFamily: 'var(--font-instrument)',
-          },
-          duration: 3000,
-        });
+        // Show all API errors (array/field errors/single message)
+        try {
+          showApiErrors(result);
+        } catch {
+          // Fallback single toast
+          toast.error(result.message || result.error || 'An error occurred', {
+            style: {
+              background: 'rgba(220, 38, 38, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(254, 202, 202, 0.3)',
+              color: 'white',
+              fontFamily: 'var(--font-instrument)',
+            },
+            duration: 3000,
+          });
+        }
         console.error(`Failed to ${isEditMode ? 'update' : 'create'} travel plan:`, result.error);
       } else {
         toast.success(result.message || 'Operation completed successfully!', {
@@ -672,6 +916,13 @@ export const CreateDestinationForm = ({
     const validationResult = validateFormData(formData, false);
 
     if (!validationResult.success) {
+      // Show all zod errors as toasts and set form errors
+      try {
+        showZodErrors(validationResult.error as z.ZodError);
+      } catch (e) {
+        console.error('Error showing zod errors', e);
+      }
+
       const errors = validationResult.error.flatten().fieldErrors;
       Object.keys(errors).forEach(field => {
         const errorMessage = errors[field as keyof typeof errors];
@@ -901,14 +1152,61 @@ export const CreateDestinationForm = ({
                               <FormControl>
                                 <DatePicker
                                   selected={
-                                    field.value &&
-                                    (typeof field.value === 'string' ||
-                                      typeof field.value === 'number' ||
-                                      field.value instanceof Date)
-                                      ? new Date(field.value as string | number | Date)
+                                    field.value
+                                      ? typeof field.value === 'string'
+                                        ? parseLocalDate(field.value)
+                                        : typeof field.value === 'number'
+                                          ? new Date(field.value)
+                                          : field.value instanceof Date
+                                            ? field.value
+                                            : null
                                       : null
                                   }
-                                  onChange={date => field.onChange(date)}
+                                  onChange={date => {
+                                    try {
+                                      if (date) {
+                                        const minStart = new Date();
+                                        minStart.setHours(0, 0, 0, 0);
+                                        minStart.setDate(minStart.getDate() + 30);
+
+                                        const selected = new Date(date as Date);
+                                        selected.setHours(0, 0, 0, 0);
+
+                                        if (selected < minStart) {
+                                          // Clear the field and show toast
+                                          field.onChange('');
+                                          toast.error(
+                                            'Start date must be at least 30 days from today.',
+                                            {
+                                              style: {
+                                                background: 'rgba(220, 38, 38, 0.95)',
+                                                color: 'white',
+                                                fontFamily: 'var(--font-instrument)',
+                                              },
+                                              duration: 4000,
+                                            }
+                                          );
+                                          return;
+                                        }
+                                      }
+                                    } catch {
+                                      // fallback: still set the value
+                                    }
+
+                                    // Normalize value stored in form to a YYYY-MM-DD string
+                                    const formatted = formatDateForFormInput(date as Date);
+                                    field.onChange(formatted);
+                                    try {
+                                      console.debug(
+                                        '[date-picker] set field',
+                                        data.id,
+                                        'to',
+                                        formatted,
+                                        'rawDate:',
+                                        date
+                                      );
+                                    } catch {}
+                                  }}
                                   dateFormat="dd/MM/yyyy"
                                   className="h-11 w-full border border-gray-200 rounded-md px-3 focus:border-purple-400 focus:ring-purple-100 focus:outline-none font-instrument"
                                   placeholderText="DD/MM/YYYY"
@@ -1648,7 +1946,7 @@ export const CreateDestinationForm = ({
                                           onClick={removeImage}
                                           variant="destructive"
                                           size="sm"
-                                          className="absolute right-2 top-2 font-instrument border-2 rounded-xl !px-8 !py-6 font-bold transition-all bg-red-600 text-white text-base border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-red-600/80 cursor-pointer"
+                                          className="absolute right-2 top-2 font-instrument border-2 rounded-xl px-8 py-6 font-bold transition-all bg-red-600 text-white text-base border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-red-600/80 cursor-pointer"
                                         >
                                           <X size={20} strokeWidth={5} />
                                         </Button>

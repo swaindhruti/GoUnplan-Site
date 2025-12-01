@@ -471,6 +471,15 @@ export const cancelBooking = async (bookingId: string) => {
       });
     });
 
+    await prisma.travelPlans.update({
+      where: { travelPlanId: booking.travelPlanId },
+      data: {
+        maxParticipants: {
+          increment: booking.participants,
+        },
+      },
+    });
+
     revalidatePath('/my-trips');
     revalidatePath(`/booking/${booking.travelPlanId}`);
 
