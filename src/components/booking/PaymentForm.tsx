@@ -20,6 +20,7 @@ import GreenConfirmationLoader from '../global/Loaders';
 import { processRazorpayPayment, handlePaymentFailure } from '@/actions/payment/razorpayActions';
 import { toast } from 'sonner';
 import { initiateRazorpayPayment } from '@/lib/razorpay';
+import { sendEmailAction } from '@/actions/email/action';
 
 interface PaymentFormProps {
   tripData: {
@@ -143,10 +144,25 @@ export function PaymentForm({
           setShowLoader(true);
 
           try {
-            // Use the new Razorpay-specific payment processing
             const result = await processRazorpayPayment(bookingId, paymentData, total);
 
             if (result.success) {
+              sendEmailAction({
+                to: 'mayan6378@gmail.com',
+                type: 'booking_user_confirmation',
+                payload: {
+                  userName: booking && booking.guests && booking?.guests[0]?.firstName,
+                  bookingId,
+                  travelName: tripData?.title,
+                  totalPrice: tripData?.pricePerPerson * tripData.numberOfGuests,
+                  amountPaid: total,
+                  participants: booking.participants,
+                  startDate: tripData.startDate,
+                  endDate: tripData.endDate,
+                  remainingAmount: booking?.remainingAmount,
+                  paymentStatus: booking.remainingAmount === 0 ? 'PAID' : 'PARTIAL',
+                },
+              });
               toast.success(result.message, {
                 style: {
                   background: 'rgba(147, 51, 234, 0.95)',
@@ -206,7 +222,7 @@ export function PaymentForm({
         duration: 3000,
       });
     }
-  }, [bookingId, total, isProcessing, tripData, userDetails]);
+  }, [bookingId, total, isProcessing, tripData, userDetails, booking]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);

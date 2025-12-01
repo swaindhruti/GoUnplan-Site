@@ -165,7 +165,8 @@ export const createTravelPlan = async (data: {
     const price = isNaN(Number(data.price)) ? 0 : Number(data.price);
 
     // Handle noOfDays with fallback for drafts
-    const noOfDays = isNaN(data.noOfDays) || data.noOfDays <= 0 ? 1 : data.noOfDays;
+    const noOfDays =
+      isNaN(Number(data.noOfDays)) || Number(data.noOfDays) <= 0 ? 1 : Number(data.noOfDays);
 
     // Handle maxParticipants with fallback for drafts
     const maxParticipants = isNaN(Number(data.maxParticipants)) ? 0 : Number(data.maxParticipants);

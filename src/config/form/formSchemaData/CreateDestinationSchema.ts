@@ -1,5 +1,36 @@
 import { z } from 'zod';
 
+// Helper: normalize various date inputs to a local date-only Date (midnight local)
+const toDateOnly = (v: unknown): Date | null => {
+  try {
+    if (v instanceof Date && !isNaN(v.getTime())) {
+      return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+    }
+
+    if (typeof v === 'string') {
+      const match = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const y = Number(match[1]);
+        const m = Number(match[2]) - 1;
+        const d = Number(match[3]);
+        return new Date(y, m, d);
+      }
+      const parsed = new Date(v);
+      if (!isNaN(parsed.getTime())) {
+        return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+      }
+    }
+
+    const fallback = new Date(String(v));
+    if (!isNaN(fallback.getTime())) {
+      return new Date(fallback.getFullYear(), fallback.getMonth(), fallback.getDate());
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return null;
+};
+
 export const CreateDestinationSchema = z
   .object({
     tripName: z.string().min(3, 'Trip name must be at least 3 characters'),
@@ -59,9 +90,10 @@ export const CreateDestinationSchema = z
   .refine(
     data => {
       if (data.startDate && data.endDate) {
-        const start = new Date(data.startDate);
-        const end = new Date(data.endDate);
-        return end >= start;
+        const startOnly = toDateOnly(data.startDate);
+        const endOnly = toDateOnly(data.endDate);
+        if (!startOnly || !endOnly) return true; // let other validators catch invalid dates
+        return endOnly.getTime() >= startOnly.getTime();
       }
       return true;
     },
@@ -137,9 +169,10 @@ export const CreateDestinationDraftSchema = z
   .refine(
     data => {
       if (data.startDate && data.endDate) {
-        const start = new Date(data.startDate);
-        const end = new Date(data.endDate);
-        return end >= start;
+        const startOnly = toDateOnly(data.startDate);
+        const endOnly = toDateOnly(data.endDate);
+        if (!startOnly || !endOnly) return true;
+        return endOnly.getTime() >= startOnly.getTime();
       }
       return true;
     },

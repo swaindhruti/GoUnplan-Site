@@ -73,6 +73,15 @@ export const processRazorpayPayment = async (
         },
       });
 
+      await prisma.travelPlans.update({
+        where: { travelPlanId: booking.travelPlanId },
+        data: {
+          maxParticipants: {
+            decrement: booking.participants,
+          },
+        },
+      });
+
       return { partialPayment, booking: updatedBooking };
     });
 
