@@ -13,6 +13,7 @@ import { payoutCreatedTemplate } from '@/lib/email/templates/payout/payoutCreate
 import { paymentProcessedTemplate } from '@/lib/email/templates/payout/paymentProcessed';
 import { emailVerificationTemplate } from '@/lib/email/templates/emailVerification';
 import { passwordResetTemplate } from '@/lib/email/templates/passwordReset';
+import { supportTicketCreatedTemplate } from '@/lib/email/templates/support/ticketCreated';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -32,7 +33,8 @@ export async function sendEmailAction({
     | 'booking_cancelled'
     | 'booking_payment_reminder'
     | 'payout_created'
-    | 'payout_payment_processed';
+    | 'payout_payment_processed'
+    | 'support_ticket_created';
   payload: unknown;
 }) {
   let subject = '';
@@ -207,6 +209,34 @@ export async function sendEmailAction({
       paidAt: p.paidAt || '',
     });
     subject = 'Payment Processed Successfully';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'support_ticket_created') {
+    const p = payload as {
+      ticketId?: string;
+      userName?: string;
+      userEmail?: string;
+      category?: string;
+      priority?: string;
+      title?: string;
+      description?: string;
+      bookingId?: string;
+      bookingDetails?: string;
+    };
+    const tpl = supportTicketCreatedTemplate({
+      ticketId: p.ticketId || '',
+      userName: p.userName || '',
+      userEmail: p.userEmail || '',
+      category: p.category || '',
+      priority: p.priority || '',
+      title: p.title || '',
+      description: p.description || '',
+      bookingId: p.bookingId,
+      bookingDetails: p.bookingDetails,
+    });
+    subject = 'New Support Ticket Created - Action Required';
     text = tpl.text;
     html = tpl.html;
   }

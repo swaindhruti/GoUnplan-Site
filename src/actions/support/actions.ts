@@ -3,6 +3,10 @@
 import prisma from '@/lib/prisma';
 import { requireSupport, requireAuth } from '@/lib/roleGaurd';
 import { CreateTicketData, UpdateTicketData, CreateTicketMessageData } from '@/types/support';
+import { sendEmailAction } from '@/actions/email/action';
+
+// Company email addresses for support notifications
+const COMPANY_EMAILS = ['Sambhav.founder@gounplan.com', 'Rishika.founder@gounplan.com'];
 
 export const getAllSupportStaff = async () => {
   const session = await requireSupport();
@@ -215,6 +219,36 @@ export const createTicket = async (data: CreateTicketData) => {
           },
         },
       },
+    });
+
+    // Prepare booking details if booking exists
+    let bookingDetails = '';
+    if (ticket.booking) {
+      bookingDetails = `${ticket.booking.travelPlan.title} - ${ticket.booking.travelPlan.destination} (${new Date(ticket.booking.startDate).toLocaleDateString()} - ${new Date(ticket.booking.endDate).toLocaleDateString()})`;
+    }
+
+    // Send email notifications to company email addresses
+    const emailPromises = COMPANY_EMAILS.map(email =>
+      sendEmailAction({
+        to: email,
+        type: 'support_ticket_created',
+        payload: {
+          ticketId: ticket.id,
+          userName: ticket.user.name || 'Unknown User',
+          userEmail: ticket.user.email || '',
+          category: ticket.category,
+          priority: ticket.priority,
+          title: ticket.title,
+          description: ticket.description,
+          bookingId: ticket.bookingId,
+          bookingDetails: bookingDetails || undefined,
+        },
+      })
+    );
+
+    // Send emails without blocking the response
+    Promise.all(emailPromises).catch(error => {
+      console.error('Error sending support ticket emails:', error);
     });
 
     return { success: true, ticket };
