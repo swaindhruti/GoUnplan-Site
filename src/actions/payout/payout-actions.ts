@@ -205,7 +205,18 @@ export const createPayout = async (input: CreatePayoutInput) => {
       include: {
         travelPlan: {
           select: {
+            title: true,
             hostId: true,
+            host: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -246,6 +257,30 @@ export const createPayout = async (input: CreatePayoutInput) => {
         notes: input.notes,
       },
     });
+
+    // Send email notification to host
+    const hostEmail = booking.travelPlan.host.user.email;
+    if (hostEmail) {
+      try {
+        const { sendEmailAction } = await import('@/actions/email/action');
+        await sendEmailAction({
+          to: hostEmail,
+          type: 'payout_created',
+          payload: {
+            hostName: booking.travelPlan.host.user.name,
+            bookingId: booking.id,
+            travelTitle: booking.travelPlan.title,
+            amount: firstPaymentAmount,
+            paymentDate: firstPaymentDate.toLocaleDateString('en-IN'),
+            totalAmount: booking.totalPrice,
+            notes: input.notes,
+          },
+        });
+      } catch (emailError) {
+        console.error('Failed to send payout creation email:', emailError);
+        // Don't fail the payout creation if email fails
+      }
+    }
 
     revalidatePath('/dashboard/admin/payouts');
     return { success: true, payout };
@@ -326,6 +361,36 @@ export const markPayoutPaid = async (input: MarkPayoutPaidInput) => {
   if (!session) return { error: 'Unauthorized' };
 
   try {
+    // First, get the payout with related data for email
+    const existingPayout = await prisma.payout.findUnique({
+      where: { id: input.payoutId },
+      include: {
+        booking: {
+          include: {
+            travelPlan: {
+              select: {
+                title: true,
+                host: {
+                  select: {
+                    user: {
+                      select: {
+                        name: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!existingPayout) {
+      return { error: 'Payout not found' };
+    }
+
     const updateData: Record<string, unknown> = {};
 
     if (input.paymentType === 'first') {
@@ -340,6 +405,34 @@ export const markPayoutPaid = async (input: MarkPayoutPaidInput) => {
       where: { id: input.payoutId },
       data: updateData,
     });
+
+    // Send email notification to host
+    const hostEmail = existingPayout.booking.travelPlan.host.user.email;
+    if (hostEmail) {
+      try {
+        const { sendEmailAction } = await import('@/actions/email/action');
+        const emailType = input.paymentType === 'first' ? 'payout_first_payment' : 'payout_second_payment';
+        const amount = input.paymentType === 'first' ? existingPayout.firstPaymentAmount : existingPayout.secondPaymentAmount;
+        const paymentDate = input.paymentType === 'first' ? existingPayout.firstPaymentDate : existingPayout.secondPaymentDate;
+        
+        await sendEmailAction({
+          to: hostEmail,
+          type: emailType,
+          payload: {
+            hostName: existingPayout.booking.travelPlan.host.user.name,
+            bookingId: existingPayout.booking.id,
+            travelTitle: existingPayout.booking.travelPlan.title,
+            amount,
+            paymentDate: paymentDate.toLocaleDateString('en-IN'),
+            totalAmount: existingPayout.totalAmount,
+            notes: existingPayout.notes,
+          },
+        });
+      } catch (emailError) {
+        console.error('Failed to send payout payment email:', emailError);
+        // Don't fail the payout update if email fails
+      }
+    }
 
     revalidatePath('/dashboard/admin/payouts');
     return { success: true, payout };
