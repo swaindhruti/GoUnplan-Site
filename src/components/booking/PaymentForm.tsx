@@ -20,7 +20,7 @@ import GreenConfirmationLoader from '../global/Loaders';
 import { processRazorpayPayment, handlePaymentFailure } from '@/actions/payment/razorpayActions';
 import { toast } from 'sonner';
 import { initiateRazorpayPayment } from '@/lib/razorpay';
-import { sendEmailAction } from '@/actions/email/action';
+// import { sendEmailAction } from '@/actions/email/action';
 
 interface PaymentFormProps {
   tripData: {
@@ -147,22 +147,39 @@ export function PaymentForm({
             const result = await processRazorpayPayment(bookingId, paymentData, total);
 
             if (result.success) {
-              sendEmailAction({
-                to: 'mayan6378@gmail.com',
-                type: 'booking_user_confirmation',
-                payload: {
-                  userName: booking && booking.guests && booking?.guests[0]?.firstName,
-                  bookingId,
-                  travelName: tripData?.title,
-                  totalPrice: tripData?.pricePerPerson * tripData.numberOfGuests,
-                  amountPaid: total,
-                  participants: booking.participants,
-                  startDate: tripData.startDate,
-                  endDate: tripData.endDate,
-                  remainingAmount: booking?.remainingAmount,
-                  paymentStatus: booking.remainingAmount === 0 ? 'PAID' : 'PARTIAL',
-                },
-              });
+              // fetch the most recent booking from the server to ensure email has up-to-date info
+              // let latestBooking: Partial<BookingData> = booking;
+              // try {
+              //   const resp = await fetch(`/api/bookings/${bookingId}`);
+              //   if (resp.ok) {
+              //     latestBooking = (await resp.json()) as Partial<BookingData>;
+              //   } else {
+              //     console.warn(
+              //       '[PaymentForm] failed to fetch latest booking, using local booking prop'
+              //     );
+              //   }
+              // } catch (fetchErr) {
+              //   console.warn('[PaymentForm] error fetching latest booking', fetchErr);
+              // }
+
+              // build safe values from the fresh booking with fallbacks
+              // const userName =
+              //   latestBooking?.guests?.[0]?.firstName ||
+              //   booking?.guests?.[0]?.firstName ||
+              //   paymentUserDetails.name ||
+              //   'Guest';
+              // const userEmail =
+              //   // prefer booking's user email if available, else the payment user email
+              //   (latestBooking as any)?.userEmail || paymentUserDetails.email || '';
+              // const pricePerPerson = latestBooking?.pricePerPerson ?? tripData.pricePerPerson ?? 0;
+              // const participants = latestBooking?.participants ?? tripData.numberOfGuests ?? 0;
+              // // const totalPrice = isPartialPayment
+              // //   ? pricePerPerson * participants
+              // //   : paymentBreakdown.subtotal;
+              // const remainingAmount =
+              //   latestBooking?.remainingAmount ?? booking?.remainingAmount ?? 0;
+              // // const paymentStatus = remainingAmount === 0 ? 'PAID' : 'PARTIAL';
+
               toast.success(result.message, {
                 style: {
                   background: 'rgba(147, 51, 234, 0.95)',
@@ -222,7 +239,7 @@ export function PaymentForm({
         duration: 3000,
       });
     }
-  }, [bookingId, total, isProcessing, tripData, userDetails, booking]);
+  }, [bookingId, total, isProcessing, tripData, userDetails]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);

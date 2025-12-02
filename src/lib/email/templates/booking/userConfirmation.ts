@@ -37,7 +37,7 @@ Total Price: ₹${totalPrice}
 Amount Paid: ₹${amountPaid}
 Remaining: ₹${remaining}
 
-Status: ${paymentStatus === 'PAID' ? 'Fully Paid' : 'Partially Paid'}
+Status: ${remaining === 0 ? 'Fully Paid' : 'Partially Paid'}
 
 Thank you for choosing us!
 `;
@@ -55,7 +55,7 @@ Thank you for choosing us!
   </div>
 
   <h3>Payment Details</h3>
-  <p><strong>Total Price:</strong> ₹${totalPrice}</p>
+  <p><strong>Remaining Price:</strong> ₹${totalPrice}</p>
   <p><strong>Paid:</strong> ₹${amountPaid}</p>
   <p><strong>Remaining:</strong> ₹${remaining}</p>
   <p><strong>Status:</strong> ${paymentStatus === 'PAID' ? 'Fully Paid' : 'Partially Paid'}</p>
