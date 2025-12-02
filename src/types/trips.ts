@@ -17,6 +17,7 @@ export type RawTrip = {
   maxParticipants?: number;
   seatsLeft?: number;
   bookedSeats?: number;
+  genderPreference?: string;
 };
 
 export type Trip = {
@@ -41,6 +42,7 @@ export type Trip = {
   bookedSeats?: number;
   averageRating: number;
   reviewCount: number;
+  genderPreference?: string;
 };
 
 export type SelectOption = {
@@ -56,6 +58,7 @@ export type FilterState = {
   languageFilter: string[];
   vibeFilter: string[];
   travellerFilter: string[];
+  genderPreferenceFilter: string[];
 };
 
 export const INITIAL_FILTERS: FilterState = {
@@ -66,6 +69,7 @@ export const INITIAL_FILTERS: FilterState = {
   languageFilter: [],
   vibeFilter: [],
   travellerFilter: [],
+  genderPreferenceFilter: [],
 };
 
 export const DURATION_OPTIONS = [

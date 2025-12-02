@@ -1,5 +1,14 @@
 import Link from 'next/link';
-import { Compass, Calendar, Languages, ArrowRight, Users, Star, CalendarDays } from 'lucide-react';
+import {
+  Compass,
+  Calendar,
+  Languages,
+  ArrowRight,
+  Users,
+  Star,
+  CalendarDays,
+  UserCheck,
+} from 'lucide-react';
 import { Trip } from '@/types/trips';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +49,29 @@ export const TripCard = ({
   const endDate = trip.startDate
     ? formatDate(calculateEndDate(trip.startDate, trip.noOfDays))
     : null;
+
+  // Format gender preference for display
+  const formatGenderPreference = (preference?: string) => {
+    if (!preference) return null;
+    const displayMap: Record<string, string> = {
+      MALE: 'Male Only',
+      FEMALE: 'Female Only',
+      MIX: 'Mixed',
+      OTHER: 'Other',
+    };
+    return displayMap[preference] || preference;
+  };
+
+  // Get color for gender preference badge
+  const getGenderPreferenceColor = (preference?: string) => {
+    const colorMap: Record<string, string> = {
+      MALE: 'bg-blue-50 text-blue-700 border-blue-200',
+      FEMALE: 'bg-pink-50 text-pink-700 border-pink-200',
+      MIX: 'bg-purple-50 text-purple-700 border-purple-200',
+      OTHER: 'bg-gray-50 text-gray-700 border-gray-200',
+    };
+    return preference ? colorMap[preference] || colorMap['OTHER'] : colorMap['OTHER'];
+  };
 
   return (
     <div
@@ -161,6 +193,14 @@ export const TripCard = ({
                 <div className="flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
                   <Languages className="w-3 h-3 mr-1 text-purple-600" />
                   {trip.languages.join(', ')}
+                </div>
+              )}
+              {trip.genderPreference && (
+                <div
+                  className={`flex items-center px-2 py-1 rounded-full border ${getGenderPreferenceColor(trip.genderPreference)}`}
+                >
+                  <UserCheck className="w-3 h-3 mr-1" />
+                  {formatGenderPreference(trip.genderPreference)}
                 </div>
               )}
               {trip.vibes.slice(0, 2).map(vibe => (

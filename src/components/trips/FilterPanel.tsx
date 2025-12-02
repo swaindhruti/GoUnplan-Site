@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import ReactSelect, { StylesConfig, MultiValue, CSSObjectWithLabel } from 'react-select';
 import { FilterState, SelectOption, DURATION_OPTIONS } from '@/types/trips';
-import { DollarSign, Clock, MapPin, Globe, MessageCircle, Zap, Filter } from 'lucide-react';
+import { DollarSign, Clock, MapPin, Globe, MessageCircle, Zap, Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 
 const INITIAL_LANGUAGES = [
@@ -65,7 +65,8 @@ interface FilterPanelProps {
   handlePriceMaxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleLanguageChange: (selected: MultiValue<SelectOption>) => void;
   handleVibeChange: (selected: MultiValue<SelectOption>) => void;
-  handleTravellerChange: (selected: MultiValue<SelectOption>) => void; // <-- Add this
+  handleTravellerChange: (selected: MultiValue<SelectOption>) => void;
+  handleGenderPreferenceChange: (selected: MultiValue<SelectOption>) => void;
 }
 
 export const FilterPanel = ({
@@ -77,6 +78,7 @@ export const FilterPanel = ({
   handleLanguageChange,
   handleVibeChange,
   handleTravellerChange,
+  handleGenderPreferenceChange,
   selectStyles,
 }: FilterPanelProps) => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -95,6 +97,13 @@ export const FilterPanel = ({
     value: t,
     label: t,
   }));
+
+  const genderPreferenceOptions = [
+    { value: 'MALE', label: 'Male Only' },
+    { value: 'FEMALE', label: 'Female Only' },
+    { value: 'MIX', label: 'Mixed' },
+    { value: 'OTHER', label: 'Other' },
+  ];
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
@@ -349,6 +358,32 @@ export const FilterPanel = ({
                   menuPlacement="auto"
                 />
               </div>
+
+              {/* Gender Preference */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-purple-600" />
+                  Gender Preference
+                </Label>
+                <ReactSelect
+                  isMulti
+                  instanceId="gender-preference-select-mobile"
+                  styles={{ ...selectStyles, ...menuPortalStyles }}
+                  menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
+                  placeholder="Select gender preference"
+                  options={genderPreferenceOptions}
+                  value={
+                    filters.genderPreferenceFilter?.map((g: string) => ({
+                      value: g,
+                      label: genderPreferenceOptions.find(opt => opt.value === g)?.label || g,
+                    })) || []
+                  }
+                  onChange={handleGenderPreferenceChange}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  menuPlacement="auto"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -538,6 +573,31 @@ export const FilterPanel = ({
                   })) || []
                 }
                 onChange={handleTravellerChange}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+
+            {/* Gender Preference */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Users className="h-4 w-4 text-purple-600" />
+                Gender Preference
+              </Label>
+              <ReactSelect
+                isMulti
+                instanceId="gender-preference-select-desktop"
+                styles={{ ...selectStyles, ...menuPortalStyles }}
+                menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
+                placeholder="Select gender preference"
+                options={genderPreferenceOptions}
+                value={
+                  filters.genderPreferenceFilter?.map((g: string) => ({
+                    value: g,
+                    label: genderPreferenceOptions.find(opt => opt.value === g)?.label || g,
+                  })) || []
+                }
+                onChange={handleGenderPreferenceChange}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />

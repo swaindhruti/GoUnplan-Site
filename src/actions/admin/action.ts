@@ -535,6 +535,42 @@ export const approveTravelPlan = async (travelPlanId: string) => {
   }
 };
 
+export const toggleTravelPlanStatus = async (travelPlanId: string) => {
+  const session = await requireAdmin();
+  if (!session) return { error: 'Unauthorized' };
+
+  try {
+    // First, get the current status
+    const travelPlan = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: travelPlanId },
+      select: { status: true },
+    });
+
+    if (!travelPlan) {
+      return { error: 'Travel plan not found' };
+    }
+
+    // Toggle the status
+    const newStatus =
+      travelPlan.status === TravelPlanStatus.ACTIVE
+        ? TravelPlanStatus.INACTIVE
+        : TravelPlanStatus.ACTIVE;
+
+    const updatedTravelPlan = await prisma.travelPlans.update({
+      where: { travelPlanId: travelPlanId },
+      data: { status: newStatus },
+    });
+
+    return { success: true, travelPlan: updatedTravelPlan, newStatus };
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2025') {
+      return { error: 'Travel plan not found' };
+    }
+    console.error('Error toggling travel plan status:', error);
+    return { error: 'Failed to toggle travel plan status' };
+  }
+};
+
 export const getAllActiveTrips = async () => {
   const session = await requireAdmin();
   if (!session) return { error: 'Unauthorized' };

@@ -47,6 +47,7 @@ import {
   approveTravelPlan,
   getAllBookings,
   getAllActiveTrips,
+  toggleTravelPlanStatus,
 } from '@/actions/admin/action';
 import {
   getAllPayouts,
@@ -346,6 +347,7 @@ export default function AdminDashboard() {
   const [showEditPayoutDialog, setShowEditPayoutDialog] = useState(false);
   const [showCreatePayoutDialog, setShowCreatePayoutDialog] = useState(false);
   const [payoutActionLoading, setPayoutActionLoading] = useState(false);
+  const [togglingTripId, setTogglingTripId] = useState<string | null>(null);
 
   const handleRevenueReportButton = () => {
     if (analyticsModal === true) setAnalyticsModal(false);
@@ -426,6 +428,36 @@ export default function AdminDashboard() {
   const resetDateFilter = () => {
     setIsDateFilterActive(false);
     fetchRevenueData();
+  };
+
+  // Handle toggle travel plan status
+  const handleToggleTravelPlanStatus = async (travelPlanId: string) => {
+    setTogglingTripId(travelPlanId);
+    try {
+      const response = await toggleTravelPlanStatus(travelPlanId);
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      // Update the activeTrips state
+      setActiveTrips(prevTrips =>
+        prevTrips.map(trip =>
+          trip.travelPlanId === travelPlanId ? { ...trip, status: response.newStatus! } : trip
+        )
+      );
+
+      toast.success(
+        response.newStatus === 'ACTIVE'
+          ? 'Trip published successfully'
+          : 'Trip unpublished successfully'
+      );
+    } catch (err) {
+      toast.error('Failed to toggle trip status');
+      console.error(err);
+    } finally {
+      setTogglingTripId(null);
+    }
   };
 
   // Fetch data on component mount
@@ -2099,6 +2131,9 @@ export default function AdminDashboard() {
                             <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
                               Status
                             </TableHead>
+                            <TableHead className="px-6 py-4 text-left text-sm font-semibold text-gray-700 font-instrument">
+                              Actions
+                            </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="bg-white divide-y divide-slate-200">
@@ -2239,6 +2274,31 @@ export default function AdminDashboard() {
                                   )}
                                 </TableCell>
                                 <TableCell className="px-6 py-4">{statusBadge}</TableCell>
+                                <TableCell className="px-6 py-4">
+                                  {/* Only show toggle button for upcoming trips */}
+                                  {trip.startDate && new Date(trip.startDate) > now && (
+                                    <Button
+                                      onClick={() =>
+                                        handleToggleTravelPlanStatus(trip.travelPlanId)
+                                      }
+                                      disabled={togglingTripId === trip.travelPlanId}
+                                      size="sm"
+                                      className={`font-instrument ${
+                                        trip.status === 'ACTIVE'
+                                          ? 'bg-red-600 hover:bg-red-700 text-white'
+                                          : 'bg-green-600 hover:bg-green-700 text-white'
+                                      }`}
+                                    >
+                                      {togglingTripId === trip.travelPlanId ? (
+                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                      ) : trip.status === 'ACTIVE' ? (
+                                        'Unpublish'
+                                      ) : (
+                                        'Publish'
+                                      )}
+                                    </Button>
+                                  )}
+                                </TableCell>
                               </TableRow>
                             );
                           })}

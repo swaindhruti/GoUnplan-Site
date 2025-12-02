@@ -235,6 +235,16 @@ export default function TripsPage() {
     [updateFilter]
   );
 
+  const handleGenderPreferenceChange = useCallback(
+    (selected: MultiValue<SelectOption>) => {
+      updateFilter(
+        'genderPreferenceFilter',
+        selected.map(opt => opt.value)
+      );
+    },
+    [updateFilter]
+  );
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -437,6 +447,7 @@ export default function TripsPage() {
                     handleLanguageChange={handleLanguageChange}
                     handleVibeChange={handleVibeChange}
                     handleTravellerChange={handleTravellerChange}
+                    handleGenderPreferenceChange={handleGenderPreferenceChange}
                   />
                 </div>
               </motion.div>

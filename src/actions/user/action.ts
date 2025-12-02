@@ -543,6 +543,7 @@ export const getAllActiveTrips = async () => {
         createdAt: true,
         averageRating: true,
         reviewCount: true,
+        genderPreference: true,
         bookings: {
           where: {
             paymentStatus: { in: ['PARTIALLY_PAID', 'FULLY_PAID'] },

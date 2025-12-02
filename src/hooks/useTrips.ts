@@ -72,6 +72,7 @@ export const useFilters = (trips: Trip[]) => {
         'Business',
         'Backpackers',
       ],
+      genderPreferences: ['MALE', 'FEMALE', 'MIX', 'OTHER'],
     }),
     [trips]
   );
@@ -116,6 +117,13 @@ export const useFilters = (trips: Trip[]) => {
       ) {
         return false;
       }
+      if (
+        filters.genderPreferenceFilter.length > 0 &&
+        trip.genderPreference &&
+        !filters.genderPreferenceFilter.includes(trip.genderPreference)
+      ) {
+        return false;
+      }
 
       return true;
     });
@@ -129,6 +137,7 @@ export const useFilters = (trips: Trip[]) => {
     if (filters.countryFilter !== 'all') count++;
     if (filters.languageFilter.length > 0) count++;
     if (filters.vibeFilter.length > 0) count++;
+    if (filters.genderPreferenceFilter.length > 0) count++;
     return count;
   }, [filters]);
 
