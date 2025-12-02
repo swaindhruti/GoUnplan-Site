@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       'drive.google.com',
       'i.pravatar.cc',
       'ik.imagekit.io',
+      'lh3.googleusercontent.com',
     ],
   },
 };

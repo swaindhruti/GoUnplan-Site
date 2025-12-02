@@ -368,70 +368,96 @@ export const BookingsSection = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {trips.map(trip => (
-              <div
-                key={trip.travelPlanId}
-                onClick={() => handleTripSelect(trip.travelPlanId)}
-                className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                  selectedTrip === trip.travelPlanId
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-25'
-                }`}
-              >
-                <div className="relative h-32 rounded-t-lg overflow-hidden">
-                  <Image
-                    src={trip.tripImage || 'https://avatar.iran.liara.run/public'}
-                    alt={trip.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 right-2 flex gap-1">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        trip.remainingSeats <= 5
-                          ? 'bg-red-100 text-red-800'
-                          : trip.remainingSeats <= 15
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {trip.remainingSeats} left
-                    </span>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2 truncate">{trip.title}</h4>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      <span className="truncate">{trip.destination || 'Destination TBA'}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>
-                        {trip.startDate ? formatDate(trip.startDate) : 'Date TBA'} -{' '}
-                        {trip.endDate ? formatDate(trip.endDate) : 'Date TBA'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>
-                        {trip.confirmedParticipants}/{trip.maxParticipants || 50} confirmed
+            {trips.map(trip => {
+              // Calculate paid guests for this trip
+              const tripBookings = bookings.filter(b => b.travelPlanId === trip.travelPlanId);
+              const paidGuests = tripBookings
+                .filter(
+                  b => b.paymentStatus === 'FULLY_PAID' || b.paymentStatus === 'PARTIALLY_PAID'
+                )
+                .reduce((sum, b) => sum + b.participants, 0);
+              const totalGuests = trip.confirmedParticipants;
+
+              return (
+                <div
+                  key={trip.travelPlanId}
+                  onClick={() => handleTripSelect(trip.travelPlanId)}
+                  className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
+                    selectedTrip === trip.travelPlanId
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-25'
+                  }`}
+                >
+                  <div className="relative h-32 rounded-t-lg overflow-hidden">
+                    <Image
+                      src={trip.tripImage || 'https://avatar.iran.liara.run/public'}
+                      alt={trip.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          trip.remainingSeats <= 5
+                            ? 'bg-red-100 text-red-800'
+                            : trip.remainingSeats <= 15
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-green-100 text-green-800'
+                        }`}
+                      >
+                        {trip.remainingSeats} left
                       </span>
                     </div>
                   </div>
+                  <div className="p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2 truncate">{trip.title}</h4>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        <span className="truncate">{trip.destination || 'Destination TBA'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {trip.startDate ? formatDate(trip.startDate) : 'Date TBA'} -{' '}
+                          {trip.endDate ? formatDate(trip.endDate) : 'Date TBA'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>
+                          {trip.confirmedParticipants}/{trip.maxParticipants || 50} confirmed
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="font-medium text-green-700">
+                          {paidGuests}/{totalGuests} paid guests
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Status Filter - Only show when trip is selected */}
+      {/* Payment Status Filter - Only show when trip is selected */}
       {selectedTrip && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Payment Status</h3>
           <div className="flex flex-wrap gap-3">
-            {['ALL', 'CONFIRMED', 'PENDING', 'REFUNDED', 'CANCELLED'].map(status => (
+            {[
+              'ALL',
+              'PENDING',
+              'PARTIALLY_PAID',
+              'FULLY_PAID',
+              'OVERDUE',
+              'CANCELLED',
+              'REFUNDED',
+            ].map(status => (
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
@@ -441,7 +467,7 @@ export const BookingsSection = () => {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span>{status}</span>
+                <span>{status.replace('_', ' ')}</span>
                 <span className="ml-2 px-2 py-0.5 rounded-full bg-white bg-opacity-20 text-xs">
                   {counts[status as keyof BookingCounts]}
                 </span>

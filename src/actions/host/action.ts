@@ -733,14 +733,35 @@ export const getHostBookings = async (
     // Add status filter if provided
     if (statusFilter && statusFilter !== 'ALL') {
       if (filterType === 'payment') {
-        whereClause.paymentStatus = statusFilter as PaymentStatus;
+        // Valid payment status values
+        const validPaymentStatuses: PaymentStatus[] = [
+          'PENDING',
+          'PARTIALLY_PAID',
+          'FULLY_PAID',
+          'OVERDUE',
+          'REFUNDED',
+          'CANCELLED',
+        ];
+        if (validPaymentStatuses.includes(statusFilter as PaymentStatus)) {
+          whereClause.paymentStatus = statusFilter as PaymentStatus;
+        }
       } else {
-        whereClause.status = statusFilter as BookingStatus;
+        // Valid booking status values
+        const validBookingStatuses: BookingStatus[] = [
+          'PENDING',
+          'CONFIRMED',
+          'CANCELLED',
+          'REFUNDED',
+          'NOTPAID',
+        ];
+        if (validBookingStatuses.includes(statusFilter as BookingStatus)) {
+          whereClause.status = statusFilter as BookingStatus;
+        }
       }
     }
 
     // Fetch bookings with related data
-    const bookings = await prisma.booking.findMany({
+    const rawBookings = await prisma.booking.findMany({
       where: whereClause,
       include: {
         user: {
@@ -771,17 +792,40 @@ export const getHostBookings = async (
       },
     });
 
-    // Get booking counts by status (for selected trip if specified)
+    // Map payment status to booking status
+    const getBookingStatusFromPayment = (paymentStatus: PaymentStatus): BookingStatus => {
+      switch (paymentStatus) {
+        case 'FULLY_PAID':
+          return 'CONFIRMED';
+        case 'PARTIALLY_PAID':
+        case 'PENDING':
+        case 'OVERDUE':
+          return 'PENDING';
+        case 'REFUNDED':
+          return 'REFUNDED';
+        case 'CANCELLED':
+          return 'CANCELLED';
+        default:
+          return 'PENDING';
+      }
+    };
+
+    // Transform bookings with mapped status
+    const bookings = rawBookings.map(booking => ({
+      ...booking,
+      status: getBookingStatusFromPayment(booking.paymentStatus),
+    }));
+
+    // Get booking counts by payment status and map to booking status
     const bookingCountsWhere = selectedTripId
       ? { travelPlanId: selectedTripId }
       : { travelPlanId: { in: travelPlanIds } };
 
-    const bookingCounts = await prisma.booking.groupBy({
-      by: ['status'],
-      _count: {
-        id: true,
-      },
+    const allBookingsForCount = await prisma.booking.findMany({
       where: bookingCountsWhere,
+      select: {
+        paymentStatus: true,
+      },
     });
 
     const counts = {
@@ -793,9 +837,10 @@ export const getHostBookings = async (
       NOTPAID: 0,
     };
 
-    bookingCounts.forEach(count => {
-      counts[count.status] = count._count.id;
-      counts.ALL += count._count.id;
+    allBookingsForCount.forEach(booking => {
+      const mappedStatus = getBookingStatusFromPayment(booking.paymentStatus);
+      counts[mappedStatus] += 1;
+      counts.ALL += 1;
     });
 
     // Calculate confirmed participants for each trip
@@ -804,7 +849,7 @@ export const getHostBookings = async (
         const confirmedBookings = await prisma.booking.findMany({
           where: {
             travelPlanId: trip.travelPlanId,
-            status: 'CONFIRMED',
+            paymentStatus: 'FULLY_PAID', // Fully paid bookings are confirmed
           },
           select: {
             participants: true,
