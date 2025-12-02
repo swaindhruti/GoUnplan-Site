@@ -119,7 +119,7 @@ Thank you for being a host with us!
 
     <!-- CTA Button -->
     <div style="text-align: center; margin: 30px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/host" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://gounplan.com'}/dashboard/host" 
          style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);">
         View Dashboard →
       </a>

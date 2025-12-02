@@ -64,3 +64,13 @@ export interface PayoutFilter {
   dateTo?: Date;
   searchQuery?: string;
 }
+
+export interface PayoutEmailPayload {
+  hostName?: string;
+  bookingId?: string;
+  travelTitle?: string;
+  amount?: number;
+  paymentDate?: string;
+  totalAmount?: number;
+  notes?: string;
+}

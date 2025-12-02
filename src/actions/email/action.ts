@@ -10,6 +10,7 @@ import { hostBookingNotificationTemplate } from '@/lib/email/templates/booking/h
 import { bookingCancellationTemplate } from '@/lib/email/templates/booking/cancellation';
 import { paymentReminderTemplate } from '@/lib/email/templates/booking/paymentReminder';
 import { hostPayoutNotificationTemplate } from '@/lib/email/templates/payout/hostPayoutNotification';
+import { PayoutEmailPayload } from '@/types/payout';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -144,15 +145,7 @@ export async function sendEmailAction({
   }
 
   if (type === 'payout_created') {
-    const p = payload as {
-      hostName?: string;
-      bookingId?: string;
-      travelTitle?: string;
-      amount?: number;
-      paymentDate?: string;
-      totalAmount?: number;
-      notes?: string;
-    };
+    const p = payload as PayoutEmailPayload;
     const tpl = hostPayoutNotificationTemplate({
       hostName: p.hostName || '',
       payoutType: 'created',
@@ -169,15 +162,7 @@ export async function sendEmailAction({
   }
 
   if (type === 'payout_first_payment') {
-    const p = payload as {
-      hostName?: string;
-      bookingId?: string;
-      travelTitle?: string;
-      amount?: number;
-      paymentDate?: string;
-      totalAmount?: number;
-      notes?: string;
-    };
+    const p = payload as PayoutEmailPayload;
     const tpl = hostPayoutNotificationTemplate({
       hostName: p.hostName || '',
       payoutType: 'first_payment',
@@ -194,15 +179,7 @@ export async function sendEmailAction({
   }
 
   if (type === 'payout_second_payment') {
-    const p = payload as {
-      hostName?: string;
-      bookingId?: string;
-      travelTitle?: string;
-      amount?: number;
-      paymentDate?: string;
-      totalAmount?: number;
-      notes?: string;
-    };
+    const p = payload as PayoutEmailPayload;
     const tpl = hostPayoutNotificationTemplate({
       hostName: p.hostName || '',
       payoutType: 'second_payment',
