@@ -752,6 +752,45 @@ function BookingCard({ booking }: { booking: Booking }) {
                 </div>
               </div>
             </div>
+
+            {/* Refund policy table - placed at bottom of the cancel modal content */}
+            <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4">
+              <h4 className="text-sm font-semibold text-gray-800 mb-3 font-instrument">
+                Refund Policy (time before trip)
+              </h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead>
+                    <tr className="text-gray-600">
+                      <th className="py-2 px-3">Days before trip</th>
+                      <th className="py-2 px-3">Refund</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-t">
+                      <td className="py-2 px-3">30 days or more</td>
+                      <td className="py-2 px-3 font-medium">100% refund</td>
+                    </tr>
+                    <tr className="border-t bg-gray-50">
+                      <td className="py-2 px-3">14 - 29 days</td>
+                      <td className="py-2 px-3 font-medium">80% refund</td>
+                    </tr>
+                    <tr className="border-t">
+                      <td className="py-2 px-3">7 - 13 days</td>
+                      <td className="py-2 px-3 font-medium">50% refund</td>
+                    </tr>
+                    <tr className="border-t bg-gray-50">
+                      <td className="py-2 px-3">4 - 6 days</td>
+                      <td className="py-2 px-3 font-medium">20% refund</td>
+                    </tr>
+                    <tr className="border-t">
+                      <td className="py-2 px-3">&lt; 4 days</td>
+                      <td className="py-2 px-3 font-medium">No refund</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <DialogFooter className="gap-2">
