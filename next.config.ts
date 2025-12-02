@@ -14,6 +14,12 @@ const nextConfig: NextConfig = {
       'lh3.googleusercontent.com',
     ],
   },
+  // Enable compression for better performance
+  compress: true,
+  // Optimize production builds
+  poweredByHeader: false,
+  // Generate static pages where possible
+  reactStrictMode: true,
 };
 
 export default nextConfig;

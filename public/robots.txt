@@ -1,0 +1,29 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/edit
+Disallow: /verify-email/
+
+# Sitemap location
+Sitemap: https://gounplan.com/sitemap.xml
+
+# Google bots
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+
+# Bing bot
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+
+# Crawl-delay (optional, adjust as needed)
+Crawl-delay: 1
