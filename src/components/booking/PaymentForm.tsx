@@ -239,7 +239,7 @@ export function PaymentForm({
         duration: 3000,
       });
     }
-  }, [bookingId, total, isProcessing, tripData, userDetails, booking]);
+  }, [bookingId, total, isProcessing, tripData, userDetails]);
 
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
