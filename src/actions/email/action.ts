@@ -9,6 +9,7 @@ import { userBookingConfirmationTemplate } from '@/lib/email/templates/booking/u
 import { hostBookingNotificationTemplate } from '@/lib/email/templates/booking/hostNotification';
 import { bookingCancellationTemplate } from '@/lib/email/templates/booking/cancellation';
 import { paymentReminderTemplate } from '@/lib/email/templates/booking/paymentReminder';
+import { hostPayoutNotificationTemplate } from '@/lib/email/templates/payout/hostPayoutNotification';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -24,7 +25,10 @@ export async function sendEmailAction({
     | 'booking_user_confirmation'
     | 'booking_host_notification'
     | 'booking_cancelled'
-    | 'booking_payment_reminder';
+    | 'booking_payment_reminder'
+    | 'payout_created'
+    | 'payout_first_payment'
+    | 'payout_second_payment';
   payload: unknown;
 }) {
   let subject = '';
@@ -135,6 +139,81 @@ export async function sendEmailAction({
       paymentDeadline: p.paymentDeadline || '',
     });
     subject = 'Payment Reminder – Important';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'payout_created') {
+    const p = payload as {
+      hostName?: string;
+      bookingId?: string;
+      travelTitle?: string;
+      amount?: number;
+      paymentDate?: string;
+      totalAmount?: number;
+      notes?: string;
+    };
+    const tpl = hostPayoutNotificationTemplate({
+      hostName: p.hostName || '',
+      payoutType: 'created',
+      bookingId: p.bookingId || '',
+      travelTitle: p.travelTitle || '',
+      amount: p.amount || 0,
+      paymentDate: p.paymentDate || '',
+      totalAmount: p.totalAmount || 0,
+      notes: p.notes,
+    });
+    subject = 'Payout Schedule Created';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'payout_first_payment') {
+    const p = payload as {
+      hostName?: string;
+      bookingId?: string;
+      travelTitle?: string;
+      amount?: number;
+      paymentDate?: string;
+      totalAmount?: number;
+      notes?: string;
+    };
+    const tpl = hostPayoutNotificationTemplate({
+      hostName: p.hostName || '',
+      payoutType: 'first_payment',
+      bookingId: p.bookingId || '',
+      travelTitle: p.travelTitle || '',
+      amount: p.amount || 0,
+      paymentDate: p.paymentDate || '',
+      totalAmount: p.totalAmount || 0,
+      notes: p.notes,
+    });
+    subject = 'First Payment Processed';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'payout_second_payment') {
+    const p = payload as {
+      hostName?: string;
+      bookingId?: string;
+      travelTitle?: string;
+      amount?: number;
+      paymentDate?: string;
+      totalAmount?: number;
+      notes?: string;
+    };
+    const tpl = hostPayoutNotificationTemplate({
+      hostName: p.hostName || '',
+      payoutType: 'second_payment',
+      bookingId: p.bookingId || '',
+      travelTitle: p.travelTitle || '',
+      amount: p.amount || 0,
+      paymentDate: p.paymentDate || '',
+      totalAmount: p.totalAmount || 0,
+      notes: p.notes,
+    });
+    subject = 'Second Payment Processed';
     text = tpl.text;
     html = tpl.html;
   }
