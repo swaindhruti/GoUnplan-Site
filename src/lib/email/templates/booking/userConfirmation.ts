@@ -21,7 +21,7 @@ export function userBookingConfirmationTemplate({
   endDate: string;
   paymentStatus: 'PARTIAL' | 'PAID';
 }) {
-  const remaining = totalPrice - amountPaid;
+  const remaining = remainingAmount;
 
   const text = `
 Hi ${userName},
