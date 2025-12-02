@@ -12,6 +12,7 @@ import { paymentReminderTemplate } from '@/lib/email/templates/booking/paymentRe
 import { payoutCreatedTemplate } from '@/lib/email/templates/payout/payoutCreated';
 import { paymentProcessedTemplate } from '@/lib/email/templates/payout/paymentProcessed';
 import { emailVerificationTemplate } from '@/lib/email/templates/emailVerification';
+import { passwordResetTemplate } from '@/lib/email/templates/passwordReset';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -25,6 +26,7 @@ export async function sendEmailAction({
     | 'welcome'
     | 'otp'
     | 'email_verification'
+    | 'password_reset'
     | 'booking_user_confirmation'
     | 'booking_host_notification'
     | 'booking_cancelled'
@@ -57,6 +59,14 @@ export async function sendEmailAction({
     const p = payload as { name?: string; verificationLink?: string };
     const tpl = emailVerificationTemplate(p.name || '', p.verificationLink || '');
     subject = 'Verify Your Email - GoUnplan';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'password_reset') {
+    const p = payload as { name?: string; resetLink?: string };
+    const tpl = passwordResetTemplate(p.name || '', p.resetLink || '');
+    subject = 'Reset Your Password - GoUnplan';
     text = tpl.text;
     html = tpl.html;
   }

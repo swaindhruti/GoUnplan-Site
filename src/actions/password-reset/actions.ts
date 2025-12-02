@@ -1,11 +1,9 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { Resend } from 'resend';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
-
-const resend = new Resend(process.env.RESEND_API_KEY!);
+import { sendEmailAction } from '@/actions/email/action';
 
 export async function sendPasswordResetEmail(email: string) {
   try {
@@ -39,35 +37,18 @@ export async function sendPasswordResetEmail(email: string) {
       process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     }/auth/reset-password?token=${resetToken}`;
 
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #7c3aed; text-align: center;">Reset Your Password</h1>
-        <p style="font-size: 16px; line-height: 1.5; color: #374151;">
-          Hi ${
-            user.name || 'User'
-          }, we received a request to reset your password. Click the button below to create a new password:
-        </p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetLink}" 
-             style="background-color: #7c3aed; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
-            Reset Password
-          </a>
-        </div>
-        <p style="font-size: 14px; color: #6b7280; text-align: center;">
-          This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
-        </p>
-      </div>
-    `;
-
-    const { error } = await resend.emails.send({
-      from: 'Gounplan <noreply@gounplan.com>',
-      to: [user.email || ''],
-      subject: 'Reset Your Password - GoUnplan',
-      html: emailHtml,
+    // Send password reset email using sendEmailAction
+    const emailResult = await sendEmailAction({
+      to: user.email || '',
+      type: 'password_reset',
+      payload: {
+        name: user.name || 'User',
+        resetLink,
+      },
     });
 
-    if (error) {
-      throw new Error(`Failed to send password reset email: ${error.message}`);
+    if (!emailResult.success) {
+      throw new Error(`Failed to send password reset email: ${emailResult.error}`);
     }
 
     return {
