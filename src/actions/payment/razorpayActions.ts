@@ -4,6 +4,7 @@ import { prisma } from '@/lib/shared';
 import { requireUser } from '@/lib/roleGaurd';
 import { PaymentStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { sendEmailAction } from '../email/action';
 
 export const processRazorpayPayment = async (
   bookingId: string,
@@ -21,8 +22,9 @@ export const processRazorpayPayment = async (
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
-        travelPlan: true,
+        travelPlan: { include: { host: true } },
         partialPayments: true,
+        user: true,
       },
     });
 
@@ -30,9 +32,7 @@ export const processRazorpayPayment = async (
       return { error: 'Booking not found or unauthorized' };
     }
 
-    // Update booking with Razorpay payment details
     const result = await prisma.$transaction(async tx => {
-      // Add partial payment record
       const partialPayment = await tx.partialPayment.create({
         data: {
           bookingId,
@@ -55,7 +55,6 @@ export const processRazorpayPayment = async (
         newPaymentStatus = 'PARTIALLY_PAID';
       }
 
-      // Update booking
       const updatedBooking = await tx.booking.update({
         where: { id: bookingId },
         data: {
@@ -67,22 +66,55 @@ export const processRazorpayPayment = async (
           razorpayOrderId: paymentData.razorpay_order_id,
           updatedAt: new Date(),
         },
-        include: {
-          partialPayments: true,
-          travelPlan: true,
-        },
+        include: { travelPlan: true, partialPayments: true, user: true },
       });
 
-      await prisma.travelPlans.update({
-        where: { travelPlanId: booking.travelPlanId },
-        data: {
-          maxParticipants: {
-            decrement: booking.participants,
+      if ((amount ?? 0) > 0) {
+        await tx.travelPlans.update({
+          where: { travelPlanId: booking.travelPlanId },
+          data: {
+            maxParticipants: {
+              decrement: booking.participants ?? 0,
+            },
           },
-        },
-      });
+        });
+      }
 
       return { partialPayment, booking: updatedBooking };
+    });
+
+    await sendEmailAction({
+      to: booking.user.email || '',
+      type: 'booking_user_confirmation',
+      payload: {
+        userName: result.booking.user.name,
+        bookingId: result.booking.id,
+        travelName: result.booking.travelPlan.title,
+        totalPrice: result.booking.totalPrice,
+        amountPaid: result.booking.amountPaid,
+        participants: result.booking.participants,
+        startDate: result.booking.startDate,
+        endDate: result.booking.endDate,
+        remainingAmount: result.booking.remainingAmount,
+        paymentStatus: result.booking.paymentStatus === 'FULLY_PAID' ? 'PAID' : 'PARTIAL',
+      },
+    });
+
+    await sendEmailAction({
+      to: booking.travelPlan.host.hostEmail,
+      type: 'booking_user_confirmation',
+      payload: {
+        userName: result.booking.user.name,
+        bookingId: result.booking.id,
+        travelName: result.booking.travelPlan.title,
+        totalPrice: result.booking.totalPrice,
+        amountPaid: result.booking.amountPaid,
+        participants: result.booking.participants,
+        startDate: result.booking.startDate,
+        endDate: result.booking.endDate,
+        remainingAmount: result.booking.remainingAmount,
+        paymentStatus: result.booking.paymentStatus === 'FULLY_PAID' ? 'PAID' : 'PARTIAL',
+      },
     });
 
     revalidatePath(`/booking/${booking.travelPlanId}`);
