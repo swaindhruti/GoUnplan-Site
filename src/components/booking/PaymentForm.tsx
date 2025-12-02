@@ -20,7 +20,7 @@ import GreenConfirmationLoader from '../global/Loaders';
 import { processRazorpayPayment, handlePaymentFailure } from '@/actions/payment/razorpayActions';
 import { toast } from 'sonner';
 import { initiateRazorpayPayment } from '@/lib/razorpay';
-import { sendEmailAction } from '@/actions/email/action';
+// import { sendEmailAction } from '@/actions/email/action';
 
 interface PaymentFormProps {
   tripData: {
