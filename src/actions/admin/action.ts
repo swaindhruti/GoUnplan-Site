@@ -556,7 +556,11 @@ export const getAllActiveTrips = async () => {
         },
         _count: {
           select: {
-            bookings: true,
+            bookings: {
+              where: {
+                paymentStatus: 'FULLY_PAID',
+              },
+            },
           },
         },
       },

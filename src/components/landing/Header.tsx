@@ -508,7 +508,7 @@ export default function Header() {
               <Link href="/" className="flex items-center group flex-shrink-0">
                 <div className="relative bg-white rounded-full">
                   <Image
-                    src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
+                    src="https://res.cloudinary.com/dbnfkkfov/image/upload/v1764696162/Untitled_pvxt1m.jpg"
                     alt="GoUnplan Logo"
                     width={50}
                     height={50}
@@ -632,7 +632,7 @@ export default function Header() {
           <Link href="/" className="flex items-center group flex-shrink-0">
             <div className="relative bg-white rounded-full">
               <Image
-                src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754613844/unplan_6_l0vcxr.png"
+                src="https://res.cloudinary.com/dbnfkkfov/image/upload/v1764696162/Untitled_pvxt1m.jpg"
                 alt="GoUnplan Logo"
                 width={60}
                 height={60}

@@ -12,6 +12,7 @@ import {
   PayoutSummary,
 } from '@/types/payout';
 import { revalidatePath } from 'next/cache';
+import { sendEmailAction } from '@/actions/email/action';
 
 /**
  * Get all payouts with detailed information
@@ -206,6 +207,17 @@ export const createPayout = async (input: CreatePayoutInput) => {
         travelPlan: {
           select: {
             hostId: true,
+            title: true,
+            host: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -213,6 +225,11 @@ export const createPayout = async (input: CreatePayoutInput) => {
 
     if (!booking) {
       return { error: 'Booking not found' };
+    }
+
+    // Check if booking payment is fully paid
+    if (booking.paymentStatus !== 'FULLY_PAID') {
+      return { error: 'Payout can only be created for bookings with fully paid payment status' };
     }
 
     // Calculate payment amounts and dates
@@ -247,7 +264,39 @@ export const createPayout = async (input: CreatePayoutInput) => {
       },
     });
 
+    // Send email notification to host (fire and forget - don't block the response)
+    const hostEmail = booking.travelPlan.host.user.email;
+    console.log(hostEmail);
+    if (hostEmail) {
+      // Don't await - send email in background
+      sendEmailAction({
+        to: hostEmail,
+        type: 'payout_created',
+        payload: {
+          hostName: booking.travelPlan.host.user.name,
+          tripTitle: booking.travelPlan.title,
+          totalAmount: booking.totalPrice,
+          firstPaymentAmount,
+          firstPaymentDate: firstPaymentDate.toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          secondPaymentAmount,
+          secondPaymentDate: secondPaymentDate.toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          bookingId: input.bookingId,
+        },
+      }).catch(error => {
+        console.error('Failed to send payout created email:', error);
+      });
+    }
+
     revalidatePath('/dashboard/admin/payouts');
+    revalidatePath('/dashboard/admin');
     return { success: true, payout };
   } catch (error) {
     console.error('Error creating payout:', error);
@@ -326,14 +375,45 @@ export const markPayoutPaid = async (input: MarkPayoutPaidInput) => {
   if (!session) return { error: 'Unauthorized' };
 
   try {
+    // Get payout with booking and host details for email
+    const existingPayout = await prisma.payout.findUnique({
+      where: { id: input.payoutId },
+      include: {
+        booking: {
+          include: {
+            travelPlan: {
+              select: {
+                title: true,
+                host: {
+                  select: {
+                    user: {
+                      select: {
+                        name: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!existingPayout) {
+      return { error: 'Payout not found' };
+    }
+
     const updateData: Record<string, unknown> = {};
+    const paidAt = new Date();
 
     if (input.paymentType === 'first') {
       updateData.firstPaymentStatus = PayoutStatus.PAID;
-      updateData.firstPaymentPaidAt = new Date();
+      updateData.firstPaymentPaidAt = paidAt;
     } else {
       updateData.secondPaymentStatus = PayoutStatus.PAID;
-      updateData.secondPaymentPaidAt = new Date();
+      updateData.secondPaymentPaidAt = paidAt;
     }
 
     const payout = await prisma.payout.update({
@@ -341,7 +421,37 @@ export const markPayoutPaid = async (input: MarkPayoutPaidInput) => {
       data: updateData,
     });
 
+    // Send email notification to host (fire and forget - don't block the response)
+    const hostEmail = existingPayout.booking.travelPlan.host.user.email;
+    if (hostEmail) {
+      const paymentAmount =
+        input.paymentType === 'first'
+          ? existingPayout.firstPaymentAmount
+          : existingPayout.secondPaymentAmount;
+
+      // Don't await - send email in background
+      sendEmailAction({
+        to: hostEmail,
+        type: 'payout_payment_processed',
+        payload: {
+          hostName: existingPayout.booking.travelPlan.host.user.name,
+          tripTitle: existingPayout.booking.travelPlan.title,
+          paymentAmount,
+          paymentType: input.paymentType,
+          bookingId: existingPayout.bookingId,
+          paidAt: paidAt.toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+        },
+      }).catch(error => {
+        console.error('Failed to send payout payment email:', error);
+      });
+    }
+
     revalidatePath('/dashboard/admin/payouts');
+    revalidatePath('/dashboard/admin');
     return { success: true, payout };
   } catch (error) {
     console.error('Error marking payout as paid:', error);
@@ -360,6 +470,7 @@ export const getBookingsNeedingPayouts = async () => {
     const bookings = await prisma.booking.findMany({
       where: {
         status: 'CONFIRMED',
+        paymentStatus: 'FULLY_PAID',
         payouts: {
           none: {},
         },
@@ -403,44 +514,44 @@ export const getBookingsNeedingPayouts = async () => {
 /**
  * Auto-create payouts for all confirmed bookings without payouts
  */
-export const autoCreatePayouts = async () => {
-  const session = await requireAdmin();
-  if (!session) return { error: 'Unauthorized' };
+// export const autoCreatePayouts = async () => {
+//   const session = await requireAdmin();
+//   if (!session) return { error: 'Unauthorized' };
 
-  try {
-    const result = await getBookingsNeedingPayouts();
+//   try {
+//     const result = await getBookingsNeedingPayouts();
 
-    if ('error' in result || !result.bookings) {
-      return { error: result.error || 'Failed to get bookings' };
-    }
+//     if ('error' in result || !result.bookings) {
+//       return { error: result.error || 'Failed to get bookings' };
+//     }
 
-    const createdPayouts = [];
-    const errors = [];
+//     const createdPayouts = [];
+//     const errors = [];
 
-    for (const booking of result.bookings) {
-      try {
-        const createResult = await createPayout({
-          bookingId: booking.id,
-        });
+//     for (const booking of result.bookings) {
+//       try {
+//         const createResult = await createPayout({
+//           bookingId: booking.id,
+//         });
 
-        if ('error' in createResult) {
-          errors.push({ bookingId: booking.id, error: createResult.error });
-        } else {
-          createdPayouts.push(createResult.payout);
-        }
-      } catch {
-        errors.push({ bookingId: booking.id, error: 'Unexpected error' });
-      }
-    }
+//         if ('error' in createResult) {
+//           errors.push({ bookingId: booking.id, error: createResult.error });
+//         } else {
+//           createdPayouts.push(createResult.payout);
+//         }
+//       } catch {
+//         errors.push({ bookingId: booking.id, error: 'Unexpected error' });
+//       }
+//     }
 
-    revalidatePath('/dashboard/admin/payouts');
-    return {
-      success: true,
-      created: createdPayouts.length,
-      errors: errors.length > 0 ? errors : undefined,
-    };
-  } catch (error) {
-    console.error('Error auto-creating payouts:', error);
-    return { error: 'Failed to auto-create payouts' };
-  }
-};
+//     revalidatePath('/dashboard/admin/payouts');
+//     return {
+//       success: true,
+//       created: createdPayouts.length,
+//       errors: errors.length > 0 ? errors : undefined,
+//     };
+//   } catch (error) {
+//     console.error('Error auto-creating payouts:', error);
+//     return { error: 'Failed to auto-create payouts' };
+//   }
+// };

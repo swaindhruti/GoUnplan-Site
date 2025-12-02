@@ -1,124 +1,37 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
-
+import React from 'react';
 import { ChevronDown } from 'lucide-react';
-
 import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import { handleScroll } from '@/components/global/Handlescroll';
 import { Button } from '@/components/ui/button';
 
 export const HeroSection = () => {
-  const [hasScrolled, setHasScrolled] = useState(false);
-  const lastScrollTop = useRef(0);
-  const scrollThreshold = 10;
-
-  const slides = [
-    {
-      image:
-        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764636764/pexels-pixabay-262325_rzvfhc.jpg',
-      text: (
-        <>
-          your journey&apos;s <span className="highlight-wavy ">love language</span>
-        </>
-      ),
-    },
-    {
-      image:
-        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764636974/pexels-pixabay-163872_l8jshk.jpg',
-      text: (
-        <>
-          <span className="highlight-circle">crafted</span> for explorers
-        </>
-      ),
-    },
-    {
-      image:
-        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764637265/pexels-esan-2085998_xv2zvs.jpg',
-      text: (
-        <>
-          slow travel is the new <span className="highlight-stroke">luxury</span>
-        </>
-      ),
-    },
-    {
-      image:
-        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764637535/sergey-pesterev-_VqyrvQi6do-unsplash_slg3qf.jpg',
-      text: (
-        <>
-          powered by stories, <span className="highlight-oval">backed by locals</span>
-        </>
-      ),
-    },
-  ];
-
-  useEffect(() => {
-    const handleScrollEvent = () => {
-      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollDirection = currentScrollTop > lastScrollTop.current ? 'down' : 'up';
-
-      if (scrollDirection === 'down' && !hasScrolled && currentScrollTop >= scrollThreshold) {
-        setHasScrolled(true);
-
-        /*  handleScroll({
-          location: "#filtertrip",
-          duration: 1.5,
-          ease: "power3.inOut"
-        });
- */
-        setTimeout(() => {
-          setHasScrolled(false);
-        }, 2000);
-      }
-
-      lastScrollTop.current = currentScrollTop <= 0 ? 0 : currentScrollTop;
-    };
-
-    window.addEventListener('scroll', handleScrollEvent, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScrollEvent);
-    };
-  }, [hasScrolled]);
-
   return (
-    <div className="relative w-full h-screen  min-h-[600px]">
-      <Swiper
-        modules={[Autoplay]}
-        slidesPerView={1}
-        loop={true}
-        autoplay={{
-          delay: 3000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false,
-        }}
-        speed={1000}
-        effect="slide"
-        centeredSlides
-        className="h-full w-full [&_.swiper-slide-active]:scale-100 [&_.swiper-slide]:transition-transform [&_.swiper-slide]:duration-1000 px-6 md:px-20 "
+    <div className="relative w-full h-screen min-h-[600px] overflow-hidden">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
       >
-        {slides.map((slide, index) => (
-          <SwiperSlide key={index} className="relative overflow-hidden">
-            <Image
-              src={slide.image}
-              alt={`Hero Image ${index + 1}`}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover transition-transform duration-1000 ease-in-out"
-            />
-            <div className="absolute inset-0 z-10 flex items-center justify-center px-4 text-center">
-              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-[1.05] tracking-tighter drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
-                {slide.text}
-              </h2>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        <source
+          src="https://res.cloudinary.com/dbnfkkfov/video/upload/v1764694095/WhatsApp_Video_2025-12-02_at_22.14.37_kib51z.mp4"
+          type="video/mp4"
+        />
+      </video>
+
+      {/* Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/30 z-10" />
+
+      {/* Text Content */}
+      <div className="absolute inset-0 z-20 flex items-center justify-center px-4 text-center">
+        <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-[1.05] tracking-tighter drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
+          your journey&apos;s <span className="highlight-wavy">love language</span>
+        </h2>
+      </div>
 
       <div className="absolute bottom-6 sm:bottom-10 w-full z-40 flex justify-center">
         <Button

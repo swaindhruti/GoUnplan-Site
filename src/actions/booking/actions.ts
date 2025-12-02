@@ -5,6 +5,7 @@ import { requireUser } from '@/lib/roleGaurd';
 import { TeamMemberInput } from '@/types/booking';
 import { BookingStatus, PaymentStatus, PaymentType, Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { sendEmailAction } from '../email/action';
 
 export const createBooking = async (bookingData: {
   id: string;
@@ -409,7 +410,7 @@ export const cancelBooking = async (bookingId: string) => {
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { partialPayments: true },
+      include: { partialPayments: true, travelPlan: { include: { host: true } } },
     });
 
     if (!booking || booking.userId !== session.user.id) return { error: 'Unauthorized' };
@@ -482,6 +483,28 @@ export const cancelBooking = async (bookingId: string) => {
 
     revalidatePath('/my-trips');
     revalidatePath(`/booking/${booking.travelPlanId}`);
+
+    await sendEmailAction({
+      to: 'mayan6378@gmail.com',
+      type: 'booking_cancelled',
+      payload: {
+        userName: session.user.name || 'Customer',
+        bookingId: booking.id,
+        travelName: booking.travelPlanId,
+        refundAmount,
+      },
+    });
+
+    await sendEmailAction({
+      to: booking.travelPlan.host.hostEmail,
+      type: 'booking_cancelled',
+      payload: {
+        userName: session.user.name || 'Customer',
+        bookingId: booking.id,
+        travelName: booking.travelPlanId,
+        refundAmount,
+      },
+    });
 
     return {
       success: true,
@@ -559,12 +582,12 @@ export const processRefund = async (bookingId: string, refundAmount?: number) =>
       return { error: 'Booking not found' };
     }
 
-    if (booking.status !== 'CANCELLED') {
-      return { error: 'Only cancelled bookings can be refunded' };
-    }
-
     if (booking.paymentStatus === 'REFUNDED') {
       return { error: 'Booking has already been refunded' };
+    }
+
+    if (booking.paymentStatus !== 'CANCELLED') {
+      return { error: 'Only cancelled bookings can be refunded' };
     }
 
     const finalRefundAmount = refundAmount || booking.refundAmount;

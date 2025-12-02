@@ -53,7 +53,7 @@ import {
   getPayoutSummary,
   markPayoutPaid,
   getBookingsNeedingPayouts,
-  autoCreatePayouts,
+  // autoCreatePayouts,
 } from '@/actions/payout/payout-actions';
 import { PayoutDetails, PayoutSummary } from '@/types/payout';
 import { PayoutStatus } from '@prisma/client';
@@ -775,26 +775,26 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAutoCreatePayouts = async () => {
-    setPayoutActionLoading(true);
-    try {
-      const result = await autoCreatePayouts();
+  // const handleAutoCreatePayouts = async () => {
+  //   setPayoutActionLoading(true);
+  //   try {
+  //     const result = await autoCreatePayouts();
 
-      if ('error' in result) {
-        toast.error(result.error);
-      } else {
-        toast.success(
-          `Successfully created ${result.created} payout${result.created !== 1 ? 's' : ''}`
-        );
-        await fetchPayoutsData();
-      }
-    } catch (error) {
-      toast.error('Failed to auto-create payouts');
-      console.error(error);
-    } finally {
-      setPayoutActionLoading(false);
-    }
-  };
+  //     if ('error' in result) {
+  //       toast.error(result.error);
+  //     } else {
+  //       toast.success(
+  //         `Successfully created ${result.created} payout${result.created !== 1 ? 's' : ''}`
+  //       );
+  //       await fetchPayoutsData();
+  //     }
+  //   } catch (error) {
+  //     toast.error('Failed to auto-create payouts');
+  //     console.error(error);
+  //   } finally {
+  //     setPayoutActionLoading(false);
+  //   }
+  // };
 
   const getPayoutStatusBadge = (status: PayoutStatus) => {
     const variants: Record<
@@ -2486,7 +2486,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
                 <div className="flex gap-2 mt-4 md:mt-0">
-                  {bookingsNeedingPayouts.length > 0 && (
+                  {/* {bookingsNeedingPayouts.length > 0 && (
                     <Button
                       onClick={handleAutoCreatePayouts}
                       disabled={payoutActionLoading}
@@ -2495,7 +2495,7 @@ export default function AdminDashboard() {
                       <DollarSign className="w-4 h-4 mr-2" />
                       Auto-Create ({bookingsNeedingPayouts.length})
                     </Button>
-                  )}
+                  )} */}
                   <Button
                     onClick={() => setShowCreatePayoutDialog(true)}
                     disabled={payoutActionLoading || bookingsNeedingPayouts.length === 0}
@@ -2599,7 +2599,7 @@ export default function AdminDashboard() {
                       <TableRow>
                         <TableCell colSpan={8} className="text-center py-8">
                           <p className="text-gray-500 font-instrument">No payouts found</p>
-                          {bookingsNeedingPayouts.length > 0 && (
+                          {/* {bookingsNeedingPayouts.length > 0 && (
                             <Button
                               onClick={handleAutoCreatePayouts}
                               className="mt-4 bg-purple-600 hover:bg-purple-700"
@@ -2608,7 +2608,7 @@ export default function AdminDashboard() {
                               Create Payouts for {bookingsNeedingPayouts.length} Booking
                               {bookingsNeedingPayouts.length !== 1 ? 's' : ''}
                             </Button>
-                          )}
+                          )} */}
                         </TableCell>
                       </TableRow>
                     ) : (
