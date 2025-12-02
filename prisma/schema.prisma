@@ -163,6 +163,7 @@ model Booking {
   review              Review?
   guests              TeamMember[]
   supportTickets      SupportTicket[]
+  payouts             Payout[]
 
   @@map("bookings")
 }
@@ -176,6 +177,33 @@ model PartialPayment {
   booking     Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("partial_payments")
+}
+
+model Payout {
+  id                   String       @id @default(cuid())
+  bookingId            String
+  hostId               String
+  totalAmount          Int
+  firstPaymentAmount   Int
+  firstPaymentDate     DateTime
+  firstPaymentStatus   PayoutStatus @default(PENDING)
+  firstPaymentPaidAt   DateTime?
+  secondPaymentAmount  Int
+  secondPaymentDate    DateTime
+  secondPaymentStatus  PayoutStatus @default(PENDING)
+  secondPaymentPaidAt  DateTime?
+  firstPaymentPercent  Int          @default(20)
+  secondPaymentPercent Int          @default(80)
+  notes                String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  booking              Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId])
+  @@index([hostId])
+  @@index([firstPaymentDate])
+  @@index([secondPaymentDate])
+  @@map("payouts")
 }
 
 model WaitingList {
@@ -393,4 +421,11 @@ enum GenderPreference {
   MALE_ONLY
   FEMALE_ONLY
   MIX
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FAILED
 }

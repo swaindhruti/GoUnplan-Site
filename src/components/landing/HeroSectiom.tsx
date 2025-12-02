@@ -20,7 +20,7 @@ export const HeroSection = () => {
   const slides = [
     {
       image:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610583/pexels-esan-2085998_bcqaqq.jpg',
+        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764636764/pexels-pixabay-262325_rzvfhc.jpg',
       text: (
         <>
           your journey&apos;s <span className="highlight-wavy ">love language</span>
@@ -29,7 +29,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610582/pexels-pixabay-163872_osxe5v.jpg',
+        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764636974/pexels-pixabay-163872_l8jshk.jpg',
       text: (
         <>
           <span className="highlight-circle">crafted</span> for explorers
@@ -38,7 +38,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610574/pexels-pixabay-262325_barmtl.jpg',
+        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764637265/pexels-esan-2085998_xv2zvs.jpg',
       text: (
         <>
           slow travel is the new <span className="highlight-stroke">luxury</span>
@@ -47,7 +47,7 @@ export const HeroSection = () => {
     },
     {
       image:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610586/sergey-pesterev-_VqyrvQi6do-unsplash_1_k2ygzi.jpg',
+        'https://res.cloudinary.com/dbnfkkfov/image/upload/v1764637535/sergey-pesterev-_VqyrvQi6do-unsplash_slg3qf.jpg',
       text: (
         <>
           powered by stories, <span className="highlight-oval">backed by locals</span>

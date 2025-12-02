@@ -6,6 +6,7 @@ import { ProfileSection } from './components/ProfileSection';
 import { BookingsSection } from './components/BookingsSection';
 import { BookingsHistory } from './components/BookingsHistory';
 import { EarningsSection } from './components/EarningsSection';
+import { WalletSection } from './components/WalletSection';
 import { MessageSection } from './components/MessageSection';
 import { HostData, RevenueAnalytics, Trip, TabType } from './types';
 
@@ -182,6 +183,12 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
                 description: 'Revenue Analytics',
               },
               {
+                id: 'wallet',
+                label: 'WALLET',
+                icon: '💳',
+                description: 'Payouts & Balance',
+              },
+              {
                 id: 'messages',
                 label: 'MESSAGES',
                 icon: '💬',
@@ -227,6 +234,8 @@ export const HostLanding = ({ hostData }: HostLandingProps) => {
             revenueError={revenueError}
           />
         )}
+
+        {activeTab === 'wallet' && <WalletSection />}
 
         {activeTab === 'messages' && <MessageSection userSession={hostData.id || ''} />}
       </div>

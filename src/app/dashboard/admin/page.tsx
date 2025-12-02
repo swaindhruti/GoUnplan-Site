@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type React from 'react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
@@ -47,6 +48,18 @@ import {
   getAllBookings,
   getAllActiveTrips,
 } from '@/actions/admin/action';
+import {
+  getAllPayouts,
+  getPayoutSummary,
+  markPayoutPaid,
+  getBookingsNeedingPayouts,
+  autoCreatePayouts,
+} from '@/actions/payout/payout-actions';
+import { PayoutDetails, PayoutSummary } from '@/types/payout';
+import { PayoutStatus } from '@prisma/client';
+import PayoutDetailsDialog from '@/components/admin/payout/PayoutDetailsDialog';
+import EditPayoutDialog from '@/components/admin/payout/EditPayoutDialog';
+import CreatePayoutDialog from '@/components/admin/payout/CreatePayoutDialog';
 import TravelPlanModal from '@/components/dashboard/TravelPlanModal';
 import HostApplicationModal from '@/components/dashboard/HostApplicationModal';
 import { Role } from '@/types/auth';
@@ -131,6 +144,33 @@ interface ActiveTrip {
   };
   _count: {
     bookings: number;
+  };
+}
+
+interface BookingNeedingPayout {
+  id: string;
+  userId: string;
+  travelPlanId: string;
+  startDate: Date;
+  endDate: Date;
+  totalPrice: number;
+  participants: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    name: string;
+    email: string | null;
+  };
+  travelPlan: {
+    title: string;
+    hostId: string;
+    host: {
+      user: {
+        name: string;
+        email: string | null;
+      };
+    };
   };
 }
 
@@ -297,6 +337,16 @@ export default function AdminDashboard() {
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
   const [isHostApplicationModalOpen, setIsHostApplicationModalOpen] = useState(false);
 
+  // Payout state
+  const [payouts, setPayouts] = useState<PayoutDetails[]>([]);
+  const [payoutSummary, setPayoutSummary] = useState<PayoutSummary | null>(null);
+  const [bookingsNeedingPayouts, setBookingsNeedingPayouts] = useState<BookingNeedingPayout[]>([]);
+  const [selectedPayout, setSelectedPayout] = useState<PayoutDetails | null>(null);
+  const [showPayoutDetailsDialog, setShowPayoutDetailsDialog] = useState(false);
+  const [showEditPayoutDialog, setShowEditPayoutDialog] = useState(false);
+  const [showCreatePayoutDialog, setShowCreatePayoutDialog] = useState(false);
+  const [payoutActionLoading, setPayoutActionLoading] = useState(false);
+
   const handleRevenueReportButton = () => {
     if (analyticsModal === true) setAnalyticsModal(false);
 
@@ -448,6 +498,28 @@ export default function AdminDashboard() {
           console.error(revenueResponse.error);
         } else {
           setTotalRevenue(revenueResponse as RevenueData);
+        }
+
+        // Fetch payouts data
+        const [payoutsResponse, payoutSummaryResponse, bookingsNeedingPayoutsResponse] =
+          await Promise.all([getAllPayouts(), getPayoutSummary(), getBookingsNeedingPayouts()]);
+
+        if ('error' in payoutsResponse) {
+          console.error(payoutsResponse.error);
+        } else if (payoutsResponse.payouts) {
+          setPayouts(payoutsResponse.payouts);
+        }
+
+        if ('error' in payoutSummaryResponse) {
+          console.error(payoutSummaryResponse.error);
+        } else if (payoutSummaryResponse.summary) {
+          setPayoutSummary(payoutSummaryResponse.summary);
+        }
+
+        if ('error' in bookingsNeedingPayoutsResponse) {
+          console.error(bookingsNeedingPayoutsResponse.error);
+        } else if (bookingsNeedingPayoutsResponse.bookings) {
+          setBookingsNeedingPayouts(bookingsNeedingPayoutsResponse.bookings);
         }
 
         // Update stats
@@ -655,6 +727,115 @@ export default function AdminDashboard() {
     const totalRefunds = revenue.refundAmount._sum.refundAmount || 0;
     return totalSales - totalRefunds;
   };
+
+  // Payout handlers
+  const fetchPayoutsData = async () => {
+    try {
+      const [payoutsResponse, payoutSummaryResponse, bookingsNeedingPayoutsResponse] =
+        await Promise.all([getAllPayouts(), getPayoutSummary(), getBookingsNeedingPayouts()]);
+
+      if ('error' in payoutsResponse) {
+        console.error(payoutsResponse.error);
+      } else if (payoutsResponse.payouts) {
+        setPayouts(payoutsResponse.payouts);
+      }
+
+      if ('error' in payoutSummaryResponse) {
+        console.error(payoutSummaryResponse.error);
+      } else if (payoutSummaryResponse.summary) {
+        setPayoutSummary(payoutSummaryResponse.summary);
+      }
+
+      if ('error' in bookingsNeedingPayoutsResponse) {
+        console.error(bookingsNeedingPayoutsResponse.error);
+      } else if (bookingsNeedingPayoutsResponse.bookings) {
+        setBookingsNeedingPayouts(bookingsNeedingPayoutsResponse.bookings);
+      }
+    } catch (error) {
+      console.error('Failed to fetch payouts data:', error);
+    }
+  };
+
+  const handleMarkPayoutAsPaid = async (payoutId: string, paymentType: 'first' | 'second') => {
+    setPayoutActionLoading(true);
+    try {
+      const result = await markPayoutPaid({ payoutId, paymentType });
+
+      if ('error' in result) {
+        toast.error(result.error);
+      } else {
+        toast.success(`${paymentType === 'first' ? 'First' : 'Second'} payment marked as paid`);
+        await fetchPayoutsData();
+      }
+    } catch (error) {
+      toast.error('Failed to mark payment as paid');
+      console.error(error);
+    } finally {
+      setPayoutActionLoading(false);
+    }
+  };
+
+  const handleAutoCreatePayouts = async () => {
+    setPayoutActionLoading(true);
+    try {
+      const result = await autoCreatePayouts();
+
+      if ('error' in result) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          `Successfully created ${result.created} payout${result.created !== 1 ? 's' : ''}`
+        );
+        await fetchPayoutsData();
+      }
+    } catch (error) {
+      toast.error('Failed to auto-create payouts');
+      console.error(error);
+    } finally {
+      setPayoutActionLoading(false);
+    }
+  };
+
+  const getPayoutStatusBadge = (status: PayoutStatus) => {
+    const variants: Record<
+      PayoutStatus,
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        icon: React.ComponentType<{ className?: string }>;
+      }
+    > = {
+      PENDING: { variant: 'secondary', icon: Clock },
+      PAID: { variant: 'default', icon: CheckCircle },
+      CANCELLED: { variant: 'destructive', icon: XCircle },
+      FAILED: { variant: 'destructive', icon: AlertTriangle },
+    };
+
+    const { variant, icon: Icon } = variants[status];
+
+    return (
+      <Badge variant={variant} className="flex items-center gap-1 w-fit">
+        <Icon className="w-3 h-3" />
+        {status}
+      </Badge>
+    );
+  };
+
+  const formatPayoutCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatPayoutDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
   const filteredUsers = users.filter(user => {
     if (userFilter === 'all') return true;
     if (userFilter === 'users') return user.role === 'USER';
@@ -714,6 +895,13 @@ export default function AdminDashboard() {
       description: 'Booking Management',
       count: bookings.length,
     },
+    {
+      id: 'payouts',
+      label: 'PAYOUTS',
+      icon: <DollarSign className="w-5 h-5" />,
+      description: 'Host Payout Management',
+      count: payoutSummary?.pendingPayouts || 0,
+    },
   ];
 
   if (loading) {
@@ -767,7 +955,7 @@ export default function AdminDashboard() {
         </div>
       </div>
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-2 py-4">
             {tabs.map(tab => (
               <button
@@ -2284,8 +2472,281 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+
+          {/* Payouts Section */}
+          {activeTab === 'payouts' && (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 font-bricolage">
+                    Payout Management
+                  </h3>
+                  <p className="text-gray-600 font-instrument mt-1">
+                    Manage host payouts and payment schedules
+                  </p>
+                </div>
+                <div className="flex gap-2 mt-4 md:mt-0">
+                  {bookingsNeedingPayouts.length > 0 && (
+                    <Button
+                      onClick={handleAutoCreatePayouts}
+                      disabled={payoutActionLoading}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      Auto-Create ({bookingsNeedingPayouts.length})
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => setShowCreatePayoutDialog(true)}
+                    disabled={payoutActionLoading || bookingsNeedingPayouts.length === 0}
+                    variant="outline"
+                  >
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Create Payout
+                  </Button>
+                  <Button
+                    onClick={fetchPayoutsData}
+                    variant="outline"
+                    disabled={payoutActionLoading}
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 mr-2 ${payoutActionLoading ? 'animate-spin' : ''}`}
+                    />
+                    Refresh
+                  </Button>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              {payoutSummary && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                    <p className="text-sm font-medium text-gray-600 font-instrument">
+                      Total Payouts
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900 mt-2 font-bricolage">
+                      {payoutSummary.totalPayouts}
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 font-instrument">
+                      <Clock className="w-4 h-4" />
+                      Pending
+                    </div>
+                    <p className="text-2xl font-bold text-orange-600 mt-2 font-bricolage">
+                      {payoutSummary.pendingPayouts}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatPayoutCurrency(payoutSummary.totalPendingAmount)}
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 font-instrument">
+                      <CheckCircle className="w-4 h-4" />
+                      Paid
+                    </div>
+                    <p className="text-2xl font-bold text-green-600 mt-2 font-bricolage">
+                      {payoutSummary.paidPayouts}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatPayoutCurrency(payoutSummary.totalPaidAmount)}
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 font-instrument">
+                      <Calendar className="w-4 h-4" />
+                      Upcoming (7 days)
+                    </div>
+                    <p className="text-2xl font-bold text-blue-600 mt-2 font-bricolage">
+                      {payoutSummary.upcomingPayments}
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 font-instrument">
+                      <DollarSign className="w-4 h-4" />
+                      Total Value
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900 mt-2 font-bricolage">
+                      {formatPayoutCurrency(
+                        payoutSummary.totalPaidAmount + payoutSummary.totalPendingAmount
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Payouts Table */}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Host</TableHead>
+                      <TableHead>Trip</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Trip Date</TableHead>
+                      <TableHead>Total Amount</TableHead>
+                      <TableHead>First Payment</TableHead>
+                      <TableHead>Second Payment</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payouts.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8">
+                          <p className="text-gray-500 font-instrument">No payouts found</p>
+                          {bookingsNeedingPayouts.length > 0 && (
+                            <Button
+                              onClick={handleAutoCreatePayouts}
+                              className="mt-4 bg-purple-600 hover:bg-purple-700"
+                              disabled={payoutActionLoading}
+                            >
+                              Create Payouts for {bookingsNeedingPayouts.length} Booking
+                              {bookingsNeedingPayouts.length !== 1 ? 's' : ''}
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      payouts.map(payout => (
+                        <TableRow key={payout.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium font-instrument">{payout.hostName}</p>
+                              <p className="text-xs text-gray-500">{payout.hostEmail}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="font-medium max-w-xs truncate font-instrument">
+                              {payout.tripTitle}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium font-instrument">{payout.userName}</p>
+                              <p className="text-xs text-gray-500">{payout.userEmail}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              <p>{formatPayoutDate(payout.tripStartDate)}</p>
+                              <p className="text-xs text-gray-500">
+                                to {formatPayoutDate(payout.tripEndDate)}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-semibold font-bricolage">
+                            {formatPayoutCurrency(payout.totalAmount)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium font-instrument">
+                                {formatPayoutCurrency(payout.firstPaymentAmount)} (
+                                {payout.firstPaymentPercent}%)
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Due: {formatPayoutDate(payout.firstPaymentDate)}
+                              </p>
+                              {getPayoutStatusBadge(payout.firstPaymentStatus)}
+                              {payout.firstPaymentStatus === PayoutStatus.PENDING && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleMarkPayoutAsPaid(payout.id, 'first')}
+                                  disabled={payoutActionLoading}
+                                  className="mt-1 w-full"
+                                >
+                                  Mark Paid
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium font-instrument">
+                                {formatPayoutCurrency(payout.secondPaymentAmount)} (
+                                {payout.secondPaymentPercent}%)
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Due: {formatPayoutDate(payout.secondPaymentDate)}
+                              </p>
+                              {getPayoutStatusBadge(payout.secondPaymentStatus)}
+                              {payout.secondPaymentStatus === PayoutStatus.PENDING && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleMarkPayoutAsPaid(payout.id, 'second')}
+                                  disabled={payoutActionLoading}
+                                  className="mt-1 w-full"
+                                >
+                                  Mark Paid
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedPayout(payout);
+                                  setShowPayoutDetailsDialog(true);
+                                }}
+                              >
+                                <EyeIcon className="w-4 h-4 mr-1" />
+                                View
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedPayout(payout);
+                                  setShowEditPayoutDialog(true);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Payout Dialogs */}
+      {selectedPayout && (
+        <>
+          <PayoutDetailsDialog
+            payout={selectedPayout}
+            open={showPayoutDetailsDialog}
+            onOpenChange={setShowPayoutDetailsDialog}
+          />
+          <EditPayoutDialog
+            payout={selectedPayout}
+            open={showEditPayoutDialog}
+            onOpenChange={setShowEditPayoutDialog}
+            onSuccess={fetchPayoutsData}
+          />
+        </>
+      )}
+
+      <CreatePayoutDialog
+        bookings={bookingsNeedingPayouts}
+        open={showCreatePayoutDialog}
+        onOpenChange={setShowCreatePayoutDialog}
+        onSuccess={fetchPayoutsData}
+      />
 
       {/* Travel Plan Details Modal */}
       {isModalOpen && selectedTravelPlanId && (

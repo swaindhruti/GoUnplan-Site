@@ -93,4 +93,5 @@ export type TabType =
   | 'bookings'
   | 'bookingsHistory'
   | 'earnings'
+  | 'wallet'
   | 'messages';
