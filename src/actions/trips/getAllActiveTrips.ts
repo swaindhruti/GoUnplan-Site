@@ -18,6 +18,7 @@ export const getAllActiveTrips = async () => {
         state: true,
         city: true,
         languages: true,
+        tripImage: true,
         filters: true,
         noOfDays: true,
         price: true,
@@ -84,6 +85,15 @@ export const getAllActiveTrips = async () => {
       return base;
     });
 
+    const TripDestinationWithInfo = activeTrips.map(trip => {
+      return {
+        travelPlanId: trip.travelPlanId,
+        title: trip.title,
+        description: trip.description,
+        image: trip.tripImage,
+      };
+    });
+
     // Collect unique hosts from trips (normalize shape)
     const hostMap = new Map<string, any>();
     for (const t of tripsWithVibes) {
@@ -106,7 +116,7 @@ export const getAllActiveTrips = async () => {
     const hosts = Array.from(hostMap.values());
     // console.log(hosts);
 
-    return { success: true, trips: tripsWithVibes, hosts };
+    return { success: true, trips: tripsWithVibes, hosts, TripDestinationWithInfo };
   } catch (error) {
     console.error('Error fetching active trips:', error);
     return { error: 'Failed to fetch active trips' };

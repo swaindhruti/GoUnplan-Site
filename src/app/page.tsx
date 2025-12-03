@@ -21,6 +21,7 @@ import { Carousels } from '@/components/landing/common';
 export default async function Page() {
   const res = await getAllActiveTrips();
   const hosts = Array.isArray(res?.hosts) ? res.hosts : [];
+  const tripDestinationWithInfo = res?.TripDestinationWithInfo || [];
 
   console.log('Hosts on landing page:', hosts);
 
@@ -28,23 +29,24 @@ export default async function Page() {
     <main className="min-h-screen ">
       <MessageComponent />
       <HeroSection />
-      <FindMyVibe />
-      <FilterAndTrip />
-      {/* <TopDestinations /> */}
-      <WhyUsSection />
-      <SectionJoinerMarquee />
-      <BecomeAHostPage />
-      <HowItWorksSection />
-      <ReviewSection />
+      <FilterAndTrip tripDestinationWithInfo={tripDestinationWithInfo} />
       <Carousels
         type="hosts"
         SectionTitle="Meet our hosts"
         Description="Local experts"
         hosts={hosts}
       />
+      <FindMyVibe />
+      {/* <TopDestinations /> */}
+      <WhyUsSection />
+      <SectionJoinerMarquee />
+      <BecomeAHostPage />
+      <HowItWorksSection />
+      <ReviewSection />
+
       <AboutUs />
       <ReadyToStart />
-      <FAQSection />
+      {/* <FAQSection /> */}
       {/* <StickyBanner /> */}
       <Footer />
     </main>

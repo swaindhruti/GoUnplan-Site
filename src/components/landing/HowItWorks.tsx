@@ -1,4 +1,4 @@
-import { Search, Calendar, MapPin } from 'lucide-react';
+import { Search, Calendar, MapPin, Square } from 'lucide-react';
 
 import Image from 'next/image';
 
@@ -23,47 +23,38 @@ export const HowItWorksSection = () => {
             <h1 className="text-2xl font-bricolage leading-[1.05] tracking-tighter sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-medium text-black  drop-shadow-2xl mb-8">
               Travel, <span className="text-purple-600">Simplified.</span>
             </h1>
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <Search className="w-5 h-5 text-black" />
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="relative w-10 h-10 bg-white/20 flex items-center justify-center">
+                  <Square className="w-full h-full text-transparent" />
+                  <span className="absolute text-sm font-medium text-black">1</span>
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
                     Explore trips designed by real hosts.
                   </h3>
-                  <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Browse through our curated collection of unique destinations and experiences
-                    tailored to your interests and preferences.
-                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <Calendar className="w-5 h-5 text-black" />
+              <div className="flex items-center gap-4">
+                <div className="relative w-10 h-10 bg-white/20 flex items-center justify-center">
+                  <Square className="w-full h-full text-transparent" />
+                  <span className="absolute text-sm font-medium text-black">2</span>
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
                     Match with people your age who vibe like you.
                   </h3>
-                  <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Work with our expert team to customize your itinerary, select accommodations,
-                    and plan activities that match your style.
-                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <MapPin className="w-5 h-5 text-black" />
+              <div className="flex items-center gap-4">
+                <div className="relative w-10 h-10 bg-white/20 flex items-center justify-center">
+                  <Square className="w-full h-full text-transparent" />
+                  <span className="absolute text-sm font-medium text-black">3</span>
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage leading-[1.05] tracking-tighter font-normal text-black mb-1">
                     Go. Experience. Belong.
                   </h3>
-                  <p className="text-sm font-instrument text-black/90 leading-relaxed font-medium">
-                    Confirm your booking and embark on your unforgettable journey with 24/7 support
-                    throughout your adventure.
-                  </p>
                 </div>
               </div>
             </div>

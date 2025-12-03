@@ -1,4 +1,13 @@
-import { Search, Calendar, MapPin } from 'lucide-react';
+import {
+  Search,
+  Calendar,
+  MapPin,
+  CheckSquare,
+  MessagesSquare,
+  Compass,
+  Handshake,
+  LockKeyhole,
+} from 'lucide-react';
 import Image from 'next/image';
 
 export const WhyUsSection = () => {
@@ -22,51 +31,59 @@ export const WhyUsSection = () => {
               WHY US
             </span>
             <h1 className="text-2xl font-bricolage sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-medium text-white leading-[1.05] tracking-tighter drop-shadow-2xl mb-8">
-              Crafting Unforgettable
+              Why We&apos;re
               <br />
-              Journeys
+              Different
             </h1>
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <Search className="w-5 h-5 text-white" />
+                  <CheckSquare className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage font-normal text-white mb-1">
-                    Customized Packages
+                    Verified hosts you can trust
                   </h3>
-                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Tailor-made itineraries to suit your preferences and interests, ensuring a
-                    unique travel experience every time.
-                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <Calendar className="w-5 h-5 text-white" />
+                  <MessagesSquare className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage font-normal text-white mb-1">
-                    Adventure Tours
+                    {` Community > packages`}
                   </h3>
-                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Explore thrilling destinations and activities, from mountain trekking to scuba
-                    diving, for the adrenaline seekers.
-                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
-                  <MapPin className="w-5 h-5 text-white" />
+                  <Compass className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bricolage font-normal text-white mb-1">
-                    Luxury Vacations
+                    Every trip handcrafted
                   </h3>
-                  <p className="text-sm font-instrument text-white/90 leading-relaxed font-medium">
-                    Indulge in opulent accommodations and exclusive experiences, designed for those
-                    seeking a lavish escape.
-                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
+                  <Handshake className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bricolage font-normal text-white mb-1">
+                    Match with travelers like you
+                  </h3>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mt-1">
+                  <LockKeyhole className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bricolage font-normal text-white mb-1">
+                    Safe, secure, transparent
+                  </h3>
                 </div>
               </div>
             </div>
