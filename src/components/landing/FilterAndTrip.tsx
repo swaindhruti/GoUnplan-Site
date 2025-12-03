@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom';
 import { Input } from '@/components/ui/input';
 // import { Label } from '@/components/ui/label';
 import { PrimaryButton } from './common';
-import { handleScroll } from '../global/Handlescroll';
+// import { handleScroll } from '../global/Handlescroll';
 import type { Trip } from '@/actions/trips/getHostTripsServer';
 import Image from 'next/image';
 
