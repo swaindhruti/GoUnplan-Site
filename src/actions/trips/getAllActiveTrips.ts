@@ -20,7 +20,24 @@ export const getAllActiveTrips = async () => {
         filters: true,
         noOfDays: true,
         price: true,
+        stops: true,
+        destination: true,
         hostId: true,
+        host: {
+          select: {
+            hostEmail: true,
+            hostId: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                image: true,
+              },
+            },
+          },
+        },
         createdAt: true,
       },
       orderBy: {
@@ -30,9 +47,9 @@ export const getAllActiveTrips = async () => {
 
     // Add default vibes to trips that don't have any filters
     const tripsWithVibes = activeTrips.map(trip => {
-      if (!trip.filters || trip.filters.length === 0) {
-        // Generate vibes based on trip content
-        const content = `${trip.title} ${trip.description}`.toLowerCase();
+      const base = { ...trip } as any;
+      if (!base.filters || base.filters.length === 0) {
+        const content = `${base.title} ${base.description}`.toLowerCase();
         const generatedVibes: string[] = [];
 
         if (content.includes('adventure') || content.includes('trek') || content.includes('hike')) {
@@ -56,21 +73,39 @@ export const getAllActiveTrips = async () => {
           generatedVibes.push('Relaxation');
         }
 
-        // If still no vibes, add a default one
         if (generatedVibes.length === 0) {
           const defaultVibes = ['Adventure', 'Cultural', 'Nature', 'Relaxation'];
           generatedVibes.push(defaultVibes[Math.floor(Math.random() * defaultVibes.length)]);
         }
 
-        return {
-          ...trip,
-          filters: generatedVibes,
-        };
+        base.filters = generatedVibes;
       }
-      return trip;
+      return base;
     });
 
-    return { success: true, trips: tripsWithVibes };
+    // Collect unique hosts from trips (normalize shape)
+    const hostMap = new Map<string, any>();
+    for (const t of tripsWithVibes) {
+      const host = (t as any).host;
+      if (host) {
+        const hostKey = host.id ?? host.hostEmail ?? host.user?.id ?? host.user?.email;
+        if (!hostKey) continue;
+        if (!hostMap.has(String(hostKey))) {
+          hostMap.set(String(hostKey), {
+            id: host.id ?? null,
+            email: host.hostEmail ?? host.user?.email ?? null,
+            name: host.user?.name ?? null,
+            hostId: host.hostId ?? null,
+            phone: host.user?.phone ?? null,
+            image: host.user?.image ?? null,
+          });
+        }
+      }
+    }
+    const hosts = Array.from(hostMap.values());
+    // console.log(hosts);
+
+    return { success: true, trips: tripsWithVibes, hosts };
   } catch (error) {
     console.error('Error fetching active trips:', error);
     return { error: 'Failed to fetch active trips' };

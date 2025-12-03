@@ -8,7 +8,7 @@ export const HowItWorksSection = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 w-full h-screen">
         <div className="relative hidden lg:block bg-purple-200">
           <Image
-            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610239/pexels-rpnickson-2661176_mhopaa.jpg"
+            src="https://ik.imagekit.io/bkt3emitco/pexels-rpnickson-2661176.jpg"
             alt="How it works background"
             fill
             className="object-cover object-center scale-80 shadow-lg "

@@ -1,3 +1,4 @@
+'use client';
 import { getUnreadCount } from '@/actions/chat/actions';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';

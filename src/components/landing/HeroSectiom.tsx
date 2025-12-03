@@ -5,8 +5,10 @@ import { ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { handleScroll } from '@/components/global/Handlescroll';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export const HeroSection = () => {
+  const router = useRouter();
   return (
     <div className="relative w-full h-screen min-h-[600px] overflow-hidden">
       {/* Video Background */}
@@ -18,7 +20,7 @@ export const HeroSection = () => {
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source
-          src="https://res.cloudinary.com/dbnfkkfov/video/upload/v1764694095/WhatsApp_Video_2025-12-02_at_22.14.37_kib51z.mp4"
+          src="https://ik.imagekit.io/bkt3emitco/Untitled%20design%20(7).mp4"
           type="video/mp4"
         />
       </video>
@@ -28,12 +30,36 @@ export const HeroSection = () => {
 
       {/* Text Content */}
       <div className="absolute inset-0 z-20 flex items-center justify-center px-4 text-center">
-        <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-[1.05] tracking-tighter drop-shadow-xl max-w-[90%] sm:max-w-3xl md:max-w-4xl">
-          your journey&apos;s <span className="highlight-wavy">love language</span>
-        </h2>
+        <div className="max-w-4xl w-full">
+          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bricolage font-bold leading-[1.05] tracking-tighter drop-shadow-xl">
+            Travel with people who get your vibe.
+          </h2>
+          <p className="mt-3 text-white/90 text-sm sm:text-base md:text-lg font-medium max-w-3xl mx-auto drop-shadow-sm">
+            Join raw, real trips hosted by travelers like you — not AI or agencies.
+          </p>
+
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <Button
+              variant="default"
+              onClick={() => router.push('/dashboard/host')}
+              className="bg-white text-black hover:text-white cursor-pointer px-8 py-4 rounded-full shadow-xl hover:scale-[0.99] transition-transform font-instrument"
+              size="lg"
+            >
+              Host a Trip
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => router.push('/trips')}
+              className="bg-white/90 text-black hover:text-white cursor-pointer px-8 py-4 rounded-full shadow-xl hover:scale-[0.99] transition-transform font-instrument"
+              size="lg"
+            >
+              Join a Trip
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <div className="absolute bottom-6 sm:bottom-10 w-full z-40 flex justify-center">
+      <div className="absolute bottom-2 sm:bottom-4 w-full z-40 flex justify-center">
         <Button
           onClick={() =>
             handleScroll({
