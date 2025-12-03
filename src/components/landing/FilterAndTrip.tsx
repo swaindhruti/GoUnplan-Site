@@ -41,7 +41,7 @@ const TRAVEL_TYPE_OPTIONS = [
   { value: 'backpacking', label: 'Backpacking', emoji: '🎯' },
 ];
 
-const FEATURED_DESTINATIONS = [
+export const FEATURED_DESTINATIONS = [
   {
     title: 'Taj Mahal',
     subtitle: 'Monumental paradise & culture',
@@ -545,7 +545,7 @@ export const FilterAndTrip = ({ tripDestinationWithInfo }: tripDestinationWithIn
           {tripDestinationWithInfo.slice(0, 3).map((dest, idx) => (
             <motion.div
               key={idx}
-              className="group relative overflow-hidden rounded-xl aspect-[4/3] md:aspect-[3/4] cursor-pointer"
+              className="group relative overflow-hidden rounded-xl aspect-[4/3] sm:aspect-[3/4] cursor-pointer"
             >
               <Image
                 layout="fill"

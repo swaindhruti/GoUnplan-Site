@@ -1,13 +1,4 @@
-import {
-  Search,
-  Calendar,
-  MapPin,
-  CheckSquare,
-  MessagesSquare,
-  Compass,
-  Handshake,
-  LockKeyhole,
-} from 'lucide-react';
+import { CheckSquare, MessagesSquare, Compass, Handshake, LockKeyhole } from 'lucide-react';
 import Image from 'next/image';
 
 export const WhyUsSection = () => {

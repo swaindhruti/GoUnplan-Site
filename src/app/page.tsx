@@ -8,7 +8,7 @@ import { ReadyToStart } from '@/components/landing/ReadyToStart';
 import { WhyUsSection } from '@/components/landing/WhyUs';
 import { HowItWorksSection } from '@/components/landing/HowItWorks';
 import ReviewSection from '@/components/landing/ReviewSection';
-import FAQSection from '@/components/landing/Faqs';
+// import FAQSection from '@/components/landing/Faqs';
 // import { TopHosts } from '@/components/landing/TopHosts';
 import { SectionJoinerMarquee } from '@/components/landing/common';
 import { Footer } from '@/components/landing/Footer';

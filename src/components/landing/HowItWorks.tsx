@@ -1,4 +1,4 @@
-import { Search, Calendar, MapPin, Square } from 'lucide-react';
+import { Square } from 'lucide-react';
 
 import Image from 'next/image';
 
