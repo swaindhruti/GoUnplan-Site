@@ -26,7 +26,7 @@ export default function AboutUs() {
         {/* Left Side Image */}
         <div className="w-full lg:w-1/2">
           <Image
-            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752733322/hand-drawn-people-with-suitcase-silhouette_rwflee.png"
+            src="https://ik.imagekit.io/bkt3emitco/cb033347b7f3748d8a47e22ed935b031.jpg"
             alt="About Us Illustration"
             width={600}
             height={600}

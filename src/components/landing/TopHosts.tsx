@@ -1,13 +1,14 @@
-import { Carousels } from './common';
-
-export const TopHosts = () => {
+export const TopHosts = async () => {
+  //   const res = await getAllActiveTrips();
+  //   const hosts = Array.isArray(res?.hosts) ? res.hosts : [];
   return (
     <>
-      <Carousels
-        SectionTitle="Top Hosts"
-        Description="Explore the most popular hosts around the world."
+      {/* <Carousels
         type="hosts"
-      />
+        SectionTitle="Meet our hosts"
+        Description="Local experts"
+        hosts={hosts}
+      /> */}
     </>
   );
 };

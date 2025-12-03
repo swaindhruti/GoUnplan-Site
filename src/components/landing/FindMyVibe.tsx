@@ -66,9 +66,9 @@ export const FindMyVibe = () => {
             <div className="space-y-4 max-w-md text-center lg:text-left mt-16">
               <SectionLabel label="Choose Your Vibe!" />
               <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-900 ">
-                Popular
+                Pick Your
                 <br />
-                <span className="text-gray-800 ml-3">Vibes</span>
+                <span className="text-gray-800 ml-3">Vibe</span>
               </h1>
               <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
                 Join us as we explore the wonders of the globe, one incredible journey at a time.
@@ -85,7 +85,7 @@ export const FindMyVibe = () => {
             } relative group`}
           >
             <Image
-              src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+              src="https://ik.imagekit.io/bkt3emitco/f94c5898fcc5227a6b969b303bf8a1b6.jpg"
               alt="Adventure"
               fill
               className="object-cover rounded-[60px] sm:rounded-[80px] shadow-lg"

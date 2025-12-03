@@ -34,7 +34,7 @@ export const ReadyToStart = () => {
         {/* Right Image Section */}
         <div className="w-full lg:w-1/2 order-1 lg:order-2 flex justify-center lg:justify-end">
           <Image
-            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1752687713/44654751_9058421_vdjhyw.svg"
+            src="https://ik.imagekit.io/bkt3emitco/3dc6eb873315c4125b1c9bb2912aa4e6.jpg?updatedAt=1764724987452"
             alt="Adventure illustration"
             className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
             width={500}

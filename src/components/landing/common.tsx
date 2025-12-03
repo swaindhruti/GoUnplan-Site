@@ -16,6 +16,7 @@ import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import Marquee from 'react-fast-marquee';
+import { useRouter } from 'next/navigation';
 
 export const SectionLabel = ({ label }: { label: ReactNode }) => {
   return (
@@ -73,19 +74,24 @@ type Destination = {
 };
 
 type Host = {
-  id: number;
-  name: string;
-  description: string;
+  id?: string | number;
+  name?: string;
+  description?: string;
+  image?: string;
+  email?: string;
+  hostId?: string | null;
 };
 
 export const Carousels = ({
   SectionTitle,
   Description,
   type,
+  hosts: hostsProp,
 }: {
   SectionTitle?: string;
   Description?: string;
   type?: 'destinations' | 'hosts';
+  hosts?: Host[];
 }) => {
   const destinations: Destination[] = [
     {
@@ -135,40 +141,53 @@ export const Carousels = ({
     },
   ];
 
-  const hosts: Host[] = [
+  // keep a fallback static hosts list for dev if none passed
+  const fallbackHosts: Host[] = [
     {
       id: 1,
       name: 'Maria Rodriguez',
       description:
         'Expert local guide with 8 years of experience. Specializes in cultural tours and hidden gems. Fluent in English, Spanish, and French.',
+      image: '',
     },
     {
       id: 2,
       name: 'Hiroshi Tanaka',
       description:
         'Tokyo native and certified tour guide. Passionate about sharing Japanese culture, history, and the best local food experiences.',
+      image: '',
     },
     {
       id: 3,
       name: 'James Wilson',
       description:
         "New York local with extensive knowledge of the city's history, art scene, and best kept secrets. 10+ years guiding experience.",
+      image: '',
     },
     {
       id: 4,
       name: 'Emma Thompson',
       description:
         'London historian and certified guide. Specializes in royal history, architecture, and traditional British culture experiences.',
+      image: '',
     },
     {
       id: 5,
       name: 'Ahmed Al-Rashid',
       description:
         'Dubai local expert offering unique insights into Middle Eastern culture, modern architecture, and luxury experiences.',
+      image: '',
     },
   ];
 
-  const data = type === 'destinations' ? (destinations as Destination[]) : (hosts as Host[]);
+  const router = useRouter();
+  // use passed hosts when type === 'hosts'
+  const data =
+    type === 'destinations'
+      ? (destinations as Destination[])
+      : hostsProp && hostsProp.length
+        ? hostsProp
+        : fallbackHosts;
 
   return (
     <div className="h-auto md:min-h-screen flex justify-center items-center px-6 md:px-20  py-10 ">
@@ -202,10 +221,21 @@ export const Carousels = ({
             >
               {data.map(item => (
                 <SwiperSlide key={item.id}>
-                  <div className="flex flex-col items-center">
+                  <div
+                    onClick={() => {
+                      const hostIdentifier = (item as Host).hostId;
+                      if (hostIdentifier) {
+                        router.push(`/host/${hostIdentifier}`);
+                      }
+                    }}
+                    className="flex flex-col items-center"
+                  >
                     <Card className="rounded-[90px] h-[40vh] w-full relative shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group cursor-pointer">
                       <Image
-                        src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg"
+                        src={
+                          item.image ||
+                          'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1751841644/freddy-rezvanian-Eelegt4hFNc-unsplash_cplvmo.jpg'
+                        }
                         alt="Host"
                         fill
                         className="object-cover rounded-[90px] transition-transform duration-300 group-hover:scale-105"
@@ -283,26 +313,23 @@ export const Carousels = ({
 export const SectionJoinerMarquee = () => {
   const marqueeContent = [
     {
-      imageurl:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611737/travel-luggage_cwevzh.png',
+      imageurl: 'https://ik.imagekit.io/bkt3emitco/1e575c48c3460ad077e75928abe3b1e3.jpg',
       label: 'Adventure approved',
     },
     {
-      imageurl: 'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/travel_v9i3za.png',
+      imageurl: 'https://ik.imagekit.io/bkt3emitco/289f28cf4150759f9b7e85b7a165f828.jpg',
       label: 'Memory enriched',
     },
     {
-      imageurl:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/destination_e5puwk.png',
+      imageurl: 'https://ik.imagekit.io/bkt3emitco/30e4c7ef3bc89110dc40adc639f7e66f.jpg',
       label: 'Culture infused',
     },
     {
-      imageurl: 'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611738/world_wj01uz.png',
+      imageurl: 'https://ik.imagekit.io/bkt3emitco/f28cfca72228fe29b3a9ba83ddc86f7a.jpg',
       label: 'Stress-free travel',
     },
     {
-      imageurl:
-        'https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754611796/landscape_t31pnd.png',
+      imageurl: 'https://ik.imagekit.io/bkt3emitco/37cafbd5622ac30ad12542922c98e57d.jpg',
       label: 'Wanderlust certified',
     },
   ];
@@ -311,7 +338,7 @@ export const SectionJoinerMarquee = () => {
     <Marquee className="py-6 md:py-10" gradient={false} speed={50}>
       {marqueeContent.map((item, index) => (
         <div key={index} className="flex items-center gap-3 md:gap-6 px-4 md:px-8">
-          <div className="relative w-10 h-10 md:w-16 md:h-16 flex-shrink-0">
+          <div className="relative w-10 h-10 md:w-24 md:h-24 flex-shrink-0">
             <Image
               src={item.imageurl}
               alt={item.label}

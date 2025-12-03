@@ -8,7 +8,7 @@ export const WhyUsSection = () => {
         {/* Left: Image with overlay */}
         <div className="relative hidden lg:block">
           <Image
-            src="https://res.cloudinary.com/dfe8sdlkc/image/upload/v1754610239/pexels-quang-nguyen-vinh-222549-2133369_n3mamd.jpg"
+            src="https://ik.imagekit.io/bkt3emitco/pexels-quang-nguyen-vinh-222549-2133369.jpg"
             alt="Why us background"
             fill
             className="object-cover object-center"
