@@ -49,7 +49,7 @@ export const FindMyVibe = () => {
     <div id="find-my-vibe" className="bg-purple-500/[0.05] relative min-h-screen w-full ">
       {myVibes && (
         <div className="w-screen flex justify-center -mt-3 lg:-mt-6 pt-6 lg:pt-12">
-          <SectionLabel label="Choose Your Vibe!" />
+          <SectionLabel label="BROWSE BY VIBE!" />
         </div>
       )}
       <div
@@ -64,14 +64,14 @@ export const FindMyVibe = () => {
           {' '}
           {!myVibes && (
             <div className="space-y-4 max-w-md text-center lg:text-left mt-16">
-              <SectionLabel label="Choose Your Vibe!" />
+              <SectionLabel label="BROWSE BY VIBE!" />
               <h1 className="text-3xl max-md:justify-center flex sm:text-4xl lg:text-5xl font-bricolage leading-[1.05] tracking-tighter font-bold text-gray-900 ">
                 Pick Your
                 <br />
                 <span className="text-gray-800 ml-3">Vibe</span>
               </h1>
               <p className="text-[15px] sm:text-[16px] mb-8 font-instrument text-gray-600">
-                Join us as we explore the wonders of the globe, one incredible journey at a time.
+                Because every traveler’s story begins differently.
               </p>
               <div onClick={handleVibeButtonClick} className="flex justify-center lg:justify-start">
                 <PrimaryButton label="Find your Vibe" />
