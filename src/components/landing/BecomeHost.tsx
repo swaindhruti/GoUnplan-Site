@@ -93,7 +93,7 @@ export default function BecomeAHostPage() {
                   </Link>
                 </div>
                 <div className="mt-8 text-sm text-gray-600">
-                  <strong>Quick facts:</strong> We'll help you with promotion, payments, and
+                  <strong>Quick facts:</strong> We&apos;ll help you with promotion, payments, and
                   traveler support — you focus on the experience.
                 </div>
               </div>

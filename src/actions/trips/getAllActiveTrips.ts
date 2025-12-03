@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma, requireUser } from '@/lib/shared';
 
 export const getAllActiveTrips = async () => {

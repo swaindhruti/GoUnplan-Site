@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     console.log('Search result:', result);
     return NextResponse.json(result);
   } catch (error) {
+    console.error('Error searching trips:', error);
     return NextResponse.json({ error: 'Failed to search trips' }, { status: 500 });
   }
 }

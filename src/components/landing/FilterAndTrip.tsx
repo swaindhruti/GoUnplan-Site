@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+// import { Label } from '@/components/ui/label';
 import { PrimaryButton } from './common';
 import { handleScroll } from '../global/Handlescroll';
 import type { Trip } from '@/actions/trips/getHostTripsServer';
@@ -39,9 +39,9 @@ interface SearchState {
 
 export const FilterAndTrip = () => {
   const [destination, setDestination] = useState('');
-  const [travelerType, setTravelerType] = useState('Solo'); // kept (used in search params)
-  const [vibe, setVibe] = useState(''); // kept (used in search params)
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined); // kept
+  const [travelerType] = useState('Solo'); // kept (used in search params)
+  const [vibe] = useState(''); // kept (used in search params)
+  const [startDate] = useState<Date | undefined>(undefined); // kept
 
   const [searchState, setSearchState] = useState<SearchState>({
     tripResults: [],
@@ -218,11 +218,11 @@ export const FilterAndTrip = () => {
     }, 200);
   }, []);
 
-  const handleBrowseVibeClick = useCallback(() => {
-    handleScroll({ location: '#find-my-vibe' });
-  }, []);
+  // const handleBrowseVibeClick = useCallback(() => {
+  //   handleScroll({ location: '#find-my-vibe' });
+  // }, []);
 
-  const hasResults = searchState.tripResults.length > 0 || searchState.olaResults.length > 0;
+  // const hasResults = searchState.tripResults.length > 0 || searchState.olaResults.length > 0;
   const isLoading = searchState.isLoadingTrips || searchState.isLoadingOla;
 
   return (
@@ -388,7 +388,7 @@ export const FilterAndTrip = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
-              <h3 className="text-white font-bricolage font-semibold text-lg mb-1">Taj Mahar</h3>
+              <h3 className="text-white font-bricolage font-semibold text-lg mb-1">Taj Mahal</h3>
               <p className="text-white/90 text-xs font-instrument">Monumental paradise & culture</p>
             </div>
           </motion.div>
