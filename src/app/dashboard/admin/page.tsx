@@ -709,9 +709,12 @@ export default function AdminDashboard() {
     try {
       const result = await processRefund(bookingId);
       if (result.success) {
+        // Update the booking in the state with the correct paymentStatus
         setBookings(
           bookings.map(booking =>
-            booking.id === bookingId ? { ...booking, status: 'REFUNDED' } : booking
+            booking.id === bookingId
+              ? { ...booking, paymentStatus: 'REFUNDED' as PaymentStatus }
+              : booking
           )
         );
         setBookingCounts(prev => ({
@@ -719,10 +722,13 @@ export default function AdminDashboard() {
           CANCELLED: prev.CANCELLED - 1,
           REFUNDED: prev.REFUNDED + 1,
         }));
+        toast.success(result.message || 'Booking marked as refunded successfully');
       } else {
+        toast.error(result.error || 'Failed to mark booking as refunded');
         setError(result.error || 'Failed to mark booking as refunded');
       }
     } catch (err) {
+      toast.error('Failed to mark booking as refunded');
       setError('Failed to mark booking as refunded');
       console.error(err);
     }

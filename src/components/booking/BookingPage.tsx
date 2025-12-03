@@ -393,8 +393,8 @@ export function BookingPage({
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4 w-3xl">
-                    <p className="text-sm text-gray-700 font-instrument leading-relaxed">
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-gray-700 font-instrument leading-relaxed whitespace-pre-wrap break-words">
                       {hostInfo.description ||
                         'Experienced travel guide passionate about sharing local culture and creating unforgettable experiences.'}
                     </p>
