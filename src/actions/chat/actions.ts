@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { CreateChatResult } from '@/types/chats';
 import { revalidatePath } from 'next/cache';
+import { sendEmailAction } from '@/actions/email/action';
 
 interface CreateChatParams {
   userId: string;
@@ -101,6 +102,7 @@ export async function createOrGetChat({
               select: {
                 id: true,
                 name: true,
+                email: true,
                 image: true,
                 role: true,
               },
@@ -132,6 +134,45 @@ export async function createOrGetChat({
       },
     });
 
+    // Send email notification to host about the new chat
+    try {
+      const hostUser = newChat.participants.find(
+        (p: { userId: string }) => p.userId === hostId
+      )?.user;
+      const initiatingUser = newChat.participants.find(
+        (p: { userId: string }) => p.userId === userId
+      )?.user;
+
+      if (hostUser?.email && initiatingUser?.name) {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const chatUrl = `${baseUrl}/chat?chatId=${newChat.id}`;
+
+        // Fetch travel plan details if travelPlanId exists
+        let tripTitle: string | undefined;
+        if (newChat.travelPlanId) {
+          const travelPlan = await prisma.travelPlans.findUnique({
+            where: { travelPlanId: newChat.travelPlanId },
+            select: { title: true },
+          });
+          tripTitle = travelPlan?.title;
+        }
+
+        await sendEmailAction({
+          to: hostUser.email,
+          type: 'new_chat_message',
+          payload: {
+            hostName: hostUser.name || 'Host',
+            userName: initiatingUser.name,
+            tripTitle,
+            chatUrl,
+          },
+        });
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the chat creation
+      console.error('Failed to send new chat notification email:', emailError);
+    }
+
     return {
       success: true as const,
       chat: {
@@ -157,6 +198,13 @@ export async function sendMessage({
   type = 'TEXT',
 }: SendMessageParams) {
   try {
+    // Check if this is the first message in the chat
+    const messageCount = await prisma.message.count({
+      where: { chatId },
+    });
+
+    const isFirstMessage = messageCount === 0;
+
     const message = await prisma.message.create({
       data: {
         chatId,
@@ -177,6 +225,51 @@ export async function sendMessage({
       where: { id: chatId },
       data: { lastMessageAt: new Date() },
     });
+
+    // Send email notification to receiver if this is the first message
+    if (isFirstMessage) {
+      try {
+        // Fetch receiver details
+        const receiver = await prisma.user.findUnique({
+          where: { id: receiverId },
+          select: { name: true, email: true },
+        });
+
+        if (receiver?.email && message.sender.name) {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+          const chatUrl = `${baseUrl}/chat?chatId=${chatId}`;
+
+          // Fetch chat and travel plan details
+          const chat = await prisma.chat.findUnique({
+            where: { id: chatId },
+            select: { travelPlanId: true },
+          });
+
+          let tripTitle: string | undefined;
+          if (chat?.travelPlanId) {
+            const travelPlan = await prisma.travelPlans.findUnique({
+              where: { travelPlanId: chat.travelPlanId },
+              select: { title: true },
+            });
+            tripTitle = travelPlan?.title;
+          }
+
+          await sendEmailAction({
+            to: receiver.email,
+            type: 'new_chat_message',
+            payload: {
+              hostName: receiver.name || 'Host',
+              userName: message.sender.name,
+              tripTitle,
+              chatUrl,
+            },
+          });
+        }
+      } catch (emailError) {
+        // Log email error but don't fail the message send
+        console.error('Failed to send new message notification email:', emailError);
+      }
+    }
 
     revalidatePath('/chat');
     return { success: true, message };

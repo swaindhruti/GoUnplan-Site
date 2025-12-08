@@ -19,6 +19,7 @@ import { tripSubmittedAdminTemplate } from '@/lib/email/templates/trip/tripSubmi
 import { hostApprovedTemplate } from '@/lib/email/templates/host/hostApproved';
 import { hostRejectedTemplate } from '@/lib/email/templates/host/hostRejected';
 import { tripApprovedTemplate } from '@/lib/email/templates/host/tripApproved';
+import { newChatNotificationTemplate } from '@/lib/email/templates/chat/newChatNotification';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -44,7 +45,8 @@ export async function sendEmailAction({
     | 'trip_submitted_admin'
     | 'host_approved'
     | 'host_rejected'
-    | 'trip_approved';
+    | 'trip_approved'
+    | 'new_chat_message';
   payload: unknown;
 }) {
   let subject = '';
@@ -353,6 +355,24 @@ export async function sendEmailAction({
       approvedAt: p.approvedAt || '',
     });
     subject = 'Great News! Your Trip Has Been Approved';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'new_chat_message') {
+    const p = payload as {
+      hostName?: string;
+      userName?: string;
+      tripTitle?: string;
+      chatUrl?: string;
+    };
+    const tpl = newChatNotificationTemplate({
+      hostName: p.hostName || '',
+      userName: p.userName || '',
+      tripTitle: p.tripTitle,
+      chatUrl: p.chatUrl || '',
+    });
+    subject = `New Question from ${p.userName || 'a Traveler'}`;
     text = tpl.text;
     html = tpl.html;
   }
