@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { requireHost } from '@/lib/roleGaurd';
 import { TravelPlanStatuses } from '@/types/travel';
 import { TravelPlanStatus, BookingStatus, PaymentStatus, Prisma } from '@prisma/client';
+import { sendEmailAction } from '@/actions/email/action';
 
 export const getHostDetails = async () => {
   const session = await requireHost();
@@ -611,6 +612,72 @@ export const submitTripForVerification = async (
       data: {
         ...data,
         status: newStatus,
+      },
+    });
+
+    // Get host user details for email
+    const hostUser = await prisma.user.findUnique({
+      where: { id: hostProfile.hostId },
+      select: {
+        name: true,
+        email: true,
+      },
+    });
+
+    // Format dates for email
+    const formatDate = (date: Date | null | undefined) => {
+      if (!date) return undefined;
+      return new Date(date).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    };
+
+    const submittedAt = new Date().toLocaleString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    // Send email to host
+    if (hostUser?.email) {
+      await sendEmailAction({
+        to: hostUser.email,
+        type: 'trip_submitted_host',
+        payload: {
+          hostName: hostUser.name || 'Host',
+          tripTitle: updatedPlan.title,
+          tripId: updatedPlan.travelPlanId,
+          destination: updatedPlan.destination,
+          price: updatedPlan.price,
+          noOfDays: updatedPlan.noOfDays,
+          maxParticipants: updatedPlan.maxParticipants || 0,
+          submittedAt,
+        },
+      });
+    }
+
+    // Send email to admin
+    const adminEmail = process.env.ADMIN_EMAIL || 'sambhavkothari25@gmail.com';
+    await sendEmailAction({
+      to: adminEmail,
+      type: 'trip_submitted_admin',
+      payload: {
+        hostName: hostUser?.name || 'Unknown Host',
+        hostEmail: hostUser?.email || 'N/A',
+        hostId: hostProfile.hostId,
+        tripTitle: updatedPlan.title,
+        tripId: updatedPlan.travelPlanId,
+        destination: updatedPlan.destination,
+        price: updatedPlan.price,
+        noOfDays: updatedPlan.noOfDays,
+        maxParticipants: updatedPlan.maxParticipants || 0,
+        submittedAt,
+        startDate: formatDate(updatedPlan.startDate),
+        endDate: formatDate(updatedPlan.endDate),
       },
     });
 

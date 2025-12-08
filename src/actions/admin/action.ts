@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/roleGaurd';
 import { Role } from '@/types/auth';
 import { TravelPlanStatus, BookingStatus, Prisma } from '@prisma/client';
-import { sendHostApprovalEmail, sendHostRejectionEmail } from '@/lib/emailService';
+import { sendEmailAction } from '@/actions/email/action';
 
 export const getAllUsers = async () => {
   const session = await requireAdmin();
@@ -237,7 +237,13 @@ export const approveHostApplication = async (email: string) => {
     });
 
     // Send approval email
-    const emailResult = await sendHostApprovalEmail(email, user.name);
+    const emailResult = await sendEmailAction({
+      to: email,
+      type: 'host_approved',
+      payload: {
+        hostName: user.name || 'Host',
+      },
+    });
 
     if (!emailResult.success) {
       // Log the email error but don't fail the approval
@@ -277,7 +283,14 @@ export const rejectHostApplication = async (email: string) => {
     });
 
     // Send rejection email
-    const emailResult = await sendHostRejectionEmail(email, user.name);
+    const emailResult = await sendEmailAction({
+      to: email,
+      type: 'host_rejected',
+      payload: {
+        hostName: user.name || 'Host',
+        reason: undefined, // Optional reason field
+      },
+    });
 
     if (!emailResult.success) {
       // Log the email error but don't fail the rejection
@@ -520,12 +533,64 @@ export const approveTravelPlan = async (travelPlanId: string) => {
   if (!session) return { error: 'Unauthorized' };
 
   try {
+    // First get the travel plan with host details
+    const travelPlan = await prisma.travelPlans.findUnique({
+      where: { travelPlanId: travelPlanId },
+      include: {
+        host: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!travelPlan) {
+      return { error: 'Travel plan not found' };
+    }
+
+    // Update travel plan status to ACTIVE
     const updatedTravelPlan = await prisma.travelPlans.update({
       where: { travelPlanId: travelPlanId },
       data: { status: TravelPlanStatus.ACTIVE },
     });
 
-    return { success: true, travelPlan: updatedTravelPlan };
+    // Send approval email to host
+    const emailResult = await sendEmailAction({
+      to: travelPlan.host.user.email || '',
+      type: 'trip_approved',
+      payload: {
+        hostName: travelPlan.host.user.name || 'Host',
+        tripTitle: travelPlan.title,
+        tripId: travelPlan.travelPlanId,
+        destination:
+          travelPlan.destination ||
+          `${travelPlan.city}, ${travelPlan.state}, ${travelPlan.country}`,
+        approvedAt: new Date().toISOString(),
+      },
+    });
+
+    if (!emailResult.success) {
+      console.error('Email sending failed:', emailResult.error);
+      return {
+        success: true,
+        travelPlan: updatedTravelPlan,
+        emailError: emailResult.error,
+        message:
+          'Travel plan approved successfully, but notification email failed to send. Please inform the host manually.',
+      };
+    }
+
+    return {
+      success: true,
+      travelPlan: updatedTravelPlan,
+      message: 'Travel plan approved successfully and notification email sent.',
+    };
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error && error.code === 'P2025') {
       return { error: 'Travel plan not found' };

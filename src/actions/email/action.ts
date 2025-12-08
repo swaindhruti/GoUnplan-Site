@@ -14,6 +14,11 @@ import { paymentProcessedTemplate } from '@/lib/email/templates/payout/paymentPr
 import { emailVerificationTemplate } from '@/lib/email/templates/emailVerification';
 import { passwordResetTemplate } from '@/lib/email/templates/passwordReset';
 import { supportTicketCreatedTemplate } from '@/lib/email/templates/support/ticketCreated';
+import { tripSubmittedHostTemplate } from '@/lib/email/templates/trip/tripSubmittedHost';
+import { tripSubmittedAdminTemplate } from '@/lib/email/templates/trip/tripSubmittedAdmin';
+import { hostApprovedTemplate } from '@/lib/email/templates/host/hostApproved';
+import { hostRejectedTemplate } from '@/lib/email/templates/host/hostRejected';
+import { tripApprovedTemplate } from '@/lib/email/templates/host/tripApproved';
 
 const FROM_EMAIL = process.env.FROM_EMAIL as string;
 
@@ -34,7 +39,12 @@ export async function sendEmailAction({
     | 'booking_payment_reminder'
     | 'payout_created'
     | 'payout_payment_processed'
-    | 'support_ticket_created';
+    | 'support_ticket_created'
+    | 'trip_submitted_host'
+    | 'trip_submitted_admin'
+    | 'host_approved'
+    | 'host_rejected'
+    | 'trip_approved';
   payload: unknown;
 }) {
   let subject = '';
@@ -237,6 +247,112 @@ export async function sendEmailAction({
       bookingDetails: p.bookingDetails,
     });
     subject = 'New Support Ticket Created - Action Required';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'trip_submitted_host') {
+    const p = payload as {
+      hostName?: string;
+      tripTitle?: string;
+      tripId?: string;
+      destination?: string;
+      price?: number;
+      noOfDays?: number;
+      maxParticipants?: number;
+      submittedAt?: string;
+    };
+    const tpl = tripSubmittedHostTemplate({
+      hostName: p.hostName || '',
+      tripTitle: p.tripTitle || '',
+      tripId: p.tripId || '',
+      destination: p.destination || '',
+      price: p.price || 0,
+      noOfDays: p.noOfDays || 0,
+      maxParticipants: p.maxParticipants || 0,
+      submittedAt: p.submittedAt || '',
+    });
+    subject = 'Trip Submitted Successfully - Under Review';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'trip_submitted_admin') {
+    const p = payload as {
+      hostName?: string;
+      hostEmail?: string;
+      hostId?: string;
+      tripTitle?: string;
+      tripId?: string;
+      destination?: string;
+      price?: number;
+      noOfDays?: number;
+      maxParticipants?: number;
+      submittedAt?: string;
+      startDate?: string;
+      endDate?: string;
+    };
+    const tpl = tripSubmittedAdminTemplate({
+      hostName: p.hostName || '',
+      hostEmail: p.hostEmail || '',
+      hostId: p.hostId || '',
+      tripTitle: p.tripTitle || '',
+      tripId: p.tripId || '',
+      destination: p.destination || '',
+      price: p.price || 0,
+      noOfDays: p.noOfDays || 0,
+      maxParticipants: p.maxParticipants || 0,
+      submittedAt: p.submittedAt || '',
+      startDate: p.startDate,
+      endDate: p.endDate,
+    });
+    subject = 'New Trip Submission - Action Required';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'host_approved') {
+    const p = payload as {
+      hostName?: string;
+    };
+    const tpl = hostApprovedTemplate({
+      hostName: p.hostName || '',
+    });
+    subject = 'Congratulations! Your Host Application Has Been Approved';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'host_rejected') {
+    const p = payload as {
+      hostName?: string;
+      reason?: string;
+    };
+    const tpl = hostRejectedTemplate({
+      hostName: p.hostName || '',
+      reason: p.reason,
+    });
+    subject = 'Host Application Update';
+    text = tpl.text;
+    html = tpl.html;
+  }
+
+  if (type === 'trip_approved') {
+    const p = payload as {
+      hostName?: string;
+      tripTitle?: string;
+      tripId?: string;
+      destination?: string;
+      approvedAt?: string;
+    };
+    const tpl = tripApprovedTemplate({
+      hostName: p.hostName || '',
+      tripTitle: p.tripTitle || '',
+      tripId: p.tripId || '',
+      destination: p.destination || '',
+      approvedAt: p.approvedAt || '',
+    });
+    subject = 'Great News! Your Trip Has Been Approved';
     text = tpl.text;
     html = tpl.html;
   }
