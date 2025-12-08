@@ -8,8 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { HostData } from '../types';
 import Image from 'next/image';
 
-// Common languages list
 const COMMON_LANGUAGES = [
+  // Common Indian Languages (Added)
+  'Hindi', // Already in your original list, but moved here for organization
+  'Bengali',
+  'Marathi',
+  'Telugu',
+  'Tamil',
+  'Gujarati',
+  'Urdu', // Already in your original list, but moved here for organization
+  'Kannada',
+  'Malayalam',
+  'Odia',
+  'Punjabi',
+
+  // Existing Global Languages
   'English',
   'Spanish',
   'French',
@@ -21,7 +34,8 @@ const COMMON_LANGUAGES = [
   'Japanese',
   'Korean',
   'Arabic',
-  'Hindi',
+
+  // The Rest of the Languages (Original list minus the moved Indian languages)
   'Dutch',
   'Swedish',
   'Norwegian',
