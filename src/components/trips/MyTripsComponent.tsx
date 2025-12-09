@@ -1035,7 +1035,7 @@ function formatCurrency(amount: number) {
 function isUpcoming(booking: Booking) {
   const startDate = new Date(booking.startDate);
   const now = new Date();
-  return booking.paymentStatus === 'FULLY_PAID' && startDate > now;
+  return ['FULLY_PAID', 'PARTIALLY_PAID'].includes(booking?.paymentStatus) && startDate > now;
 }
 
 // Empty State Component for My Trips
