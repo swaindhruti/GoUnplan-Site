@@ -490,7 +490,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   const isUpcomingTrip = isUpcoming(booking);
 
   const canCancelBooking = () => {
-    if (booking.paymentStatus !== 'FULLY_PAID') return false;
+    if (!['FULLY_PAID', 'PARTIALLY_PAID'].includes(booking?.paymentStatus ?? '')) return false;
 
     const now = new Date();
     const startDate = new Date(booking.startDate);
