@@ -26,7 +26,6 @@ export const TripCard = ({
   isSelected = false,
   isTripPage = true,
 }: TripCardProps) => {
-  // Helper function to format dates
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -36,21 +35,18 @@ export const TripCard = ({
     });
   };
 
-  // Calculate end date from start date + number of days
   const calculateEndDate = (startDate: string, noOfDays: number) => {
     const start = new Date(startDate);
     const end = new Date(start);
-    end.setDate(start.getDate() + noOfDays - 1); // Subtract 1 because if it's a 3-day trip starting Monday, it ends Wednesday
+    end.setDate(start.getDate() + noOfDays - 1);
     return end.toISOString();
   };
 
-  // Get formatted dates
   const startDate = trip.startDate ? formatDate(trip.startDate) : null;
   const endDate = trip.startDate
     ? formatDate(calculateEndDate(trip.startDate, trip.noOfDays))
     : null;
 
-  // Format gender preference for display
   const formatGenderPreference = (preference?: string) => {
     if (!preference) return null;
     const displayMap: Record<string, string> = {
@@ -62,7 +58,6 @@ export const TripCard = ({
     return displayMap[preference] || preference;
   };
 
-  // Get color for gender preference badge
   const getGenderPreferenceColor = (preference?: string) => {
     const colorMap: Record<string, string> = {
       MALE: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -92,6 +87,25 @@ export const TripCard = ({
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <div className=" absolute  w-full bottom-0 p-2 bg-white/40 backdrop-blur-lg">
+          <div className="flex justify-center items-center gap-2">
+            <div className="border-black text-xs text-black/80 font-roboto">
+              <div>hosted by:</div>
+              <div className="text-black">{trip?.host?.user.name || ''}</div>
+            </div>
+            <div className="relative h-12 w-12 rounded-full">
+              <Image
+                src={
+                  trip.host?.user.image ||
+                  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+                }
+                alt={trip.title}
+                fill
+                className="object-cover rounded-full transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          </div>
+        </div>
         {isSelected && (
           <div className="absolute top-3 right-3 bg-purple-600 text-white rounded-full p-1 shadow-md">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
