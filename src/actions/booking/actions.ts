@@ -410,38 +410,111 @@ export const cancelBooking = async (bookingId: string) => {
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { partialPayments: true, travelPlan: { include: { host: true } } },
+      include: {
+        partialPayments: true,
+        travelPlan: { include: { host: true } },
+      },
     });
 
-    if (!booking || booking.userId !== session.user.id) return { error: 'Unauthorized' };
+    if (!booking || booking.userId !== session.user.id) {
+      return { error: 'Unauthorized' };
+    }
 
-    if (booking.paymentStatus === 'CANCELLED') return { error: 'Booking is already cancelled' };
-    if (booking.paymentStatus === 'REFUNDED') return { error: 'Cannot cancel a refunded booking' };
+    if (booking.paymentStatus === 'CANCELLED') {
+      return { error: 'Booking is already cancelled' };
+    }
+
+    if (booking.paymentStatus === 'REFUNDED') {
+      return { error: 'Cannot cancel a refunded booking' };
+    }
 
     const now = new Date();
+    const bookingDate = new Date(booking.createdAt);
     const startDate = new Date(booking.startDate);
-    const daysUntilTrip = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const daysFromBookingToTrip = Math.ceil(
+      (startDate.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
-    if (daysUntilTrip < 4) {
-      return {
-        error: 'Cancellation not allowed less than 4 days prior to the trip',
-      };
-    }
+    const daysUntilTrip = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const isFullPayment = booking.amountPaid >= booking.totalPrice;
+    const isPartialPayment = !isFullPayment && daysFromBookingToTrip > 20;
 
     let refundAmount = 0;
     let refundPercentage = 0;
+    let policyApplied = '';
 
-    if (daysUntilTrip >= 30) {
-      refundPercentage = 1.0;
-    } else if (daysUntilTrip >= 14) {
-      refundPercentage = 0.8;
-    } else if (daysUntilTrip >= 7) {
-      refundPercentage = 0.5;
-    } else if (daysUntilTrip >= 4) {
-      refundPercentage = 0.2;
+    if (isFullPayment) {
+      let freeCancellationDays = 0;
+
+      if (daysFromBookingToTrip > 40) {
+        freeCancellationDays = 10;
+      } else if (daysFromBookingToTrip >= 20 && daysFromBookingToTrip <= 40) {
+        freeCancellationDays = 7;
+      }
+
+      const daysFromBooking = Math.ceil(
+        (now.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (freeCancellationDays > 0 && daysFromBooking <= freeCancellationDays) {
+        refundPercentage = 1.0;
+        policyApplied = `Full refund (within ${freeCancellationDays}-day free cancellation window)`;
+      } else {
+        if (daysUntilTrip >= 15 && daysUntilTrip <= 20) {
+          refundPercentage = 0.5;
+          policyApplied = 'Cancellation 15-20 days before trip';
+        } else if (daysUntilTrip < 15) {
+          refundPercentage = 0;
+          policyApplied = 'Cancellation less than 15 days before trip';
+        } else {
+          refundPercentage = 0.5;
+          policyApplied = 'Standard cancellation policy';
+        }
+      }
+    } else if (isPartialPayment) {
+      const partialPaymentAmount = booking.amountPaid;
+      const daysFromBooking = Math.ceil(
+        (now.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysFromBooking <= 7) {
+        const hasRemainingPayment = booking.amountPaid >= booking.totalPrice;
+
+        if (hasRemainingPayment) {
+          if (daysUntilTrip >= 15 && daysUntilTrip <= 20) {
+            refundPercentage = 0.5;
+            refundAmount = Math.floor(booking.totalPrice * refundPercentage);
+            policyApplied = 'Cancellation after full payment (15-20 days before trip)';
+          } else if (daysUntilTrip < 15) {
+            refundPercentage = 0;
+            refundAmount = 0;
+            policyApplied = 'Cancellation after full payment (less than 15 days)';
+          }
+        } else {
+          refundPercentage = 1.0;
+          refundAmount = Math.floor(partialPaymentAmount);
+          policyApplied = 'Cancellation within 7 days of partial payment';
+        }
+      } else {
+        if (daysUntilTrip >= 15) {
+          refundPercentage = 0.5;
+          refundAmount = Math.floor(booking.totalPrice * refundPercentage);
+          policyApplied = 'Cancellation 15+ days before trip';
+        } else {
+          refundPercentage = 0;
+          refundAmount = 0;
+          policyApplied = 'Cancellation less than 15 days before trip';
+        }
+      }
+    } else {
+      return {
+        error:
+          'Partial payment bookings are only available for trips booked more than 20 days in advance',
+      };
     }
 
-    refundAmount = Math.floor(booking.amountPaid * refundPercentage);
+    if (refundAmount === 0 && refundPercentage > 0) {
+      refundAmount = Math.floor(booking.amountPaid * refundPercentage);
+    }
 
     const updatedBooking = await prisma.$transaction(async tx => {
       const currentBooking = await tx.booking.findUnique({
@@ -462,12 +535,13 @@ export const cancelBooking = async (bookingId: string) => {
         });
       }
 
+      // Update booking status
       return await tx.booking.update({
         where: { id: bookingId },
         data: {
           cancelledAt: new Date(),
           refundAmount,
-          paymentStatus: refundAmount > 0 ? 'CANCELLED' : booking.paymentStatus,
+          paymentStatus: 'CANCELLED',
         },
       });
     });
@@ -480,7 +554,6 @@ export const cancelBooking = async (bookingId: string) => {
         },
       },
     });
-
     revalidatePath('/my-trips');
     revalidatePath(`/booking/${booking.travelPlanId}`);
 
@@ -492,6 +565,8 @@ export const cancelBooking = async (bookingId: string) => {
         bookingId: booking.id,
         travelName: booking.travelPlanId,
         refundAmount,
+        refundPercentage: Math.round(refundPercentage * 100),
+        policyApplied,
       },
     });
 
@@ -503,6 +578,8 @@ export const cancelBooking = async (bookingId: string) => {
         bookingId: booking.id,
         travelName: booking.travelPlanId,
         refundAmount,
+        refundPercentage: Math.round(refundPercentage * 100),
+        policyApplied,
       },
     });
 
@@ -511,12 +588,13 @@ export const cancelBooking = async (bookingId: string) => {
       booking: updatedBooking,
       refundAmount,
       refundPercentage: Math.round(refundPercentage * 100),
+      policyApplied,
       message:
         refundAmount > 0
-          ? `Booking cancelled. Refund of ${refundAmount} (${Math.round(
+          ? `Booking cancelled successfully. Refund of ₹${refundAmount} (${Math.round(
               refundPercentage * 100
-            )}%) will be processed.`
-          : 'Booking cancelled successfully.',
+            )}%) will be processed. Policy: ${policyApplied}`
+          : `Booking cancelled. No refund available. Policy: ${policyApplied}`,
     };
   } catch (error) {
     console.error('Error cancelling booking:', error);

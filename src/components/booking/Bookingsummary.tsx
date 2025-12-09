@@ -449,8 +449,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                               </h4>
                               <div className="space-y-2 text-sm text-red-700 font-instrument">
                                 <p>
-                                  • Your refund of{' '}
-                                  <strong>{formatCurrency(paymentBreakdown.total)}</strong> is being
+                                  • Your refund of <strong>{booking.refundAmount}</strong> is being
                                   processed
                                 </p>
                                 <p>• Amount will be credited to your original payment method</p>
@@ -477,7 +476,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                                   Refund Amount:
                                 </span>
                                 <span className="text-lg font-bold text-red-600 font-instrument">
-                                  {formatCurrency(paymentBreakdown.total)}
+                                  {booking.refundAmount}
                                 </span>
                               </div>
                             </div>
@@ -487,39 +486,157 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                         {/* Refund policy table */}
                         <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4">
                           <h4 className="text-sm font-semibold text-gray-800 mb-3 font-instrument">
-                            Refund Policy (time before trip)
+                            Cancellation & Refund Policy
                           </h4>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                              <thead>
-                                <tr className="text-gray-600">
-                                  <th className="py-2 px-3">Days before trip</th>
-                                  <th className="py-2 px-3">Refund</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="border-t">
-                                  <td className="py-2 px-3">30 days or more</td>
-                                  <td className="py-2 px-3 font-medium">100% refund</td>
-                                </tr>
-                                <tr className="border-t bg-gray-50">
-                                  <td className="py-2 px-3">14 - 29 days</td>
-                                  <td className="py-2 px-3 font-medium">75% refund</td>
-                                </tr>
-                                <tr className="border-t">
-                                  <td className="py-2 px-3">7 - 13 days</td>
-                                  <td className="py-2 px-3 font-medium">50% refund</td>
-                                </tr>
-                                <tr className="border-t bg-gray-50">
-                                  <td className="py-2 px-3">4 - 6 days</td>
-                                  <td className="py-2 px-3 font-medium">30% refund</td>
-                                </tr>
-                                <tr className="border-t">
-                                  <td className="py-2 px-3">&lt; 4 days</td>
-                                  <td className="py-2 px-3 font-medium">No refund</td>
-                                </tr>
-                              </tbody>
-                            </table>
+
+                          {/* Part A: Full Payment Bookings */}
+                          <div className="mb-6">
+                            <h5 className="text-xs font-semibold text-gray-700 mb-2 bg-yellow-50 px-2 py-1 rounded">
+                              Part A: Full Payment Bookings
+                            </h5>
+
+                            <p className="text-xs text-gray-600 mb-3">
+                              Free cancellation window (100% refund):
+                            </p>
+
+                            <div className="overflow-x-auto mb-3">
+                              <table className="w-full text-xs text-left">
+                                <thead>
+                                  <tr className="text-gray-600 bg-blue-50">
+                                    <th className="py-2 px-3 font-medium">
+                                      Booking Made (Before Trip)
+                                    </th>
+                                    <th className="py-2 px-3 font-medium">
+                                      Free Cancellation Within
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3">More than 40 days</td>
+                                    <td className="py-2 px-3 font-medium text-green-600">
+                                      10 days of booking
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t bg-gray-50">
+                                    <td className="py-2 px-3">20 - 40 days</td>
+                                    <td className="py-2 px-3 font-medium text-green-600">
+                                      7 days of booking
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3">15 - 20 days</td>
+                                    <td className="py-2 px-3 font-medium text-gray-500">
+                                      No free cancellation
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+
+                            <p className="text-xs text-gray-600 mb-2">
+                              After free cancellation window:
+                            </p>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs text-left">
+                                <thead>
+                                  <tr className="text-gray-600 bg-blue-50">
+                                    <th className="py-2 px-3 font-medium">
+                                      Cancellation (Before Trip)
+                                    </th>
+                                    <th className="py-2 px-3 font-medium">Refund Amount</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3">15 - 20 days</td>
+                                    <td className="py-2 px-3 font-medium text-orange-600">50%</td>
+                                  </tr>
+                                  <tr className="border-t bg-gray-50">
+                                    <td className="py-2 px-3">Less than 15 days</td>
+                                    <td className="py-2 px-3 font-medium text-red-600">
+                                      0% (No Refund)
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
+                          {/* Part B: Partial Payment Bookings */}
+                          <div>
+                            <h5 className="text-xs font-semibold text-gray-700 mb-2 bg-yellow-50 px-2 py-1 rounded">
+                              Part B: Partial Payment Bookings
+                            </h5>
+
+                            <p className="text-xs text-gray-600 mb-3 italic">
+                              Only available for trips booked more than 20 days in advance
+                            </p>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs text-left">
+                                <thead>
+                                  <tr className="text-gray-600 bg-blue-50">
+                                    <th className="py-2 px-3 font-medium">Step</th>
+                                    <th className="py-2 px-3 font-medium">Action</th>
+                                    <th className="py-2 px-3 font-medium">Refund Details</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3 font-medium">1. Initial Booking</td>
+                                    <td className="py-2 px-3">Make partial payment</td>
+                                    <td className="py-2 px-3 text-gray-600">
+                                      Spot held for 7 days
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t bg-gray-50">
+                                    <td className="py-2 px-3 font-medium" rowSpan={3}>
+                                      2. Within 7 Days
+                                    </td>
+                                    <td className="py-2 px-3">A) Pay remaining balance</td>
+                                    <td className="py-2 px-3 text-green-600">Booking confirmed</td>
+                                  </tr>
+                                  <tr className="border-t bg-gray-50">
+                                    <td className="py-2 px-3">B) Cancel booking</td>
+                                    <td className="py-2 px-3 font-medium text-green-600">
+                                      100% refund
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t bg-gray-50">
+                                    <td className="py-2 px-3">C) Take no action</td>
+                                    <td className="py-2 px-3 font-medium text-orange-600">
+                                      Auto-cancel, 50% refund
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3 font-medium" rowSpan={2}>
+                                      3. After Full Payment
+                                    </td>
+                                    <td className="py-2 px-3">A) Cancel 15+ days before</td>
+                                    <td className="py-2 px-3 font-medium text-orange-600">
+                                      50% refund
+                                    </td>
+                                  </tr>
+                                  <tr className="border-t">
+                                    <td className="py-2 px-3">B) Cancel &lt;15 days before</td>
+                                    <td className="py-2 px-3 font-medium text-red-600">
+                                      0% refund
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
+                          {/* Host Cancellation */}
+                          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p className="text-xs text-green-800">
+                              <span className="font-semibold">Host Cancellations:</span> If we
+                              cancel your trip, you'll receive a full refund for the cancelled
+                              portion.
+                            </p>
                           </div>
                         </div>
                         {/* end refund policy table */}
