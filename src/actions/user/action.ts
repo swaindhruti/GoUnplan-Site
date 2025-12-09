@@ -524,6 +524,7 @@ export const getAllActiveTrips = async () => {
           gte: currentDate,
         },
       },
+
       select: {
         travelPlanId: true,
         title: true,
@@ -544,6 +545,11 @@ export const getAllActiveTrips = async () => {
         averageRating: true,
         reviewCount: true,
         genderPreference: true,
+        host: {
+          select: {
+            user: true,
+          },
+        },
         bookings: {
           where: {
             paymentStatus: { in: ['PARTIALLY_PAID', 'FULLY_PAID'] },

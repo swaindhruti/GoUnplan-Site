@@ -1,3 +1,5 @@
+import { HostProfile } from './booking';
+
 export type RawTrip = {
   travelPlanId: string;
   title: string;
@@ -33,6 +35,7 @@ export type Trip = {
   createdAt: string | Date;
   languages: string[];
   filters: string[];
+  host?: HostProfile;
   vibes: string[];
   tripImage: string;
   maxParticipants?: number;

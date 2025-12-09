@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Calendar,
   MapPin,
@@ -46,6 +46,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const isCancelled = booking?.paymentStatus === 'CANCELLED';
+    const [showCancelModal, setShowCancelModal] = useState(false);
 
     const formatDate = useCallback((dateString: Date | string | undefined | null): string => {
       if (!dateString) return 'N/A';
@@ -55,8 +56,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         day: 'numeric',
       });
     }, []);
-    if (!booking) return null;
-    const [showCancelModal, setShowCancelModal] = React.useState(false);
 
     const formatCurrency = useCallback((amount: number | undefined | null): string => {
       if (!amount) return '₹0';
@@ -74,24 +73,6 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
         (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
       );
       return daysUntilTrip >= 4;
-    };
-
-    const getDaysUntilTrip = () => {
-      const now = new Date();
-      const tripDate = new Date(booking.startDate || '');
-      return Math.ceil((tripDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    };
-    const getDaysFromBooking = () => {
-      const now = new Date();
-      const bookingDate = new Date(booking.createdAt || '');
-      return Math.ceil((now.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
-    };
-
-    // Helper function to get days from booking to trip
-    const getDaysFromBookingToTrip = () => {
-      const bookingDate = new Date(booking.createdAt || '');
-      const tripDate = new Date(booking.startDate || '');
-      return Math.ceil((tripDate.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
     };
 
     const calculateRefundAmount = () => {
@@ -297,6 +278,24 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
               : ''
         }`
       );
+    };
+    if (!booking) return null;
+    const getDaysUntilTrip = () => {
+      const now = new Date();
+      const tripDate = new Date(booking.startDate || '');
+      return Math.ceil((tripDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    };
+    const getDaysFromBooking = () => {
+      const now = new Date();
+      const bookingDate = new Date(booking.createdAt || '');
+      return Math.ceil((now.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
+    };
+
+    // Helper function to get days from booking to trip
+    const getDaysFromBookingToTrip = () => {
+      const bookingDate = new Date(booking.createdAt || '');
+      const tripDate = new Date(booking.startDate || '');
+      return Math.ceil((tripDate.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
     };
 
     if (loading) {
@@ -608,7 +607,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     size="sm"
                     variant="outline"
                     onClick={handleOpenCancelModal}
-                    className=" border-red-300 text-red-600 hover:bg-red-50 font-instrument"
+                    className="mt-5 border-red-300 text-red-600 hover:bg-red-50 font-instrument"
                   >
                     <XCircle className="h-3 w-3 mr-1" />
                     Cancel Booking
@@ -971,7 +970,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                     <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                       <p className="text-xs text-green-800">
                         <span className="font-semibold">Host Cancellations:</span> If we cancel your
-                        trip, you'll receive a full refund for the cancelled portion.
+                        trip, you&apos;ll receive a full refund for the cancelled portion.
                       </p>
                     </div>
                   </div>
@@ -1172,7 +1171,7 @@ const BookingSummary: React.FC<BookingSummaryProps> = React.memo(
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-xs text-green-800">
                     <span className="font-semibold">Host Cancellations:</span> If we cancel your
-                    trip, you'll receive a full refund for the cancelled portion.
+                    trip, you&apos;ll receive a full refund for the cancelled portion.
                   </p>
                 </div>
               </div>
