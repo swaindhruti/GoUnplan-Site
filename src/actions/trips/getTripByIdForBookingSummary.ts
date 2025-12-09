@@ -32,6 +32,7 @@ export const getTripById = async (tripId: string, bookingId: string) => {
         startDate: true,
         endDate: true,
         totalPrice: true,
+
         participants: true,
         status: true,
         pricePerPerson: true,

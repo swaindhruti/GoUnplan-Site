@@ -490,7 +490,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   const isUpcomingTrip = isUpcoming(booking);
 
   const canCancelBooking = () => {
-    if (booking.paymentStatus !== 'FULLY_PAID') return false;
+    if (!['FULLY_PAID', 'PARTIALLY_PAID'].includes(booking?.paymentStatus ?? '')) return false;
 
     const now = new Date();
     const startDate = new Date(booking.startDate);
@@ -498,29 +498,127 @@ function BookingCard({ booking }: { booking: Booking }) {
     return daysUntilTrip >= 4;
   };
 
+  const getDaysFromBooking = () => {
+    const now = new Date();
+    const bookingDate = new Date(booking.createdAt);
+    return Math.ceil((now.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  // Helper function to get days from booking to trip
+  const getDaysFromBookingToTrip = () => {
+    const bookingDate = new Date(booking.createdAt);
+    const tripDate = new Date(booking.startDate);
+    return Math.ceil((tripDate.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  // Your existing function (keep this)
   const getDaysUntilTrip = () => {
     const now = new Date();
-    const startDate = new Date(booking.startDate);
-    return Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const tripDate = new Date(booking.startDate);
+    return Math.ceil((tripDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   };
 
   const calculateRefundAmount = () => {
     const daysUntilTrip = getDaysUntilTrip();
-    let refundPercentage = 0;
+    const daysFromBooking = getDaysFromBooking(); // You'll need to add this function
+    const daysFromBookingToTrip = getDaysFromBookingToTrip(); // Calculate trip booking advance time
 
-    if (daysUntilTrip >= 30) {
-      refundPercentage = 1.0;
-    } else if (daysUntilTrip >= 14) {
-      refundPercentage = 0.8;
-    } else if (daysUntilTrip >= 7) {
-      refundPercentage = 0.5;
-    } else if (daysUntilTrip >= 4) {
-      refundPercentage = 0.2;
+    let refundPercentage = 0;
+    let refundAmount = 0;
+    let policyMessage = '';
+
+    // Determine if this is full payment or partial payment
+    if (!booking.amountPaid) {
+      return null;
+    }
+    const isFullPayment = booking?.amountPaid >= booking.totalPrice;
+    const isPartialPayment = !isFullPayment && daysFromBookingToTrip > 20;
+
+    if (isFullPayment) {
+      // PART A: Full Payment Bookings
+
+      // Determine free cancellation window based on when booking was made
+      let freeCancellationDays = 0;
+
+      if (daysFromBookingToTrip > 40) {
+        freeCancellationDays = 10;
+      } else if (daysFromBookingToTrip >= 20 && daysFromBookingToTrip <= 40) {
+        freeCancellationDays = 7;
+      }
+      // No free cancellation if booked 15-20 days before trip
+
+      // Check if within free cancellation window
+      if (freeCancellationDays > 0 && daysFromBooking <= freeCancellationDays) {
+        refundPercentage = 1.0;
+        refundAmount = booking.amountPaid;
+        policyMessage = `Full refund - You're within the ${freeCancellationDays}-day free cancellation window`;
+      }
+      // After free cancellation window
+      else {
+        if (daysUntilTrip >= 15 && daysUntilTrip <= 20) {
+          refundPercentage = 0.5;
+          refundAmount = Math.floor(booking.amountPaid * 0.5);
+          policyMessage = '50% refund - Cancellation 15-20 days before trip';
+        } else if (daysUntilTrip < 15) {
+          refundPercentage = 0;
+          refundAmount = 0;
+          policyMessage = 'No refund - Cancellation less than 15 days before trip';
+        } else {
+          // More than 20 days, but outside free cancellation window
+          refundPercentage = 0.5;
+          refundAmount = Math.floor(booking.amountPaid * 0.5);
+          policyMessage = '50% refund - Standard cancellation policy applies';
+        }
+      }
+    } else if (isPartialPayment) {
+      // PART B: Partial Payment Bookings
+
+      // Within 7 days of booking
+      if (daysFromBooking <= 7) {
+        // Check if full payment has been made
+        if (booking.amountPaid >= booking.totalPrice) {
+          // Full payment completed - apply full payment rules
+          if (daysUntilTrip >= 15 && daysUntilTrip <= 20) {
+            refundPercentage = 0.5;
+            refundAmount = Math.floor(booking.totalPrice * 0.5);
+            policyMessage = '50% refund - Cancellation after full payment (15-20 days before trip)';
+          } else if (daysUntilTrip < 15) {
+            refundPercentage = 0;
+            refundAmount = 0;
+            policyMessage = 'No refund - Cancellation after full payment (less than 15 days)';
+          }
+        } else {
+          // Still in partial payment state
+          refundPercentage = 1.0;
+          refundAmount = booking.amountPaid;
+          policyMessage = `Full refund of partial payment - You're within 7 days of booking`;
+        }
+      }
+      // After 7 days from booking
+      else {
+        if (daysUntilTrip >= 15) {
+          refundPercentage = 0.5;
+          refundAmount = Math.floor(booking.totalPrice * 0.5);
+          policyMessage = '50% refund - Cancellation 15+ days before trip';
+        } else {
+          refundPercentage = 0;
+          refundAmount = 0;
+          policyMessage = 'No refund - Cancellation less than 15 days before trip';
+        }
+      }
+    } else {
+      // Booking made less than 20 days in advance with partial payment
+      policyMessage =
+        'Partial payment bookings are only available for trips booked more than 20 days in advance';
+      refundPercentage = 0;
+      refundAmount = 0;
     }
 
     return {
-      refundAmount: Math.floor((booking.amountPaid || booking.totalPrice) * refundPercentage),
+      refundAmount,
       refundPercentage: Math.round(refundPercentage * 100),
+      policyMessage,
+      canCancel: daysUntilTrip > 0,
     };
   };
 
@@ -698,7 +796,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 
       {/* Cancellation Confirmation Modal */}
       <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md py-10 h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600 font-bricolage">
               <AlertTriangle className="h-5 w-5" />
@@ -739,12 +837,13 @@ function BookingCard({ booking }: { booking: Booking }) {
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   <span>
                     <strong>
-                      {calculateRefundAmount().refundPercentage === 100
+                      {calculateRefundAmount()?.refundPercentage === 100
                         ? 'Full refund'
-                        : `${calculateRefundAmount().refundPercentage}% refund`}
+                        : `${calculateRefundAmount()?.refundPercentage}% refund`}
                       :
                     </strong>{' '}
-                    {formatCurrency(calculateRefundAmount().refundAmount)}
+                    {calculateRefundAmount()?.refundAmount &&
+                      formatCurrency(calculateRefundAmount()?.refundAmount || 0)}
                   </span>
                 </div>
                 <div className="mt-1 text-green-700">
@@ -756,39 +855,134 @@ function BookingCard({ booking }: { booking: Booking }) {
             {/* Refund policy table - placed at bottom of the cancel modal content */}
             <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4">
               <h4 className="text-sm font-semibold text-gray-800 mb-3 font-instrument">
-                Refund Policy (time before trip)
+                Cancellation & Refund Policy
               </h4>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="text-gray-600">
-                      <th className="py-2 px-3">Days before trip</th>
-                      <th className="py-2 px-3">Refund</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-t">
-                      <td className="py-2 px-3">30 days or more</td>
-                      <td className="py-2 px-3 font-medium">100% refund</td>
-                    </tr>
-                    <tr className="border-t bg-gray-50">
-                      <td className="py-2 px-3">14 - 29 days</td>
-                      <td className="py-2 px-3 font-medium">80% refund</td>
-                    </tr>
-                    <tr className="border-t">
-                      <td className="py-2 px-3">7 - 13 days</td>
-                      <td className="py-2 px-3 font-medium">50% refund</td>
-                    </tr>
-                    <tr className="border-t bg-gray-50">
-                      <td className="py-2 px-3">4 - 6 days</td>
-                      <td className="py-2 px-3 font-medium">20% refund</td>
-                    </tr>
-                    <tr className="border-t">
-                      <td className="py-2 px-3">&lt; 4 days</td>
-                      <td className="py-2 px-3 font-medium">No refund</td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              {/* Part A: Full Payment Bookings */}
+              <div className="mb-6">
+                <h5 className="text-xs font-semibold text-gray-700 mb-2 bg-yellow-50 px-2 py-1 rounded">
+                  Part A: Full Payment Bookings
+                </h5>
+
+                <p className="text-xs text-gray-600 mb-3">
+                  Free cancellation window (100% refund):
+                </p>
+
+                <div className="overflow-x-auto mb-3">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="text-gray-600 bg-blue-50">
+                        <th className="py-2 px-3 font-medium">Booking Made (Before Trip)</th>
+                        <th className="py-2 px-3 font-medium">Free Cancellation Within</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="py-2 px-3">More than 40 days</td>
+                        <td className="py-2 px-3 font-medium text-green-600">10 days of booking</td>
+                      </tr>
+                      <tr className="border-t bg-gray-50">
+                        <td className="py-2 px-3">20 - 40 days</td>
+                        <td className="py-2 px-3 font-medium text-green-600">7 days of booking</td>
+                      </tr>
+                      <tr className="border-t">
+                        <td className="py-2 px-3">15 - 20 days</td>
+                        <td className="py-2 px-3 font-medium text-gray-500">
+                          No free cancellation
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className="text-xs text-gray-600 mb-2">After free cancellation window:</p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="text-gray-600 bg-blue-50">
+                        <th className="py-2 px-3 font-medium">Cancellation (Before Trip)</th>
+                        <th className="py-2 px-3 font-medium">Refund Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="py-2 px-3">15 - 20 days</td>
+                        <td className="py-2 px-3 font-medium text-orange-600">50%</td>
+                      </tr>
+                      <tr className="border-t bg-gray-50">
+                        <td className="py-2 px-3">Less than 15 days</td>
+                        <td className="py-2 px-3 font-medium text-red-600">0% (No Refund)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Part B: Partial Payment Bookings */}
+              <div>
+                <h5 className="text-xs font-semibold text-gray-700 mb-2 bg-yellow-50 px-2 py-1 rounded">
+                  Part B: Partial Payment Bookings
+                </h5>
+
+                <p className="text-xs text-gray-600 mb-3 italic">
+                  Only available for trips booked more than 20 days in advance
+                </p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="text-gray-600 bg-blue-50">
+                        <th className="py-2 px-3 font-medium">Step</th>
+                        <th className="py-2 px-3 font-medium">Action</th>
+                        <th className="py-2 px-3 font-medium">Refund Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="py-2 px-3 font-medium">1. Initial Booking</td>
+                        <td className="py-2 px-3">Make partial payment</td>
+                        <td className="py-2 px-3 text-gray-600">Spot held for 7 days</td>
+                      </tr>
+                      <tr className="border-t bg-gray-50">
+                        <td className="py-2 px-3 font-medium" rowSpan={3}>
+                          2. Within 7 Days
+                        </td>
+                        <td className="py-2 px-3">A) Pay remaining balance</td>
+                        <td className="py-2 px-3 text-green-600">Booking confirmed</td>
+                      </tr>
+                      <tr className="border-t bg-gray-50">
+                        <td className="py-2 px-3">B) Cancel booking</td>
+                        <td className="py-2 px-3 font-medium text-green-600">100% refund</td>
+                      </tr>
+                      <tr className="border-t bg-gray-50">
+                        <td className="py-2 px-3">C) Take no action</td>
+                        <td className="py-2 px-3 font-medium text-orange-600">
+                          Auto-cancel, 50% refund
+                        </td>
+                      </tr>
+                      <tr className="border-t">
+                        <td className="py-2 px-3 font-medium" rowSpan={2}>
+                          3. After Full Payment
+                        </td>
+                        <td className="py-2 px-3">A) Cancel 15+ days before</td>
+                        <td className="py-2 px-3 font-medium text-orange-600">50% refund</td>
+                      </tr>
+                      <tr className="border-t">
+                        <td className="py-2 px-3">B) Cancel &lt;15 days before</td>
+                        <td className="py-2 px-3 font-medium text-red-600">0% refund</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Host Cancellation */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-800">
+                  <span className="font-semibold">Host Cancellations:</span> If we cancel your trip,
+                  you'll receive a full refund for the cancelled portion.
+                </p>
               </div>
             </div>
           </div>

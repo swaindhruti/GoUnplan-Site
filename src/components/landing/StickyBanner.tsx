@@ -1,3 +1,4 @@
+'use client';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -32,7 +33,7 @@ export const StickyBanner = () => {
 
   return (
     <div
-      className={`fixed bottom-0 z-50 bg-purple-50 w-screen flex justify-center gap-3 items-center text-sm text-black text-center py-2 px-4 shadow-lg transition-transform duration-300 ${
+      className={`z-50 bg-purple-50 w-screen flex justify-center gap-3 items-center text-sm text-black text-center py-2 px-4 shadow-lg transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
