@@ -9,6 +9,7 @@ import { PrimaryButton } from './common';
 import type { Trip } from '@/actions/trips/getHostTripsServer';
 import Image from 'next/image';
 import { Calendar, ChevronDown } from 'lucide-react';
+import { HostProfile } from '@/types/booking';
 
 // Constants
 const DEBOUNCE_DELAY = 300;
@@ -82,6 +83,7 @@ interface tripDestinationWithInfoProps {
     title: string | null;
     description: string | null;
     image: string | null;
+    host?: HostProfile;
   }[];
 }
 
@@ -553,6 +555,25 @@ export const FilterAndTrip = ({ tripDestinationWithInfo }: tripDestinationWithIn
                 alt={dest.title || ''}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              <div className=" absolute  w-full top-0 p-2 bg-white/40 backdrop-blur-lg">
+                <div className="flex justify-center items-center gap-2">
+                  <div className="border-black text-xs text-black/80 font-roboto">
+                    <div>hosted by:</div>
+                    <div className="text-black">{dest.host?.user.name || ''}</div>
+                  </div>
+                  <div className="relative h-12 w-12 rounded-full">
+                    <Image
+                      src={
+                        dest.host?.user.image ||
+                        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+                      }
+                      alt={dest.title || ''}
+                      fill
+                      className="object-cover rounded-full transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

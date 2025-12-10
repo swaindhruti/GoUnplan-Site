@@ -183,10 +183,10 @@ export default function ChatWindow({
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-gray-900 truncate">{otherUser.name}</h2>
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <p className="text-sm text-gray-600 font-medium">Active now</p>
-            </div>
+            </div> */}
           </div>
         </div>
         <Button
