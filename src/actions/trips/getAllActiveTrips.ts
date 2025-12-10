@@ -91,6 +91,7 @@ export const getAllActiveTrips = async () => {
         title: trip.title,
         description: trip.description,
         image: trip.tripImage,
+        host: trip.host,
       };
     });
 

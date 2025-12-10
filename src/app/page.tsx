@@ -24,6 +24,7 @@ export default async function Page() {
   const tripDestinationWithInfo = res?.TripDestinationWithInfo || [];
 
   console.log('Hosts on landing page:', hosts);
+  console.log('trip: ', tripDestinationWithInfo);
 
   return (
     <main className="min-h-screen ">

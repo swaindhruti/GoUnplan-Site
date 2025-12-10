@@ -64,7 +64,7 @@ export interface User {
   bio?: string | null;
   phone?: string | null;
   password?: string | null;
-  role: Role;
+  role?: Role;
   image?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -75,11 +75,11 @@ export interface HostProfile {
   hostId: string;
   description?: string | null;
   image?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   averageRating?: number | null;
-  hostEmail: string | null;
-  hostMobile: string | null;
+  hostEmail?: string | null;
+  hostMobile?: string | null;
   user: User;
 }
 

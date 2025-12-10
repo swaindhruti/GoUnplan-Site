@@ -387,7 +387,15 @@ export default async function TripDetailsPage({ params }: Props) {
                 {/* Host Profile - Compact Version */}
                 <div className="flex gap-3 items-start mb-3">
                   <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-purple-200 flex-shrink-0">
-                    <AvatarImage src={hostInfo.image} />
+                    <Image
+                      src={
+                        trip.host?.user.image ||
+                        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+                      }
+                      alt={trip.title}
+                      fill
+                      className="object-cover rounded-full transition-transform duration-500 group-hover:scale-105"
+                    />
                     <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-bold">
                       {hostInfo.name?.charAt(0).toUpperCase() ?? 'H'}
                     </AvatarFallback>
